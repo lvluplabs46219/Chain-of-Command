@@ -1,0 +1,53 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Auth helpers
+    function isSignedIn() { return request.auth != null; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    // Blueprint checks for Case
+    function isValidCase(data) {
+      return data.keys().hasOnly(['courtListenerId', 'caseName', 'court', 'dateFiled', 'docketNumber', 'status', 'updatedAt']) &&
+             data.courtListenerId is string && data.courtListenerId.size() <= 200 &&
+             data.caseName is string && data.caseName.size() <= 200 &&
+             (data.get('court', '') is string) && (data.get('dateFiled', '') is string) &&
+             (data.get('docketNumber', '') is string) && (data.get('status', '') is string) &&
+             (data.get('updatedAt', '') is string);
+    }
+
+    // Blueprint checks for DocketEntry
+    function isValidDocketEntry(data) {
+      return data.keys().hasOnly(['caseId', 'dateFiled', 'description', 'documentUrl']) &&
+             data.caseId is string && data.caseId.size() <= 200 &&
+             data.dateFiled is string && data.dateFiled.size() <= 100 &&
+             data.description is string && data.description.size() <= 1000 &&
+             (data.get('documentUrl', '') is string);
+    }
+
+    // cases collection
+    match /cases/{caseId} {
+      allow get: if isSignedIn() && isValidId(caseId);
+      allow list: if isSignedIn();
+      allow create: if false; // Only allow creation from server for migration
+      allow update: if false; // Only allow updates from server for migration
+      allow delete: if false; // Only allow deletion from server
+      
+      match /docketEntries/{entryId} {
+        allow get: if isSignedIn() && isValidId(entryId);
+        allow list: if isSignedIn();
+        allow create: if false; // Server-only
+        allow update: if false; // Server-only
+        allow delete: if false; // Server-only
+      }
+    }
+  }
+}

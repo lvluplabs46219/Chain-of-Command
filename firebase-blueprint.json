@@ -1,0 +1,67 @@
+{
+  "entities": {
+    "Case": {
+      "title": "Case",
+      "description": "A legal case from CourtListener.",
+      "type": "object",
+      "properties": {
+        "courtListenerId": {
+          "type": "string",
+          "description": "The unique ID from CourtListener"
+        },
+        "caseName": {
+          "type": "string",
+          "description": "The name of the case"
+        },
+        "court": {
+          "type": "string",
+          "description": "The court where the case was filed"
+        },
+        "dateFiled": {
+          "type": "string",
+          "description": "Date the case was filed (ISO string)"
+        },
+        "docketNumber": {
+          "type": "string",
+          "description": "The docket number"
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status of the case"
+        }
+      },
+      "required": ["courtListenerId", "caseName"]
+    },
+    "DocketEntry": {
+      "title": "Docket Entry",
+      "description": "An entry in a case docket.",
+      "type": "object",
+      "properties": {
+        "caseId": {
+          "type": "string",
+          "description": "The parent case ID"
+        },
+        "dateFiled": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "documentUrl": {
+          "type": "string"
+        }
+      },
+      "required": ["caseId", "dateFiled", "description"]
+    }
+  },
+  "firestore": {
+    "cases/{caseId}": {
+      "schema": "Case",
+      "description": "Stores legal cases imported from CourtListener"
+    },
+    "cases/{caseId}/docketEntries/{entryId}": {
+      "schema": "DocketEntry",
+      "description": "Stores docket entries for a specific case"
+    }
+  }
+}

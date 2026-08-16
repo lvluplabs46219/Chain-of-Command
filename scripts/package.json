@@ -1,0 +1,18 @@
+{
+  "name": "@workspace/scripts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "ingest": "tsx ./src/ingest_courtlistener.ts",
+    "ingest:docket": "tsx ./ingest_courtlistener_docket.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.21.0"
+  },
+  "dependencies": {
+    "@workspace/db": "*"
+  }
+}

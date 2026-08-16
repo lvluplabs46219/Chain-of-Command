@@ -1,0 +1,54 @@
+Yes — partially, but not the actual production database.
+
+What we have right now is:
+
+* PostgreSQL/Supabase → intended as the actual transactional backend: users, cases, documents, agents, runs, RAG metadata, embeddings, permissions, etc.
+* IPFS → intended for content-addressed/static assets and potentially immutable legal-source documents, not as the primary relational database.
+* Court connectors → retrieve permitted case information into Acquit’s PostgreSQL-backed case workspace.
+* RAG → PostgreSQL + pgvector indexes the content for retrieval.
+* AI agents → operate against the PostgreSQL/RAG layer rather than directly against IPFS.
+
+The IPFS material you supplied earlier was specifically the Schema Studio deployment:
+
+Acquit Schema Studio
+        │
+        └── IPFS
+             ├── index.html
+             ├── css/style.css
+             ├── js/data.js
+             └── js/main.js
+
+That’s not the Acquit.ai production legal database.
+
+For the actual platform, I’d recommend this architecture:
+
+                    ACQUIT.AI
+                       │
+          ┌────────────┴────────────┐
+          │                         │
+     PostgreSQL                 IPFS / Object
+     + pgvector                 Content Storage
+          │                         │
+    ┌─────┼─────┐              ┌────┴────┐
+    │     │     │              │         │
+  Cases  RAG  Agents       Legal Docs  Evidence
+    │     │     │
+    └─────┼─────┘
+          │
+       AI TEAM
+          │
+   ┌──────┼─────────┐
+   │      │         │
+Lawyer  Paralegal  Custom Agents
+   │      │         │
+   └──────┼─────────┘
+          │
+      User Review
+          │
+    Court Connectors
+
+One important distinction: I would not put sensitive user case records, PII, privileged communications, or anything requiring deletion/access control directly onto a public IPFS network. IPFS is immutable/content-addressed by nature, which makes it a poor primary store for that kind of data.
+
+IPFS can be extremely useful for public legal authorities, immutable source snapshots, hashes/provenance, published datasets, and versioned artifacts, while PostgreSQL remains the authoritative application database.
+
+So if you’re asking whether I already made the Acquit.ai backend itself partially IPFS-based: no—not yet. The IPFS portion we discussed is the Schema Studio/static deployment architecture. The production backend I implemented is PostgreSQL-oriented.

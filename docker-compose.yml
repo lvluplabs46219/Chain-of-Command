@@ -1,0 +1,32 @@
+version: '3.9'
+services:
+  aquit:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/aquit?pgbouncer=true
+      PINATA_JWT: ${PINATA_JWT}
+      UNICOURT_API_KEY: ${UNICOURT_API_KEY} # Free trial covers Maricopa 85043
+      DOXPOP_API_KEY: ${DOXPOP_API_KEY} # $200/mo
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./data:/app/data # Screenshots + DOM + Video audit logs
+
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: aquit
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine # For Docket Monitor queue (polls every 6h)
+
+volumes:
+  pgdata:
