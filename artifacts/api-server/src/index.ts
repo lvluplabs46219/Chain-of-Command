@@ -182,6 +182,7 @@ export function verifyHumanGateToken(token: string, secret: string, expectedFili
 // 7. Express App Assembly & Security Config
 // ==========================================
 const app = express();
+app.set('trust proxy', 1);
 
 app.use(
   helmet({
@@ -190,8 +191,14 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", 'data:', 'https://*.supabase.co'],
-        connectSrc: ["'self'", 'https://*.supabase.co', 'https://api.openai.com'],
+        imgSrc: ["'self'", 'data:', 'https://*.supabase.co', 'https://*.googleusercontent.com'],
+        connectSrc: [
+          "'self'",
+          'https://*.supabase.co',
+          'https://api.openai.com',
+          'https://generativelanguage.googleapis.com',
+          'https://*.googleapis.com',
+        ],
         frameAncestors: ["'none'"],
         objectSrc: ["'none'"],
       },

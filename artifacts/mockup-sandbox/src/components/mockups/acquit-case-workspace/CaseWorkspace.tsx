@@ -35,6 +35,7 @@ import { AcquitAcademy } from "./AcquitAcademy";
 import { AILab } from "./AILab";
 import { SovereignCylinder } from "./SovereignCylinder";
 import { FilingCenter } from "./FilingCenter";
+import { GoogleWorkspaceIntegration } from "./GoogleWorkspaceIntegration";
 import { MOCK_RAG_MESSAGES, type LegalAuthority } from "./legalData";
 
 type IconType = typeof Scale;
@@ -42,6 +43,7 @@ type IconType = typeof Scale;
 const navItems: { label: string; icon: IconType }[] = [
   { label: "Case overview", icon: BriefcaseBusiness },
   { label: "AI Lab", icon: Sparkles },
+  { label: "Google Drive & Docs", icon: FileText },
   { label: "Find an attorney", icon: UserCheck },
   { label: "Timeline", icon: FolderOpen },
   { label: "Documents", icon: FileText },
@@ -130,25 +132,53 @@ export function CaseWorkspace() {
 
   const agents = [
     {
-      name: "Head Legal AI",
-      role: "Strategy & overview",
-      initials: "HL",
+      name: "Lead Counsel Coordinator",
+      role: "Strategy & Issue Synthesis",
+      initials: "LC",
       color: "bg-[#D4AF37] text-black",
-      note: "I have prepared 3 questions to ask your prospective attorney.",
+      note: "Synthesized 3 strategic lines of inquiry for discovery.",
     },
     {
       name: "Paralegal AI",
-      role: "Documents & timeline",
+      role: "Deadlines & Procedural Rules",
       initials: "PL",
       color: "bg-white/10 border border-white/20 text-white",
-      note: "Extracted 4 deadlines from the new police report.",
+      note: "Calculated 14-day statutory cutoff for omnibus hearing.",
     },
     {
-      name: "Research AI",
-      role: "Authorities & statutes",
-      initials: "RA",
+      name: "Investigator AI",
+      role: "Timeline & Fact Verification",
+      initials: "IN",
       color: "bg-white/10 border border-white/20 text-white",
-      note: "Found 2 binding precedents regarding suppression.",
+      note: "Cross-referenced dashcam timeline with patrol log.",
+    },
+    {
+      name: "Evidence Analyst AI",
+      role: "Chain of Custody & Hash Checks",
+      initials: "EA",
+      color: "bg-white/10 border border-white/20 text-white",
+      note: "Verified SHA-256 checksums across all 7 uploaded exhibits.",
+    },
+    {
+      name: "Court Preparation AI",
+      role: "Hearing Q&A & Advocacy",
+      initials: "CP",
+      color: "bg-white/10 border border-white/20 text-white",
+      note: "Formulated 5 judicial procedural questions for appearance.",
+    },
+    {
+      name: "Rights Checker AI",
+      role: "Constitutional & Miranda Audits",
+      initials: "RC",
+      color: "bg-white/10 border border-white/20 text-white",
+      note: "Audited initial stop duration against 4th Amendment standards.",
+    },
+    {
+      name: "Charge Explainer AI",
+      role: "Statutory Elements Breakdown",
+      initials: "CE",
+      color: "bg-white/10 border border-white/20 text-white",
+      note: "Broken down IC § 9-21-8-24 into clear required proof elements.",
     },
   ];
 
@@ -312,8 +342,20 @@ export function CaseWorkspace() {
             <div className="hidden sm:flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] font-bold tracking-widest text-white/50 backdrop-blur-md">
               <span className="text-[#D4AF37]">DOCKET:</span> {matters[0]?.caseNumber || "IN-MAR-24-0187"}
             </div>
-            <button               onClick={() => alert("Global search is coming soon!")}              className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-bold tracking-widest text-white/70 hover:bg-white/10 hover:text-white transition sm:flex"            >              <Search size={14} /> SEARCH            </button>
-            <button               onClick={() => alert("No new notifications")}              className="relative rounded-full p-2 text-white/60 hover:bg-white/10 transition"            >              <Bell size={18} />              <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#D4AF37]" />            </button>
+            <button 
+              onClick={() => setActiveNav("Law library")}
+              className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-bold tracking-widest text-white/70 hover:bg-white/10 hover:text-white transition sm:flex"
+            >
+              <Search size={14} /> SEARCH
+            </button>
+            <button 
+              onClick={() => setActiveNav("AI Lab")}
+              className="relative rounded-full p-2 text-white/60 hover:bg-white/10 transition"
+              title="Intelligence Notifications"
+            >
+              <Bell size={18} />
+              <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#D4AF37]" />
+            </button>
           </div>
         </header>
 
@@ -322,7 +364,13 @@ export function CaseWorkspace() {
             
 
             {/* Sub-routing */}
-            {activeNav === "AI Lab" ? (
+            {activeNav === "Google Drive & Docs" ? (
+              <GoogleWorkspaceIntegration
+                matterTitle="State of Indiana v. Alex Thompson"
+                caseNumber="IN-MAR-24-0187"
+                courtName="Marion County Superior Court, Criminal Division 3"
+              />
+            ) : activeNav === "AI Lab" ? (
               <AILab />
             ) : activeNav === "Find an attorney" ? (
               <AttorneyDirectory
@@ -423,7 +471,20 @@ export function CaseWorkspace() {
                           </p>
                         </div>
                       </div>
-                      <div className="flex flex-wrap gap-3 border-t border-white/10 pt-5">                        <button                           onClick={() => alert("Agenda review coming soon")}                          className="rounded-full bg-white px-5 py-2.5 text-[10px] font-bold tracking-widest text-black hover:bg-[#EFE6D0] transition"                        >                          REVIEW AGENDA                        </button>                        <button                           onClick={() => alert("Question generation coming soon")}                          className="rounded-full border border-white/20 bg-white/5 px-5 py-2.5 text-[10px] font-bold tracking-widest text-white hover:bg-white/10 transition"                        >                          GENERATE QUESTIONS                        </button>                      </div>
+                      <div className="flex flex-wrap gap-3 border-t border-white/10 pt-5">
+                        <button 
+                          onClick={() => setActiveNav("Timeline")}
+                          className="rounded-full bg-white px-5 py-2.5 text-[10px] font-bold tracking-widest text-black hover:bg-[#EFE6D0] transition cursor-pointer"
+                        >
+                          REVIEW AGENDA
+                        </button>
+                        <button 
+                          onClick={() => setActiveNav("AI Lab")}
+                          className="rounded-full border border-white/20 bg-white/5 px-5 py-2.5 text-[10px] font-bold tracking-widest text-white hover:bg-white/10 transition cursor-pointer"
+                        >
+                          GENERATE QUESTIONS
+                        </button>
+                      </div>
                     </section>
 
                     {/* AI Assessment */}
@@ -446,7 +507,15 @@ export function CaseWorkspace() {
                           <div className="mb-3 flex items-center gap-2 text-[11px] font-bold tracking-widest text-[#D4AF37]">
                             <BookOpen size={14} /> STATUTORY EXPOSURE
                           </div>
-                          <p className="text-xs leading-[1.6] text-white/70">                            You are charged under IC 35-43-2-1. This is a Level 6 felony carrying a potential sentence of 6 months to 2.5 years.                          </p>                          <button                             onClick={() => alert("Statute details coming soon")}                            className="mt-3 text-[10px] font-bold tracking-widest text-[#D4AF37] hover:text-white transition"                          >                            VIEW STATUTE DETAILS →                          </button>
+                          <p className="text-xs leading-[1.6] text-white/70">
+                            You are charged under IC 35-43-2-1. This is a Level 6 felony carrying a potential sentence of 6 months to 2.5 years.
+                          </p>
+                          <button 
+                            onClick={() => setActiveNav("Law library")}
+                            className="mt-3 text-[10px] font-bold tracking-widest text-[#D4AF37] hover:text-white transition cursor-pointer"
+                          >
+                            VIEW STATUTE DETAILS →
+                          </button>
                         </div>
                       </div>
                     </section>
@@ -465,7 +534,53 @@ export function CaseWorkspace() {
                             Your Legal Team
                           </h2>
                         </div>
-                        <button                           onClick={() => alert("Add agent coming soon")}                          className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 transition"                        >                          <Plus size={14} />                        </button>                      </div>                                            <div className="space-y-3">                        {agents.map((agent) => (                          <div                            key={agent.name}                            className="overflow-hidden rounded-[14px] border border-white/10 bg-black/40"                          >                            <button                              onClick={() =>                                setAgentOpen(agentOpen === agent.name ? null : agent.name)                              }                              className="flex w-full items-center gap-3 p-3 text-left hover:bg-white/5 transition"                            >                              <div                                className={`flex h-9 w-9 items-center justify-center rounded-[10px] text-[11px] font-bold ${agent.color}`}                              >                                {agent.initials}                              </div>                              <div className="min-w-0 flex-1">                                <p className="text-xs font-bold text-white">{agent.name}</p>                                <p className="mt-0.5 text-[10px] text-white/50">{agent.role}</p>                              </div>                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />                              {agentOpen === agent.name ? (                                <ChevronDown size={14} className="text-white/40" />                              ) : (                                <ChevronRight size={14} className="text-white/40" />                              )}                            </button>                            {agentOpen === agent.name && (                              <div className="border-t border-white/10 px-3 pb-3 pt-3 text-[11px] leading-[1.5] text-white/70">                                <span className="mr-2 font-bold text-[#D4AF37]">LATEST:</span>                                {agent.note}                                <button                                   onClick={() => alert(`Opening conversation with ${agent.name}`)}                                  className="mt-3 flex items-center gap-1 text-[10px] font-bold tracking-widest text-white hover:text-[#D4AF37] transition"                                >                                  OPEN CONVERSATION <ArrowRight size={12} />                                </button>
+                        <button 
+                          onClick={() => setActiveNav("AI Lab")}
+                          className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 transition cursor-pointer"
+                          title="Add Specialist Agent"
+                        >
+                          <Plus size={14} />
+                        </button>
+                      </div>
+
+                      <div className="space-y-3">
+                        {agents.map((agent) => (
+                          <div
+                            key={agent.name}
+                            className="overflow-hidden rounded-[14px] border border-white/10 bg-black/40"
+                          >
+                            <button
+                              onClick={() =>
+                                setAgentOpen(agentOpen === agent.name ? null : agent.name)
+                              }
+                              className="flex w-full items-center gap-3 p-3 text-left hover:bg-white/5 transition cursor-pointer"
+                            >
+                              <div
+                                className={`flex h-9 w-9 items-center justify-center rounded-[10px] text-[11px] font-bold ${agent.color}`}
+                              >
+                                {agent.initials}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-xs font-bold text-white">{agent.name}</p>
+                                <p className="mt-0.5 text-[10px] text-white/50">{agent.role}</p>
+                              </div>
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                              {agentOpen === agent.name ? (
+                                <ChevronDown size={14} className="text-white/40" />
+                              ) : (
+                                <ChevronRight size={14} className="text-white/40" />
+                              )}
+                            </button>
+                            {agentOpen === agent.name && (
+                              <div className="border-t border-white/10 px-3 pb-3 pt-3 text-[11px] leading-[1.5] text-white/70">
+                                <span className="mr-2 font-bold text-[#D4AF37]">LATEST:</span>
+                                {agent.note}
+                                <button 
+                                  onClick={() => setActiveNav("AI Lab")}
+                                  className="mt-3 flex items-center gap-1 text-[10px] font-bold tracking-widest text-white hover:text-[#D4AF37] transition cursor-pointer"
+                                >
+                                  OPEN CONVERSATION <ArrowRight size={12} />
+                                </button>
                               </div>
                             )}
                           </div>

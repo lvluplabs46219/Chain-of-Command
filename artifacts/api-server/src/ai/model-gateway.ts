@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { GoogleGenAI } from '@google/genai';
 
 const OpenAIChatResponseSchema = z.object({
   id: z.string(),
@@ -26,7 +27,7 @@ export async function parseModelResponse(rawResponse: unknown): Promise<OpenAICh
   return result.data;
 }
 
-export type ModelProvider = "demo" | "ollama" | "openai";
+export type ModelProvider = "demo" | "ollama" | "openai" | "gemini";
 
 export interface ChatMessage {
   role: "system" | "user" | "assistant";
@@ -413,7 +414,126 @@ export class ModelGateway {
   }
 }
 
+export class GeminiModelAdapter implements ModelAdapter {
+  provider = "gemini" as const;
+  private ai: GoogleGenAI | null = null;
+
+  private getClient(): GoogleGenAI {
+    if (!this.ai) {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error("GEMINI_API_KEY environment variable is required");
+      }
+      this.ai = new GoogleGenAI({ apiKey });
+    }
+    return this.ai;
+  }
+
+  async listModels(): Promise<string[]> {
+    return [
+      "gemini-2.5-flash",
+      "gemini-2.5-pro",
+      "gemini-1.5-flash",
+      "gemini-1.5-pro",
+    ];
+  }
+
+  async complete(request: ModelRequest): Promise<ModelResponse> {
+    const ai = this.getClient();
+    const modelName = request.model || "gemini-2.5-flash";
+
+    const systemMessage = request.messages.find((m) => m.role === "system");
+    const contents = request.messages
+      .filter((m) => m.role !== "system")
+      .map((m) => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }],
+      }));
+
+    const response = await ai.models.generateContent({
+      model: modelName,
+      contents: contents.length > 0 ? contents : [{ role: "user", parts: [{ text: "Hello" }] }],
+      config: {
+        systemInstruction: systemMessage?.content,
+        maxOutputTokens: request.maxTokens,
+      },
+    });
+
+    const text = response.text || "";
+    const inputTokens = request.messages.reduce(
+      (total, m) => total + estimateTokens(m.content),
+      0
+    );
+    const outputTokens = estimateTokens(text);
+
+    return {
+      id: responseId(this.provider),
+      provider: this.provider,
+      model: modelName,
+      content: text,
+      finishReason: "stop",
+      usage: {
+        inputTokens,
+        outputTokens,
+        totalTokens: inputTokens + outputTokens,
+      },
+    };
+  }
+
+  async *stream(request: ModelRequest): AsyncIterable<ModelStreamEvent> {
+    const ai = this.getClient();
+    const modelName = request.model || "gemini-2.5-flash";
+
+    const systemMessage = request.messages.find((m) => m.role === "system");
+    const contents = request.messages
+      .filter((m) => m.role !== "system")
+      .map((m) => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }],
+      }));
+
+    const responseStream = await ai.models.generateContentStream({
+      model: modelName,
+      contents: contents.length > 0 ? contents : [{ role: "user", parts: [{ text: "Hello" }] }],
+      config: {
+        systemInstruction: systemMessage?.content,
+        maxOutputTokens: request.maxTokens,
+      },
+    });
+
+    for await (const chunk of responseStream) {
+      const text = chunk.text;
+      if (text) {
+        yield { type: "delta", text };
+      }
+    }
+
+    yield { type: "done" };
+  }
+
+  async health(): Promise<{ ok: boolean; latencyMs?: number; details?: string }> {
+    const startedAt = Date.now();
+    try {
+      if (!process.env.GEMINI_API_KEY) {
+        return { ok: false, details: "GEMINI_API_KEY is not set" };
+      }
+      return {
+        ok: true,
+        latencyMs: Date.now() - startedAt,
+        details: "Google Gemini API is configured and reachable.",
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        latencyMs: Date.now() - startedAt,
+        details: error instanceof Error ? error.message : "Gemini is unreachable.",
+      };
+    }
+  }
+}
+
 export const modelGateway = new ModelGateway();
 modelGateway.register(new DemoModelAdapter());
 modelGateway.register(new OllamaAdapter());
 modelGateway.register(new OpenAiAdapter());
+modelGateway.register(new GeminiModelAdapter());

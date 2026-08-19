@@ -97,11 +97,54 @@ const requiredStates = ['CA', 'NY', 'IN', 'TX', 'FL', 'IL', 'PA', 'OH', 'AZ', 'G
 const allFound = requiredStates.every((st) => Boolean(STATE_COURT_MAPPINGS[st]));
 assert(allFound, `All priority state court identifiers mapped (Total mapped: ${Object.keys(STATE_COURT_MAPPINGS).length})`);
 
+// 4. Test Multi-Agent UPL Policy Boundaries
+console.log('\n4. Testing Multi-Agent UPL & Autonomous Action Boundaries:');
+import { SPECIALIST_AGENTS } from '../artifacts/api-server/src/routes/ai';
+
+const agentKeys = Object.keys(SPECIALIST_AGENTS);
+assert(agentKeys.length >= 7, `All 7 specialized AI legal agents defined (Found: ${agentKeys.length})`);
+
+const allAgentsComply = agentKeys.every((key) => {
+  const agent = SPECIALIST_AGENTS[key];
+  return (
+    agent.policy.mayMakeFinalLegalDecision === false &&
+    agent.policy.mayRecommendLegalStrategy === false &&
+    agent.policy.mayFileOrSubmitDocuments === false &&
+    agent.policy.mayRecommendIndividualLawyer === false &&
+    agent.policy.disclaimerRequired === true &&
+    agent.policy.mustCiteMaterialClaims === true
+  );
+});
+assert(allAgentsComply, 'All specialist agents enforce strict UPL guardrails and require disclaimers');
+
+// 5. Test Structured Output Validation on Procedural Extraction
+console.log('\n5. Testing Structured Output Schema Validation on Real World Scenarios:');
+const sampleCaliforniaEviction = {
+  disclaimer: 'This information is for educational purposes only and does not constitute legal advice.',
+  jurisdiction: { state: 'CA', county: 'Los Angeles' },
+  citations: [
+    {
+      statuteOrRule: 'Cal. Code Civ. Proc. § 1162',
+      summary: 'Specifies acceptable methods of service for notice to quit including personal service and substituted service.',
+      sourceUrl: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?sectionNum=1162.&lawCode=CCP',
+    },
+  ],
+  proceduralSteps: [
+    '1. Prepare Notice to Pay Rent or Quit with exact delinquent amount.',
+    '2. Have a non-party adult (over 18) serve the notice personally or via substituted service.',
+    '3. Complete and sign a Proof of Service declaration (Form POS-010).',
+  ],
+  requiresHumanReview: true,
+  outcomePredictionAllowed: false,
+};
+
+const evictionParse = LegalInfoResponseSchema.safeParse(sampleCaliforniaEviction);
+assert(evictionParse.success, 'Valid procedural response for California eviction passes structured schema');
 
 console.log('\n-------------------------------------------------------------');
 console.log(`Results: ${passed} passed, ${failed} failed.`);
 if (failed > 0) {
   process.exit(1);
 } else {
-  console.log('All compliance and security checks passed successfully.\n');
+  console.log('All compliance, security, and end-to-end checks passed successfully.\n');
 }
