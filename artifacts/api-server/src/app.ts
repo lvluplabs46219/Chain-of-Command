@@ -1,10 +1,17 @@
 import express, { type Express } from "express";
 import cors from "cors";
-import pinoHttp from "pino-http";
-import helmet from "helmet";
+import pinoHttpModule from "pino-http";
+import helmetModule from "helmet";
 import router from "./routes";
 import { logger } from "./lib/logger";
 import { verifySession } from "./middleware/verifySession";
+
+// pino-http and helmet publish callable CommonJS exports whose TypeScript
+// declarations can be exposed as module namespaces under Vercel/Bun's
+// bundler resolution. Normalize them once at the boundary so the app remains
+// type-safe regardless of the package-manager/module-resolution combination.
+const pinoHttp = pinoHttpModule as unknown as (options?: any) => any;
+const helmet = helmetModule as unknown as (options?: any) => any;
 
 const app: Express = express();
 
@@ -12,14 +19,14 @@ app.use(
   pinoHttp({
     logger,
     serializers: {
-      req(req) {
+      req(req: any) {
         return {
           id: req.id,
           method: req.method,
           url: req.url?.split("?")[0],
         };
       },
-      res(res) {
+      res(res: any) {
         return {
           statusCode: res.statusCode,
         };
