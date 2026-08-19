@@ -210,7 +210,7 @@ router.get("/directory/lawyers", (req: Request, res: Response) => {
     return a.name.localeCompare(b.name);
   });
 
-  res.json({
+  return res.json({
     policy: {
       enforced: true,
       name: "ACQUIT ATTORNEY DIRECTORY POLICY",
@@ -226,12 +226,12 @@ router.post("/directory/referrals", (req: Request, res: Response) => {
   const { lawyerId, referralContext } = req.body;
   
   if (!lawyerId || !referralContext) {
-    res.status(400).json({ message: "lawyerId and referralContext are required." });
+    return res.status(400).json({ message: "lawyerId and referralContext are required." });
     return;
   }
 
   // Log referral without case data payload
-  res.status(201).json({
+  return res.status(201).json({
     status: "recorded",
     referralId: crypto.randomUUID(),
     lawyerId,

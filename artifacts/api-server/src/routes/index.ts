@@ -7,6 +7,7 @@ import { webhooksRouter } from "./webhooks";
 import { documentsRouter } from "./documents";
 import { mattersRouter } from "./matters";
 import { geminiRouter } from "./gemini";
+import { filingRouter } from "./filing";
 import { verifySession } from "../middleware/verifySession";
 
 const router: IRouter = Router();
@@ -21,5 +22,6 @@ router.use(courtlistenerRouter);
 router.use(documentsRouter);
 router.use(mattersRouter);
 router.use(geminiRouter);
+router.use(filingRouter);
 
 export default router;

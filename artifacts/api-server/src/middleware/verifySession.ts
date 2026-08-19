@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, User } from '@supabase/supabase-js';
 
 let supabase: ReturnType<typeof createClient> | null = null;
 
@@ -16,10 +16,7 @@ function getSupabase() {
 }
 
 export interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-  };
+  user?: User;
 }
 
 export async function verifySession(
@@ -28,6 +25,7 @@ export async function verifySession(
   next: NextFunction
 ): Promise<void> {
   const authHeader = req.headers.authorization;
+
   if (!authHeader?.startsWith('Bearer ')) {
     res.status(401).json({ error: 'UNAUTHORIZED', message: 'Missing or malformed authorization header.' });
     return;
@@ -43,7 +41,7 @@ export async function verifySession(
       return;
     }
 
-    req.user = { id: user.id, email: user.email || '' };
+    req.user = user;
     next();
   } catch (err) {
     console.error("Supabase auth error:", err);

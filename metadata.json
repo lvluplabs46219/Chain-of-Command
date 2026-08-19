@@ -1,6 +1,8 @@
 {
   "name": "Acquit AI",
-  "description": "Legal AI case workspace platform",
+  "description": "Legal AI case workspace platform for self-represented litigants.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

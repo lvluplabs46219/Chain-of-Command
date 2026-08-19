@@ -10,7 +10,7 @@ const router: IRouter = Router();
 router.get(["/health", "/healthz"], (_req, res) => {
   console.log("Health endpoint hit!");
   const data = HealthCheckResponse.parse({ status: "ok" });
-  res.json(data);
+  return res.json(data);
 });
 
 export default router;

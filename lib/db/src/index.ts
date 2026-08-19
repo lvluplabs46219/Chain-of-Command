@@ -130,7 +130,7 @@ export const sourcesTable = pgTable("sources", {
   publisher: text("publisher"),
   publishedAt: timestamp("published_at", { withTimezone: true }),
   retrievedAt: timestamp("retrieved_at", { withTimezone: true }),
-  sourceHash: text("source_hash").notNull(),
+  sourceHash: text("source_hash").notNull().unique(),
   metadata: jsonb("metadata").default('{}').notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
@@ -253,7 +253,10 @@ try {
   if (dbUrl) {
     pool = new Pool({ 
       connectionString: dbUrl,
-      ssl: dbUrl.includes("supabase.co") ? { rejectUnauthorized: false } : undefined
+      ssl: dbUrl.includes("supabase.co") || process.env.NODE_ENV === "production" ? { rejectUnauthorized: process.env.NODE_ENV === "production" } : undefined,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000
     });
     
     pool.on('error', (err: Error) => {

@@ -7,6 +7,7 @@
   "workspaces": [
     "artifacts/*",
     "lib/db",
+    "lib/rag-engine",
     "scripts"
   ],
   "scripts": {
@@ -22,7 +23,8 @@
     "harvard:preview": "python3 scripts/harvard_cases.py --action preview --limit 5",
     "harvard:ingest": "python3 scripts/harvard_cases.py --action ingest --limit 10",
     "start": "tsx artifacts/mockup-sandbox/server.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "tsx scripts/test_compliance_and_security.ts"
   },
   "dependencies": {
     "@google/genai": "^2.17.1",

@@ -286,9 +286,9 @@ export class OpenAiAdapter implements ModelAdapter {
       content,
       finishReason: payload.choices?.[0]?.finish_reason === "length" ? "length" : "stop",
       usage: {
-        inputTokens: usage.prompt_tokens,
-        outputTokens: usage.completion_tokens,
-        totalTokens: usage.total_tokens || (usage.prompt_tokens + usage.completion_tokens),
+        inputTokens: usage.prompt_tokens ?? 0,
+        outputTokens: usage.completion_tokens ?? 0,
+        totalTokens: usage.total_tokens || ((usage.prompt_tokens ?? 0) + (usage.completion_tokens ?? 0)),
       },
     };
   }

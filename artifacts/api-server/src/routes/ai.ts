@@ -1,12 +1,17 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { z } from "zod";
+import { acquitAgentRuntime, LEGAL_DISCLAIMER, type AgentEvent, type AgentPolicy, type AgentSource } from "../ai/runtime";
+import type { ModelProvider } from "../ai/model-gateway";
+import { Redis } from "@upstash/redis";
+import crypto from "crypto";
 
 export const AiRunRequest = z.object({
   agentId: z.string(),
-  provider: z.enum(["demo", "ollama", "openai"]).optional(),
+  provider: z.enum(["demo", "ollama", "openai", "gemini"]).optional(),
   model: z.string().optional(),
   input: z.string(),
-  sources: z.array(z.any()).optional()
+  sources: z.array(z.any()).optional(),
+  matterId: z.string().optional(),
 });
 
 export const AiRunResponse = z.object({
@@ -14,10 +19,9 @@ export const AiRunResponse = z.object({
   status: z.string(),
   streamUrl: z.string(),
   disclaimer: z.string(),
-  humanReviewRequired: z.boolean()
+  humanReviewRequired: z.boolean(),
+  agentName: z.string().optional(),
 });
-import { acquitAgentRuntime, LEGAL_DISCLAIMER, type AgentEvent, type AgentPolicy, type AgentSource } from "../ai/runtime";
-import type { ModelProvider } from "../ai/model-gateway";
 
 const router: IRouter = Router();
 
@@ -25,27 +29,43 @@ interface RunRecord {
   events: AgentEvent[];
   done: boolean;
   listeners: Set<(event: AgentEvent) => void>;
-  request: ReturnType<typeof AiRunRequest.parse>;
+  request: z.infer<typeof AiRunRequest>;
+  createdAt: number;
 }
 
-const runs = new Map<string, RunRecord>();
+// In-memory active stream listeners map
+const memoryRuns = new Map<string, RunRecord>();
 
-const defaultPolicies: Record<string, { name: string; policy: AgentPolicy }> = {
+// Upstash Redis instance with 60-min TTL (HIGH-1 resolution)
+let redisClient: Redis | null = null;
+if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+  redisClient = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  });
+}
+
+// Helper to save run events with 60 min TTL (3600s)
+async function persistRunState(runId: string, record: RunRecord): Promise<void> {
+  if (!redisClient) return;
+  try {
+    const payload = {
+      runId,
+      events: record.events,
+      done: record.done,
+      request: record.request,
+      createdAt: record.createdAt,
+    };
+    await redisClient.set(`agent_run:${runId}`, JSON.stringify(payload), { ex: 3600 });
+  } catch (err) {
+    console.warn("Redis run state persistence warning:", err);
+  }
+}
+
+export const SPECIALIST_AGENTS: Record<string, { name: string; roleDescription: string; policy: AgentPolicy }> = {
   "lead-counsel": {
-    name: "Lead Counsel",
-    policy: {
-      mayProvideLegalInformation: true,
-      mayRecommendLegalStrategy: true,
-      mayMakeFinalLegalDecision: false,
-      mayFileOrSubmitDocuments: false,
-      mayRecommendIndividualLawyer: false,
-      mustUseRagForLegalClaims: true,
-      mustCiteMaterialClaims: true,
-      disclaimerRequired: true,
-    },
-  },
-  paralegal: {
-    name: "Paralegal",
+    name: "Lead Counsel Coordinator",
+    roleDescription: "Decomposes complex litigation objectives, coordinates specialist sub-agents, and synthesizes unified procedural workspaces.",
     policy: {
       mayProvideLegalInformation: true,
       mayRecommendLegalStrategy: false,
@@ -57,8 +77,79 @@ const defaultPolicies: Record<string, { name: string; policy: AgentPolicy }> = {
       disclaimerRequired: true,
     },
   },
-  researcher: {
-    name: "Legal Researcher",
+  "paralegal": {
+    name: "Paralegal AI",
+    roleDescription: "Calculates statutory court deadlines, reviews formatting rules, and prepares procedural filing checklists.",
+    policy: {
+      mayProvideLegalInformation: true,
+      mayRecommendLegalStrategy: false,
+      mayMakeFinalLegalDecision: false,
+      mayFileOrSubmitDocuments: false,
+      mayRecommendIndividualLawyer: false,
+      mustUseRagForLegalClaims: true,
+      mustCiteMaterialClaims: true,
+      disclaimerRequired: true,
+    },
+  },
+  "investigator": {
+    name: "Investigator AI",
+    roleDescription: "Analyzes chronological records, detects factual contradictions in police reports, and highlights timeline gaps.",
+    policy: {
+      mayProvideLegalInformation: true,
+      mayRecommendLegalStrategy: false,
+      mayMakeFinalLegalDecision: false,
+      mayFileOrSubmitDocuments: false,
+      mayRecommendIndividualLawyer: false,
+      mustUseRagForLegalClaims: true,
+      mustCiteMaterialClaims: true,
+      disclaimerRequired: true,
+    },
+  },
+  "evidence-analyst": {
+    name: "Evidence Analyst AI",
+    roleDescription: "Indexes exhibits, evaluates chain-of-custody metadata, and maps tangible evidence directly to statutory elements.",
+    policy: {
+      mayProvideLegalInformation: true,
+      mayRecommendLegalStrategy: false,
+      mayMakeFinalLegalDecision: false,
+      mayFileOrSubmitDocuments: false,
+      mayRecommendIndividualLawyer: false,
+      mustUseRagForLegalClaims: true,
+      mustCiteMaterialClaims: true,
+      disclaimerRequired: true,
+    },
+  },
+  "court-prep": {
+    name: "Court Preparation AI",
+    roleDescription: "Generates 1-page court appearance prep sheets, courtroom etiquette guidelines, and procedural question outlines.",
+    policy: {
+      mayProvideLegalInformation: true,
+      mayRecommendLegalStrategy: false,
+      mayMakeFinalLegalDecision: false,
+      mayFileOrSubmitDocuments: false,
+      mayRecommendIndividualLawyer: false,
+      mustUseRagForLegalClaims: true,
+      mustCiteMaterialClaims: true,
+      disclaimerRequired: true,
+    },
+  },
+  "rights-checker": {
+    name: "Rights Checker AI",
+    roleDescription: "Audits law enforcement encounters against Fourth, Fifth, and Sixth Amendment procedural guarantees.",
+    policy: {
+      mayProvideLegalInformation: true,
+      mayRecommendLegalStrategy: false,
+      mayMakeFinalLegalDecision: false,
+      mayFileOrSubmitDocuments: false,
+      mayRecommendIndividualLawyer: false,
+      mustUseRagForLegalClaims: true,
+      mustCiteMaterialClaims: true,
+      disclaimerRequired: true,
+    },
+  },
+  "charge-explainer": {
+    name: "Charge Explainer AI",
+    roleDescription: "Translates criminal charging affidavits and statutory degrees into plain-language factual element trees.",
     policy: {
       mayProvideLegalInformation: true,
       mayRecommendLegalStrategy: false,
@@ -77,7 +168,7 @@ function writeEvent(res: Response, event: AgentEvent): void {
 }
 
 async function executeRun(runId: string, record: RunRecord): Promise<void> {
-  const agent = defaultPolicies[record.request.agentId] ?? defaultPolicies["paralegal"];
+  const agent = SPECIALIST_AGENTS[record.request.agentId] ?? SPECIALIST_AGENTS["paralegal"];
   const provider = (record.request.provider ?? "demo") as ModelProvider;
   const sources = (record.request.sources ?? []) as AgentSource[];
 
@@ -97,10 +188,24 @@ async function executeRun(runId: string, record: RunRecord): Promise<void> {
     }
   } finally {
     record.done = true;
+    void persistRunState(runId, record);
     for (const listener of record.listeners) record.listeners.delete(listener);
   }
 }
 
+// Get directory of specialist agents
+router.get("/ai/agents", (_req: Request, res: Response) => {
+  const list = Object.entries(SPECIALIST_AGENTS).map(([id, meta]) => ({
+    id,
+    name: meta.name,
+    description: meta.roleDescription,
+    disclaimerRequired: meta.policy.disclaimerRequired,
+    mustCiteMaterialClaims: meta.policy.mustCiteMaterialClaims,
+  }));
+  return res.json({ agents: list });
+});
+
+// Launch an AI agent run
 router.post("/ai/agents/:agentId/runs", (req: Request, res: Response) => {
   const parsed = AiRunRequest.safeParse({
     ...req.body,
@@ -108,8 +213,7 @@ router.post("/ai/agents/:agentId/runs", (req: Request, res: Response) => {
   });
 
   if (!parsed.success) {
-    res.status(400).json({ message: "Invalid AI run request.", issues: parsed.error.issues });
-    return;
+    return res.status(400).json({ message: "Invalid AI run request.", issues: parsed.error.issues });
   }
 
   const runId = crypto.randomUUID();
@@ -118,9 +222,13 @@ router.post("/ai/agents/:agentId/runs", (req: Request, res: Response) => {
     done: false,
     listeners: new Set(),
     request: parsed.data,
+    createdAt: Date.now(),
   };
-  runs.set(runId, record);
+
+  memoryRuns.set(runId, record);
   void executeRun(runId, record);
+
+  const agent = SPECIALIST_AGENTS[parsed.data.agentId] ?? SPECIALIST_AGENTS["paralegal"];
 
   const response = AiRunResponse.parse({
     runId,
@@ -128,16 +236,38 @@ router.post("/ai/agents/:agentId/runs", (req: Request, res: Response) => {
     streamUrl: `/api/ai/runs/${runId}/stream`,
     disclaimer: LEGAL_DISCLAIMER,
     humanReviewRequired: true,
+    agentName: agent.name,
   });
-  res.status(202).json(response);
+
+  return res.status(202).json(response);
 });
 
-router.get("/ai/runs/:runId/stream", (req: Request, res: Response) => {
+// Stream real-time agent output with SSE
+router.get("/ai/runs/:runId/stream", async (req: Request, res: Response): Promise<void> => {
   const runId = String(req.params.runId);
-  const record = runs.get(runId);
+  let record = memoryRuns.get(runId);
+
+  // If not in local memory, check Redis store for completed run
+  if (!record && redisClient) {
+    try {
+      const cached = await redisClient.get<string>(`agent_run:${runId}`);
+      if (cached) {
+        const parsed = typeof cached === "string" ? JSON.parse(cached) : cached;
+        record = {
+          events: parsed.events || [],
+          done: true,
+          listeners: new Set(),
+          request: parsed.request,
+          createdAt: parsed.createdAt || Date.now(),
+        };
+      }
+    } catch (err) {
+      console.warn("Redis run fetch error:", err);
+    }
+  }
 
   if (!record) {
-    res.status(404).json({ message: "AI run not found." });
+    res.status(404).json({ message: "AI run not found or expired." });
     return;
   }
 
@@ -148,6 +278,7 @@ router.get("/ai/runs/:runId/stream", (req: Request, res: Response) => {
   res.flushHeaders();
 
   for (const event of record.events) writeEvent(res, event);
+
   if (record.done) {
     res.end();
     return;
@@ -157,7 +288,7 @@ router.get("/ai/runs/:runId/stream", (req: Request, res: Response) => {
   record.listeners.add(listener);
 
   req.on("close", () => {
-    record.listeners.delete(listener);
+    record?.listeners.delete(listener);
   });
 });
 
