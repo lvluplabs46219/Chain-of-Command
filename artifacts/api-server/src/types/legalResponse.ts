@@ -8,7 +8,7 @@ export const LegalCitationSchema = z.object({
 
 export const LegalInfoResponseSchema = z.object({
   disclaimer: z.literal(
-    'This information is for educational purposes only and does not constitute legal advice.'
+    'This information is provided for educational and procedural purposes only and does not constitute legal advice. No attorney-client relationship is formed. Consult a licensed attorney for case-specific representation.'
   ),
   jurisdiction: z.object({
     state: z.string().min(2).max(2), // e.g., 'AZ', 'CA', 'TX'

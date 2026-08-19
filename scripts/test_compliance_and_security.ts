@@ -20,7 +20,7 @@ console.log('\n=== ACQUIT.AI SECURITY & COMPLIANCE VERIFICATION HARNESS ===\n');
 // 1. Test Zod Legal Schema Compliance
 console.log('1. Testing Zod Legal Schema & UPL Safe-Harbor Constraints:');
 const validPayload = {
-  disclaimer: 'This information is for educational purposes only and does not constitute legal advice.',
+  disclaimer: 'This information is provided for educational and procedural purposes only and does not constitute legal advice. No attorney-client relationship is formed. Consult a licensed attorney for case-specific representation.',
   jurisdiction: { state: 'IN', county: 'Marion' },
   citations: [
     {
@@ -120,7 +120,7 @@ assert(allAgentsComply, 'All specialist agents enforce strict UPL guardrails and
 // 5. Test Structured Output Validation on Procedural Extraction
 console.log('\n5. Testing Structured Output Schema Validation on Real World Scenarios:');
 const sampleCaliforniaEviction = {
-  disclaimer: 'This information is for educational purposes only and does not constitute legal advice.',
+  disclaimer: 'This information is provided for educational and procedural purposes only and does not constitute legal advice. No attorney-client relationship is formed. Consult a licensed attorney for case-specific representation.',
   jurisdiction: { state: 'CA', county: 'Los Angeles' },
   citations: [
     {

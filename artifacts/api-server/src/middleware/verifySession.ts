@@ -8,7 +8,7 @@ function getSupabase() {
     const url = process.env.SUPABASE_URL;
     const anonKey = process.env.SUPABASE_ANON_KEY;
     if (!url || !anonKey) {
-      throw new Error('Supabase environment variables missing');
+      return null;
     }
     supabase = createClient(url, anonKey);
   }
@@ -24,6 +24,12 @@ export async function verifySession(
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  // Allow bypassing auth in development if explicitly requested or if Supabase is missing
+  if (process.env.NODE_ENV === 'development' && process.env.BYPASS_AUTH === 'true') {
+    next();
+    return;
+  }
+
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith('Bearer ')) {
@@ -34,7 +40,14 @@ export async function verifySession(
   const token = authHeader.split(' ')[1];
   
   try {
-    const { data: { user }, error } = await getSupabase().auth.getUser(token);
+    const client = getSupabase();
+    if (!client) {
+      console.warn("Supabase keys missing - falling back to unauthenticated state");
+      res.status(503).json({ error: 'SERVICE_UNAVAILABLE', message: 'Authentication service not configured.' });
+      return;
+    }
+
+    const { data: { user }, error } = await client.auth.getUser(token);
     
     if (error || !user) {
       res.status(401).json({ error: 'UNAUTHORIZED', message: 'Invalid or expired session token.' });

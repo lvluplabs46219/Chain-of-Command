@@ -19,8 +19,8 @@ import {
   listDriveFiles,
   createGoogleDocLegalPleading,
   type GoogleDriveFile,
+  type User,
 } from "../../../lib/googleWorkspace";
-import type { User } from "firebase/auth";
 
 export function GoogleWorkspaceIntegration({
   matterTitle = "State of Indiana v. Alex Thompson",

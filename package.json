@@ -22,7 +22,7 @@
     "ingest:docket": "tsx scripts/ingest_courtlistener_docket.ts",
     "harvard:preview": "python3 scripts/harvard_cases.py --action preview --limit 5",
     "harvard:ingest": "python3 scripts/harvard_cases.py --action ingest --limit 10",
-    "start": "tsx artifacts/mockup-sandbox/server.ts",
+    "start": "tsx artifacts/api-server/src/index.ts",
     "prepare": "husky",
     "test": "tsx scripts/test_compliance_and_security.ts"
   },
@@ -37,7 +37,6 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.6.2",
-    "firebase": "^12.17.1",
     "helmet": "^8.3.0",
     "multer": "^2.2.0",
     "pg": "^8.23.0",

@@ -9,6 +9,7 @@ export const modules: ModuleMap = {
   "./components/mockups/acquit-case-workspace/DocumentEditorVSCode.tsx": () => import("../components/mockups/acquit-case-workspace/DocumentEditorVSCode.tsx"),
   "./components/mockups/acquit-case-workspace/EvidenceCarousel.tsx": () => import("../components/mockups/acquit-case-workspace/EvidenceCarousel.tsx"),
   "./components/mockups/acquit-case-workspace/FilingCenter.tsx": () => import("../components/mockups/acquit-case-workspace/FilingCenter.tsx"),
+  "./components/mockups/acquit-case-workspace/GoogleWorkspaceIntegration.tsx": () => import("../components/mockups/acquit-case-workspace/GoogleWorkspaceIntegration.tsx"),
   "./components/mockups/acquit-case-workspace/LawLibraryExplorer.tsx": () => import("../components/mockups/acquit-case-workspace/LawLibraryExplorer.tsx"),
   "./components/mockups/acquit-case-workspace/RagCitationViewer.tsx": () => import("../components/mockups/acquit-case-workspace/RagCitationViewer.tsx"),
   "./components/mockups/acquit-case-workspace/SovereignCylinder.tsx": () => import("../components/mockups/acquit-case-workspace/SovereignCylinder.tsx")

@@ -1,4 +1,4 @@
-import { Router, type Request, type Response } from "express";
+import { Router, type Request, type Response as ExpressResponse } from "express";
 import { db, sourcesTable, authoritiesTable, mattersTable, timelineEventsTable } from "@workspace/db";
 import crypto from "crypto";
 
@@ -37,7 +37,7 @@ async function pinLegalTextToIPFS(title: string, text: string): Promise<string |
 }
 
 // Search endpoint proxying to CourtListener REST API v4
-courtlistenerRouter.get("/courtlistener/search", async (req: Request, res: Response) => {
+courtlistenerRouter.get("/courtlistener/search", async (req: Request, res: ExpressResponse) => {
   try {
     const { q, court, type = "o", page = 1 } = req.query;
     const queryStr = (q as string) || "criminal procedure discovery";
@@ -71,7 +71,7 @@ courtlistenerRouter.get("/courtlistener/search", async (req: Request, res: Respo
 });
 
 // Ingest/Migrate an authority from CourtListener to Acquit Law DB
-courtlistenerRouter.post("/courtlistener/migrate", async (req: Request, res: Response) => {
+courtlistenerRouter.post("/courtlistener/migrate", async (req: Request, res: ExpressResponse) => {
   try {
     const { caseName, citation, court, year, summary, excerpt, courtlistenerId } = req.body;
     const sourceHash = courtlistenerId || `cl-${crypto.createHash("sha256").update(caseName + (citation || "")).digest("hex").slice(0, 16)}`;
@@ -127,7 +127,7 @@ courtlistenerRouter.post("/courtlistener/migrate", async (req: Request, res: Res
 });
 
 // Import docket directly into a user matter
-courtlistenerRouter.post('/migrate/courtlistener', async (req: Request, res: Response) => {
+courtlistenerRouter.post('/migrate/courtlistener', async (req: Request, res: ExpressResponse) => {
   try {
     const { docketNumber, court } = req.body;
     const userId = (req as any).user?.id || 'anonymous-user';

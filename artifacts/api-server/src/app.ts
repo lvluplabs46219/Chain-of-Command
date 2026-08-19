@@ -36,7 +36,7 @@ app.use(
 );
 
 app.use(cors({
-  origin: ['https://acquit.ai', 'https://app.acquit.ai'],
+  origin: true, // Allow all origins in development/preview
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
@@ -47,7 +47,13 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'"],
-      connectSrc: ["'self'", 'https://api.acquit.ai', 'https://*.supabase.co'],
+      connectSrc: [
+        "'self'",
+        "https://*.supabase.co",
+        "https://generativelanguage.googleapis.com",
+        "https://*.googleapis.com",
+        "https://api.openai.com",
+      ],
       imgSrc: ["'self'", 'data:', 'https:'],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: []

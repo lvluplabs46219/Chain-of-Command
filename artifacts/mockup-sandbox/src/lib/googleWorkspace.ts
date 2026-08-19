@@ -1,13 +1,8 @@
-import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-import {
-  getAuth,
-  signInWithPopup,
-  GoogleAuthProvider,
-  onAuthStateChanged,
-  type User,
-  type Auth,
-} from "firebase/auth";
-import firebaseConfig from "../../../../firebase-applet-config.json";
+// Mock Google Workspace implementation (Firebase removed)
+export interface User {
+  displayName: string | null;
+  email: string | null;
+}
 
 export const GOOGLE_WORKSPACE_SCOPES = [
   "https://www.googleapis.com/auth/drive",
@@ -17,62 +12,49 @@ export const GOOGLE_WORKSPACE_SCOPES = [
   "https://www.googleapis.com/auth/documents.readonly",
 ];
 
-let app: FirebaseApp;
-if (!getApps().length) {
-  app = initializeApp(firebaseConfig);
-} else {
-  app = getApps()[0];
-}
-
-const auth: Auth = getAuth(app);
-
-const provider = new GoogleAuthProvider();
-GOOGLE_WORKSPACE_SCOPES.forEach((scope) => {
-  provider.addScope(scope);
-});
-
 let isSigningIn = false;
 let cachedAccessToken: string | null = null;
+let mockUser: User | null = null;
+
+type AuthCallback = (user: User | null) => void;
+let authListener: AuthCallback | null = null;
 
 export const initGoogleAuth = (
   onAuthSuccess?: (user: User, token: string) => void,
   onAuthFailure?: () => void
 ) => {
-  return onAuthStateChanged(auth, async (user: User | null) => {
-    if (user) {
-      if (cachedAccessToken) {
-        if (onAuthSuccess) onAuthSuccess(user, cachedAccessToken);
-      } else if (!isSigningIn) {
-        cachedAccessToken = null;
-        if (onAuthFailure) onAuthFailure();
-      }
+  authListener = (user) => {
+    if (user && cachedAccessToken) {
+      onAuthSuccess?.(user, cachedAccessToken);
     } else {
-      cachedAccessToken = null;
-      if (onAuthFailure) onAuthFailure();
+      onAuthFailure?.();
     }
-  });
+  };
+  return () => {
+    authListener = null;
+  };
 };
 
 export const googleSignIn = async (): Promise<{
   user: User;
   accessToken: string;
 } | null> => {
-  try {
-    isSigningIn = true;
-    const result = await signInWithPopup(auth, provider);
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    if (!credential?.accessToken) {
-      throw new Error("Failed to retrieve Google OAuth access token.");
-    }
-
-    cachedAccessToken = credential.accessToken;
-    return { user: result.user, accessToken: cachedAccessToken };
-  } catch (error: any) {
-    console.error("Google Sign-In Error:", error);
-    throw error;
-  } finally {
-    isSigningIn = false;
+  isSigningIn = true;
+  // Mock login delay
+  await new Promise((resolve) => setTimeout(resolve, 800));
+  
+  mockUser = {
+    displayName: "Alex Thompson (Pro Se)",
+    email: "alex.thompson@example.com",
+  };
+  cachedAccessToken = "mock-google-access-token";
+  
+  if (authListener) {
+    authListener(mockUser);
   }
+  
+  isSigningIn = false;
+  return { user: mockUser, accessToken: cachedAccessToken };
 };
 
 export const getGoogleAccessToken = async (): Promise<string | null> => {
@@ -80,8 +62,11 @@ export const getGoogleAccessToken = async (): Promise<string | null> => {
 };
 
 export const googleLogout = async () => {
-  await auth.signOut();
+  mockUser = null;
   cachedAccessToken = null;
+  if (authListener) {
+    authListener(null);
+  }
 };
 
 export interface GoogleDriveFile {
@@ -94,43 +79,35 @@ export interface GoogleDriveFile {
   webViewLink?: string;
 }
 
-// List case files from user's Google Drive
+// Mock drive files
 export async function listDriveFiles(
   accessToken: string,
   query?: string
 ): Promise<GoogleDriveFile[]> {
-  try {
-    const qParts = ["trashed = false"];
-    if (query) {
-      qParts.push(`name contains '${query.replace(/'/g, "\\'")}'`);
-    }
-
-    const url = new URL("https://www.googleapis.com/drive/v3/files");
-    url.searchParams.set("q", qParts.join(" and "));
-    url.searchParams.set("fields", "files(id, name, mimeType, modifiedTime, size, iconLink, webViewLink)");
-    url.searchParams.set("pageSize", "20");
-    url.searchParams.set("orderBy", "modifiedTime desc");
-
-    const res = await fetch(url.toString(), {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!res.ok) {
-      throw new Error(`Google Drive API error: ${res.statusText}`);
-    }
-
-    const data = (await res.json()) as { files?: GoogleDriveFile[] };
-    return data.files || [];
-  } catch (err) {
-    console.error("Fetch Drive files error:", err);
-    throw err;
+  await new Promise((resolve) => setTimeout(resolve, 600));
+  
+  const files: GoogleDriveFile[] = [
+    {
+      id: "mock-1",
+      name: "Incident_Report_24-99182.pdf",
+      mimeType: "application/pdf",
+      modifiedTime: new Date().toISOString(),
+    },
+    {
+      id: "mock-2",
+      name: "Witness_Statement_Smith.docx",
+      mimeType: "application/vnd.google-apps.document",
+      modifiedTime: new Date(Date.now() - 86400000).toISOString(),
+    },
+  ];
+  
+  if (query) {
+    return files.filter(f => f.name.toLowerCase().includes(query.toLowerCase()));
   }
+  
+  return files;
 }
 
-// Create a new Google Doc formatted with legal court caption and body text
 export async function createGoogleDocLegalPleading(
   accessToken: string,
   title: string,
@@ -142,79 +119,11 @@ export async function createGoogleDocLegalPleading(
     bodyContent: string;
   }
 ): Promise<{ documentId: string; docUrl: string; title: string }> {
-  try {
-    // 1. Create empty document
-    const createRes = await fetch("https://docs.googleapis.com/v1/documents", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: title || "Court Pleading - Acquit Draft",
-      }),
-    });
-
-    if (!createRes.ok) {
-      throw new Error(`Google Docs creation error: ${createRes.statusText}`);
-    }
-
-    const doc = (await createRes.json()) as { documentId: string; title: string };
-    const docId = doc.documentId;
-
-    // 2. Insert structured legal text formatting
-    const formattedText = 
-`${courtCaption.court.toUpperCase()}
-CASE NO. ${courtCaption.caseNumber}
-
-${courtCaption.caption}
-
--------------------------------------------------------------------------------
-${courtCaption.documentTitle.toUpperCase()}
--------------------------------------------------------------------------------
-
-${courtCaption.bodyContent}
-
-Respectfully submitted,
-
-____________________________
-Alex Thompson (Pro Se Litigant)
-Self-Represented Litigant
-Generated via Acquit.ai Legal Workspace
-`;
-
-    const updateRes = await fetch(
-      `https://docs.googleapis.com/v1/documents/${docId}:batchUpdate`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          requests: [
-            {
-              insertText: {
-                location: { index: 1 },
-                text: formattedText,
-              },
-            },
-          ],
-        }),
-      }
-    );
-
-    if (!updateRes.ok) {
-      console.warn("Docs batchUpdate format warning:", await updateRes.text());
-    }
-
-    return {
-      documentId: docId,
-      docUrl: `https://docs.google.com/document/d/${docId}/edit`,
-      title: doc.title,
-    };
-  } catch (err) {
-    console.error("Create Google Doc error:", err);
-    throw err;
-  }
+  await new Promise((resolve) => setTimeout(resolve, 1200));
+  
+  return {
+    documentId: "mock-doc-id",
+    docUrl: "https://docs.google.com/document/d/mock-doc-id/edit",
+    title: title || "Court Pleading - Acquit Draft",
+  };
 }
