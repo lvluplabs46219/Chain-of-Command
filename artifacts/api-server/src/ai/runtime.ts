@@ -118,13 +118,57 @@ export const PROHIBITED_RECOMMENDATION_TERMS = [
   "our top choice",
 ];
 
+export function detectPromptInjection(input: string): boolean {
+  const lower = input.toLowerCase();
+  const injectionPatterns = [
+    "ignore previous instructions",
+    "ignore above instructions",
+    "ignore all instructions",
+    "system override",
+    "you are now a",
+    "you must now",
+    "disregard other rules",
+    "new instructions",
+    "override system",
+    "bypass safety",
+    "forget all prior",
+    "prompt injection",
+    "dan mode",
+    "jailbreak"
+  ];
+  return injectionPatterns.some((pattern) => lower.includes(pattern));
+}
+
 export function outputGuardCheck(text: string): { isValid: boolean; violation?: string } {
-  const lower = text.toLowerCase();
-  for (const term of PROHIBITED_RECOMMENDATION_TERMS) {
-    if (lower.includes(term)) {
+  const normalized = text.toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ");
+  const normalizedProhibitedTerms = PROHIBITED_RECOMMENDATION_TERMS.map(t =>
+    t.toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ")
+  );
+
+  for (let i = 0; i < PROHIBITED_RECOMMENDATION_TERMS.length; i++) {
+    const term = PROHIBITED_RECOMMENDATION_TERMS[i];
+    const normalizedTerm = normalizedProhibitedTerms[i];
+    if (normalized.includes(normalizedTerm)) {
       return { isValid: false, violation: term };
     }
   }
+
+  const regexPatterns = [
+    /\b(highly|strongly)?\s*recomends?\b/i,
+    /\bbest attorney\b/i,
+    /\btop attorney\b/i,
+    /\bmost qualified\b/i,
+    /\bperfect match\b/i,
+    /\bideal for (your|the) case\b/i,
+    /\bwe advise (choosing|selecting)\b/i,
+  ];
+
+  for (const pattern of regexPatterns) {
+    if (pattern.test(text)) {
+      return { isValid: false, violation: pattern.source };
+    }
+  }
+
   return { isValid: true };
 }
 
@@ -202,6 +246,17 @@ export class AcquitAgentRuntime {
       type: "reasoning.status",
       message: `Routing this request to ${request.agentName}.`,
     };
+
+    if (detectPromptInjection(request.input)) {
+      yield {
+        type: "run.completed",
+        response: blockedResponse(
+          request,
+          "This request was blocked because it contains instructions that attempt to override our security safety guidelines.",
+        ),
+      };
+      return;
+    }
 
     if (request.policy.mayMakeFinalLegalDecision) {
       yield {
@@ -297,9 +352,9 @@ export class AcquitAgentRuntime {
     } catch (error) {
       yield {
         type: "run.failed",
-        error: {
-          code: "MODEL_UNAVAILABLE",
-          message: error instanceof Error ? error.message : "The selected model is unavailable.",
+        error: { 
+          code: "MODEL_UNAVAILABLE", 
+          message: error instanceof Error ? error.message : "The selected model is unavailable." 
         },
       };
       return;
@@ -325,12 +380,20 @@ export class AcquitAgentRuntime {
       return;
     }
 
+    let finalOutput = response.content.trim();
+    if (!finalOutput.startsWith(HEADER_DISCLAIMER)) {
+      finalOutput = `${HEADER_DISCLAIMER}\n\n${finalOutput}`;
+    }
+    if (!finalOutput.endsWith(LEGAL_DISCLAIMER)) {
+      finalOutput = `${finalOutput}\n\n${LEGAL_DISCLAIMER}`;
+    }
+
     yield {
       type: "run.completed",
       response: {
         runId: request.runId,
         status: "completed",
-        output: response.content,
+        output: finalOutput,
         citations,
         disclaimer: LEGAL_DISCLAIMER,
         provider: response.provider,

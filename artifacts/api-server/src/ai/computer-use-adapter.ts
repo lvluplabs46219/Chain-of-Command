@@ -29,6 +29,35 @@ export interface ComputerUseResult {
 }
 
 /**
+ * Custom type guard to validate FilingGateChallenge structure
+ */
+function isFilingGateChallenge(obj: any): obj is FilingGateChallenge {
+  return (
+    obj !== null &&
+    typeof obj === 'object' &&
+    typeof obj.matterId === 'string' &&
+    /^[a-zA-Z0-9\-_]+$/.test(obj.matterId) &&
+    typeof obj.payloadHash === 'string' &&
+    typeof obj.userSignature === 'string' &&
+    typeof obj.timestamp === 'number'
+  );
+}
+
+/**
+ * Validates standard case number formats to prevent injection attacks
+ */
+function validateCaseNumber(caseNumber: string): void {
+  if (typeof caseNumber !== 'string') {
+    throw new Error("Invalid case number type");
+  }
+  // Standard court case numbers: alphanumeric, dashes, dots, slashes, spaces. Length 3-50.
+  const caseNumberRegex = /^[a-zA-Z0-9.\-\/\s]{3,50}$/;
+  if (!caseNumberRegex.test(caseNumber)) {
+    throw new Error("Invalid case number format");
+  }
+}
+
+/**
  * Computer Use Court Adapter
  * Acts as a headless browser bridge for courts without APIs.
  * Integrates with Browserbase / Steel.dev under the hood.
@@ -40,6 +69,7 @@ export class ComputerUseCourtAdapter {
   async extractDocket(caseNumber: string, portalUrl: string): Promise<ComputerUseResult> {
     logger.info(`Initiating Computer Use READ task for case ${caseNumber}`);
     
+    validateCaseNumber(caseNumber);
     const systemPrompt = this.getDoxpopSystemPrompt(caseNumber);
     
     return {
@@ -60,11 +90,12 @@ export class ComputerUseCourtAdapter {
   async stageFiling(caseNumber: string, documentUrl: string, userToken: string): Promise<ComputerUseResult> {
     logger.info(`Initiating Computer Use HUMAN_ACTION task for case ${caseNumber}`);
     
+    validateCaseNumber(caseNumber);
     if (!this.verifyHumanGate(userToken)) {
       throw new Error("Human authorization gate failed. Cannot stage filing.");
     }
     
-    return {
+    return { 
       status: 'pending_human',
       auditTrail: {
         screenshots: ['s3://audit-logs/staged-filing-ready.png'],
@@ -74,20 +105,18 @@ export class ComputerUseCourtAdapter {
     };
   }
 
-  private verifyHumanGate(token: string): boolean {
+  private verifyHumanGate(token: string): boolean { 
     const secret = process.env.HUMAN_GATE_HMAC_SECRET;
     if (!secret || !token) return false;
 
     try {
-      // Decode the token - assume it's JSON encoded: { challenge: FilingGateChallenge, signature: string }
-      // Or if token is just the userSignature and we need to pass challenge
-      // Let's adapt based on the snippet provided:
-      const challenge: FilingGateChallenge = JSON.parse(token);
+      const challenge: unknown = JSON.parse(token);
       
-      if (!challenge?.userSignature) return false;
+      if (!isFilingGateChallenge(challenge)) return false;
 
-      // Enforce 5-minute maximum window to prevent replay attacks
-      if (Date.now() - challenge.timestamp > 5 * 60 * 1000) return false;
+      // Enforce both past and future bounds to prevent replay and future-date bypass attacks
+      const age = Date.now() - challenge.timestamp;
+      if (age < 0 || age > 5 * 60 * 1000) return false;
 
       const expectedPayload = `${challenge.matterId}:${challenge.payloadHash}:${challenge.timestamp}`;
       const expectedSignature = crypto
@@ -106,6 +135,7 @@ export class ComputerUseCourtAdapter {
   }
 
   public getDoxpopSystemPrompt(caseNumber: string): string {
+    validateCaseNumber(caseNumber);
     return `
 You are an authorized legal agent navigating the Doxpop / MyCase court portal on behalf of a verified pro se litigant.
 Your objective is to locate a specific case and accurately extract its chronological docket events.

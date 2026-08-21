@@ -4,7 +4,6 @@ import pinoHttpModule from "pino-http";
 import helmetModule from "helmet";
 import router from "./routes";
 import { logger } from "./lib/logger";
-import { verifySession } from "./middleware/verifySession";
 
 // pino-http and helmet publish callable CommonJS exports whose TypeScript
 // declarations can be exposed as module namespaces under Vercel/Bun's
@@ -35,8 +34,12 @@ app.use(
   }),
 );
 
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : ["http://localhost:3000", "http://localhost:5173"];
+
 app.use(cors({
-  origin: true, // Allow all origins in development/preview
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
@@ -61,8 +64,8 @@ app.use(helmet({
   }
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
 app.use("/api", router);
 

@@ -77,6 +77,29 @@ function responseId(provider: ModelProvider): string {
   return `${provider}-${crypto.randomUUID()}`;
 }
 
+async function fetchWithTimeout(url: string, options: RequestInit & { timeoutMs?: number }): Promise<Response> {
+  const { timeoutMs = 30000, ...fetchOptions } = options;
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, {
+      ...fetchOptions,
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(id);
+  }
+}
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs = 30000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("Request timed out")), timeoutMs)
+    ),
+  ]);
+}
+
 export class DemoModelAdapter implements ModelAdapter {
   provider = "demo" as const;
 
@@ -120,15 +143,25 @@ export class DemoModelAdapter implements ModelAdapter {
   }
 
   async *stream(request: ModelRequest): AsyncIterable<ModelStreamEvent> {
-    const response = await this.complete(request);
-    const words = response.content.split(" ");
-    for (const [index, word] of words.entries()) {
+    try {
+      const response = await this.complete(request);
+      const words = response.content.split(" ");
+      for (const [index, word] of words.entries()) {
+        yield {
+          type: "delta",
+          text: `${index === 0 ? "" : " "}${word}`,
+        };
+      }
+      yield { type: "done", response };
+    } catch (error) {
       yield {
-        type: "delta",
-        text: `${index === 0 ? "" : " "}${word}`,
+        type: "error",
+        error: {
+          code: "DEMO_STREAM_ERROR",
+          message: error instanceof Error ? error.message : String(error),
+        },
       };
     }
-    yield { type: "done", response };
   }
 
   async health(): Promise<{ ok: boolean; details?: string }> {
@@ -142,18 +175,26 @@ export class OllamaAdapter implements ModelAdapter {
   constructor(private readonly baseUrl = process.env.OLLAMA_BASE_URL ?? "http://localhost:11434") {}
 
   async listModels(): Promise<string[]> {
-    const response = await fetch(`${this.baseUrl}/api/tags`);
-    if (!response.ok) {
-      throw new Error(`Ollama model listing failed with HTTP ${response.status}.`);
+    try {
+      const response = await fetchWithTimeout(`${this.baseUrl}/api/tags`, { timeoutMs: 10000 });
+      if (!response.ok) {
+        throw new Error(`Ollama model listing failed with HTTP ${response.status}.`);
+      }
+      const payload = (await response.json()) as { models?: Array<{ name?: string }> };
+      const models = (payload.models ?? [])
+        .map((model) => model.name)
+        .filter((name): name is string => Boolean(name));
+      if (models.length === 0) {
+        return ["llama3", "mistral", "gemma", "phi3"];
+      }
+      return models;
+    } catch {
+      return ["llama3", "mistral", "gemma", "phi3"];
     }
-    const payload = (await response.json()) as { models?: Array<{ name?: string }> };
-    return (payload.models ?? [])
-      .map((model) => model.name)
-      .filter((name): name is string => Boolean(name));
   }
 
   async complete(request: ModelRequest): Promise<ModelResponse> {
-    const response = await fetch(`${this.baseUrl}/api/chat`, {
+    const response = await fetchWithTimeout(`${this.baseUrl}/api/chat`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -162,6 +203,7 @@ export class OllamaAdapter implements ModelAdapter {
         stream: false,
         options: { num_predict: request.maxTokens ?? 8192 },
       }),
+      timeoutMs: 30000,
     });
 
     if (!response.ok) {
@@ -198,22 +240,32 @@ export class OllamaAdapter implements ModelAdapter {
   }
 
   async *stream(request: ModelRequest): AsyncIterable<ModelStreamEvent> {
-    const response = await this.complete(request);
-    yield { type: "delta", text: response.content };
-    yield { type: "done", response };
+    try {
+      const response = await this.complete(request);
+      yield { type: "delta", text: response.content };
+      yield { type: "done", response };
+    } catch (error) {
+      yield {
+        type: "error",
+        error: {
+          code: "OLLAMA_STREAM_ERROR",
+          message: error instanceof Error ? error.message : String(error),
+        },
+      };
+    }
   }
 
   async health(): Promise<{ ok: boolean; latencyMs?: number; details?: string }> {
     const startedAt = Date.now();
     try {
-      const response = await fetch(`${this.baseUrl}/api/version`);
-      return {
+      const response = await fetchWithTimeout(`${this.baseUrl}/api/version`, { timeoutMs: 10000 });
+      return { 
         ok: response.ok,
         latencyMs: Date.now() - startedAt,
         details: response.ok ? "Ollama is reachable." : `Ollama returned HTTP ${response.status}.`,
       };
     } catch (error) {
-      return {
+      return { 
         ok: false,
         latencyMs: Date.now() - startedAt,
         details: error instanceof Error ? error.message : "Ollama is unreachable.",
@@ -233,14 +285,21 @@ export class OpenAiAdapter implements ModelAdapter {
   async listModels(): Promise<string[]> {
     if (!this.apiKey) return [];
     try {
-      const response = await fetch(`${this.baseUrl}/models`, {
-        headers: { "Authorization": `Bearer ${this.apiKey}` }
+      const response = await fetchWithTimeout(`${this.baseUrl}/models`, {
+        headers: { "Authorization": `Bearer ${this.apiKey}` },
+        timeoutMs: 10000
       });
-      if (!response.ok) return [];
+      if (!response.ok) {
+        return ["gpt-4o", "gpt-4o-mini", "gpt-4", "gpt-3.5-turbo"];
+      }
       const payload = await response.json() as { data?: Array<{ id: string }> };
-      return (payload.data ?? []).map((m) => m.id);
+      const list = (payload.data ?? []).map((m) => m.id);
+      if (list.length === 0) {
+        return ["gpt-4o", "gpt-4o-mini", "gpt-4", "gpt-3.5-turbo"];
+      }
+      return list;
     } catch {
-      return [];
+      return ["gpt-4o", "gpt-4o-mini", "gpt-4", "gpt-3.5-turbo"];
     }
   }
 
@@ -248,7 +307,7 @@ export class OpenAiAdapter implements ModelAdapter {
     if (!this.apiKey) {
       throw new Error("OPENAI_API_KEY environment variable is not set.");
     }
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+    const response = await fetchWithTimeout(`${this.baseUrl}/chat/completions`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -260,6 +319,7 @@ export class OpenAiAdapter implements ModelAdapter {
         stream: false,
         max_tokens: request.maxTokens
       }),
+      timeoutMs: 30000,
     });
 
     if (!response.ok) {
@@ -298,80 +358,113 @@ export class OpenAiAdapter implements ModelAdapter {
     if (!this.apiKey) {
       throw new Error("OPENAI_API_KEY environment variable is not set.");
     }
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "Authorization": `Bearer ${this.apiKey}`,
-        "Accept": "text/event-stream"
-      },
-      body: JSON.stringify({
-        model: request.model,
-        messages: request.messages,
-        stream: true,
-        max_tokens: request.maxTokens
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`OpenAI API request failed with HTTP ${response.status}: ${await response.text()}`);
-    }
-
-    if (!response.body) {
-      throw new Error("OpenAI returned an empty body.");
-    }
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-
+    let accumulatedContent = "";
     try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || "";
-        
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed || !trimmed.startsWith("data: ")) continue;
-          const data = trimmed.slice(6);
-          if (data === "[DONE]") return;
+      const response = await fetchWithTimeout(`${this.baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "Authorization": `Bearer ${this.apiKey}`,
+          "Accept": "text/event-stream"
+        },
+        body: JSON.stringify({
+          model: request.model,
+          messages: request.messages,
+          stream: true,
+          max_tokens: request.maxTokens
+        }),
+        timeoutMs: 30000,
+      });
+
+      if (!response.ok) {
+        throw new Error(`OpenAI API request failed with HTTP ${response.status}: ${await response.text()}`);
+      }
+
+      if (!response.body) {
+        throw new Error("OpenAI returned an empty body.");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let isDone = false;
+
+      try {
+        while (!isDone) {
+          const { done, value } = await reader.read();
+          if (done) break;
           
-          try {
-            const parsed = JSON.parse(data);
-            const content = parsed.choices?.[0]?.delta?.content;
-            if (content) {
-              yield { type: "delta", text: content };
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || "";
+          
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || !trimmed.startsWith("data: ")) continue;
+            const data = trimmed.slice(6);
+            if (data === "[DONE]") {
+              isDone = true;
+              break;
             }
-          } catch (e) {
-            // Ignore parse errors for incomplete chunks
+            
+            try {
+              const parsed = JSON.parse(data);
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) {
+                accumulatedContent += content;
+                yield { type: "delta", text: content };
+              }
+            } catch (e) {
+              // Ignore parse errors for incomplete chunks
+            }
           }
         }
+      } finally {
+        reader.releaseLock();
       }
-    } finally {
-      reader.releaseLock();
+      
+      const inputTokens = estimateTokens(request.messages.map((m) => m.content).join(" "));
+      const outputTokens = estimateTokens(accumulatedContent);
+      const modelResponse: ModelResponse = {
+        id: responseId(this.provider),
+        provider: this.provider,
+        model: request.model,
+        content: accumulatedContent,
+        finishReason: "stop",
+        usage: {
+          inputTokens,
+          outputTokens,
+          totalTokens: inputTokens + outputTokens,
+        },
+      };
+
+      yield { type: "done", response: modelResponse };
+    } catch (error) {
+      yield {
+        type: "error",
+        error: {
+          code: "OPENAI_STREAM_ERROR",
+          message: error instanceof Error ? error.message : String(error),
+        },
+      };
     }
-    
-    yield { type: "done" };
   }
 
   async health(): Promise<{ ok: boolean; latencyMs?: number; details?: string }> {
     const startedAt = Date.now();
     try {
       if (!this.apiKey) return { ok: false, details: "OPENAI_API_KEY is not set" };
-      const response = await fetch(`${this.baseUrl}/models`, {
-        headers: { "Authorization": `Bearer ${this.apiKey}` }
+      const response = await fetchWithTimeout(`${this.baseUrl}/models`, {
+        headers: { "Authorization": `Bearer ${this.apiKey}` },
+        timeoutMs: 10000
       });
-      return {
+      return { 
         ok: response.ok,
         latencyMs: Date.now() - startedAt,
         details: response.ok ? "OpenAI is reachable." : `OpenAI returned HTTP ${response.status}.`,
       };
     } catch (error) {
-      return {
+      return { 
         ok: false,
         latencyMs: Date.now() - startedAt,
         details: error instanceof Error ? error.message : "OpenAI is unreachable.",
@@ -393,8 +486,13 @@ export class ModelGateway {
       throw new Error(`No model adapter is registered for provider "${provider}".`);
     }
     const models = await adapter.listModels();
-    if (provider !== "demo" && models.length > 0 && !models.includes(model)) {
-      throw new Error(`Model "${model}" is not available from provider "${provider}".`);
+    if (provider !== "demo") {
+      if (models.length === 0) {
+        throw new Error(`Failed to list available models for provider "${provider}".`);
+      }
+      if (!models.includes(model)) {
+        throw new Error(`Model "${model}" is not available from provider "${provider}".`);
+      }
     }
     return adapter;
   }
@@ -450,14 +548,17 @@ export class GeminiModelAdapter implements ModelAdapter {
         parts: [{ text: m.content }],
       }));
 
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: contents.length > 0 ? contents : [{ role: "user", parts: [{ text: "Hello" }] }],
-      config: {
-        systemInstruction: systemMessage?.content,
-        maxOutputTokens: request.maxTokens,
-      },
-    });
+    const response = await withTimeout(
+      ai.models.generateContent({
+        model: modelName,
+        contents: contents.length > 0 ? contents : [{ role: "user", parts: [{ text: "Hello" }] }],
+        config: {
+          systemInstruction: systemMessage?.content,
+          maxOutputTokens: request.maxTokens,
+        },
+      }),
+      30000
+    );
 
     const text = response.text || "";
     const inputTokens = request.messages.reduce(
@@ -481,34 +582,68 @@ export class GeminiModelAdapter implements ModelAdapter {
   }
 
   async *stream(request: ModelRequest): AsyncIterable<ModelStreamEvent> {
-    const ai = this.getClient();
-    const modelName = request.model || "gemini-2.5-flash";
+    let accumulatedContent = "";
+    try {
+      const ai = this.getClient();
+      const modelName = request.model || "gemini-2.5-flash";
 
-    const systemMessage = request.messages.find((m) => m.role === "system");
-    const contents = request.messages
-      .filter((m) => m.role !== "system")
-      .map((m) => ({
-        role: m.role === "assistant" ? "model" : "user",
-        parts: [{ text: m.content }],
-      }));
+      const systemMessage = request.messages.find((m) => m.role === "system");
+      const contents = request.messages
+        .filter((m) => m.role !== "system")
+        .map((m) => ({
+          role: m.role === "assistant" ? "model" : "user",
+          parts: [{ text: m.content }],
+        }));
 
-    const responseStream = await ai.models.generateContentStream({
-      model: modelName,
-      contents: contents.length > 0 ? contents : [{ role: "user", parts: [{ text: "Hello" }] }],
-      config: {
-        systemInstruction: systemMessage?.content,
-        maxOutputTokens: request.maxTokens,
-      },
-    });
+      const responseStream = await withTimeout(
+        ai.models.generateContentStream({
+          model: modelName,
+          contents: contents.length > 0 ? contents : [{ role: "user", parts: [{ text: "Hello" }] }],
+          config: {
+            systemInstruction: systemMessage?.content,
+            maxOutputTokens: request.maxTokens,
+          },
+        }),
+        30000
+      );
 
-    for await (const chunk of responseStream) {
-      const text = chunk.text;
-      if (text) {
-        yield { type: "delta", text };
+      for await (const chunk of responseStream) {
+        const text = chunk.text;
+        if (text) {
+          accumulatedContent += text;
+          yield { type: "delta", text };
+        }
       }
-    }
 
-    yield { type: "done" };
+      const inputTokens = request.messages.reduce(
+        (total, m) => total + estimateTokens(m.content),
+        0
+      );
+      const outputTokens = estimateTokens(accumulatedContent);
+
+      const modelResponse: ModelResponse = {
+        id: responseId(this.provider),
+        provider: this.provider,
+        model: modelName,
+        content: accumulatedContent,
+        finishReason: "stop",
+        usage: {
+          inputTokens,
+          outputTokens,
+          totalTokens: inputTokens + outputTokens,
+        },
+      };
+
+      yield { type: "done", response: modelResponse };
+    } catch (error) {
+      yield {
+        type: "error",
+        error: {
+          code: "GEMINI_STREAM_ERROR",
+          message: error instanceof Error ? error.message : String(error),
+        },
+      };
+    }
   }
 
   async health(): Promise<{ ok: boolean; latencyMs?: number; details?: string }> {
@@ -537,3 +672,4 @@ modelGateway.register(new DemoModelAdapter());
 modelGateway.register(new OllamaAdapter());
 modelGateway.register(new OpenAiAdapter());
 modelGateway.register(new GeminiModelAdapter());
+

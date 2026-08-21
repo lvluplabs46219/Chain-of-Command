@@ -142,9 +142,12 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
 // ==========================================
 // 6. Cryptographic Verification Utilities
 // ==========================================
-export function verifyHmacSignature(rawBody: Buffer, signatureHeader: string | undefined, secret: string): boolean {
+export function verifyHmacSignature(rawBody: Buffer, signatureHeader: string | undefined, secret: string, timestampHeader?: string): boolean {
   if (!signatureHeader) return false;
   const hmac = crypto.createHmac('sha256', secret);
+  if (timestampHeader) {
+    hmac.update(timestampHeader + '.');
+  }
   hmac.update(rawBody);
   const calculatedSignature = 'sha256=' + hmac.digest('hex');
 
@@ -169,7 +172,9 @@ export function verifyHumanGateToken(token: string, secret: string, expectedFili
     }
 
     const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf8'));
-    const isNotExpired = Date.now() - payload.timestamp < 15 * 60 * 1000; // 15-minute validity window
+    if (typeof payload.timestamp !== 'number') return false;
+    const age = Date.now() - payload.timestamp;
+    const isNotExpired = age >= 0 && age < 15 * 60 * 1000; // 15-minute validity window
     const isFilingMatch = payload.filingId === expectedFilingId;
 
     return isNotExpired && isFilingMatch && payload.authorized === true;
@@ -219,13 +224,13 @@ app.use(
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Filing-Auth-Token', 'X-Signature'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Filing-Auth-Token', 'X-Signature', 'X-Timestamp'],
   })
 );
 
 app.use(
   express.json({
-    limit: '20mb',
+    limit: '2mb',
     verify: (req: Request, _res, buf) => {
       req.rawBody = buf;
     },
@@ -246,7 +251,20 @@ app.get('/healthz', (_req: Request, res: Response) => {
 // Webhook: CourtListener Docket Ingestion (HMAC-Verified)
 app.post('/api/webhooks/courtlistener', async (req: Request, res: Response) => {
   const signature = req.headers['x-signature'] as string | undefined;
-  if (!req.rawBody || !env.COURTLISTENER_WEBHOOK_SECRET || !verifyHmacSignature(req.rawBody, signature, env.COURTLISTENER_WEBHOOK_SECRET)) {
+  const timestampHeader = req.headers['x-timestamp'] as string | undefined;
+
+  if (!timestampHeader) {
+    logger.warn('Webhook rejected: missing X-Timestamp header');
+    return res.status(400).json({ error: 'Missing X-Timestamp header' });
+  }
+
+  const timestamp = parseInt(timestampHeader, 10);
+  if (isNaN(timestamp) || Math.abs(Date.now() - timestamp) > 5 * 60 * 1000) {
+    logger.warn({ timestampHeader }, 'Webhook rejected: invalid or expired timestamp');
+    return res.status(401).json({ error: 'Webhook timestamp validation failed' });
+  }
+
+  if (!req.rawBody || !env.COURTLISTENER_WEBHOOK_SECRET || !verifyHmacSignature(req.rawBody, signature, env.COURTLISTENER_WEBHOOK_SECRET, timestampHeader)) {
     logger.warn('Unauthorized webhook delivery attempt: invalid HMAC signature');
     return res.status(401).json({ error: 'Invalid webhook signature' });
   }
@@ -284,6 +302,18 @@ app.post('/api/filings/submit', requireAuth, rateLimitMiddleware, async (req: Re
   const { matterId, filingId, courtId, packageStoragePath } = parse.data;
   const humanGateToken = req.headers['x-filing-auth-token'] as string | undefined;
 
+  // 1. Ownership Check / IDOR Protection
+  const { data: filing, error: filingError } = await supabaseAdmin
+    .from('filings')
+    .select('id, user_id, matter_id')
+    .eq('id', filingId)
+    .single();
+
+  if (filingError || !filing || filing.user_id !== req.user!.id || filing.matter_id !== matterId) {
+    logger.warn({ filingId, matterId, userId: req.user!.id }, 'Unauthorized filing or matter access attempt');
+    return res.status(403).json({ error: 'Access denied: Filing/Matter ownership mismatch or not found' });
+  }
+
   if (!humanGateToken || !env.FILING_GATE_SECRET || !verifyHumanGateToken(humanGateToken, env.FILING_GATE_SECRET, filingId)) {
     logger.warn({ filingId, userId: req.user!.id }, 'Filing submission rejected: Human authorization gate validation failed.');
     return res.status(403).json({
@@ -292,8 +322,20 @@ app.post('/api/filings/submit', requireAuth, rateLimitMiddleware, async (req: Re
   }
 
   try {
-    // Record immutable audit log entry
-    await supabaseAdmin.from('audit_logs').insert({
+    // 2. Mark filing status as approved/submitted
+    const { data: updateData, error: updateError } = await supabaseAdmin
+      .from('filings')
+      .update({ status: 'submitted', updated_at: new Date().toISOString() })
+      .eq('id', filingId)
+      .eq('user_id', req.user!.id)
+      .select();
+
+    if (updateError || !updateData || updateData.length === 0) {
+      throw new Error(updateError?.message || 'Filing update failed or filing not found');
+    }
+
+    // 3. Record immutable audit log entry
+    const { error: auditError } = await supabaseAdmin.from('audit_logs').insert({
       user_id: req.user!.id,
       matter_id: matterId,
       action: 'COURT_FILING_AUTHORIZED_SUBMISSION',
@@ -306,12 +348,14 @@ app.post('/api/filings/submit', requireAuth, rateLimitMiddleware, async (req: Re
       },
     });
 
-    // Mark filing status as approved/submitted
-    await supabaseAdmin
-      .from('filings')
-      .update({ status: 'submitted', updated_at: new Date().toISOString() })
-      .eq('id', filingId)
-      .eq('user_id', req.user!.id);
+    if (auditError) {
+      // Compensating action: revert status update to ensure consistency
+      await supabaseAdmin
+        .from('filings')
+        .update({ status: 'draft', updated_at: new Date().toISOString() })
+        .eq('id', filingId);
+      throw new Error(`Audit log entry failed: ${auditError.message}`);
+    }
 
     return res.status(200).json({
       status: 'submitted',
