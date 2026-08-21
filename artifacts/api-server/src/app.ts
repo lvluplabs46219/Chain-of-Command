@@ -5,10 +5,6 @@ import helmetModule from "helmet";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
-// pino-http and helmet publish callable CommonJS exports whose TypeScript
-// declarations can be exposed as module namespaces under Vercel/Bun's
-// bundler resolution. Normalize them once at the boundary so the app remains
-// type-safe regardless of the package-manager/module-resolution combination.
 const pinoHttp = pinoHttpModule as unknown as (options?: any) => any;
 const helmet = helmetModule as unknown as (options?: any) => any;
 
@@ -34,14 +30,23 @@ app.use(
   }),
 );
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(",")
-  : ["http://localhost:3000", "http://localhost:5173"];
+const parseAllowedOrigins = (): (string | RegExp)[] => {
+  const envOrigins = process.env.ALLOWED_ORIGINS;
+  if (!envOrigins) {
+    return ["http://localhost:3000", "http://localhost:5173"];
+  }
+  const origins = envOrigins.split(",").map(o => o.trim()).filter(Boolean);
+  if (origins.some(o => o === "*")) {
+    throw new Error("Wildcard CORS origin '*' is strictly forbidden when credentials are enabled.");
+  }
+  return origins;
+};
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: parseAllowedOrigins(),
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 }));
 
 app.use(helmet({
@@ -49,7 +54,7 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
-      styleSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
       connectSrc: [
         "'self'",
         "https://*.supabase.co",
@@ -57,7 +62,7 @@ app.use(helmet({
         "https://*.googleapis.com",
         "https://api.openai.com",
       ],
-      imgSrc: ["'self'", 'data:', 'https:'],
+      imgSrc: ["'self'", "data:", "https:"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: []
     }

@@ -1,6 +1,5 @@
-import { randomUUID } from 'crypto';
-import * as crypto from 'crypto';
-import { logger } from '../lib/logger';
+import * as crypto from "crypto";
+import { logger } from "../lib/logger";
 
 export interface FilingGateChallenge {
   matterId: string;
@@ -9,16 +8,8 @@ export interface FilingGateChallenge {
   timestamp: number;
 }
 
-export interface ComputerUseTask {
-  courtId: string;
-  portalUrl: string;
-  instructions: string;
-  actionType: 'READ' | 'AI_ASSISTED' | 'HUMAN_ACTION';
-  requiresHumanAuthorization?: boolean;
-}
-
 export interface ComputerUseResult {
-  status: 'success' | 'failed' | 'pending_human';
+  status: "success" | "failed" | "pending_human";
   extractedData?: any;
   auditTrail: {
     screenshots: string[];
@@ -28,108 +19,145 @@ export interface ComputerUseResult {
   };
 }
 
-/**
- * Custom type guard to validate FilingGateChallenge structure
- */
 function isFilingGateChallenge(obj: any): obj is FilingGateChallenge {
   return (
     obj !== null &&
-    typeof obj === 'object' &&
-    typeof obj.matterId === 'string' &&
+    typeof obj === "object" &&
+    typeof obj.matterId === "string" &&
     /^[a-zA-Z0-9\-_]+$/.test(obj.matterId) &&
-    typeof obj.payloadHash === 'string' &&
-    typeof obj.userSignature === 'string' &&
-    typeof obj.timestamp === 'number'
+    typeof obj.payloadHash === "string" &&
+    typeof obj.userSignature === "string" &&
+    typeof obj.timestamp === "number"
   );
 }
 
-/**
- * Validates standard case number formats to prevent injection attacks
- */
 function validateCaseNumber(caseNumber: string): void {
-  if (typeof caseNumber !== 'string') {
+  if (typeof caseNumber !== "string") {
     throw new Error("Invalid case number type");
   }
-  // Standard court case numbers: alphanumeric, dashes, dots, slashes, spaces. Length 3-50.
   const caseNumberRegex = /^[a-zA-Z0-9.\-\/\s]{3,50}$/;
   if (!caseNumberRegex.test(caseNumber)) {
     throw new Error("Invalid case number format");
   }
 }
 
-/**
- * Computer Use Court Adapter
- * Acts as a headless browser bridge for courts without APIs.
- * Integrates with Browserbase / Steel.dev under the hood.
- */
+function validateDocumentUrl(documentUrl: string): void {
+  if (typeof documentUrl !== "string" || documentUrl.length === 0) {
+    throw new Error("Invalid document URL: must be a non-empty string.");
+  }
+
+  try {
+    const url = new URL(documentUrl);
+
+    if (url.protocol !== "https:") {
+      throw new Error("Invalid document URL: only HTTPS protocol is allowed.");
+    }
+
+    const hostname = url.hostname.toLowerCase();
+    if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "0.0.0.0") {
+      throw new Error("Invalid document URL: localhost access is forbidden.");
+    }
+
+    const ipMatch = hostname.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+    if (ipMatch) {
+      const parts = ipMatch.slice(1).map(Number);
+      if (
+        parts[0] === 10 ||
+        (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
+        (parts[0] === 192 && parts[1] === 168) ||
+        (parts[0] === 169 && parts[1] === 254)
+      ) {
+        throw new Error("Invalid document URL: access to private or metadata IP ranges is forbidden.");
+      }
+    }
+
+    if (documentUrl.length > 2048) {
+      throw new Error("Invalid document URL: exceeds maximum length (2048 characters).");
+    }
+  } catch (error: any) {
+    throw new Error(`Document URL validation failed: ${error.message}`);
+  }
+}
+
 export class ComputerUseCourtAdapter {
-  /**
-   * Layer 1: READ Adapter (Low Risk, High Value)
-   */
   async extractDocket(caseNumber: string, portalUrl: string): Promise<ComputerUseResult> {
     logger.info(`Initiating Computer Use READ task for case ${caseNumber}`);
-    
     validateCaseNumber(caseNumber);
-    const systemPrompt = this.getDoxpopSystemPrompt(caseNumber);
-    
+    validateDocumentUrl(portalUrl);
+
     return {
-      status: 'success',
+      status: "success",
       extractedData: {
-        events: [{ date: new Date().toISOString(), description: 'Scraped from portal' }]
+        events: [{ date: new Date().toISOString(), description: "Scraped from portal" }]
       },
       auditTrail: {
-        screenshots: ['s3://audit-logs/screenshot-1.png'],
+        screenshots: ["s3://audit-logs/screenshot-1.png"],
         timestamp: new Date().toISOString()
       }
     };
   }
 
-  /**
-   * Layer 3: HUMAN_ACTION Executor
-   */
   async stageFiling(caseNumber: string, documentUrl: string, userToken: string): Promise<ComputerUseResult> {
     logger.info(`Initiating Computer Use HUMAN_ACTION task for case ${caseNumber}`);
-    
     validateCaseNumber(caseNumber);
-    if (!this.verifyHumanGate(userToken)) {
+    validateDocumentUrl(documentUrl);
+
+    const documentUrlHash = crypto.createHash("sha256").update(documentUrl).digest("hex");
+
+    if (!this.verifyHumanGate(userToken, documentUrlHash)) {
       throw new Error("Human authorization gate failed. Cannot stage filing.");
     }
-    
-    return { 
-      status: 'pending_human',
+
+    return {
+      status: "pending_human",
       auditTrail: {
-        screenshots: ['s3://audit-logs/staged-filing-ready.png'],
-        videoRecordingUrl: 's3://audit-logs/staging-session.mp4',
+        screenshots: ["s3://audit-logs/staged-filing-ready.png"],
+        videoRecordingUrl: "s3://audit-logs/staging-session.mp4",
         timestamp: new Date().toISOString()
       }
     };
   }
 
-  private verifyHumanGate(token: string): boolean { 
+  private verifyHumanGate(token: string, expectedDocumentHash: string): boolean {
     const secret = process.env.HUMAN_GATE_HMAC_SECRET;
-    if (!secret || !token) return false;
+    if (!secret || !token) {
+      logger.warn("Human gate verification failed: secret or token missing.");
+      return false;
+    }
 
     try {
       const challenge: unknown = JSON.parse(token);
-      
-      if (!isFilingGateChallenge(challenge)) return false;
+      if (!isFilingGateChallenge(challenge)) {
+        logger.warn("Human gate verification failed: invalid challenge structure.");
+        return false;
+      }
 
-      // Enforce both past and future bounds to prevent replay and future-date bypass attacks
+      if (challenge.payloadHash !== expectedDocumentHash) {
+        logger.warn("Human gate challenge failed: payloadHash does not match document.");
+        return false;
+      }
+
       const age = Date.now() - challenge.timestamp;
-      if (age < 0 || age > 5 * 60 * 1000) return false;
+      if (age < 0 || age > 5 * 60 * 1000) {
+        logger.warn("Human gate challenge failed: token expired or future-dated.");
+        return false;
+      }
 
       const expectedPayload = `${challenge.matterId}:${challenge.payloadHash}:${challenge.timestamp}`;
       const expectedSignature = crypto
-        .createHmac('sha256', secret)
+        .createHmac("sha256", secret)
         .update(expectedPayload)
-        .digest('hex');
+        .digest("hex");
 
-      const sigBuffer = Buffer.from(challenge.userSignature);
-      const expectedBuffer = Buffer.from(expectedSignature);
+      const sigBuffer = Buffer.from(challenge.userSignature, "hex");
+      const expectedBuffer = Buffer.from(expectedSignature, "hex");
 
-      if (sigBuffer.length !== expectedBuffer.length) return false;
+      if (sigBuffer.length !== expectedBuffer.length) {
+        return false;
+      }
       return crypto.timingSafeEqual(sigBuffer, expectedBuffer);
-    } catch {
+    } catch (error: any) {
+      logger.error(`Error during human gate verification: ${error.message}`);
       return false;
     }
   }
