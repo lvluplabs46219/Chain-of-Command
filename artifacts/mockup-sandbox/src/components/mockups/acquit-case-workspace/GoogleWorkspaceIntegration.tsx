@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  FileText,
   FolderOpen,
-  Upload,
   ExternalLink,
   CheckCircle2,
   RefreshCw,
@@ -19,9 +17,11 @@ import {
   Calendar,
   AlertCircle,
   FileSpreadsheet,
-  Clock,
-  Shield,
-  Filter,
+  ListTodo,
+  MapPin,
+  Compass,
+  Layers,
+  Check,
 } from "lucide-react";
 import {
   initGoogleAuth,
@@ -35,11 +35,17 @@ import {
   fetchFormResponses,
   listLegalEmails,
   createGmailDraft,
+  listLegalCalendarEvents,
+  addCaseEventToCalendar,
+  listCourtroomTasks,
+  addCourtroomTask,
   type GoogleDriveFile,
   type LegalSpreadsheet,
   type LegalGoogleForm,
   type FormResponseItem,
   type GmailMessageItem,
+  type LegalCalendarEvent,
+  type LegalTaskItem,
   type User,
 } from "../../../lib/googleWorkspace";
 
@@ -55,10 +61,24 @@ export function GoogleWorkspaceIntegration({
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"sheets" | "forms" | "gmail" | "drive">("sheets");
+  const [activeTab, setActiveTab] = useState<
+    "calendar" | "tasks" | "sheets" | "forms" | "gmail" | "drive" | "map"
+  >("calendar");
 
   // Notifications
   const [statusMessage, setStatusMessage] = useState<{ text: string; type: "success" | "info" } | null>(null);
+
+  // Calendar State
+  const [calendarEvents, setCalendarEvents] = useState<LegalCalendarEvent[]>([]);
+  const [isFetchingCalendar, setIsFetchingCalendar] = useState(false);
+  const [isAddingEvent, setIsAddingEvent] = useState(false);
+
+  // Tasks State
+  const [tasks, setTasks] = useState<LegalTaskItem[]>([]);
+  const [isFetchingTasks, setIsFetchingTasks] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskNotes, setNewTaskNotes] = useState("");
+  const [isAddingTask, setIsAddingTask] = useState(false);
 
   // Sheets State
   const [isExportingSheet, setIsExportingSheet] = useState(false);
@@ -68,7 +88,6 @@ export function GoogleWorkspaceIntegration({
   const [isCreatingForm, setIsCreatingForm] = useState(false);
   const [activeForm, setActiveForm] = useState<LegalGoogleForm | null>(null);
   const [formResponses, setFormResponses] = useState<FormResponseItem[]>([]);
-  const [isLoadingResponses, setIsLoadingResponses] = useState(false);
 
   // Gmail State
   const [legalEmails, setLegalEmails] = useState<GmailMessageItem[]>([]);
@@ -80,7 +99,6 @@ export function GoogleWorkspaceIntegration({
   const [draftBody, setDraftBody] = useState(
     `Dear Prosecutor Miller,\n\nI am writing regarding State v. Thompson (${caseNumber}) to respectfully request confirmation on the estimated delivery date for the BWC digital evidence upload from IMPD Incident #24-99182.\n\nThank you,\nAlex Thompson\nDefendant Pro Se`
   );
-  const [createdDraft, setCreatedDraft] = useState<{ draftId: string } | null>(null);
   const [showSendConfirmation, setShowSendConfirmation] = useState(false);
 
   // Drive & Docs State
@@ -89,6 +107,11 @@ export function GoogleWorkspaceIntegration({
   const [isFetchingFiles, setIsFetchingFiles] = useState(false);
   const [isExportingDoc, setIsExportingDoc] = useState(false);
   const [exportedDoc, setExportedDoc] = useState<{ docUrl: string; title: string } | null>(null);
+
+  // Map Scene Reconstruction State
+  const [selectedSceneView, setSelectedSceneView] = useState<"satellite" | "street" | "cad">("street");
+  const [sightlineDistance] = useState("42.5 feet");
+  const [lightingCondition] = useState("Dusk (18:24 EST) - Streetlamp #14 Active");
 
   useEffect(() => {
     const unsubscribe = initGoogleAuth(
@@ -103,6 +126,8 @@ export function GoogleWorkspaceIntegration({
         setDriveFiles([]);
         setLegalEmails([]);
         setExportedSheets([]);
+        setCalendarEvents([]);
+        setTasks([]);
         setActiveForm(null);
       }
     );
@@ -122,9 +147,9 @@ export function GoogleWorkspaceIntegration({
         setUser(res.user);
         setToken(res.accessToken);
         await loadAllWorkspaceData(res.accessToken);
-        showNotification("Connected to Google Workspace (Sheets, Forms, Gmail, Drive).");
+        showNotification("Connected to Google Workspace (Calendar, Tasks, Sheets, Forms, Gmail, Drive).");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Google Auth error:", err);
     } finally {
       setIsLoading(false);
@@ -138,16 +163,97 @@ export function GoogleWorkspaceIntegration({
     setDriveFiles([]);
     setLegalEmails([]);
     setExportedSheets([]);
+    setCalendarEvents([]);
+    setTasks([]);
     setActiveForm(null);
     setExportedDoc(null);
   };
 
   const loadAllWorkspaceData = async (accessToken: string) => {
+    void loadCalendar(accessToken);
+    void loadTasks(accessToken);
     void loadDriveFiles(accessToken);
     void loadEmails(accessToken);
   };
 
-  // 1. Google Sheets Operations
+  // 1. Google Calendar
+  const loadCalendar = async (accessToken: string) => {
+    setIsFetchingCalendar(true);
+    try {
+      const events = await listLegalCalendarEvents(accessToken);
+      setCalendarEvents(events);
+    } catch (err) {
+      console.warn("Calendar load error:", err);
+    } finally {
+      setIsFetchingCalendar(false);
+    }
+  };
+
+  const handleSyncHearingToCalendar = async () => {
+    if (!token) return;
+    setIsAddingEvent(true);
+    try {
+      const newEv = await addCaseEventToCalendar(token, {
+        summary: `Pre-Trial Conference — ${caseNumber}`,
+        description: `Pre-trial motion arguments before Judge Vance in ${courtName}.`,
+        location: "Marion County Superior Court, Rm 312",
+        startIso: "2026-10-28T10:00:00-04:00",
+        endIso: "2026-10-28T11:30:00-04:00",
+      });
+      setCalendarEvents((prev) => [newEv, ...prev]);
+      showNotification(`Synced "${newEv.summary}" to Google Calendar.`);
+    } catch (err) {
+      console.error("Calendar add error:", err);
+    } finally {
+      setIsAddingEvent(false);
+    }
+  };
+
+  // 2. Google Tasks
+  const loadTasks = async (accessToken: string) => {
+    setIsFetchingTasks(true);
+    try {
+      const items = await listCourtroomTasks(accessToken);
+      setTasks(items);
+    } catch (err) {
+      console.warn("Tasks load error:", err);
+    } finally {
+      setIsFetchingTasks(false);
+    }
+  };
+
+  const handleAddTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token || !newTaskTitle.trim()) return;
+    setIsAddingTask(true);
+    try {
+      const item = await addCourtroomTask(token, {
+        title: newTaskTitle.trim(),
+        notes: newTaskNotes.trim() || undefined,
+        due: new Date(Date.now() + 86400000 * 7).toISOString(),
+      });
+      setTasks((prev) => [item, ...prev]);
+      setNewTaskTitle("");
+      setNewTaskNotes("");
+      showNotification(`Added task "${item.title}" to Google Tasks.`);
+    } catch (err) {
+      console.error("Task add error:", err);
+    } finally {
+      setIsAddingTask(false);
+    }
+  };
+
+  const toggleTaskStatus = (taskId: string) => {
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === taskId
+          ? { ...t, status: t.status === "completed" ? "needsAction" : "completed" }
+          : t
+      )
+    );
+  };
+
+  // 3. Google Sheets
   const handleExportChronologySheet = async () => {
     if (!token) return;
     setIsExportingSheet(true);
@@ -187,7 +293,7 @@ export function GoogleWorkspaceIntegration({
     }
   };
 
-  // 2. Google Forms Operations
+  // 4. Google Forms
   const handleCreateWitnessForm = async () => {
     if (!token) return;
     setIsCreatingForm(true);
@@ -195,7 +301,8 @@ export function GoogleWorkspaceIntegration({
       const form = await createWitnessQuestionnaireForm(token, caseNumber);
       setActiveForm(form);
       showNotification(`Generated Google Form: "${form.title}"`);
-      await loadFormResponses(token, form.formId);
+      const responses = await fetchFormResponses(token, form.formId);
+      setFormResponses(responses);
     } catch (err) {
       console.error("Form creation error:", err);
     } finally {
@@ -203,19 +310,7 @@ export function GoogleWorkspaceIntegration({
     }
   };
 
-  const loadFormResponses = async (accessToken: string, formId: string) => {
-    setIsLoadingResponses(true);
-    try {
-      const responses = await fetchFormResponses(accessToken, formId);
-      setFormResponses(responses);
-    } catch (err) {
-      console.error("Responses fetch error:", err);
-    } finally {
-      setIsLoadingResponses(false);
-    }
-  };
-
-  // 3. Gmail Operations
+  // 5. Gmail
   const loadEmails = async (accessToken: string, query?: string) => {
     setIsFetchingEmails(true);
     try {
@@ -233,7 +328,6 @@ export function GoogleWorkspaceIntegration({
     setIsDraftingEmail(true);
     try {
       const result = await createGmailDraft(token, draftRecipient, draftSubject, draftBody);
-      setCreatedDraft(result);
       setShowSendConfirmation(false);
       showNotification(`Saved legal correspondence draft in Gmail (ID: ${result.draftId}).`);
     } catch (err) {
@@ -243,7 +337,7 @@ export function GoogleWorkspaceIntegration({
     }
   };
 
-  // 4. Google Drive & Docs Operations
+  // 6. Google Drive & Docs
   const loadDriveFiles = async (accessToken: string, query?: string) => {
     setIsFetchingFiles(true);
     try {
@@ -288,9 +382,9 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
   };
 
   return (
-    <div className="space-y-6">
+    <div id="google-workspace-integration-root" className="space-y-6">
       {/* Header Banner */}
-      <div className="rounded-2xl border border-white/10 bg-gradient-to-r from-[#174E48]/40 via-[#0B2523]/60 to-black/60 p-6 shadow-xl backdrop-blur-xl">
+      <div id="workspace-header-banner" className="rounded-2xl border border-white/10 bg-gradient-to-r from-[#174E48]/40 via-[#0B2523]/60 to-black/60 p-6 shadow-xl backdrop-blur-xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center border border-white/15 shadow-inner">
@@ -299,14 +393,14 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-serif font-bold text-white tracking-wide">
-                  Google Workspace Legal Hub
+                  Integrated Legal Command Center
                 </h2>
                 <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30">
-                  Sheets · Forms · Gmail · Drive
+                  Calendar · Tasks · Sheets · Forms · Gmail · Drive · Scene Map
                 </span>
               </div>
               <p className="text-xs text-white/70 mt-0.5">
-                Organize case chronologies in Sheets, collect witness statements via Forms, scan court notices in Gmail, and edit pleadings in Docs.
+                Full-spectrum legal toolkit: Court calendar sync, preparation tasks, chronologies in Sheets, witness forms, Gmail notices, Docs pleadings, and Maps incident reconstruction.
               </p>
             </div>
           </div>
@@ -314,6 +408,7 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
           <div>
             {!user ? (
               <button
+                id="btn-google-signin"
                 onClick={handleSignIn}
                 disabled={isLoading}
                 className="flex items-center gap-3 px-5 py-2.5 rounded-xl bg-white text-[#1f1f1f] hover:bg-neutral-100 transition font-medium text-xs shadow-lg border border-neutral-300 disabled:opacity-50 cursor-pointer"
@@ -344,10 +439,11 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
                   <div className="text-xs font-medium text-white">{user.displayName || user.email}</div>
                   <div className="text-[10px] text-emerald-400 flex items-center gap-1 justify-end">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    Google Workspace Active
+                    Google Workspace & Maps Connected
                   </div>
                 </div>
                 <button
+                  id="btn-google-signout"
                   onClick={handleSignOut}
                   className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition border border-white/10"
                   title="Sign out of Google"
@@ -370,6 +466,31 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
       {/* Workspace Navigation Tabs */}
       <div className="flex border-b border-white/10 gap-2 overflow-x-auto">
         <button
+          id="tab-btn-calendar"
+          onClick={() => setActiveTab("calendar")}
+          className={`flex items-center gap-2 px-4 py-3 text-xs font-bold tracking-wider uppercase transition border-b-2 ${
+            activeTab === "calendar"
+              ? "border-[#4285F4] text-[#60A5FA] bg-[#4285F4]/10"
+              : "border-transparent text-white/50 hover:text-white/80"
+          }`}
+        >
+          <Calendar className="w-4 h-4" />
+          Google Calendar
+        </button>
+        <button
+          id="tab-btn-tasks"
+          onClick={() => setActiveTab("tasks")}
+          className={`flex items-center gap-2 px-4 py-3 text-xs font-bold tracking-wider uppercase transition border-b-2 ${
+            activeTab === "tasks"
+              ? "border-[#FBBC05] text-[#FDE047] bg-[#FBBC05]/10"
+              : "border-transparent text-white/50 hover:text-white/80"
+          }`}
+        >
+          <ListTodo className="w-4 h-4" />
+          Google Tasks
+        </button>
+        <button
+          id="tab-btn-sheets"
           onClick={() => setActiveTab("sheets")}
           className={`flex items-center gap-2 px-4 py-3 text-xs font-bold tracking-wider uppercase transition border-b-2 ${
             activeTab === "sheets"
@@ -381,6 +502,7 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
           Google Sheets
         </button>
         <button
+          id="tab-btn-forms"
           onClick={() => setActiveTab("forms")}
           className={`flex items-center gap-2 px-4 py-3 text-xs font-bold tracking-wider uppercase transition border-b-2 ${
             activeTab === "forms"
@@ -392,6 +514,7 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
           Google Forms
         </button>
         <button
+          id="tab-btn-gmail"
           onClick={() => setActiveTab("gmail")}
           className={`flex items-center gap-2 px-4 py-3 text-xs font-bold tracking-wider uppercase transition border-b-2 ${
             activeTab === "gmail"
@@ -403,6 +526,7 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
           Gmail Notices
         </button>
         <button
+          id="tab-btn-drive"
           onClick={() => setActiveTab("drive")}
           className={`flex items-center gap-2 px-4 py-3 text-xs font-bold tracking-wider uppercase transition border-b-2 ${
             activeTab === "drive"
@@ -413,15 +537,251 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
           <FolderOpen className="w-4 h-4" />
           Drive & Docs
         </button>
+        <button
+          id="tab-btn-map"
+          onClick={() => setActiveTab("map")}
+          className={`flex items-center gap-2 px-4 py-3 text-xs font-bold tracking-wider uppercase transition border-b-2 ${
+            activeTab === "map"
+              ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/10"
+              : "border-transparent text-white/50 hover:text-white/80"
+          }`}
+        >
+          <MapPin className="w-4 h-4" />
+          Scene Reconstruction
+        </button>
       </div>
 
       {/* ======================================================== */}
-      {/* 1. GOOGLE SHEETS VIEW */}
+      {/* 1. GOOGLE CALENDAR VIEW */}
+      {/* ======================================================== */}
+      {activeTab === "calendar" && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-[#4285F4]" />
+                  <h3 className="font-semibold text-white text-sm">Court Hearing & Statutory Clocks</h3>
+                </div>
+                <p className="text-xs text-white/60 leading-relaxed">
+                  Synchronize omnibus hearings, trial calls, and statutory speedy trial countdown clocks (e.g., Indiana Criminal Rule 4 70-day discharge rule) directly into your Google Calendar.
+                </p>
+                <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1.5 text-[11px] text-white/70">
+                  <div className="text-emerald-400 font-semibold">✓ Automated 24h & 2h pop-up reminders</div>
+                  <div>✓ Speedy trial discharge tracking</div>
+                  <div>✓ Discovery cutoff deadline alarms</div>
+                </div>
+              </div>
+
+              <div>
+                {!user ? (
+                  <button
+                    onClick={handleSignIn}
+                    className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 text-xs font-medium border border-white/10 flex items-center justify-center gap-2 transition cursor-pointer"
+                  >
+                    <Lock className="w-3.5 h-3.5" /> Sign in to Sync Calendar
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleSyncHearingToCalendar}
+                    disabled={isAddingEvent}
+                    className="w-full py-2.5 px-4 rounded-xl bg-[#4285F4]/80 hover:bg-[#4285F4] text-white text-xs font-semibold shadow-lg flex items-center justify-center gap-2 transition disabled:opacity-50 cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                    {isAddingEvent ? "Syncing..." : "Sync Next Hearing to Calendar"}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-white text-sm">Scheduled Case Deadlines & Appearances</h3>
+                  <p className="text-xs text-white/50">Google Calendar Events ({calendarEvents.length} events logged)</p>
+                </div>
+                {user && (
+                  <button
+                    onClick={() => token && loadCalendar(token)}
+                    disabled={isFetchingCalendar}
+                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition cursor-pointer"
+                    title="Refresh Calendar"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isFetchingCalendar ? "animate-spin" : ""}`} />
+                  </button>
+                )}
+              </div>
+
+              {!user ? (
+                <div className="p-8 rounded-xl bg-black/30 border border-white/5 text-center text-xs text-white/40 space-y-2">
+                  <Calendar className="w-6 h-6 mx-auto text-white/20" />
+                  <div>Connect Google account to view active court deadlines and omnibus schedules.</div>
+                </div>
+              ) : calendarEvents.length === 0 ? (
+                <div className="p-6 rounded-xl bg-black/30 text-center text-xs text-white/40">
+                  {isFetchingCalendar ? "Loading calendar events..." : "No events found."}
+                </div>
+              ) : (
+                <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                  {calendarEvents.map((ev) => (
+                    <div
+                      key={ev.id}
+                      className="p-4 rounded-xl bg-black/40 border border-white/10 hover:border-white/20 transition space-y-2"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`px-2 py-0.5 rounded text-[9px] font-bold ${
+                              ev.category === "SPEEDY_TRIAL"
+                                ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                                : ev.category === "DISCOVERY"
+                                ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                                : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                            }`}
+                          >
+                            {ev.category}
+                          </span>
+                          <span className="font-semibold text-xs text-white">{ev.summary}</span>
+                        </div>
+                        <span className="text-[10px] text-white/40 font-mono">
+                          {new Date(ev.start.dateTime).toLocaleDateString()} · {new Date(ev.start.dateTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-white/60 leading-relaxed">{ev.description}</p>
+                      <div className="text-[10px] text-white/40 flex items-center gap-1.5">
+                        <MapPin className="w-3 h-3 text-[#D4AF37]" />
+                        <span>{ev.location}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* 2. GOOGLE TASKS VIEW */}
+      {/* ======================================================== */}
+      {activeTab === "tasks" && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md space-y-4">
+              <div className="flex items-center gap-2">
+                <ListTodo className="w-5 h-5 text-[#FBBC05]" />
+                <h3 className="font-semibold text-white text-sm">Add Preparation Task</h3>
+              </div>
+              <p className="text-xs text-white/60 leading-relaxed">
+                Log critical action items like evidence subpoenas, witness interviews, or exhibit packet printing to Google Tasks.
+              </p>
+
+              <form onSubmit={handleAddTask} className="space-y-3">
+                <div>
+                  <label className="text-[10px] uppercase font-bold text-white/40 block mb-1">Task Title</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Subpoena dispatch radio logs"
+                    value={newTaskTitle}
+                    onChange={(e) => setNewTaskTitle(e.target.value)}
+                    className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-[#FBBC05]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase font-bold text-white/40 block mb-1">Notes / Instructions</label>
+                  <textarea
+                    rows={3}
+                    placeholder="e.g. Reference IMPD incident #24-99182"
+                    value={newTaskNotes}
+                    onChange={(e) => setNewTaskNotes(e.target.value)}
+                    className="w-full p-2.5 text-xs rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-[#FBBC05] resize-none"
+                  />
+                </div>
+
+                {!user ? (
+                  <button
+                    type="button"
+                    onClick={handleSignIn}
+                    className="w-full py-2 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 text-xs font-medium border border-white/10 flex items-center justify-center gap-2 transition cursor-pointer"
+                  >
+                    <Lock className="w-3.5 h-3.5" /> Sign in to Add Task
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={isAddingTask || !newTaskTitle.trim()}
+                    className="w-full py-2.5 px-4 rounded-xl bg-[#FBBC05]/90 hover:bg-[#FBBC05] text-black text-xs font-semibold shadow-lg flex items-center justify-center gap-2 transition disabled:opacity-50 cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                    {isAddingTask ? "Adding..." : "Add to Google Tasks"}
+                  </button>
+                )}
+              </form>
+            </div>
+
+            <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-white text-sm">Courtroom Readiness Checklist</h3>
+                  <p className="text-xs text-white/50">Synced with Google Tasks API ({tasks.length} tasks)</p>
+                </div>
+                {user && (
+                  <button
+                    onClick={() => token && loadTasks(token)}
+                    disabled={isFetchingTasks}
+                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition cursor-pointer"
+                    title="Refresh Tasks"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isFetchingTasks ? "animate-spin" : ""}`} />
+                  </button>
+                )}
+              </div>
+
+              {!user ? (
+                <div className="p-8 rounded-xl bg-black/30 border border-white/5 text-center text-xs text-white/40 space-y-2">
+                  <ListTodo className="w-6 h-6 mx-auto text-white/20" />
+                  <div>Connect Google account to view active courtroom prep checklist.</div>
+                </div>
+              ) : (
+                <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+                  {tasks.map((task) => (
+                    <div
+                      key={task.id}
+                      onClick={() => toggleTaskStatus(task.id)}
+                      className={`p-3 rounded-xl border transition flex items-start gap-3 cursor-pointer ${
+                        task.status === "completed"
+                          ? "bg-black/20 border-white/5 text-white/40 line-through"
+                          : "bg-black/40 border-white/10 hover:border-white/20 text-white"
+                      }`}
+                    >
+                      <div
+                        className={`mt-0.5 w-4 h-4 rounded flex items-center justify-center border transition shrink-0 ${
+                          task.status === "completed"
+                            ? "bg-emerald-500 border-emerald-500 text-black"
+                            : "border-white/30 hover:border-white/60"
+                        }`}
+                      >
+                        {task.status === "completed" && <Check className="w-3 h-3 stroke-[3]" />}
+                      </div>
+                      <div className="space-y-0.5 flex-1">
+                        <div className="text-xs font-medium">{task.title}</div>
+                        {task.notes && <div className="text-[11px] text-white/50 not-italic">{task.notes}</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* 3. GOOGLE SHEETS VIEW */}
       {/* ======================================================== */}
       {activeTab === "sheets" && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Sheet Creator 1: Case Chronology */}
             <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md flex flex-col justify-between space-y-4">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
@@ -442,7 +802,7 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
                 {!user ? (
                   <button
                     onClick={handleSignIn}
-                    className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 text-xs font-medium border border-white/10 flex items-center justify-center gap-2 transition"
+                    className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 text-xs font-medium border border-white/10 flex items-center justify-center gap-2 transition cursor-pointer"
                   >
                     <Lock className="w-3.5 h-3.5" /> Sign in to Create Google Sheet
                   </button>
@@ -459,7 +819,6 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
               </div>
             </div>
 
-            {/* Sheet Creator 2: Witness Credibility Matrix */}
             <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md flex flex-col justify-between space-y-4">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
@@ -479,7 +838,7 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
                 {!user ? (
                   <button
                     onClick={handleSignIn}
-                    className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 text-xs font-medium border border-white/10 flex items-center justify-center gap-2 transition"
+                    className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 text-xs font-medium border border-white/10 flex items-center justify-center gap-2 transition cursor-pointer"
                   >
                     <Lock className="w-3.5 h-3.5" /> Sign in to Create Matrix
                   </button>
@@ -497,7 +856,6 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
             </div>
           </div>
 
-          {/* Active Spreadsheets List */}
           {exportedSheets.length > 0 && (
             <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md space-y-3">
               <h3 className="text-xs font-bold tracking-widest text-[#D4AF37] uppercase">
@@ -533,12 +891,11 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
       )}
 
       {/* ======================================================== */}
-      {/* 2. GOOGLE FORMS VIEW */}
+      {/* 4. GOOGLE FORMS VIEW */}
       {/* ======================================================== */}
       {activeTab === "forms" && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Left 1/3: Form Generator */}
             <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md flex flex-col justify-between space-y-4">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
@@ -565,7 +922,7 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
                 {!user ? (
                   <button
                     onClick={handleSignIn}
-                    className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 text-xs font-medium border border-white/10 flex items-center justify-center gap-2 transition"
+                    className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 text-xs font-medium border border-white/10 flex items-center justify-center gap-2 transition cursor-pointer"
                   >
                     <Lock className="w-3.5 h-3.5" /> Sign in to Create Form
                   </button>
@@ -582,7 +939,6 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
               </div>
             </div>
 
-            {/* Right 2/3: Live Form Details & Responses */}
             <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md space-y-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -616,10 +972,10 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
               {formResponses.length === 0 ? (
                 <div className="p-8 rounded-xl bg-black/30 border border-white/5 text-center text-xs text-white/40 space-y-2">
                   <CheckSquare className="w-6 h-6 mx-auto text-white/20" />
-                  <div>No witness submissions yet. Click "Deploy Witness Form" to generate your form link.</div>
+                  <div>No witness submissions yet. Click &quot;Deploy Witness Form&quot; to generate your form link.</div>
                 </div>
               ) : (
-                <div className="space-y-3 max-h-80 overflow-y-auto pr-1 custom-scrollbar">
+                <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
                   {formResponses.map((resp) => (
                     <div
                       key={resp.responseId}
@@ -636,7 +992,7 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
                           <div key={idx} className="space-y-0.5">
                             <div className="text-[11px] text-white/50">{a.question}</div>
                             <div className="text-white/90 bg-white/[0.02] p-2 rounded-lg border border-white/5">
-                              "{a.answer}"
+                              &quot;{a.answer}&quot;
                             </div>
                           </div>
                         ))}
@@ -651,12 +1007,11 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
       )}
 
       {/* ======================================================== */}
-      {/* 3. GMAIL VIEW */}
+      {/* 5. GMAIL VIEW */}
       {/* ======================================================== */}
       {activeTab === "gmail" && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Left 2/3: Legal Notice Scanner */}
             <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -672,7 +1027,7 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
                   <button
                     onClick={() => token && loadEmails(token, emailSearchQuery)}
                     disabled={isFetchingEmails}
-                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition"
+                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition cursor-pointer"
                     title="Refresh Gmail"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isFetchingEmails ? "animate-spin" : ""}`} />
@@ -697,129 +1052,89 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
               )}
 
               {!user ? (
-                <div className="p-8 rounded-xl bg-black/30 border border-white/5 text-center text-xs text-white/50 space-y-3">
-                  <Lock className="w-6 h-6 mx-auto text-white/30" />
-                  <div>Connect your Google account to scan for electronic service and clerk notifications.</div>
-                  <button
-                    onClick={handleSignIn}
-                    className="px-4 py-2 rounded-xl bg-white text-black text-xs font-semibold mx-auto hover:bg-neutral-200 transition"
-                  >
-                    Sign in to Scan Gmail
-                  </button>
-                </div>
-              ) : legalEmails.length === 0 ? (
-                <div className="p-6 rounded-xl bg-black/30 text-center text-xs text-white/40">
-                  {isFetchingEmails ? "Scanning mailbox..." : "No court or prosecutor emails found matching query."}
+                <div className="p-8 rounded-xl bg-black/30 border border-white/5 text-center text-xs text-white/40 space-y-2">
+                  <Mail className="w-6 h-6 mx-auto text-white/20" />
+                  <div>Connect Google account to scan for formal judicial communications.</div>
                 </div>
               ) : (
-                <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1 custom-scrollbar">
-                  {legalEmails.map((email) => (
+                <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                  {legalEmails.map((msg) => (
                     <div
-                      key={email.id}
-                      className="p-3 rounded-xl bg-black/40 border border-white/10 hover:border-white/20 transition space-y-1.5"
+                      key={msg.id}
+                      className="p-4 rounded-xl bg-black/40 border border-white/10 hover:border-white/20 transition space-y-1.5"
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          {email.isCourtNotice && (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30">
-                              COURT NOTICE
-                            </span>
-                          )}
-                          <span className="font-semibold text-xs text-white truncate max-w-xs">{email.from}</span>
-                        </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-semibold text-white">{msg.from}</span>
                         <span className="text-[10px] text-white/40">
-                          {new Date(email.date).toLocaleDateString()}
+                          {new Date(msg.date).toLocaleDateString()}
                         </span>
                       </div>
-                      <div className="text-xs font-medium text-white/90">{email.subject}</div>
-                      <div className="text-[11px] text-white/50 line-clamp-2 leading-relaxed">
-                        {email.snippet}
+                      <div className="text-xs text-[#D4AF37] font-medium flex items-center gap-2">
+                        {msg.isCourtNotice && (
+                          <span className="px-1.5 py-0.5 rounded text-[9px] bg-red-500/20 text-red-300 font-bold">
+                            Official Court Notice
+                          </span>
+                        )}
+                        <span>{msg.subject}</span>
                       </div>
+                      <p className="text-[11px] text-white/60 line-clamp-2">{msg.snippet}</p>
                     </div>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Right 1/3: Draft Legal Correspondence */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md flex flex-col justify-between space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Send className="w-4 h-4 text-[#EA4335]" />
-                  <h3 className="font-semibold text-white text-sm">Draft Pro Se Inquiry</h3>
-                </div>
-                <p className="text-[11px] text-white/60 leading-relaxed">
-                  Compose formal email inquiries to the court reporter or prosecutor. Safeguarded by mandatory human review before draft creation.
-                </p>
-
-                <div className="space-y-2">
-                  <div>
-                    <label className="text-[10px] uppercase font-bold text-white/40 block mb-1">To</label>
-                    <input
-                      type="text"
-                      value={draftRecipient}
-                      onChange={(e) => setDraftRecipient(e.target.value)}
-                      className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-[#EA4335]"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] uppercase font-bold text-white/40 block mb-1">Subject</label>
-                    <input
-                      type="text"
-                      value={draftSubject}
-                      onChange={(e) => setDraftSubject(e.target.value)}
-                      className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-[#EA4335]"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] uppercase font-bold text-white/40 block mb-1">Body Text</label>
-                    <textarea
-                      rows={4}
-                      value={draftBody}
-                      onChange={(e) => setDraftBody(e.target.value)}
-                      className="w-full p-2.5 text-xs rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-[#EA4335] leading-relaxed resize-none"
-                    />
-                  </div>
-                </div>
+            {/* Email Drafting Panel */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md space-y-4">
+              <div className="flex items-center gap-2">
+                <Send className="w-5 h-5 text-[#EA4335]" />
+                <h3 className="font-semibold text-white text-sm">Formal Correspondence Draft</h3>
               </div>
+              <p className="text-xs text-white/60">
+                Draft a professional communication and save it directly to Gmail Drafts for review.
+              </p>
 
-              <div>
+              <div className="space-y-2.5">
+                <div>
+                  <label className="text-[10px] uppercase font-bold text-white/40 block mb-1">Recipient</label>
+                  <input
+                    type="text"
+                    value={draftRecipient}
+                    onChange={(e) => setDraftRecipient(e.target.value)}
+                    className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-[#EA4335]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase font-bold text-white/40 block mb-1">Subject</label>
+                  <input
+                    type="text"
+                    value={draftSubject}
+                    onChange={(e) => setDraftSubject(e.target.value)}
+                    className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-[#EA4335]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase font-bold text-white/40 block mb-1">Body Content</label>
+                  <textarea
+                    rows={4}
+                    value={draftBody}
+                    onChange={(e) => setDraftBody(e.target.value)}
+                    className="w-full p-2.5 text-xs rounded-lg bg-black/40 border border-white/10 text-white focus:outline-none focus:border-[#EA4335] resize-none font-mono"
+                  />
+                </div>
+
                 {!user ? (
                   <button
                     onClick={handleSignIn}
-                    className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 text-xs font-medium border border-white/10 flex items-center justify-center gap-2 transition"
+                    className="w-full py-2 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 text-xs font-medium border border-white/10 flex items-center justify-center gap-2 transition cursor-pointer"
                   >
                     <Lock className="w-3.5 h-3.5" /> Sign in to Save Draft
                   </button>
-                ) : showSendConfirmation ? (
-                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2 text-xs">
-                    <div className="text-amber-300 font-semibold flex items-center gap-1.5">
-                      <AlertCircle className="w-4 h-4 shrink-0" />
-                      Confirm Draft Creation in Gmail
-                    </div>
-                    <p className="text-[11px] text-white/70">
-                      This will create a draft in your Gmail account for your review. (No email is sent automatically).
-                    </p>
-                    <div className="flex gap-2 pt-1">
-                      <button
-                        onClick={handleCreateDraft}
-                        disabled={isDraftingEmail}
-                        className="flex-1 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-[11px] transition"
-                      >
-                        {isDraftingEmail ? "Saving..." : "Confirm & Save"}
-                      </button>
-                      <button
-                        onClick={() => setShowSendConfirmation(false)}
-                        className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] transition"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
                 ) : (
                   <button
                     onClick={() => setShowSendConfirmation(true)}
-                    className="w-full py-2.5 px-4 rounded-xl bg-[#EA4335]/80 hover:bg-[#EA4335] text-white text-xs font-semibold shadow-lg flex items-center justify-center gap-2 transition cursor-pointer"
+                    disabled={isDraftingEmail}
+                    className="w-full py-2.5 px-4 rounded-xl bg-[#EA4335]/90 hover:bg-[#EA4335] text-white text-xs font-semibold shadow-lg flex items-center justify-center gap-2 transition disabled:opacity-50 cursor-pointer"
                   >
                     <Mail className="w-4 h-4" />
                     Save Draft to Gmail
@@ -832,143 +1147,280 @@ WHEREFORE, Defendant prays that this Court grant this Motion and order timely pr
       )}
 
       {/* ======================================================== */}
-      {/* 4. GOOGLE DRIVE & DOCS VIEW */}
+      {/* 6. DRIVE & DOCS VIEW */}
       {/* ======================================================== */}
       {activeTab === "drive" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Left Card: Google Docs Exporter */}
-          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md flex flex-col justify-between space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-[#4285F4]" />
-                <h3 className="font-semibold text-white text-sm">Export Court Motion to Google Docs</h3>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <FolderOpen className="w-5 h-5 text-[#4285F4]" />
+                  <h3 className="font-semibold text-white text-sm">Export Pleading to Google Docs</h3>
+                </div>
+                <p className="text-xs text-white/60 leading-relaxed">
+                  Export ready-to-file legal pleadings with proper captioning, statutory authorities, and pro se verification blocks directly into Google Docs.
+                </p>
+                <div className="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] text-white/70 space-y-1">
+                  <div className="text-emerald-400 font-semibold">✓ Formal court captioning template</div>
+                  <div>✓ Verified pro se verification block</div>
+                  <div>✓ Brady & Giglio constitutional grounds</div>
+                </div>
               </div>
-              <p className="text-xs text-white/60 leading-relaxed">
-                Export the AI-drafted <strong className="text-white">Motion for Discovery & Body-Cam Production</strong> directly into a fresh Google Doc formatted with legal captions.
-              </p>
-              <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 font-mono text-[11px] text-white/80 space-y-1">
-                <div><strong>Court:</strong> {courtName}</div>
-                <div><strong>Case:</strong> {caseNumber}</div>
-                <div><strong>Doc:</strong> Motion for Discovery Production</div>
-              </div>
-            </div>
 
-            <div className="pt-2">
-              {!user ? (
-                <button
-                  onClick={handleSignIn}
-                  className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 text-xs font-medium border border-white/10 flex items-center justify-center gap-2 transition"
-                >
-                  <Lock className="w-3.5 h-3.5" /> Sign in to Export to Google Docs
-                </button>
-              ) : (
-                <div className="space-y-3">
+              <div>
+                {!user ? (
+                  <button
+                    onClick={handleSignIn}
+                    className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 text-xs font-medium border border-white/10 flex items-center justify-center gap-2 transition cursor-pointer"
+                  >
+                    <Lock className="w-3.5 h-3.5" /> Sign in to Export Document
+                  </button>
+                ) : (
                   <button
                     onClick={handleExportMotionToDocs}
                     disabled={isExportingDoc}
-                    className="w-full py-2.5 px-4 rounded-xl bg-[#4285F4]/80 hover:bg-[#4285F4] text-white text-xs font-semibold shadow-lg flex items-center justify-center gap-2 transition disabled:opacity-50 cursor-pointer"
+                    className="w-full py-2.5 px-4 rounded-xl bg-[#4285F4]/90 hover:bg-[#4285F4] text-white text-xs font-semibold shadow-lg flex items-center justify-center gap-2 transition disabled:opacity-50 cursor-pointer"
                   >
                     <Sparkles className="w-4 h-4" />
-                    {isExportingDoc ? "Formatting & Creating Google Doc..." : "Create Legal Pleading in Google Docs"}
+                    {isExportingDoc ? "Generating Doc..." : "Generate Motion in Google Docs"}
                   </button>
-
-                  {exportedDoc && (
-                    <a
-                      href={exportedDoc.docUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center justify-between hover:bg-emerald-500/20 transition group"
-                    >
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                        <span className="font-medium">Open "{exportedDoc.title}" in Google Docs</span>
-                      </div>
-                      <ExternalLink className="w-3.5 h-3.5 text-emerald-400 group-hover:translate-x-0.5 transition-transform" />
-                    </a>
-                  )}
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Right Card: Google Drive Case Records */}
-          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md flex flex-col justify-between space-y-4">
-            <div className="space-y-3">
+            <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md space-y-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <FolderOpen className="w-5 h-5 text-[#D4AF37]" />
-                  <h3 className="font-semibold text-white text-sm">Google Drive Case Records</h3>
+                <div>
+                  <h3 className="font-semibold text-white text-sm">Google Drive Evidence & Pleadings</h3>
+                  <p className="text-xs text-white/50">
+                    Linked case repository ({driveFiles.length} files detected)
+                  </p>
                 </div>
                 {user && (
                   <button
                     onClick={() => token && loadDriveFiles(token, driveSearchQuery)}
                     disabled={isFetchingFiles}
-                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition"
-                    title="Refresh Drive files"
+                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition cursor-pointer"
+                    title="Refresh Files"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isFetchingFiles ? "animate-spin" : ""}`} />
                   </button>
                 )}
               </div>
-              <p className="text-xs text-white/60 leading-relaxed">
-                Browse discovery packets, police report scans, or witness statements directly from your personal Google Drive account.
-              </p>
 
               {user && (
                 <div className="relative">
                   <Search className="w-3.5 h-3.5 text-white/40 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    placeholder="Search files in Google Drive..."
+                    placeholder="Filter Drive files by keyword (e.g. incident, bwc, statement)..."
                     value={driveSearchQuery}
                     onChange={(e) => {
                       setDriveSearchQuery(e.target.value);
                       if (token) loadDriveFiles(token, e.target.value);
                     }}
-                    className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg bg-black/40 border border-white/10 text-white placeholder-white/40 focus:outline-none focus:border-[#D4AF37]"
+                    className="w-full pl-8 pr-3 py-2 text-xs rounded-lg bg-black/40 border border-white/10 text-white placeholder-white/40 focus:outline-none focus:border-[#4285F4]"
                   />
                 </div>
               )}
-            </div>
 
-            <div className="pt-2">
+              {exportedDoc && (
+                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span>Created: <strong>{exportedDoc.title}</strong></span>
+                  </div>
+                  <a
+                    href={exportedDoc.docUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs flex items-center gap-1 font-semibold transition"
+                  >
+                    Open Google Doc <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              )}
+
               {!user ? (
-                <button
-                  onClick={handleSignIn}
-                  className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 text-xs font-medium border border-white/10 flex items-center justify-center gap-2 transition"
-                >
-                  <Lock className="w-3.5 h-3.5" /> Sign in to Browse Drive Files
-                </button>
-              ) : driveFiles.length === 0 ? (
-                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 text-center text-xs text-white/50">
-                  {isFetchingFiles ? "Scanning Google Drive..." : "No matching court files found in Google Drive."}
+                <div className="p-8 rounded-xl bg-black/30 border border-white/5 text-center text-xs text-white/40 space-y-2">
+                  <FolderOpen className="w-6 h-6 mx-auto text-white/20" />
+                  <div>Connect Google Drive to access case PDFs, bodycam still clips, and drafts.</div>
                 </div>
               ) : (
-                <div className="max-h-48 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
                   {driveFiles.map((file) => (
                     <div
                       key={file.id}
-                      className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 hover:border-white/20 flex items-center justify-between transition"
+                      className="p-3 rounded-xl bg-black/40 border border-white/10 hover:border-white/20 transition flex items-center justify-between"
                     >
-                      <div className="flex items-center gap-2.5 overflow-hidden">
-                        <FileText className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                        <div className="truncate">
-                          <div className="text-xs font-medium text-white truncate">{file.name}</div>
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-white/5 text-[#D4AF37]">
+                          <FolderOpen className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-semibold text-white">{file.name}</div>
                           <div className="text-[10px] text-white/40">
-                            {new Date(file.modifiedTime).toLocaleDateString()}
+                            {file.size || "Unknown size"} · {new Date(file.modifiedTime).toLocaleDateString()}
                           </div>
                         </div>
                       </div>
-                      <button
-                        onClick={() => showNotification(`Imported "${file.name}" into Acquit Case Workspace.`)}
-                        className="px-2 py-1 rounded-lg bg-[#174E48]/80 hover:bg-[#174E48] text-[#D4AF37] text-[10px] font-semibold flex items-center gap-1 transition shrink-0 cursor-pointer"
-                      >
-                        <Upload className="w-3 h-3" /> Import
-                      </button>
+                      {file.webViewLink && (
+                        <a
+                          href={file.webViewLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      )}
                     </div>
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* 7. SCENE RECONSTRUCTION (GOOGLE MAPS PLATFORM) */}
+      {/* ======================================================== */}
+      {activeTab === "map" && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md space-y-4">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-[#D4AF37]" />
+                <h3 className="font-semibold text-white text-sm">Incident Scene Coordinates</h3>
+              </div>
+              <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-2 text-xs text-white/80 font-mono">
+                <div><strong>Location:</strong> 450 N. Meridian St, Indianapolis, IN</div>
+                <div><strong>GPS:</strong> 39.7739° N, 86.1581° W</div>
+                <div><strong>Sightline Dist:</strong> {sightlineDistance}</div>
+                <div><strong>Lighting:</strong> {lightingCondition}</div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase font-bold text-white/40 block">Perspective Mode</label>
+                <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-black/40 border border-white/10 text-xs">
+                  <button
+                    onClick={() => setSelectedSceneView("street")}
+                    className={`py-1.5 rounded-lg font-medium transition cursor-pointer ${
+                      selectedSceneView === "street" ? "bg-[#D4AF37] text-black" : "text-white/60 hover:text-white"
+                    }`}
+                  >
+                    Street View
+                  </button>
+                  <button
+                    onClick={() => setSelectedSceneView("satellite")}
+                    className={`py-1.5 rounded-lg font-medium transition cursor-pointer ${
+                      selectedSceneView === "satellite" ? "bg-[#D4AF37] text-black" : "text-white/60 hover:text-white"
+                    }`}
+                  >
+                    Satellite
+                  </button>
+                  <button
+                    onClick={() => setSelectedSceneView("cad")}
+                    className={`py-1.5 rounded-lg font-medium transition cursor-pointer ${
+                      selectedSceneView === "cad" ? "bg-[#D4AF37] text-black" : "text-white/60 hover:text-white"
+                    }`}
+                  >
+                    Vectors
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-[11px] space-y-1">
+                <div className="font-semibold flex items-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 text-amber-400" /> Defense Sightline Finding
+                </div>
+                <p className="text-white/70">
+                  Officer vehicle was positioned 42.5 feet behind with an 18-degree visual obstruction angle from the commercial awning.
+                </p>
+              </div>
+            </div>
+
+            <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-md space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-white text-sm">Interactive Visual Scene Mockup</h3>
+                  <p className="text-xs text-white/50">Google Maps Platform Spatial Grounding</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-white/10 text-white/80">
+                    Heading: 184° S
+                  </span>
+                </div>
+              </div>
+
+              <div className="relative aspect-video rounded-xl bg-neutral-900 overflow-hidden border border-white/10 flex items-center justify-center">
+                {/* Scene Mock Rendering */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-neutral-900/40 to-black/60 flex flex-col justify-between p-4">
+                  <div className="flex items-center justify-between text-[11px] font-mono text-white/70">
+                    <span className="flex items-center gap-1.5 bg-black/60 px-2 py-1 rounded border border-white/10">
+                      <Compass className="w-3.5 h-3.5 text-[#D4AF37]" /> N 39° 46&apos; 26&quot; W 86° 09&apos; 29&quot;
+                    </span>
+                    <span className="bg-black/60 px-2 py-1 rounded border border-white/10 text-emerald-400">
+                      High Precision CAD Overlay Active
+                    </span>
+                  </div>
+
+                  <div className="text-center space-y-2">
+                    <div className="inline-block p-3 rounded-xl bg-black/75 border border-[#D4AF37]/40 text-left space-y-1 backdrop-blur-md">
+                      <div className="text-xs font-bold text-[#D4AF37] flex items-center gap-1.5">
+                        <Layers className="w-3.5 h-3.5" /> Stop Geometry & Witness Sightline Map
+                      </div>
+                      <div className="text-[11px] text-white/80">
+                        • Point A: Defendant vehicle parked at curb (450 N. Meridian)
+                      </div>
+                      <div className="text-[11px] text-white/80">
+                        • Point B: IMPD Cruiser #412 stationed behind (42.5 ft)
+                      </div>
+                      <div className="text-[11px] text-white/80">
+                        • Point C: Eyewitness Marcus Daniels at SW crosswalk
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[10px] text-white/50">
+                    <span>Elevation: 715 ft · Accuracy: ±0.4m</span>
+                    <span>IMPD Incident Report #24-99182 Geo-Anchor</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal / Confirmation for Gmail Draft */}
+      {showSendConfirmation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl bg-neutral-900 border border-white/20 p-6 space-y-4 shadow-2xl">
+            <h3 className="text-base font-bold text-white">Save Legal Draft in Gmail?</h3>
+            <p className="text-xs text-white/70 leading-relaxed">
+              This will create a draft in your Gmail account. As a safety boundary, Acquit.ai will <strong>never send emails automatically</strong>. You retain full human review and control.
+            </p>
+            <div className="p-3 rounded-xl bg-black/50 border border-white/10 text-xs font-mono text-white/80 space-y-1">
+              <div><strong>To:</strong> {draftRecipient}</div>
+              <div><strong>Subject:</strong> {draftSubject}</div>
+            </div>
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                onClick={() => setShowSendConfirmation(false)}
+                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-medium transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateDraft}
+                disabled={isDraftingEmail}
+                className="px-4 py-2 rounded-xl bg-[#EA4335] hover:bg-[#EA4335]/90 text-white text-xs font-semibold shadow-lg transition disabled:opacity-50 cursor-pointer"
+              >
+                {isDraftingEmail ? "Saving..." : "Confirm & Save Draft"}
+              </button>
             </div>
           </div>
         </div>
