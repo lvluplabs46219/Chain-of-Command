@@ -43,7 +43,7 @@ type IconType = typeof Scale;
 const navItems: { label: string; icon: IconType }[] = [
   { label: "Case overview", icon: BriefcaseBusiness },
   { label: "AI Lab", icon: Sparkles },
-  { label: "Google Drive & Docs", icon: FileText },
+  { label: "Google Workspace", icon: Sparkles },
   { label: "Find an attorney", icon: UserCheck },
   { label: "Timeline", icon: FolderOpen },
   { label: "Documents", icon: FileText },
@@ -364,7 +364,7 @@ export function CaseWorkspace() {
             
 
             {/* Sub-routing */}
-            {activeNav === "Google Drive & Docs" ? (
+            {activeNav === "Google Workspace" || activeNav === "Google Drive & Docs" ? (
               <GoogleWorkspaceIntegration
                 matterTitle="State of Indiana v. Alex Thompson"
                 caseNumber="IN-MAR-24-0187"

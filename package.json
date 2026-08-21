@@ -24,7 +24,8 @@
     "harvard:ingest": "python3 scripts/harvard_cases.py --action ingest --limit 10",
     "start": "tsx artifacts/api-server/src/index.ts",
     "prepare": "husky",
-    "test": "tsx scripts/test_compliance_and_security.ts"
+    "test": "tsx scripts/test_compliance_and_security.ts",
+    "patcher": "tsx scripts/acquit-patcher.ts"
   },
   "dependencies": {
     "@google/genai": "^2.17.1",
