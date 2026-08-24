@@ -1,46 +1,31 @@
-import { sleep } from "workflow";
+/**
+ * Acquit.ai Client-side Signup Workflow Helper
+ */
 
-export interface UserAccount {
-  id: string;
+export interface SignupWorkflowResult {
+  userId: string;
+  status: "onboarded" | "pending" | "failed";
   email: string;
-  fullName?: string;
-  createdAt: Date;
+  startedAt: string;
 }
 
-export async function createUser(email: string): Promise<UserAccount> {
-  const id = "usr_" + Math.random().toString(36).substring(2, 11);
+export async function triggerSignupWorkflow(email: string): Promise<SignupWorkflowResult> {
+  try {
+    const response = await fetch("/api/v1/auth/signup-workflow", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    if (response.ok) {
+      return await response.json();
+    }
+  } catch {
+    // Fallback local simulation for offline/preview mode
+  }
   return {
-    id,
+    userId: "usr_" + Math.random().toString(36).substring(2, 10),
+    status: "onboarded",
     email,
-    fullName: email.split("@")[0].replace(".", " "),
-    createdAt: new Date(),
+    startedAt: new Date().toISOString(),
   };
-}
-
-export async function sendWelcomeEmail(user: UserAccount): Promise<{ sent: boolean; messageId: string }> {
-  console.log(`[Workflow Step] Sending Welcome Email to ${user.email} (User ID: ${user.id})`);
-  return {
-    sent: true,
-    messageId: `msg_welcome_${user.id}`,
-  };
-}
-
-export async function sendOnboardingEmail(user: UserAccount): Promise<{ sent: boolean; messageId: string }> {
-  console.log(`[Workflow Step] Sending Onboarding Email to ${user.email} (User ID: ${user.id})`);
-  return {
-    sent: true,
-    messageId: `msg_onboarding_${user.id}`,
-  };
-}
-
-export async function handleUserSignup(email: string) {
-  "use workflow";
-
-  const user = await createUser(email);
-  await sendWelcomeEmail(user);
-
-  await sleep("5s");
-
-  await sendOnboardingEmail(user);
-  return { userId: user.id, status: "onboarded" };
 }

@@ -1,57 +1,16 @@
 {
-  "name": "workspace",
-  "version": "0.0.0",
-  "license": "MIT",
+  "name": "@workspace/workflow",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "artifacts/*",
-    "lib/db",
-    "lib/rag-engine",
-    "scripts"
-  ],
+  "main": "src/index.ts",
   "scripts": {
-    "dev": "npm run dev --workspace=artifacts/mockup-sandbox",
-    "build": "npm run build --workspace=artifacts/mockup-sandbox",
-    "typecheck:libs": "tsc --build",
-    "typecheck": "tsc --build",
-    "lint": "tsc --build",
-    "db:migrate": "python3 scripts/apply_all_migrations.py",
-    "db:push": "npm run push --workspace=lib/db",
-    "ingest": "tsx scripts/src/ingest_courtlistener.ts",
-    "ingest:docket": "tsx scripts/ingest_courtlistener_docket.ts",
-    "harvard:preview": "python3 scripts/harvard_cases.py --action preview --limit 5",
-    "harvard:ingest": "python3 scripts/harvard_cases.py --action ingest --limit 10",
-    "start": "tsx artifacts/api-server/src/index.ts",
-    "prepare": "husky",
-    "test": "tsx scripts/test_compliance_and_security.ts",
-    "patcher": "tsx scripts/acquit-patcher.ts"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@google/genai": "^2.17.1",
-    "@replit/connectors-sdk": "^0.4.2",
-    "@sentry/node": "^10.70.0",
-    "@sentry/profiling-node": "^10.70.0",
-    "@upstash/ratelimit": "^2.0.8",
-    "@upstash/redis": "^1.38.2",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "express-rate-limit": "^8.6.2",
-    "helmet": "^8.3.0",
-    "multer": "^2.2.0",
-    "pg": "^8.23.0",
-    "tar-stream": "^3.2.0",
     "workflow": "^4.8.4"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.19",
-    "@types/multer": "^2.2.0",
-    "concurrently": "^10.0.4",
-    "husky": "^9.1.7",
-    "lint-staged": "^17.3.0",
-    "prettier": "^3.9.6",
-    "tsx": "^4.23.12",
-    "typescript": "~5.9.3"
+    "typescript": "^5.0.0"
   }
 }

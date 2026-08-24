@@ -73,6 +73,16 @@ export const documentsTable = pgTable("documents", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
+export const documentChunksTable = pgTable("document_chunks", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  documentId: uuid("document_id").notNull().references(() => documentsTable.id, { onDelete: 'cascade' }),
+  chunkIndex: integer("chunk_index").notNull(),
+  chunkText: text("chunk_text").notNull(),
+  embedding: vector("embedding"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
 export const evidenceItemsTable = pgTable("evidence_items", {
   id: uuid("id").defaultRandom().primaryKey(),
   matterId: uuid("matter_id").notNull().references(() => mattersTable.id, { onDelete: 'cascade' }),
@@ -211,6 +221,7 @@ export const schema = {
   mattersTable,
   partiesTable,
   documentsTable,
+  documentChunksTable,
   evidenceItemsTable,
   timelineEventsTable,
   deadlinesTable,

@@ -1,10 +1,4 @@
-{
-  "extends": "./tsconfig.base.json",
-  "compileOnSave": false,
-  "files": [],
-  "references": [
-    {
-      "path": "./lib/db"
-    }
-  ]
-}
+import { sleep } from "workflow";
+
+export { sleep };
+export * from "workflow";

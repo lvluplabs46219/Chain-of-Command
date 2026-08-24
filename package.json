@@ -28,7 +28,7 @@
     "patcher": "tsx scripts/acquit-patcher.ts"
   },
   "dependencies": {
-    "@google/genai": "^2.17.1",
+    "@google/genai": "^2.18.0",
     "@replit/connectors-sdk": "^0.4.2",
     "@sentry/node": "^10.70.0",
     "@sentry/profiling-node": "^10.70.0",

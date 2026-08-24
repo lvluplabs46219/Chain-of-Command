@@ -1,8 +1,10 @@
 {
-  "name": "Acquit AI",
-  "description": "Legal AI case workspace platform for self-represented litigants.",
-  "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./lib/db"
+    }
   ]
 }
