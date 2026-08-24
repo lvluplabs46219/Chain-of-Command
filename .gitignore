@@ -61,3 +61,10 @@ main.yml
 .cache/
 .local/
 firebase-applet-config.json
+
+# Local development scratch & test artifacts
+Supabase.session.sql
+results.json
+
+# VS Code Workspace Settings
+.vscode/
