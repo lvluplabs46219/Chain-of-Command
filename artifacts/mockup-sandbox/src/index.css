@@ -112,10 +112,35 @@
   --sidebar-ring: 240 5.9% 10%;
 
   --font-sans: 'Inter', sans-serif;
-  --font-serif: Georgia, serif;
-  --font-mono: Menlo, monospace;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-mono: 'JetBrains Mono', Menlo, monospace;
   --radius: .5rem;
   --spacing: 0.25rem;
+
+  /* ---------------------------------------------------------------- */
+  /* SOVEREIGN (Black & Gold) — Acquit.ai brand tokens                */
+  /* Use these instead of hardcoding hex values in new components.    */
+  /* e.g. text-[color:var(--sov-gold)] or bg-[color:var(--sov-void)]  */
+  /* ---------------------------------------------------------------- */
+  --sov-void: #0A0A0A;        /* app background */
+  --sov-ink: #0E0E0E;         /* modal / raised panel background */
+  --sov-ink-2: #111214;       /* alt raised surface */
+  --sov-gold: #D4AF37;        /* primary brand / CTA / glow */
+  --sov-gold-soft: #EFE6D0;   /* warm hover text on light buttons */
+  --sov-gold-muted: #c49f27;  /* pressed / darker gold */
+  --sov-emerald: #174E48;     /* secondary buttons, agent surfaces */
+  --sov-emerald-bright: #1f665e; /* emerald hover */
+  --sov-success: #34D399;     /* verified / completed */
+  --sov-danger: #FB7185;      /* uncertainty / error */
+  --sov-glow-gold: 0 0 20px rgba(212,175,55,0.35);
+  --sov-glow-gold-sm: 0 0 12px rgba(212,175,55,0.25);
+  --sov-glow-emerald: 0 4px 20px rgba(23,78,72,0.4);
+
+  /* Alternate brand skin: Deep Blue (for a future "Pro/Enterprise" theme).
+     Swap --sov-gold-> --sov-blue and --sov-emerald -> --sov-indigo
+     app-wide by toggling a `theme-blue` class on <body> once implemented. */
+  --sov-blue: #3B82F6;
+  --sov-indigo: #1E1B4B;
 }
 
 /* DARK MODE */
@@ -181,5 +206,99 @@
     content: attr(data-placeholder);
     color: hsl(var(--muted-foreground));
     pointer-events: none;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* SOVEREIGN UI utilities — shared building blocks for Acquit.ai    */
+  /* screens. Prefer these over re-typing the same class strings.     */
+  /* ---------------------------------------------------------------- */
+
+  /* Glass panel: the base card look used across every workspace screen */
+  .sov-panel {
+    background-color: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 18px;
+    backdrop-filter: blur(24px);
+  }
+
+  /* Primary gold glow button */
+  .sov-btn-gold {
+    background-color: var(--sov-gold);
+    color: #000;
+    border-radius: 9999px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  }
+  .sov-btn-gold:hover {
+    box-shadow: var(--sov-glow-gold);
+    transform: translateY(-1px);
+  }
+
+  /* Secondary emerald button */
+  .sov-btn-emerald {
+    background-color: var(--sov-emerald);
+    color: var(--sov-gold);
+    border-radius: 9999px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  }
+  .sov-btn-emerald:hover {
+    background-color: var(--sov-emerald-bright);
+    box-shadow: var(--sov-glow-emerald);
+    transform: translateY(-1px);
+  }
+
+  /* Ghost / outline button on dark surfaces */
+  .sov-btn-outline {
+    background-color: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.20);
+    color: #fff;
+    border-radius: 9999px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+  }
+  .sov-btn-outline:hover {
+    background-color: rgba(255,255,255,0.10);
+    transform: translateY(-1px);
+  }
+
+  /* Selected/active carousel slide or list item ring+glow */
+  .sov-selected {
+    border-color: var(--sov-gold);
+    box-shadow: var(--sov-glow-gold-sm);
+    outline: 1px solid rgba(212,175,55,0.5);
+    outline-offset: -1px;
+  }
+
+  /* Live pulsing status dot (gold) */
+  .sov-live-dot {
+    position: relative;
+    display: inline-flex;
+    height: 0.5rem;
+    width: 0.5rem;
+  }
+  .sov-live-dot::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    background-color: var(--sov-gold);
+    opacity: 0.75;
+    animation: sov-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  .sov-live-dot::after {
+    content: "";
+    position: relative;
+    display: inline-flex;
+    height: 100%;
+    width: 100%;
+    border-radius: 9999px;
+    background-color: var(--sov-gold);
+  }
+  @keyframes sov-ping {
+    75%, 100% { transform: scale(2); opacity: 0; }
   }
 }
