@@ -60,11 +60,22 @@ main.yml
 # Replit
 .cache/
 .local/
+
+# Firebase - block everything
+.firebase/
+firebase.json
+.firebaserc
+firebase-debug.log
+firestore-debug.log
+firestore.indexes.json
+storage.rules
+firestore.rules
 firebase-applet-config.json
+*-firebase-*.json
+serviceAccountKey.json
+*service-account*.json
 
-# Local development scratch & test artifacts
-Supabase.session.sql
-results.json
-
-# VS Code Workspace Settings
-.vscode/
+# Env files that usually have FIREBASE_ keys
+.env
+.env.local
+.env.*.local
