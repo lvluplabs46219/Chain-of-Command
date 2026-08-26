@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { FeaturedAttorneysCarousel } from "./FeaturedAttorneysCarousel";
 import {
   Search,
   Filter,
@@ -330,6 +331,8 @@ export function AttorneyDirectory({
           </p>
         </div>
       </div>
+
+      <FeaturedAttorneysCarousel lawyers={INITIAL_LAWYERS} />
 
       {/* Filter Bar Controls */}
       <div className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.03)] p-5 space-y-4">

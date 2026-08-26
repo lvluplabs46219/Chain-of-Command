@@ -1,5 +1,6 @@
 import { useState } from "react";
-import {
+import { Sparkles } from "lucide-react";
+import { Sparkles, 
   CalendarDays,
   Check,
   CheckCircle2,

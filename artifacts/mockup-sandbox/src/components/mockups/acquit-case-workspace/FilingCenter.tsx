@@ -26,13 +26,13 @@ export function FilingCenter() {
         if (e.key === 'Escape') setShowDraftModal(false);
       };
       window.addEventListener('keydown', handleKeyDown);
-      return () => {
-        document.body.style.overflow = 'unset';
-        window.removeEventListener('keydown', handleKeyDown);
-      };
-    } else {
+          } else {
       document.body.style.overflow = 'unset';
     }
+    return () => {
+      document.body.style.overflow = 'unset';
+      if (typeof handleKeyDown !== 'undefined') window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [showDraftModal]);
 
   const handleFile = () => {

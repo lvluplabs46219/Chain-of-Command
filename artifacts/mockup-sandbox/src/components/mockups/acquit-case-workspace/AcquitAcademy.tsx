@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FeaturedCoursesCarousel } from "./FeaturedCoursesCarousel";
 import {
   GraduationCap,
   Scale,
@@ -198,6 +199,9 @@ export function AcquitAcademy() {
         </div>
       </div>
 
+      <FeaturedCoursesCarousel courses={courses} onSelect={setActiveCourse} />
+
+      <h3 className="text-[11px] font-bold uppercase tracking-wider text-white/70 mb-4">All Courses</h3>
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {courses.map((course) => (
           <div key={course.id} className="flex flex-col rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.03)] overflow-hidden hover:shadow-md transition">

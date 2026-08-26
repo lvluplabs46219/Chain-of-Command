@@ -30,6 +30,7 @@ import {
 import { AttorneyDirectory } from "./AttorneyDirectory";
 import { RagCitationViewer } from "./RagCitationViewer";
 import { CaseTimeline } from "./CaseTimeline";
+import { EvidenceCarousel } from "./EvidenceCarousel";
 import { LawLibraryExplorer } from "./LawLibraryExplorer";
 import { AcquitAcademy } from "./AcquitAcademy";
 import { AILab } from "./AILab";
@@ -381,10 +382,10 @@ export function CaseWorkspace() {
               <AcquitAcademy />
             ) : activeNav === "Filing center" ? (
               <FilingCenter />
-            ) : activeNav === "Timeline" || activeTab === "Timeline" ? (
+            ) : activeNav === "Timeline" || activeTab === "Timeline" || activeTab === "Evidence" ? (
               <div>
-                <div className="mb-8 flex gap-4 border-b border-white/10">
-                  {["Overview", "Timeline", "Documents", "Court activity"].map((tab) => (
+                <div className="mb-8 flex gap-4 border-b border-white/10 overflow-x-auto whitespace-nowrap">
+                  {["Overview", "Evidence", "Timeline", "Documents", "Court activity"].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => {
@@ -405,6 +406,13 @@ export function CaseWorkspace() {
                     </button>
                   ))}
                 </div>
+                
+                {(activeTab === "Evidence" || activeTab === "Timeline" || activeNav === "Timeline") && (
+                  <div className="mb-10 space-y-4">
+                    <EvidenceCarousel />
+                  </div>
+                )}
+                
                 <CaseTimeline
                   onOpenFilingCenter={() => setActiveNav("Filing center")}
                 />
@@ -420,7 +428,7 @@ export function CaseWorkspace() {
             ) : activeNav === "Case overview" && activeTab === "Overview" ? (
               <>
                 <div className="mb-8 flex gap-4 border-b border-white/10">
-                  {["Overview", "Timeline", "Documents", "Court activity"].map((tab) => (
+                  {["Overview", "Evidence", "Timeline", "Documents", "Court activity"].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => {

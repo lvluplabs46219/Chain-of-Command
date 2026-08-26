@@ -42,6 +42,8 @@ export interface TimelineEvent {
   description: string;
   keyTakeaways: string[];
   relatedDocumentIds?: string[];
+  linkedDocs?: { id: string; name: string; type: string }[];
+  aiInsight?: string;
   actionRequired?: string;
 }
 
