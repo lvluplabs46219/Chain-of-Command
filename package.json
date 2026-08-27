@@ -5,14 +5,12 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "artifacts/*",
-    "lib/db",
-    "lib/rag-engine",
+    "apps/*",
     "packages/*",
     "scripts"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=artifacts/mockup-sandbox",
+    "dev": "npm run dev --workspace=apps/web",
     "build": "npm run build --workspace=artifacts/mockup-sandbox",
     "typecheck:libs": "tsc --build",
     "typecheck": "tsc --build",
@@ -23,7 +21,7 @@
     "ingest:docket": "tsx scripts/ingest_courtlistener_docket.ts",
     "harvard:preview": "python3 scripts/harvard_cases.py --action preview --limit 5",
     "harvard:ingest": "python3 scripts/harvard_cases.py --action ingest --limit 10",
-    "start": "tsx artifacts/api-server/src/index.ts",
+    "start": "tsx apps/api/src/index.ts",
     "prepare": "husky",
     "test": "tsx scripts/test_compliance_and_security.ts",
     "patcher": "tsx scripts/acquit-patcher.ts"
