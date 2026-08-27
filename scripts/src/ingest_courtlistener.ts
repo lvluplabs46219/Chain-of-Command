@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config({ override: true });
-import { db, pool } from "../../lib/db/src";
-import { sourcesTable, authoritiesTable, legalChunksTable } from "../../lib/db/src/schema";
+import { db, pool } from "../../packages/db/src";
+import { sourcesTable, authoritiesTable, legalChunksTable } from "../../packages/db/src/schema";
 import { eq, sql } from "drizzle-orm";
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

@@ -15,10 +15,10 @@ export function apiPlugin(): Plugin {
 
       // Use ssrLoadModule so Vite compiles the TS file on the fly
       try {
-        const { default: app } = await server.ssrLoadModule('../api-server/src/app.ts');
+        const { default: app } = await server.ssrLoadModule('../api/src/app.ts');
         server.middlewares.use(app);
       } catch (err) {
-        console.error("Failed to load api-server app:", err);
+        console.error("Failed to load api app:", err);
       }
     }
   };
