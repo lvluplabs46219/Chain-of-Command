@@ -8,6 +8,7 @@ import { documentsRouter } from "./documents";
 import { mattersRouter } from "./matters";
 import { geminiRouter } from "./gemini";
 import { filingRouter } from "./filing";
+import auditRouter from "./audit";
 import { verifySession } from "../middleware/verifySession";
 
 const router: IRouter = Router();
@@ -23,5 +24,6 @@ router.use(documentsRouter);
 router.use(mattersRouter);
 router.use(geminiRouter);
 router.use(filingRouter);
+router.use('/audit', auditRouter as any);
 
 export default router;

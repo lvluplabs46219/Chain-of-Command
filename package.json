@@ -8,6 +8,7 @@
     "artifacts/*",
     "lib/db",
     "lib/rag-engine",
+    "packages/*",
     "scripts"
   ],
   "scripts": {
