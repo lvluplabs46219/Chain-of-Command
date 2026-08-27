@@ -1,0 +1,49 @@
+name: Deploy and Build
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Get Secrets
+        uses: bitwarden/sm-action@v2
+        with:
+          access_token: ${{ secrets.BW_ACCESS_TOKEN }}
+          base_url: https://vault.bitwarden.com
+          secrets: |
+            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > NEXT_PUBLIC_SUPABASE_URL
+            bdbb16bc-0b9b-472e-99fa-af4101309076 > SUPABASE_SERVICE_ROLE_KEY
+            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > SUPABASE_URL
+            bdbb16bc-0b9b-472e-99fa-af4101309076 > NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > NEXT_PUBLIC_SUPABASE_ANON_KEY
+            bdbb16bc-0b9b-472e-99fa-af4101309076 > SUPABASE_PUBLISHABLE_KEY
+            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > SUPABASE_ANON_KEY
+            bdbb16bc-0b9b-472e-99fa-af4101309076 > SUPABASE_SECRET_KEY
+            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > DATABASE_URL
+            bdbb16bc-0b9b-472e-99fa-af4101309076 > POSTGRES_URL
+            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > SUPABASE_JWKS_URL
+            bdbb16bc-0b9b-472e-99fa-af4101309076 > DB_HOST
+            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > DB_PORT
+            bdbb16bc-0b9b-472e-99fa-af4101309076 > DB_NAME
+            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > DB_USER
+            bdbb16bc-0b9b-472e-99fa-af4101309076 > DB_PASSWORD
+            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > GEMINI_API_KEY
+            bdbb16bc-0b9b-472e-99fa-af4101309076 > GCP_SERVICE_ACCOUNT_EMAIL
+            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > OLLAMA_BASE_URL
+            bdbb16bc-0b9b-472e-99fa-af4101309076 > WEBSCRAPER_API_KEY
+            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > BOT_TOKEN
+            bdbb16bc-0b9b-472e-99fa-af4101309076 > ANTHROPIC_API_KEY
+            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > GH_TOKEN
+            bdbb16bc-0b9b-472e-99fa-af4101309076 > GITHUB_TOKEN_AUDIT
+            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > ALLOWED_ORIGINS
+            bdbb16bc-0b9b-472e-99fa-af4101309076 > TAILSCALE_BOUND_DOMAINS
+            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > POSTMAN
+
+      - name: Verify Environment
+        run: echo "Secrets loaded successfully"
