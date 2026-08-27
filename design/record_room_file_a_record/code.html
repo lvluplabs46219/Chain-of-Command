@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Acquit.ai - Record Room</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;600;700&amp;family=Hanken+Grotesk:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#c5c6ca",
+                        "inverse-primary": "#5d5e61",
+                        "surface-container": "#201f1f",
+                        "secondary": "#b5c8df",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#e2e2e5",
+                        "surface-variant": "#353435",
+                        "on-secondary-container": "#a4b7cd",
+                        "on-primary": "#2f3133",
+                        "secondary-container": "#36485b",
+                        "primary": "#c6c6c9",
+                        "on-background": "#e5e2e1",
+                        "surface": "#141313",
+                        "on-primary-container": "#838486",
+                        "primary-fixed-dim": "#c6c6c9",
+                        "inverse-surface": "#e5e2e1",
+                        "on-tertiary-fixed": "#201b17",
+                        "tertiary-container": "#201b17",
+                        "on-secondary-fixed-variant": "#36485b",
+                        "inverse-on-surface": "#313030",
+                        "primary-container": "#1a1c1e",
+                        "on-surface": "#e5e2e1",
+                        "secondary-fixed-dim": "#b5c8df",
+                        "on-primary-fixed-variant": "#454749",
+                        "on-primary-fixed": "#1a1c1e",
+                        "background": "#141313",
+                        "on-error": "#690005",
+                        "on-tertiary-container": "#8b837d",
+                        "tertiary-fixed-dim": "#cfc5be",
+                        "secondary-fixed": "#d1e4fb",
+                        "on-tertiary": "#352f2b",
+                        "outline": "#8f9194",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-fixed": "#ebe0da",
+                        "error": "#ffb4ab",
+                        "on-secondary": "#203243",
+                        "tertiary": "#cfc5be",
+                        "outline-variant": "#44474a",
+                        "surface-dim": "#141313",
+                        "surface-container-highest": "#353435",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-bright": "#3a3939",
+                        "on-secondary-fixed": "#091d2e",
+                        "surface-tint": "#c6c6c9",
+                        "on-tertiary-fixed-variant": "#4c4641",
+                        "on-error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "margin-safe": "32px",
+                        "base": "4px",
+                        "gutter": "16px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "xl": "40px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Domine"],
+                        "headline-md": ["Domine"],
+                        "data-mono": ["JetBrains Mono"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "display-case": ["Domine"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Domine"],
+                        "label-caps": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-case": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        .border-legal { border: 1px solid theme('colors.outline-variant'); }
+        .glass-panel { background: rgba(32, 31, 31, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid theme('colors.outline-variant'); }
+        .drag-active { border-color: theme('colors.primary'); background-color: theme('colors.surface-container-high'); }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex font-body-md text-body-md">
+<!-- SideNavBar -->
+<nav class="bg-background dark:bg-background w-[280px] h-screen fixed left-0 top-0 border-r border-outline-variant flex flex-col h-full py-md z-40 hidden md:flex">
+<div class="px-lg pb-lg mb-sm border-b border-outline-variant">
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary tracking-tighter uppercase">Acquit.ai</h1>
+<p class="font-data-mono text-data-mono text-on-surface-variant mt-xs">Senior Counsel</p>
+</div>
+<div class="px-lg py-md">
+<button class="w-full bg-primary text-background font-label-caps text-label-caps py-sm px-md hover:bg-surface-tint transition-colors duration-150 flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+                NEW FILING
+            </button>
+</div>
+<ul class="flex-1 overflow-y-auto mt-sm">
+<li>
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                    Command Center
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">gavel</span>
+                    The Docket
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">account_balance</span>
+                    Chambers
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">library_books</span>
+                    Law Library
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-sm text-primary border-l-4 border-primary bg-secondary-container/30 font-bold transition-all duration-75 font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+                    Record Room
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">policy</span>
+                    Investigations
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">timeline</span>
+                    Case Timeline
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">visibility</span>
+                    Court Watch
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">groups</span>
+                    Counsel Directory
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">assignment</span>
+                    Motions &amp; Tasks
+                </a>
+</li>
+</ul>
+<div class="mt-auto border-t border-outline-variant pt-sm">
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">help</span>
+                Support
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 md:ml-[280px] flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-surface-container-low dark:bg-surface-container-low text-primary dark:text-primary h-16 fixed top-0 right-0 left-0 md:left-[280px] z-50 border-b border-outline-variant flex justify-between items-center px-lg">
+<div class="flex items-center gap-md md:hidden">
+<button class="text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="font-headline-md text-headline-md font-black text-primary">Acquit.ai</span>
+</div>
+<div class="hidden md:flex items-center gap-lg h-full">
+<div class="relative h-full flex items-center">
+<span class="material-symbols-outlined absolute left-sm text-on-surface-variant">search</span>
+<input class="bg-surface-container font-data-mono text-data-mono text-on-surface pl-[32px] pr-sm py-xs border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary w-64 transition-all bg-transparent h-8" placeholder="Search records..." type="text"/>
+</div>
+<nav class="flex h-full items-center gap-lg">
+<a class="h-full flex items-center text-on-surface-variant hover:text-primary hover:bg-surface-bright dark:hover:bg-surface-bright px-sm font-label-caps text-label-caps" href="#">Case: 2024-CV-8821</a>
+<a class="h-full flex items-center text-primary border-b-2 border-primary pb-1 ring-1 ring-primary transition-all duration-200 hover:bg-surface-bright dark:hover:bg-surface-bright px-sm font-label-caps text-label-caps" href="#">The Clerk</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:text-primary p-xs"><span class="material-symbols-outlined">notifications</span></button>
+<button class="text-on-surface-variant hover:text-primary p-xs"><span class="material-symbols-outlined">history</span></button>
+<button class="md:hidden text-on-surface-variant hover:text-primary p-xs"><span class="material-symbols-outlined">search</span></button>
+<button class="hidden lg:flex items-center gap-xs border border-outline-variant px-sm py-xs font-label-caps text-label-caps text-primary hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[16px]">edit_document</span>
+                    AFFIX SIGNATURE
+                </button>
+<img alt="Counsel Avatar" class="w-8 h-8 object-cover border border-outline-variant ml-sm" data-alt="A highly detailed close-up portrait of a professional legal counsel in a dimly lit, high-end office environment. The person is wearing a dark, tailored suit with a crisp white shirt. The lighting is cinematic, casting dramatic shadows on one side of the face while highlighting sharp features. The mood is serious, authoritative, and intelligent, fitting for a senior partner in a law firm. The background is slightly blurred, showing rows of bound legal volumes." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_tUukyWVSnj6POCNZLHRrpyOoGxTsGNRBw5AKkLvQNKjAirgNzeRlTkFrpUMyX5KqpC2Uz1xxRkkP7BU8VPlATudgX3stBPqsjrbdRay4uDKJXt05y3q3giCfMwyzGwvE0IMN-3Segc2LPZKoVOQR6cxy-8vYDGcTPOloso0tL3a32eT5NkHdhT6tUW72Vip5jWnvj7Fy4gRFS_bKNqJ8MT7RfWQEdERjvaLh-beCcmMnN5xHuNs7dw"/>
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 mt-16 p-lg grid grid-cols-1 lg:grid-cols-12 gap-gutter max-w-7xl mx-auto w-full">
+<!-- Header Section -->
+<div class="col-span-1 lg:col-span-12 mb-md">
+<h2 class="font-display-case text-display-case text-primary mb-xs">Record Intake Portal</h2>
+<p class="font-data-mono text-data-mono text-on-surface-variant">SECURE CHANNEL // FILE INGESTION PROTOCOL ACTIVE</p>
+</div>
+<!-- Left Column: Upload & Queue (8 cols) -->
+<div class="col-span-1 lg:col-span-8 flex flex-col gap-gutter">
+<!-- Dropzone -->
+<div class="glass-panel p-lg flex flex-col items-center justify-center min-h-[300px] border-2 border-dashed border-outline-variant hover:border-primary hover:bg-surface-container-high transition-all cursor-pointer group relative overflow-hidden" id="dropzone">
+<div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="material-symbols-outlined text-[48px] text-on-surface-variant mb-md group-hover:text-primary transition-colors">cloud_upload</span>
+<h3 class="font-headline-md text-headline-md text-primary mb-sm">Drag &amp; Drop Documents</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-center mb-md max-w-md">Supported formats: PDF, DOCX, TXT, JPEG, PNG. Maximum file size: 500MB per object.</p>
+<button class="bg-surface text-primary border border-primary px-lg py-sm font-label-caps text-label-caps hover:bg-primary hover:text-background transition-colors z-10">
+                        BROWSE LOCAL SYSTEM
+                    </button>
+<p class="font-data-mono text-data-mono text-on-surface-variant mt-md text-xs absolute bottom-sm right-sm opacity-50">SECURE UPLOAD ENABLED</p>
+</div>
+<!-- Ingestion Queue -->
+<div class="border-legal bg-surface-container-low flex flex-col flex-1">
+<div class="bg-surface-container p-sm border-b border-outline-variant flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-primary">INGESTION QUEUE</span>
+<span class="font-data-mono text-data-mono text-on-surface-variant text-xs">2 ACTIVE PROCESSES</span>
+</div>
+<div class="flex flex-col">
+<!-- Queue Item 1 -->
+<div class="p-sm border-b border-outline-variant flex items-center justify-between hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary">description</span>
+<div>
+<p class="font-body-md text-body-md text-on-surface">Deposition_Smith_v_Doe_FINAL.pdf</p>
+<p class="font-data-mono text-data-mono text-on-surface-variant text-[10px]">SIZE: 12.4MB | ID: DOC-8921-A</p>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex flex-col items-end gap-xs">
+<span class="font-data-mono text-data-mono text-primary text-xs">OCR PROCESSING (68%)</span>
+<div class="w-32 h-1 bg-surface-variant overflow-hidden">
+<div class="h-full bg-primary w-[68%]"></div>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined text-[18px]">cancel</span></button>
+</div>
+</div>
+<!-- Queue Item 2 -->
+<div class="p-sm border-b border-outline-variant flex items-center justify-between hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-secondary">image</span>
+<div>
+<p class="font-body-md text-body-md text-on-surface">Exhibit_C_Financial_Ledger.png</p>
+<p class="font-data-mono text-data-mono text-on-surface-variant text-[10px]">SIZE: 4.1MB | ID: DOC-8921-B</p>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex flex-col items-end gap-xs">
+<span class="font-data-mono text-data-mono text-secondary text-xs">PII SCRUB (IN PROGRESS)</span>
+<div class="w-32 h-1 bg-surface-variant overflow-hidden">
+<div class="h-full bg-secondary w-full animate-pulse"></div>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined text-[18px]">cancel</span></button>
+</div>
+</div>
+<!-- Queue Item 3 (Completed) -->
+<div class="p-sm flex items-center justify-between bg-surface-container-highest opacity-70">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">check_circle</span>
+<div>
+<p class="font-body-md text-body-md text-on-surface line-through decoration-on-surface-variant">Subpoena_Request_Form.docx</p>
+<p class="font-data-mono text-data-mono text-on-surface-variant text-[10px]">CLEARED: MALWARE SCAN PASSED</p>
+</div>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant text-xs">READY FOR REVIEW</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Inspector Panel (4 cols) -->
+<div class="col-span-1 lg:col-span-4 h-full">
+<div class="border-legal bg-surface-container-low h-full flex flex-col">
+<div class="bg-primary text-background p-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+<span class="font-label-caps text-label-caps font-bold">METADATA ENTRY</span>
+</div>
+<div class="p-md flex-1 overflow-y-auto">
+<form class="space-y-md">
+<!-- Status Seal -->
+<div class="flex items-center gap-sm mb-lg p-sm border border-outline-variant bg-surface-container">
+<div class="w-8 h-8 rounded-full border border-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[16px]">verified</span>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-primary">AWAITING CLASSIFICATION</p>
+<p class="font-data-mono text-data-mono text-on-surface-variant text-[10px]">SYS.REQ: MANUAL REVIEW REQUIRED</p>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">Document Title</label>
+<input class="w-full bg-surface border-0 border-b border-outline-variant focus:border-primary focus:ring-0 font-data-mono text-data-mono text-on-surface py-xs px-0 transition-colors" placeholder="Enter formal title..." type="text"/>
+</div>
+<div class="space-y-xs">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">Document Type</label>
+<select class="w-full bg-surface border-0 border-b border-outline-variant focus:border-primary focus:ring-0 font-data-mono text-data-mono text-on-surface py-xs px-0 transition-colors appearance-none">
+<option>Select classification...</option>
+<option>Motion</option>
+<option>Affidavit</option>
+<option>Exhibit</option>
+<option>Brief</option>
+<option>Correspondence</option>
+</select>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">Date Filed</label>
+<input class="w-full bg-surface border-0 border-b border-outline-variant focus:border-primary focus:ring-0 font-data-mono text-data-mono text-on-surface py-xs px-0 transition-colors [color-scheme:dark]" type="date"/>
+</div>
+<div class="space-y-xs">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">Security Level</label>
+<select class="w-full bg-surface border-0 border-b border-outline-variant focus:border-primary focus:ring-0 font-data-mono text-data-mono text-on-surface py-xs px-0 transition-colors appearance-none">
+<option>Confidential</option>
+<option>Public Record</option>
+<option>Under Seal</option>
+</select>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">Source / Author</label>
+<input class="w-full bg-surface border-0 border-b border-outline-variant focus:border-primary focus:ring-0 font-data-mono text-data-mono text-on-surface py-xs px-0 transition-colors" placeholder="Originating party..." type="text"/>
+</div>
+<div class="space-y-xs pt-sm">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">Abstract / Synopsis</label>
+<textarea class="w-full bg-surface border border-outline-variant focus:border-primary focus:ring-0 font-data-mono text-data-mono text-on-surface p-sm resize-none" placeholder="Brief description of contents..." rows="3"></textarea>
+</div>
+<div class="pt-md border-t border-outline-variant flex justify-end gap-sm">
+<button class="px-md py-sm border border-outline-variant text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high transition-colors" type="button">DISCARD</button>
+<button class="px-md py-sm bg-primary text-background font-label-caps text-label-caps hover:bg-surface-tint transition-colors" type="button">COMMIT TO LEDGER</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+        // Simple drag and drop visual feedback
+        const dropzone = document.getElementById('dropzone');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            dropzone.classList.add('drag-active');
+        }
+
+        function unhighlight(e) {
+            dropzone.classList.remove('drag-active');
+        }
+    </script>
+</body></html>

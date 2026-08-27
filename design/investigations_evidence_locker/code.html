@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Investigations Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400..700&amp;family=Hanken+Grotesk:wght@400..700&amp;family=JetBrains+Mono:wght@400..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#ebe0da",
+                        "surface": "#141313",
+                        "outline-variant": "#44474a",
+                        "tertiary-fixed-dim": "#cfc5be",
+                        "inverse-surface": "#e5e2e1",
+                        "primary-fixed-dim": "#c6c6c9",
+                        "secondary-container": "#36485b",
+                        "surface-container-highest": "#353435",
+                        "secondary-fixed-dim": "#b5c8df",
+                        "surface-variant": "#353435",
+                        "on-tertiary-container": "#8b837d",
+                        "on-secondary-container": "#a4b7cd",
+                        "on-tertiary": "#352f2b",
+                        "error-container": "#93000a",
+                        "surface-container-high": "#2a2a2a",
+                        "on-tertiary-fixed": "#201b17",
+                        "tertiary": "#cfc5be",
+                        "secondary": "#b5c8df",
+                        "on-error-container": "#ffdad6",
+                        "inverse-on-surface": "#313030",
+                        "error": "#ffb4ab",
+                        "primary": "#c6c6c9",
+                        "on-error": "#690005",
+                        "primary-fixed": "#e2e2e5",
+                        "on-background": "#e5e2e1",
+                        "surface-bright": "#3a3939",
+                        "on-tertiary-fixed-variant": "#4c4641",
+                        "outline": "#8f9194",
+                        "surface-tint": "#c6c6c9",
+                        "on-secondary": "#203243",
+                        "on-primary-fixed": "#1a1c1e",
+                        "on-primary-fixed-variant": "#454749",
+                        "on-primary-container": "#838486",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-secondary-fixed-variant": "#36485b",
+                        "inverse-primary": "#5d5e61",
+                        "surface-container": "#201f1f",
+                        "tertiary-container": "#201b17",
+                        "on-primary": "#2f3133",
+                        "surface-dim": "#141313",
+                        "background": "#141313",
+                        "primary-container": "#1a1c1e",
+                        "on-surface-variant": "#c5c6ca",
+                        "on-secondary-fixed": "#091d2e",
+                        "surface-container-low": "#1c1b1b",
+                        "on-surface": "#e5e2e1",
+                        "secondary-fixed": "#d1e4fb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "margin-safe": "32px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "display-case": ["Domine"],
+                        "data-mono": ["JetBrains Mono"],
+                        "headline-lg": ["Domine"],
+                        "headline-md": ["Domine"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Domine"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-case": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .hard-shadow { box-shadow: 2px 2px 0 0 #b5c8df; } /* Legal Gold / Secondary approximation */
+        .glass-panel { background: rgba(32, 31, 31, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid #44474a; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #141313; }
+        ::-webkit-scrollbar-thumb { background: #353435; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #44474a; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md h-screen overflow-hidden flex selection:bg-secondary selection:text-on-secondary">
+<!-- Top App Bar - The Clerk (Small) - Re-purposed for Actions/Meta -->
+<header class="fixed top-16 right-0 w-80 z-30 flex items-center px-4 h-10 bg-surface-container-highest border-l border-b border-outline-variant shadow-md">
+<div class="flex-1 text-label-caps font-label-caps text-on-tertiary-container">The Clerk</div>
+<div class="flex items-center gap-4">
+<button class="text-tertiary-fixed text-label-caps font-label-caps hover:bg-surface-variant px-2 py-1 rounded transition-colors">Clear All</button>
+<button class="text-on-surface-variant hover:bg-surface-variant p-1 rounded transition-colors"><span class="material-symbols-outlined text-sm">push_pin</span></button>
+</div>
+</header>
+<!-- SideNavBar - Legal OS -->
+<nav class="fixed left-0 top-0 bottom-0 flex flex-col z-40 bg-surface-container border-r border-outline-variant w-[280px] h-screen transition-all duration-200 ease-in-out shrink-0 hidden md:flex">
+<div class="p-lg border-b border-outline-variant flex flex-col gap-xs">
+<div class="flex items-center gap-sm">
+<span aria-label="Firm Seal" class="material-symbols-outlined text-secondary text-2xl">balance</span>
+<h1 class="text-label-caps font-label-caps tracking-widest text-on-surface uppercase">Legal OS</h1>
+</div>
+<div class="text-data-mono font-data-mono text-on-surface-variant text-xs mt-2">Matter 2024-772B</div>
+<button class="mt-4 w-full bg-secondary text-on-secondary text-label-caps font-label-caps py-2 hover:bg-secondary-fixed transition-colors border border-secondary">New Filing</button>
+</div>
+<div class="flex-1 overflow-y-auto py-md flex flex-col gap-xs px-sm">
+<a class="flex items-center gap-md px-md py-sm rounded hover:bg-surface-container-high hover:text-on-surface text-on-surface-variant font-medium group" href="#">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface">dashboard</span>
+<span class="text-label-caps font-label-caps uppercase">Command Center</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded hover:bg-surface-container-high hover:text-on-surface text-on-surface-variant font-medium group" href="#">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface">gavel</span>
+<span class="text-label-caps font-label-caps uppercase">The Docket</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded hover:bg-surface-container-high hover:text-on-surface text-on-surface-variant font-medium group" href="#">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface">groups</span>
+<span class="text-label-caps font-label-caps uppercase">Chambers</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded text-on-surface border-l-4 border-secondary bg-surface-variant font-bold" href="#">
+<span class="material-symbols-outlined text-secondary">menu_book</span>
+<span class="text-label-caps font-label-caps uppercase">Law Library</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded hover:bg-surface-container-high hover:text-on-surface text-on-surface-variant font-medium group" href="#">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface">folder_shared</span>
+<span class="text-label-caps font-label-caps uppercase">Record Room</span>
+</a>
+</div>
+<div class="mt-auto border-t border-outline-variant p-md flex flex-col gap-xs">
+<a class="flex items-center gap-md px-md py-sm rounded hover:bg-surface-container-high hover:text-on-surface text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="text-label-caps font-label-caps uppercase">Support</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded hover:bg-surface-container-high hover:text-on-surface text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">archive</span>
+<span class="text-label-caps font-label-caps uppercase">Archive</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col ml-0 md:ml-[280px] h-screen bg-surface-dim relative">
+<!-- TopAppBar - Acquit.ai -->
+<header class="flex justify-between items-center w-full px-gutter h-16 bg-surface-container-low border-b border-outline-variant z-20 shrink-0">
+<div class="flex items-center gap-xl">
+<div class="text-headline-md font-headline-md font-bold text-on-surface">Acquit.ai</div>
+<!-- Secondary Nav (Tabs for this module) -->
+<nav class="hidden md:flex gap-lg h-16 items-center">
+<a class="text-on-surface-variant hover:bg-surface-variant hover:text-on-surface px-3 py-2 rounded text-body-md font-body-md transition-colors" href="#">Active Research</a>
+<a class="text-primary border-b-2 border-primary pb-1 px-3 py-2 text-body-md font-body-md" href="#">Evidence Locker</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container text-data-mono font-data-mono text-sm pl-9 pr-4 py-1.5 border border-outline-variant focus:border-secondary focus:ring-0 w-64 rounded-none placeholder-on-surface-variant text-on-surface" placeholder="Search Evidence..." type="text"/>
+</div>
+<nav class="hidden lg:flex items-center gap-md ml-xl text-data-mono font-data-mono text-on-surface-variant">
+<a class="hover:text-on-surface transition-colors" href="#">File</a>
+<a class="hover:text-on-surface transition-colors" href="#">Edit</a>
+<a class="hover:text-on-surface transition-colors" href="#">View</a>
+<a class="hover:text-on-surface transition-colors" href="#">Matter</a>
+<a class="hover:text-on-surface transition-colors" href="#">Account</a>
+</nav>
+<div class="flex items-center gap-sm border-l border-outline-variant pl-sm ml-sm">
+<button aria-label="Notifications" class="p-2 text-primary hover:bg-surface-variant rounded transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button aria-label="Settings" class="p-2 text-primary hover:bg-surface-variant rounded transition-colors"><span class="material-symbols-outlined">settings</span></button>
+<button aria-label="Account" class="p-2 text-primary hover:bg-surface-variant rounded transition-colors"><span class="material-symbols-outlined">account_circle</span></button>
+</div>
+</div>
+</header>
+<!-- Module Toolbar -->
+<div class="flex justify-between items-center px-lg py-sm border-b border-outline-variant bg-surface-container shrink-0">
+<h2 class="text-headline-md font-headline-md text-on-surface">Evidence Log</h2>
+<div class="flex items-center gap-sm">
+<button class="flex items-center gap-2 border border-outline-variant px-3 py-1.5 hover:bg-surface-variant text-data-mono font-data-mono text-sm transition-colors text-on-surface">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                    Filter Tag
+                </button>
+<button class="flex items-center gap-2 border border-outline-variant px-3 py-1.5 hover:bg-surface-variant text-data-mono font-data-mono text-sm transition-colors text-on-surface">
+<span class="material-symbols-outlined text-sm">calendar_month</span>
+                    Date Range
+                </button>
+<button class="ml-4 bg-secondary text-on-secondary px-4 py-1.5 text-label-caps font-label-caps uppercase hover:bg-secondary-fixed transition-colors flex items-center gap-2 hard-shadow">
+<span class="material-symbols-outlined text-sm">add</span>
+                    Log Evidence
+                </button>
+</div>
+</div>
+<!-- 3-Pane Layout -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Context/Search Hints Sidebar (Left Pane) -->
+<aside class="w-[240px] border-r border-outline-variant bg-surface-container-low hidden lg:flex flex-col shrink-0">
+<div class="p-sm bg-surface-container-high border-b border-outline-variant text-label-caps font-label-caps text-on-surface uppercase tracking-wider">
+                    Case Research
+                </div>
+<div class="p-md flex flex-col gap-md overflow-y-auto">
+<div class="text-data-mono font-data-mono text-xs text-on-surface-variant mb-2">Active Charges Context</div>
+<div class="p-sm border border-outline-variant bg-surface hover:border-secondary cursor-pointer transition-colors group">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-secondary text-sm">search</span>
+<span class="text-sm font-semibold text-on-surface group-hover:text-secondary">Securities Fraud</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-tight">Query comms containing "guarantee", "risk-free", or internal Q3 forecasts.</p>
+</div>
+<div class="p-sm border border-outline-variant bg-surface hover:border-secondary cursor-pointer transition-colors group">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-secondary text-sm">search</span>
+<span class="text-sm font-semibold text-on-surface group-hover:text-secondary">Wire Fraud</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-tight">Identify cross-border transfers matching timestamp 2023-11-14.</p>
+</div>
+</div>
+</aside>
+<!-- Evidence Grid (Center Canvas) -->
+<section class="flex-1 p-lg overflow-y-auto bg-surface">
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-md @container">
+<!-- Evidence Card 1 -->
+<article class="border border-outline-variant bg-surface-container flex flex-col hover:border-secondary transition-colors cursor-pointer group relative">
+<div class="h-1 w-full bg-secondary absolute top-0 left-0 hidden group-hover:block"></div>
+<header class="bg-surface-container-high p-sm flex justify-between items-start border-b border-outline-variant">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full border border-secondary flex items-center justify-center text-secondary bg-surface-container">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">description</span>
+</div>
+<div>
+<div class="text-data-mono font-data-mono text-xs text-secondary">EX-A-001 • Documentary</div>
+<h3 class="text-body-md font-body-md font-semibold text-on-surface">Q3 Internal Strategy Memo</h3>
+</div>
+</div>
+<span class="px-2 py-0.5 border border-outline-variant text-[10px] uppercase font-label-caps text-on-surface-variant rounded-sm bg-surface">Secured</span>
+</header>
+<div class="p-sm flex-1 flex flex-col gap-sm">
+<p class="text-sm text-on-surface-variant line-clamp-2">Internal memorandum distributed by CEO referencing "adjusted" revenue figures prior to public filing.</p>
+<div class="mt-auto p-sm bg-surface border border-outline-variant text-xs text-on-surface relative">
+<div class="absolute -top-2 left-2 bg-surface-container-high px-1 text-[10px] text-on-primary-container uppercase font-label-caps">Exhibit Analysis</div>
+<span class="material-symbols-outlined text-[12px] text-on-primary-container inline-block mr-1 translate-y-0.5">smart_toy</span>
+                                Strong correlation with wire transfers on 2023-11-14. Suggests premeditation.
+                            </div>
+</div>
+<footer class="p-sm border-t border-outline-variant flex justify-between items-center bg-surface-container-low text-data-mono font-data-mono text-[11px] text-on-surface-variant">
+<span>Logged: 2024-05-12 09:14Z</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">link</span> Chain: Intact</span>
+</footer>
+</article>
+<!-- Evidence Card 2 -->
+<article class="border border-outline-variant bg-surface-container flex flex-col hover:border-secondary transition-colors cursor-pointer group relative">
+<div class="h-1 w-full bg-error absolute top-0 left-0 hidden group-hover:block"></div>
+<header class="bg-surface-container-high p-sm flex justify-between items-start border-b border-outline-variant">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant bg-surface-container">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">mic</span>
+</div>
+<div>
+<div class="text-data-mono font-data-mono text-xs text-on-surface-variant">EX-B-042 • Testimonial</div>
+<h3 class="text-body-md font-body-md font-semibold text-on-surface">Deposition: CFO Reynolds</h3>
+</div>
+</div>
+<span class="px-2 py-0.5 border border-error text-[10px] uppercase font-label-caps text-error rounded-sm bg-surface">Disputed</span>
+</header>
+<div class="p-sm flex-1 flex flex-col gap-sm">
+<p class="text-sm text-on-surface-variant line-clamp-2">Transcript of deposition dated 2024-01-20. Witness denies knowledge of memo EX-A-001.</p>
+<div class="mt-auto p-sm bg-error-container/20 border border-error/50 text-xs text-on-surface relative">
+<div class="absolute -top-2 left-2 bg-surface-container-high px-1 text-[10px] text-error uppercase font-label-caps border border-error/50 rounded-sm">Conflict Detected</div>
+<span class="material-symbols-outlined text-[12px] text-error inline-block mr-1 translate-y-0.5">warning</span>
+                                Direct contradiction with email thread EX-C-011 where Reynolds acknowledges receipt of memo.
+                            </div>
+</div>
+<footer class="p-sm border-t border-outline-variant flex justify-between items-center bg-surface-container-low text-data-mono font-data-mono text-[11px] text-on-surface-variant">
+<span>Logged: 2024-05-15 14:30Z</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">link</span> Chain: Intact</span>
+</footer>
+</article>
+<!-- Evidence Card 3 -->
+<article class="border border-outline-variant bg-surface-container flex flex-col hover:border-secondary transition-colors cursor-pointer group relative">
+<div class="h-1 w-full bg-secondary absolute top-0 left-0 hidden group-hover:block"></div>
+<header class="bg-surface-container-high p-sm flex justify-between items-start border-b border-outline-variant">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full border border-secondary flex items-center justify-center text-secondary bg-surface-container">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">image</span>
+</div>
+<div>
+<div class="text-data-mono font-data-mono text-xs text-secondary">EX-C-018 • Photo</div>
+<h3 class="text-body-md font-body-md font-semibold text-on-surface">Server Room Access Log</h3>
+</div>
+</div>
+<span class="px-2 py-0.5 border border-outline-variant text-[10px] uppercase font-label-caps text-on-surface-variant rounded-sm bg-surface">Secured</span>
+</header>
+<div class="p-sm flex-1 flex flex-col gap-sm">
+<p class="text-sm text-on-surface-variant line-clamp-2">Photograph of physical sign-in sheet for offshore server facility, dated 2023-11-13.</p>
+<div class="mt-auto p-sm bg-surface border border-outline-variant text-xs text-on-surface relative">
+<div class="absolute -top-2 left-2 bg-surface-container-high px-1 text-[10px] text-on-primary-container uppercase font-label-caps">Exhibit Analysis</div>
+<span class="material-symbols-outlined text-[12px] text-on-primary-container inline-block mr-1 translate-y-0.5">smart_toy</span>
+                                Handwriting match probability 87% for suspect 'JD'. Places suspect at scene 24h prior to transfer.
+                            </div>
+</div>
+<footer class="p-sm border-t border-outline-variant flex justify-between items-center bg-surface-container-low text-data-mono font-data-mono text-[11px] text-on-surface-variant">
+<span>Logged: 2024-05-18 11:05Z</span>
+<span class="flex items-center gap-1 text-error"><span class="material-symbols-outlined text-[14px]">broken_image</span> Chain: Pending Verification</span>
+</footer>
+</article>
+</div>
+</section>
+<!-- Issue Spotting Inspector (Right Pane) -->
+<aside class="w-[320px] border-l border-outline-variant bg-surface-container-low flex flex-col shrink-0 z-10 pt-10"> <!-- pt-10 to clear the small top app bar -->
+<div class="p-sm bg-surface-container-high border-b border-outline-variant flex justify-between items-center">
+<span class="text-label-caps font-label-caps text-on-surface uppercase tracking-wider flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">troubleshoot</span>
+                        Issue Spotting
+                    </span>
+<span class="bg-error text-on-error text-[10px] px-1.5 py-0.5 rounded-sm font-data-mono">2 Flags</span>
+</div>
+<div class="flex-1 overflow-y-auto p-md flex flex-col gap-md">
+<!-- Flag 1 -->
+<div class="border border-error/40 bg-surface p-sm relative">
+<div class="w-1 h-full bg-error absolute top-0 left-0"></div>
+<h4 class="text-sm font-semibold text-on-surface mb-1 pl-2">Testimony Contradiction</h4>
+<p class="text-xs text-on-surface-variant pl-2 mb-3">Witness statement in EX-B-042 conflicts with documentary evidence in EX-C-011.</p>
+<div class="pl-2 flex flex-col gap-2">
+<div class="flex items-center justify-between bg-surface-container-low p-1 border border-outline-variant text-xs">
+<span class="text-data-mono font-data-mono text-on-surface-variant">EX-B-042</span>
+<span class="text-error">"Never saw it."</span>
+</div>
+<div class="flex justify-center">
+<span class="material-symbols-outlined text-outline-variant text-sm">swap_vert</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low p-1 border border-outline-variant text-xs">
+<span class="text-data-mono font-data-mono text-on-surface-variant">EX-C-011</span>
+<span class="text-secondary">"Memo received."</span>
+</div>
+</div>
+<button class="mt-3 ml-2 w-full text-center border border-outline-variant py-1 text-xs text-on-surface hover:bg-surface-variant transition-colors">Generate Briefing</button>
+</div>
+<!-- Flag 2 -->
+<div class="border border-outline-variant bg-surface p-sm relative">
+<div class="w-1 h-full bg-secondary absolute top-0 left-0"></div>
+<h4 class="text-sm font-semibold text-on-surface mb-1 pl-2">Timeline Gap</h4>
+<p class="text-xs text-on-surface-variant pl-2 mb-3">Unaccounted 4-hour window between server room access (EX-C-018) and initial wire transfer.</p>
+<button class="ml-2 border border-outline-variant px-2 py-1 text-[10px] font-label-caps uppercase text-on-surface hover:bg-surface-variant transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">search</span> Request Subpoena: CCTV
+                        </button>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</body></html>

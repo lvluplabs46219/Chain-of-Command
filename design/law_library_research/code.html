@@ -1,0 +1,436 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Law Library - Acquit.ai</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-variant": "#353435",
+                    "surface-container-high": "#2a2a2a",
+                    "on-secondary": "#203243",
+                    "inverse-on-surface": "#313030",
+                    "inverse-surface": "#e5e2e1",
+                    "tertiary": "#cfc5be",
+                    "outline": "#8f9194",
+                    "surface-container": "#201f1f",
+                    "on-primary-fixed-variant": "#454749",
+                    "surface-bright": "#3a3939",
+                    "secondary-fixed-dim": "#b5c8df",
+                    "surface-tint": "#c6c6c9",
+                    "secondary": "#b5c8df",
+                    "tertiary-fixed": "#ebe0da",
+                    "tertiary-fixed-dim": "#cfc5be",
+                    "on-surface": "#e5e2e1",
+                    "on-tertiary": "#352f2b",
+                    "primary-container": "#1a1c1e",
+                    "secondary-container": "#36485b",
+                    "on-tertiary-container": "#8b837d",
+                    "inverse-primary": "#5d5e61",
+                    "tertiary-container": "#201b17",
+                    "secondary-fixed": "#d1e4fb",
+                    "error-container": "#93000a",
+                    "on-error-container": "#ffdad6",
+                    "on-primary-fixed": "#1a1c1e",
+                    "background": "#141313",
+                    "on-secondary-fixed": "#091d2e",
+                    "surface-container-highest": "#353435",
+                    "on-background": "#e5e2e1",
+                    "on-surface-variant": "#c5c6ca",
+                    "surface-container-low": "#1c1b1b",
+                    "primary": "#c6c6c9",
+                    "on-error": "#690005",
+                    "on-primary": "#2f3133",
+                    "primary-fixed": "#e2e2e5",
+                    "on-secondary-container": "#a4b7cd",
+                    "outline-variant": "#44474a",
+                    "surface-dim": "#141313",
+                    "surface-container-lowest": "#0e0e0e",
+                    "error": "#ffb4ab",
+                    "on-tertiary-fixed": "#201b17",
+                    "surface": "#141313",
+                    "on-tertiary-fixed-variant": "#4c4641",
+                    "on-primary-container": "#838486",
+                    "primary-fixed-dim": "#c6c6c9",
+                    "on-secondary-fixed-variant": "#36485b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "sm": "8px",
+                    "gutter": "16px",
+                    "margin-safe": "32px",
+                    "xs": "4px",
+                    "base": "4px",
+                    "lg": "24px",
+                    "xl": "40px"
+            },
+            "fontFamily": {
+                    "data-mono": ["JetBrains Mono"],
+                    "headline-lg-mobile": ["Domine"],
+                    "label-caps": ["Hanken Grotesk"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "body-md": ["Hanken Grotesk"],
+                    "display-case": ["Domine"],
+                    "headline-lg": ["Domine"],
+                    "headline-md": ["Domine"]
+            },
+            "fontSize": {
+                    "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-case": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        /* Custom scrollbar for high-density look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #141313;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #44474a;
+            border: 1px solid #141313;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8f9194;
+        }
+        
+        /* Text Highlight */
+        .highlight-text {
+            background-color: rgba(181, 200, 223, 0.2); /* secondary color w/ opacity */
+            border-bottom: 1px solid #b5c8df;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background h-screen overflow-hidden flex font-body-md text-body-md antialiased selection:bg-secondary selection:text-on-secondary">
+<!-- JSON Component: SideNavBar -->
+<nav class="bg-surface-container dark:bg-surface-container docked left-0 h-screen w-[280px] border-r border-outline-variant flat no shadows fixed left-0 top-0 bottom-0 flex flex-col z-40">
+<!-- Header -->
+<div class="p-gutter border-b border-outline-variant flex flex-col gap-sm">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border border-outline">
+<img alt="Firm Seal" class="w-full h-full object-cover" data-alt="A highly detailed, brutalist style legal firm seal logo, metallic silver and deep slate tones, sharp clean lines, corporate institutional identity, stark high-contrast lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTzc3EiYqmLUnmBfCnA-LX3hFnUtW2i56oUKtcZqPILrrPEwzjnMLRkr2bv_ufyUxkLRjZLTZ-a4oWHawhaCP3_j98KhQ_zr4vo3-pGaOsa0nj6LjItUxekIexgUdor53scaSCgfa-NwZKQJw5-B1xGbISSwR8rsMXXCfcYoe0u3-52__HO9HDqDOym67IneT9_5YMgt1ZyMXfyhf1mHmyOS0t7T-oEqShbgFbAotlO66XXAc7k_lyWg">
+</div>
+<div class="flex flex-col">
+<span class="text-label-caps font-label-caps tracking-widest text-on-surface">Legal OS</span>
+<span class="text-data-mono font-data-mono text-on-surface-variant text-[10px]">Matter 2024-772B</span>
+</div>
+</div>
+<button class="mt-sm w-full bg-secondary text-on-secondary text-data-mono font-data-mono py-2 px-4 border border-outline-variant hover:bg-surface-container-high hover:text-on-surface transition-all 200ms ease-in-out">Court Watch</button>
+</div>
+<!-- Main Nav Links -->
+<div class="flex-1 overflow-y-auto py-sm">
+<ul class="flex flex-col gap-xs">
+<li class="">
+<a class="flex items-center gap-md px-gutter py-2 text-on-surface-variant font-medium text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all 200ms ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                        Command Center
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-md px-gutter py-2 text-on-surface-variant font-medium text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all 200ms ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+                        The Docket
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-md px-gutter py-2 text-on-surface-variant font-medium text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all 200ms ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+                        Chambers
+                    </a>
+</li>
+<li class="">
+<!-- Active State -->
+<a class="flex items-center gap-md px-gutter py-2 text-on-surface border-l-4 border-secondary bg-surface-variant font-bold text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all 200ms ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+                        Law Library
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-md px-gutter py-2 text-on-surface-variant font-medium text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all 200ms ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="folder_shared">folder_shared</span>
+                        Record Room
+                    </a>
+</li>
+</ul>
+</div>
+<!-- Footer Nav -->
+<div class="border-t border-outline-variant p-sm">
+<ul class="flex flex-col gap-xs">
+<li class="">
+<a class="flex items-center gap-md px-gutter py-2 text-on-surface-variant font-medium text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all 200ms ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                        Support
+                    </a>
+</li>
+<li class="">
+<a class="flex items-center gap-md px-gutter py-2 text-on-surface-variant font-medium text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all 200ms ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+                        Archive
+                    </a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Wrapper (offset by sidebar width) -->
+<div class="ml-[280px] flex-1 flex flex-col h-full w-[calc(100%-280px)]">
+<!-- JSON Component: TopAppBar -->
+<header class="bg-surface-container-low dark:bg-surface-container-low docked full-width top-0 border-b border-outline-variant flat no shadows flex justify-between items-center w-full px-gutter h-16 z-30 shrink-0">
+<div class="flex items-center gap-lg w-full">
+<!-- Brand / Logo Area -->
+<div class="text-headline-md font-headline-md font-bold text-on-surface dark:text-on-surface shrink-0">
+                    Acquit.ai
+                </div>
+<!-- Specialized Search Bar for Library -->
+<div class="flex-1 max-w-3xl flex items-center bg-surface-container border border-outline-variant focus-within:border-primary px-sm py-1">
+<span class="material-symbols-outlined text-on-surface-variant mr-2">search</span>
+<!-- Pre-selected tags -->
+<div class="flex gap-2 mr-2">
+<span class="bg-surface-variant text-on-surface text-data-mono font-data-mono px-2 py-0.5 text-[11px] border border-outline-variant flex items-center gap-1">
+                            Indiana
+                            <span class="material-symbols-outlined text-[12px] cursor-pointer hover:text-primary">close</span>
+</span>
+<span class="bg-surface-variant text-on-surface text-data-mono font-data-mono px-2 py-0.5 text-[11px] border border-outline-variant flex items-center gap-1">
+                            Criminal
+                            <span class="material-symbols-outlined text-[12px] cursor-pointer hover:text-primary">close</span>
+</span>
+</div>
+<input class="bg-transparent border-none outline-none text-data-mono font-data-mono text-on-surface w-full focus:ring-0 placeholder-on-surface-variant" placeholder="Search the Stacks (Cases, statutes, regulations...)" type="text" value="felony murder proximate cause">
+</div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-sm shrink-0 ml-gutter">
+<button class="p-2 text-primary dark:text-primary hover:bg-surface-variant hover:text-on-surface rounded-none transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-primary dark:text-primary hover:bg-surface-variant hover:text-on-surface rounded-none transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="p-2 text-primary dark:text-primary hover:bg-surface-variant hover:text-on-surface rounded-none transition-colors">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Library Specific Tool/Menu Bar (File/Edit/View specialized) -->
+<div class="h-10 border-b border-outline-variant bg-surface-dim flex items-center px-gutter gap-md text-data-mono font-data-mono text-[12px] shrink-0">
+<div class="flex gap-sm border-r border-outline-variant pr-md">
+<button class="text-on-surface-variant hover:text-on-surface px-2 py-1 transition-colors">File</button>
+<button class="text-on-surface-variant hover:text-on-surface px-2 py-1 transition-colors">Edit</button>
+<button class="text-on-surface-variant hover:text-on-surface px-2 py-1 transition-colors">View</button>
+</div>
+<!-- Research Specific Actions -->
+<div class="flex gap-sm">
+<button class="flex items-center gap-1 text-secondary hover:text-primary px-2 py-1 border border-transparent hover:border-outline-variant transition-colors">
+<span class="material-symbols-outlined text-[14px]">format_quote</span> Export Citations
+                </button>
+<button class="flex items-center gap-1 text-secondary hover:text-primary px-2 py-1 border border-transparent hover:border-outline-variant transition-colors">
+<span class="material-symbols-outlined text-[14px]">format_ink_highlighter</span> Highlight
+                </button>
+<button class="flex items-center gap-1 text-secondary hover:text-primary px-2 py-1 border border-transparent hover:border-outline-variant transition-colors">
+<span class="material-symbols-outlined text-[14px]">hub</span> Citation Graph
+                </button>
+</div>
+<div class="ml-auto text-on-surface-variant">
+                Matter: <span class="text-on-surface">State v. Jenkins</span>
+</div>
+</div>
+<!-- 3-Pane Workspace Area -->
+<main class="flex-1 flex overflow-hidden">
+<!-- Left Pane: "Stacks" (35%) -->
+<section class="w-[35%] border-r border-outline-variant flex flex-col bg-background shrink-0">
+<div class="p-sm border-b border-outline-variant bg-surface-container flex justify-between items-center">
+<h2 class="text-label-caps font-label-caps text-on-surface">The Stacks</h2>
+<div class="flex gap-1">
+<button class="p-1 text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-[16px]">filter_list</span></button>
+<button class="p-1 text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-[16px]">sort</span></button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-sm flex flex-col gap-sm">
+<!-- Authority Group: Statutes -->
+<div class="text-label-caps font-label-caps text-on-surface-variant mb-1 mt-2 flex items-center gap-2">
+<span class="w-full h-px bg-outline-variant"></span>
+<span class="shrink-0">STATUTES (2)</span>
+<span class="w-full h-px bg-outline-variant"></span>
+</div>
+<!-- Docket Entry (List Item) Style -->
+<div class="border border-outline-variant bg-surface-container-low p-3 hover:border-outline cursor-pointer transition-colors relative">
+<div class="flex justify-between items-start mb-2">
+<span class="text-data-mono font-data-mono text-secondary text-[11px]">IC 35-42-1-1</span>
+<span class="flex items-center gap-1 text-primary text-[10px]">
+<span class="material-symbols-outlined text-[12px] text-green-500">verified</span> Binding
+                            </span>
+</div>
+<h3 class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface text-[16px] leading-tight mb-2">Murder; felony murder</h3>
+<p class="text-data-mono font-data-mono text-on-surface-variant text-[12px] line-clamp-2">A person who: (2) kills another human being while committing or attempting to commit arson, burglary, child molesting...</p>
+</div>
+<!-- Authority Group: Case Law -->
+<div class="text-label-caps font-label-caps text-on-surface-variant mb-1 mt-4 flex items-center gap-2">
+<span class="w-full h-px bg-outline-variant"></span>
+<span class="shrink-0">CASE LAW (14)</span>
+<span class="w-full h-px bg-outline-variant"></span>
+</div>
+<!-- Active List Item (Hard shadow, lifted) -->
+<div class="border border-secondary bg-surface-container shadow-[2px_2px_0px_0px_#b5c8df] p-3 cursor-pointer relative z-10">
+<div class="flex justify-between items-start mb-2">
+<span class="text-data-mono font-data-mono text-secondary text-[11px]">881 N.E.2d 1005 (Ind. 2008)</span>
+<span class="flex items-center gap-1 text-primary text-[10px]">
+<span class="material-symbols-outlined text-[12px] text-green-500">verified</span> Binding
+                            </span>
+</div>
+<h3 class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface text-[16px] leading-tight mb-2">Ex Parte Jenkins</h3>
+<p class="text-data-mono font-data-mono text-on-surface-variant text-[12px] line-clamp-2">Discussion on proximate cause in the context of felony murder when a co-felon is killed by police during the commission of a robbery.</p>
+<div class="mt-2 flex gap-2">
+<span class="bg-surface-variant px-1 py-0.5 text-data-mono font-data-mono text-[10px] text-on-surface">Cited 42 times</span>
+</div>
+</div>
+<div class="border border-outline-variant bg-surface-container-low p-3 hover:border-outline cursor-pointer transition-colors relative">
+<div class="flex justify-between items-start mb-2">
+<span class="text-data-mono font-data-mono text-secondary text-[11px]">741 N.E.2d 1245 (Ind. 2001)</span>
+<span class="flex items-center gap-1 text-primary text-[10px]">
+<span class="material-symbols-outlined text-[12px] text-yellow-500">warning</span> Distinguishable
+                            </span>
+</div>
+<h3 class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface text-[16px] leading-tight mb-2">Palmer v. State</h3>
+<p class="text-data-mono font-data-mono text-on-surface-variant text-[12px] line-clamp-2">The felony murder rule applies when the defendant's conduct was a mediate or immediate cause of the death...</p>
+</div>
+<div class="border border-outline-variant bg-surface-container-low p-3 hover:border-outline cursor-pointer transition-colors relative opacity-70">
+<div class="flex justify-between items-start mb-2">
+<span class="text-data-mono font-data-mono text-secondary text-[11px]">102 N.E.3d 293 (Ind. Ct. App. 2018)</span>
+<span class="flex items-center gap-1 text-primary text-[10px]">
+<span class="material-symbols-outlined text-[12px] text-red-500">cancel</span> Overruled in part
+                            </span>
+</div>
+<h3 class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface text-[16px] leading-tight mb-2">Smith v. State</h3>
+<p class="text-data-mono font-data-mono text-on-surface-variant text-[12px] line-clamp-2">Evaluating foreseeability in proximate cause determinations for secondary actors in burglary cases.</p>
+</div>
+</div>
+</section>
+<!-- Center Pane: "Open Volume" (40%) -->
+<section class="w-[40%] border-r border-outline-variant flex flex-col bg-surface-container-highest shrink-0 relative">
+<!-- "Dossier" Header -->
+<div class="bg-secondary-container p-sm border-b border-outline-variant flex flex-col justify-center min-h-[60px]">
+<div class="flex justify-between items-center w-full">
+<span class="text-data-mono font-data-mono text-secondary-fixed text-[11px]">INDIANA SUPREME COURT</span>
+<span class="text-data-mono font-data-mono text-secondary-fixed text-[11px]">March 12, 2008</span>
+</div>
+<h2 class="text-headline-md font-headline-md text-on-secondary-container truncate">Ex Parte Jenkins, 881 N.E.2d 1005</h2>
+</div>
+<!-- Document Viewer / Canvas -->
+<div class="flex-1 overflow-y-auto p-lg relative">
+<!-- Subtle paper texture overlay -->
+<div class="absolute inset-0 pointer-events-none opacity-5" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;"></div>
+<div class="max-w-prose mx-auto font-body-lg text-body-lg text-on-surface space-y-6 relative z-10 pb-xl">
+<!-- Headnotes Area -->
+<div class="border-l-4 border-outline p-4 bg-surface-container-low mb-8">
+<h4 class="text-label-caps font-label-caps text-on-surface-variant mb-2">SYLLABUS</h4>
+<p class="text-data-mono font-data-mono text-[13px] text-on-surface-variant">Defendant was convicted in the Superior Court of felony murder based on the death of his co-felon, who was shot by police during their flight from a robbery. Defendant appealed. The Supreme Court held that the proximate cause theory of felony murder applies when a defendant's conduct sets in motion a chain of events resulting in death, even if the fatal shot was fired by a non-participant.</p>
+</div>
+<p class="">Justice SULLIVAN delivered the opinion of the Court.</p>
+<p class="">This case requires us to reexamine the scope of the felony murder rule under Indiana Code § 35-42-1-1(2) specifically concerning the "proximate cause" theory of liability when the victim is a co-participant in the underlying felony and the fatal act is committed by a third party.</p>
+<h4 class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface mt-8 mb-4 border-b border-outline-variant pb-2">I. Factual Background</h4>
+<p class="">The facts are largely undisputed. On the evening of November 4, 2004, Jenkins and his accomplice, Vance, armed with handguns, entered a convenience store with the intent to commit robbery. An off-duty police officer, present in the store, intervened. A firefight ensued. Vance was struck by a bullet fired by the officer and died at the scene. Jenkins fled but was apprehended shortly thereafter.</p>
+<h4 class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface mt-8 mb-4 border-b border-outline-variant pb-2">II. Discussion</h4>
+<p class="">Jenkins argues that he cannot be held liable for felony murder because he did not pull the trigger, and the person killed was his co-felon, not an innocent bystander. He urges this Court to adopt an "agency theory" of felony murder.</p>
+<!-- Highlighted text -->
+<p class="">We decline the invitation. Indiana has long adhered to the proximate cause theory of felony murder. <span class="highlight-text cursor-pointer group relative">As we stated in <em>Palmer v. State</em>, 741 N.E.2d 1245 (Ind. 2001), it is not necessary that the defendant's own act be the direct cause of death; it is sufficient if the defendant's conduct during the commission of the felony "set in motion" a series of events that foreseeably led to the fatal result.
+                            <!-- Tooltip/Popover on hover -->
+<span class="hidden group-hover:block absolute bottom-full left-0 mb-2 w-64 bg-surface-container p-2 border border-secondary shadow-lg z-50 text-data-mono font-data-mono text-[10px] text-on-surface">
+<span class="block text-secondary mb-1">AI Note:</span>
+                                This exact phrasing ("set in motion") is central to the State's argument against your client. Prepare to distinguish based on "foreseeability."
+                            </span>
+</span></p>
+<p class="">When a person embarks on a dangerous felony, such as armed robbery, it is entirely foreseeable that resistance may be encountered and that deadly force may be employed by victims, bystanders, or police officers. The ensuing death is a natural and probable consequence of the felonious act.</p>
+<p class="mt-8 border-t border-outline-variant pt-4 text-data-mono font-data-mono text-[12px] text-on-surface-variant text-center">
+                            [End of excerpt]
+                        </p>
+</div>
+</div>
+</section>
+<!-- Right Pane: "Research Brief" (25%) -->
+<section class="w-[25%] flex flex-col bg-surface-container shrink-0">
+<div class="p-sm border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
+<h2 class="text-label-caps font-label-caps text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-secondary">memory</span>
+                        AI Synthesis Brief
+                    </h2>
+<button class="p-1 text-on-surface-variant hover:text-secondary"><span class="material-symbols-outlined text-[16px]">file_download</span></button>
+</div>
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 text-body-md font-body-md text-on-surface text-[14px]">
+<div class="border border-outline-variant bg-surface-container-low p-3">
+<h4 class="text-label-caps font-label-caps text-secondary mb-2 border-b border-outline-variant pb-1">Query Analysis</h4>
+<p class="text-data-mono font-data-mono text-[12px] text-on-surface-variant leading-relaxed">
+                            Analyzing application of "proximate cause" to felony murder involving death of a co-felon in Indiana.
+                        </p>
+</div>
+<div>
+<h4 class="text-headline-lg-mobile font-headline-lg-mobile text-[16px] mb-2">The Rule</h4>
+<p class="mb-2">Indiana strictly applies the <strong>proximate cause theory</strong> rather than the agency theory. A felon can be charged with felony murder if their actions during the felony set in motion a chain of events leading to a death, regardless of who pulls the trigger. <a class="text-secondary hover:underline text-data-mono font-data-mono text-[11px] bg-surface-variant px-1 ml-1" href="#">[Ex Parte Jenkins]</a></p>
+</div>
+<div>
+<h4 class="text-headline-lg-mobile font-headline-lg-mobile text-[16px] mb-2">Defense Strategy (Distinguishing)</h4>
+<p class="mb-2">To successfully defend against this, you must attack the <strong>foreseeability</strong> link in the causal chain. If an intervening act was highly extraordinary or unforeseeable, it may break the chain of proximate cause. <a class="text-secondary hover:underline text-data-mono font-data-mono text-[11px] bg-surface-variant px-1 ml-1" href="#">[Smith v. State]</a></p>
+<div class="bg-surface-variant p-2 mt-2 border-l-2 border-error">
+<span class="text-label-caps font-label-caps text-error block mb-1">Vulnerability</span>
+<span class="text-data-mono font-data-mono text-[11px] text-on-surface-variant">The court heavily favors the State in armed robbery contexts, routinely finding violent intervention "foreseeable."</span>
+</div>
+</div>
+<div class="mt-4 border-t border-outline-variant pt-4">
+<h4 class="text-label-caps font-label-caps text-on-surface-variant mb-2">Key Authorities Mapped</h4>
+<ul class="flex flex-col gap-2">
+<li class="flex items-center gap-2 text-data-mono font-data-mono text-[11px]">
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+<span class="text-on-surface">Jenkins (2008)</span> - Controlling
+                            </li>
+<li class="flex items-center gap-2 text-data-mono font-data-mono text-[11px]">
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+<span class="text-on-surface">Palmer (2001)</span> - Foundational
+                            </li>
+<li class="flex items-center gap-2 text-data-mono font-data-mono text-[11px]">
+<div class="w-2 h-2 rounded-full bg-red-500"></div>
+<span class="text-on-surface">Smith (2018)</span> - Limited Application
+                            </li>
+</ul>
+</div>
+</div>
+</section>
+</main>
+<!-- Status Bar -->
+<footer class="h-8 bg-surface border-t border-outline-variant flex items-center px-4 justify-between text-data-mono font-data-mono text-[11px] text-on-surface-variant shrink-0 z-30">
+<div class="flex items-center gap-4">
+<span class="">37 volumes searched</span>
+<span class="w-px h-3 bg-outline-variant"></span>
+<span class="">12 primary sources</span>
+<span class="w-px h-3 bg-outline-variant"></span>
+<span class="text-secondary flex items-center gap-1">AI brief ready <span class="material-symbols-outlined text-[12px]">check</span></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_4px_#22c55e]"></span>
+                Connected to Legal OS Server
+            </div>
+</footer>
+</div>
+
+
+</body></html>

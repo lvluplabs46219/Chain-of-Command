@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mitigation Memo - Acquit.ai</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;600;700&amp;family=Hanken+Grotesk:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-bright": "#3a3939",
+                      "primary": "#c6c6c9",
+                      "on-surface-variant": "#c5c6ca",
+                      "on-secondary-container": "#a4b7cd",
+                      "secondary-container": "#36485b",
+                      "surface-container-low": "#1c1b1b",
+                      "primary-fixed-dim": "#c6c6c9",
+                      "error-container": "#93000a",
+                      "inverse-surface": "#e5e2e1",
+                      "outline-variant": "#44474a",
+                      "primary-fixed": "#e2e2e5",
+                      "on-secondary": "#203243",
+                      "on-tertiary": "#352f2b",
+                      "on-secondary-fixed": "#091d2e",
+                      "primary-container": "#1a1c1e",
+                      "secondary-fixed-dim": "#b5c8df",
+                      "error": "#ffb4ab",
+                      "on-primary-container": "#838486",
+                      "surface-container": "#201f1f",
+                      "on-tertiary-container": "#8b837d",
+                      "tertiary-fixed-dim": "#cfc5be",
+                      "surface-container-highest": "#353435",
+                      "secondary-fixed": "#d1e4fb",
+                      "surface-container-lowest": "#0e0e0e",
+                      "secondary": "#b5c8df",
+                      "on-tertiary-fixed": "#201b17",
+                      "surface-variant": "#353435",
+                      "on-error": "#690005",
+                      "on-background": "#e5e2e1",
+                      "background": "#141313",
+                      "on-surface": "#e5e2e1",
+                      "on-error-container": "#ffdad6",
+                      "tertiary": "#cfc5be",
+                      "surface-dim": "#141313",
+                      "tertiary-container": "#201b17",
+                      "surface-tint": "#c6c6c9",
+                      "tertiary-fixed": "#ebe0da",
+                      "surface-container-high": "#2a2a2a",
+                      "inverse-primary": "#5d5e61",
+                      "surface": "#141313",
+                      "inverse-on-surface": "#313030",
+                      "on-primary": "#2f3133",
+                      "on-tertiary-fixed-variant": "#4c4641",
+                      "outline": "#8f9194",
+                      "on-primary-fixed": "#1a1c1e",
+                      "on-secondary-fixed-variant": "#36485b",
+                      "on-primary-fixed-variant": "#454749"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "4px",
+                      "xs": "4px",
+                      "gutter": "16px",
+                      "lg": "24px",
+                      "xl": "40px",
+                      "margin-safe": "32px",
+                      "sm": "8px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "headline-md": [
+                              "Domine"
+                      ],
+                      "body-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "label-caps": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-lg-mobile": [
+                              "Domine"
+                      ],
+                      "headline-lg": [
+                              "Domine"
+                      ],
+                      "data-mono": [
+                              "JetBrains Mono"
+                      ],
+                      "display-case": [
+                              "Domine"
+                      ]
+              },
+              "fontSize": {
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.08em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "data-mono": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-case": [
+                              "40px",
+                              {
+                                      "lineHeight": "48px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            font-feature-settings: 'liga';
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Custom scrollbar for data dense panels */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #44474a;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8f9194;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased overflow-hidden selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopAppBar -->
+<header class="bg-surface-container-low dark:bg-surface-container-low h-16 fixed top-0 right-0 left-[280px] z-50 border-b border-outline-variant flex justify-between items-center px-lg">
+<div class="flex items-center space-x-md">
+<span class="font-headline-md text-headline-md font-black text-primary">Acquit.ai</span>
+<div class="h-6 w-px bg-outline-variant mx-2"></div>
+<nav class="flex space-x-md">
+<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md transition-colors duration-200" href="#">Case: 2024-CV-8821</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-body-md text-body-md transition-all duration-200" href="#">The Clerk</a>
+</nav>
+</div>
+<div class="flex items-center space-x-gutter">
+<div class="flex items-center space-x-sm text-on-surface-variant">
+<button class="p-2 rounded hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors duration-200 text-on-surface-variant hover:text-primary focus:outline-none">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<button class="p-2 rounded hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors duration-200 text-on-surface-variant hover:text-primary focus:outline-none">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+<button class="p-2 rounded hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors duration-200 text-on-surface-variant hover:text-primary focus:outline-none relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
+</button>
+</div>
+<button class="bg-[#C5A880] text-[#141313] hover:bg-[#D4B991] font-label-caps text-label-caps px-md py-sm flex items-center space-x-xs border border-[#C5A880] transition-colors shadow-sm focus:outline-none">
+<span>AFFIX SIGNATURE</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border border-outline-variant overflow-hidden flex-shrink-0 cursor-pointer hover:border-primary transition-colors">
+<img alt="Counsel Avatar" class="w-full h-full object-cover" data-alt="A professional headshot of a seasoned legal counsel in a dimly lit, dark wood-paneled office. The counsel wears a sharp navy suit and has a serious, focused expression. The lighting is dramatic, highlighting the texture of the suit and the gravitas of the environment, conveying authority and experience." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCj56ulIa-iQEWfdRWivhLMeytGVJOtD583Nc8mGWBLhU8vOPtMgTa0EmYhsYHDynGOIkCvh2lzn5sdtFTg7tGDJN0O1CT4YjVmPOOcXfXvNFz5OmVPU_w1IzvqrdD1nRzT5Ov6jF8d3X8UPeYNl7U955lEeM82MXXM8BkQx4AKtVXvEEuDMrMfHoR1kqSp32Lrltvz8CSYHoZK52QeV7GfwqRtG6heIqfMblboSATV1giVOMfem-uUHQ"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="w-[280px] h-screen fixed left-0 top-0 border-r border-outline-variant bg-background dark:bg-background flex flex-col h-full py-md z-40">
+<!-- Brand Area -->
+<div class="px-lg pb-lg border-b border-outline-variant mb-md">
+<div class="font-headline-lg text-headline-lg font-bold text-primary tracking-tighter uppercase mb-xs">Acquit.ai</div>
+<div class="text-on-surface-variant font-label-caps text-label-caps tracking-widest uppercase">Senior Counsel</div>
+</div>
+<!-- CTA -->
+<div class="px-lg mb-lg">
+<button class="w-full bg-transparent border border-outline-variant text-on-surface hover:bg-surface-container-high hover:border-primary hover:text-primary transition-all duration-150 font-label-caps text-label-caps py-sm flex justify-center items-center space-x-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>NEW FILING</span>
+</button>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex-1 overflow-y-auto px-sm space-y-1">
+<a class="flex items-center space-x-md px-md py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 rounded-r font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Command Center</span>
+</a>
+<a class="flex items-center space-x-md px-md py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 rounded-r font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+<span>The Docket</span>
+</a>
+<a class="flex items-center space-x-md px-md py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 rounded-r font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+<span>Chambers</span>
+</a>
+<a class="flex items-center space-x-md px-md py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 rounded-r font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined" data-icon="library_books">library_books</span>
+<span>Law Library</span>
+</a>
+<a class="flex items-center space-x-md px-md py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 rounded-r font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span>Record Room</span>
+</a>
+<a class="flex items-center space-x-md px-md py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 rounded-r font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined" data-icon="policy">policy</span>
+<span>Investigations</span>
+</a>
+<a class="flex items-center space-x-md px-md py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 rounded-r font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined" data-icon="timeline">timeline</span>
+<span>Case Timeline</span>
+</a>
+<a class="flex items-center space-x-md px-md py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 rounded-r font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+<span>Court Watch</span>
+</a>
+<a class="flex items-center space-x-md px-md py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 rounded-r font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span>Counsel Directory</span>
+</a>
+<a class="flex items-center space-x-md px-md py-sm text-primary border-l-4 border-primary bg-secondary-container/30 font-bold hover:bg-surface-container-high transition-all duration-75 rounded-r font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined" data-icon="assignment" style="font-variation-settings: 'FILL' 1;">assignment</span>
+<span>Motions &amp; Tasks</span>
+</a>
+</nav>
+<!-- Footer Actions -->
+<div class="px-sm pt-md border-t border-outline-variant mt-auto space-y-1">
+<a class="flex items-center space-x-md px-md py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 rounded font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center space-x-md px-md py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 rounded font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span>Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area - 3 Pane Layout -->
+<main class="ml-[280px] mt-16 h-[calc(100vh-4rem)] flex overflow-hidden">
+<!-- Left Panel: Mitigation Factors -->
+<section class="w-80 border-r border-outline-variant bg-surface flex flex-col flex-shrink-0 z-10 shadow-[2px_0_10px_-4px_rgba(0,0,0,0.5)]">
+<div class="p-md border-b border-outline-variant bg-surface-container-low flex justify-between items-center sticky top-0">
+<h2 class="font-headline-md text-headline-md text-primary">Factors</h2>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-sm space-y-sm">
+<!-- Factor Group: Education -->
+<div class="border border-outline-variant bg-surface-container-lowest">
+<div class="bg-surface-container px-sm py-xs border-b border-outline-variant flex justify-between items-center cursor-pointer hover:bg-surface-container-highest transition-colors">
+<span class="font-label-caps text-label-caps text-on-surface uppercase tracking-wider">Education</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant" data-icon="expand_more">expand_more</span>
+</div>
+<div class="p-sm space-y-2">
+<div class="p-sm border border-outline-variant bg-surface hover:border-primary cursor-pointer transition-colors group">
+<div class="flex justify-between items-start mb-1">
+<span class="font-data-mono text-data-mono text-xs text-on-surface-variant">F-ED-01</span>
+<span class="material-symbols-outlined text-[14px] text-primary opacity-0 group-hover:opacity-100 transition-opacity" data-icon="add_circle">add_circle</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface text-sm leading-tight">Completed GED while incarcerated (2018).</p>
+</div>
+<div class="p-sm border border-outline-variant bg-surface hover:border-primary cursor-pointer transition-colors group">
+<div class="flex justify-between items-start mb-1">
+<span class="font-data-mono text-data-mono text-xs text-on-surface-variant">F-ED-02</span>
+<span class="material-symbols-outlined text-[14px] text-primary opacity-0 group-hover:opacity-100 transition-opacity" data-icon="add_circle">add_circle</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface text-sm leading-tight">Enrolled in vocational auto-mechanic training prior to arrest.</p>
+</div>
+</div>
+</div>
+<!-- Factor Group: Employment -->
+<div class="border border-outline-variant bg-surface-container-lowest">
+<div class="bg-surface-container px-sm py-xs border-b border-outline-variant flex justify-between items-center cursor-pointer hover:bg-surface-container-highest transition-colors">
+<span class="font-label-caps text-label-caps text-on-surface uppercase tracking-wider">Employment</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant" data-icon="expand_more">expand_more</span>
+</div>
+<div class="p-sm space-y-2">
+<div class="p-sm border border-outline-variant bg-surface hover:border-primary cursor-pointer transition-colors group">
+<div class="flex justify-between items-start mb-1">
+<span class="font-data-mono text-data-mono text-xs text-on-surface-variant">F-EM-01</span>
+<span class="material-symbols-outlined text-[14px] text-primary opacity-0 group-hover:opacity-100 transition-opacity" data-icon="add_circle">add_circle</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface text-sm leading-tight">Consistent employment at Riverside Construction (3 years).</p>
+</div>
+</div>
+</div>
+<!-- Factor Group: Family Support -->
+<div class="border border-[#C5A880]/50 bg-surface-container-lowest shadow-[inset_0_0_8px_rgba(197,168,128,0.1)]">
+<div class="bg-surface-container px-sm py-xs border-b border-[#C5A880]/30 flex justify-between items-center cursor-pointer">
+<span class="font-label-caps text-label-caps text-[#C5A880] uppercase tracking-wider">Family Support</span>
+<span class="material-symbols-outlined text-[16px] text-[#C5A880]" data-icon="expand_less">expand_less</span>
+</div>
+<div class="p-sm space-y-2">
+<div class="p-sm border border-[#C5A880] bg-surface-bright cursor-pointer transition-colors relative">
+<div class="absolute -left-[1px] top-0 bottom-0 w-[2px] bg-[#C5A880]"></div>
+<div class="flex justify-between items-start mb-1">
+<span class="font-data-mono text-data-mono text-xs text-[#C5A880]">F-FS-01</span>
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant hover:text-error transition-colors" data-icon="remove_circle">remove_circle</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface text-sm leading-tight">Primary caregiver for ailing mother; substantial community ties.</p>
+<div class="mt-2 flex items-center space-x-1 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[12px]" data-icon="link">link</span>
+<span>Ref: Exh. B, Affidavits</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Prompt area bottom of left panel -->
+<div class="p-sm border-t border-outline-variant bg-surface-container-highest mt-auto">
+<div class="flex items-center space-x-2 mb-2 text-primary">
+<span class="material-symbols-outlined text-[18px]" data-icon="psychology">psychology</span>
+<span class="font-label-caps text-label-caps text-xs">AI Assistant Suggestions</span>
+</div>
+<div class="bg-surface border border-outline-variant p-2 text-sm text-on-surface-variant italic font-body-md">
+                    "Consider adding humanizing details regarding the client's role in the community center volunteer program mentioned in Exhibit C."
+                </div>
+<button class="mt-2 w-full border border-outline-variant py-1 text-xs font-data-mono text-on-surface hover:bg-surface-bright transition-colors uppercase">Generate Narrative</button>
+</div>
+</section>
+<!-- Center Panel: Drafting Area -->
+<section class="flex-1 flex flex-col bg-background relative z-0">
+<!-- Toolbar -->
+<div class="h-12 border-b border-outline-variant bg-surface-container flex items-center px-md justify-between shrink-0">
+<div class="flex space-x-2 border-r border-outline-variant pr-4">
+<button class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-bright rounded"><span class="material-symbols-outlined text-[20px]" data-icon="format_bold">format_bold</span></button>
+<button class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-bright rounded"><span class="material-symbols-outlined text-[20px]" data-icon="format_italic">format_italic</span></button>
+<button class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-bright rounded"><span class="material-symbols-outlined text-[20px]" data-icon="format_underlined">format_underlined</span></button>
+<div class="w-px h-5 bg-outline-variant mx-1 self-center"></div>
+<button class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-bright rounded"><span class="material-symbols-outlined text-[20px]" data-icon="format_list_bulleted">format_list_bulleted</span></button>
+<button class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-bright rounded"><span class="material-symbols-outlined text-[20px]" data-icon="format_quote">format_quote</span></button>
+</div>
+<div class="flex items-center space-x-3">
+<span class="font-data-mono text-xs text-on-surface-variant">Last saved: 14:02 EST</span>
+<button class="bg-surface-bright border border-outline-variant px-3 py-1 text-xs font-label-caps text-on-surface hover:border-primary transition-colors">SAVE DRAFT</button>
+</div>
+</div>
+<!-- Document Canvas -->
+<div class="flex-1 overflow-y-auto p-lg flex justify-center bg-[#1A1A1A]">
+<!-- "Paper" Area -->
+<div class="w-full max-w-3xl bg-surface-container-low border border-outline-variant shadow-lg min-h-[800px] p-xl relative">
+<!-- Draft Header -->
+<div class="border-b-2 border-outline-variant pb-4 mb-8 text-center">
+<h1 class="font-headline-lg text-headline-lg text-primary uppercase tracking-wide">Memorandum in Support of Mitigation</h1>
+<p class="font-data-mono text-data-mono text-on-surface-variant mt-2">v. 1.4 - IN RE: RIVERSIDE CONSTRUCTION INC.</p>
+</div>
+<!-- Draft Content -->
+<div class="font-body-md text-body-md text-on-surface space-y-6 leading-relaxed outline-none" contenteditable="true">
+<p>
+                            This memorandum details critical mitigation factors concerning the defendant's background, specifically emphasizing their strong family ties and community contributions, which warrant a downward departure from the standard sentencing guidelines.
+                        </p>
+<h3 class="font-headline-md text-lg text-primary border-b border-outline-variant pb-1 mt-6">I. Family Support and Caregiving Responsibilities</h3>
+<p>
+                            The defendant serves as the primary caregiver for their ailing mother, a responsibility they have maintained consistently for the past five years. <span class="bg-[#C5A880]/20 text-[#D4B991] px-1 border border-[#C5A880]/50 rounded cursor-pointer hover:bg-[#C5A880]/30 transition-colors inline-flex items-center relative group">
+                                [Insert F-FS-01 details here]
+                                <span class="material-symbols-outlined text-[14px] ml-1">edit</span>
+<!-- Tooltip hint -->
+<span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block w-48 p-2 bg-surface-container-highest border border-outline-variant text-xs text-on-surface z-50 rounded shadow-md">
+                                    "Primary caregiver for ailing mother; substantial community ties."
+                                </span>
+</span> As demonstrated by the sworn affidavits from neighbors and medical personnel, the defendant's absence would cause severe and immediate hardship to their dependent family members.
+                        </p>
+<p>
+                            Furthermore, their role extends beyond immediate family...
+                        </p>
+<h3 class="font-headline-md text-lg text-primary border-b border-outline-variant pb-1 mt-6">II. Educational and Vocational Progress</h3>
+<p class="text-on-surface-variant italic opacity-50">
+                            [Drafting in progress. Consider AI suggestion regarding vocational training...]
+                        </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Panel: Source Evidence (Inspector) -->
+<section class="w-80 border-l border-outline-variant bg-surface flex flex-col flex-shrink-0 z-10 shadow-[-2px_0_10px_-4px_rgba(0,0,0,0.5)]">
+<div class="p-md border-b border-outline-variant bg-surface-container-low flex justify-between items-center sticky top-0">
+<h2 class="font-headline-md text-headline-md text-primary">Source Evidence</h2>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+</div>
+<!-- Contextual Link Area -->
+<div class="bg-[#1a2b3c]/30 border-b border-[#2C3E50] p-sm">
+<div class="flex items-center space-x-2 text-[#a4b7cd] text-xs font-label-caps uppercase mb-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="link">link</span>
+<span>Linked to active selection</span>
+</div>
+<!-- Linked Document Card -->
+<div class="bg-surface border border-[#2C3E50] p-sm shadow-sm cursor-pointer hover:border-primary transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-[#2C3E50] text-[#a4b7cd] text-[10px] px-1 py-0.5 font-data-mono uppercase">Exhibit B</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant" data-icon="open_in_new">open_in_new</span>
+</div>
+<h4 class="font-headline-md text-sm text-primary leading-tight mb-1">Sworn Affidavits - Medical &amp; Neighbors</h4>
+<p class="font-data-mono text-xs text-on-surface-variant truncate">Bates: RCI-00452 - RCI-00460</p>
+<!-- Excerpt snippet -->
+<div class="mt-2 bg-surface-container p-2 border-l-2 border-[#C5A880] text-xs font-body-md text-on-surface italic overflow-hidden h-16 relative">
+                        "...without his daily assistance, Mrs. Rivers would require full-time residential care, which she adamantly refuses and cannot afford..."
+                        <div class="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-surface-container to-transparent"></div>
+</div>
+</div>
+</div>
+<!-- Repository List -->
+<div class="flex-1 overflow-y-auto p-sm space-y-2">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider mb-2 mt-2 px-1">Record Room Available</h3>
+<!-- Doc Item 1 -->
+<div class="flex items-start space-x-3 p-2 border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-high cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary mt-0.5 text-[20px]" data-icon="description">description</span>
+<div class="flex-1 min-w-0">
+<div class="font-body-md text-sm text-on-surface font-medium truncate">GED Certificate &amp; Transcripts</div>
+<div class="font-data-mono text-[10px] text-on-surface-variant mt-0.5">May 2018 | 2 Pages</div>
+</div>
+<button class="opacity-0 group-hover:opacity-100 text-primary transition-opacity">
+<span class="material-symbols-outlined text-[18px]" data-icon="post_add">post_add</span>
+</button>
+</div>
+<!-- Doc Item 2 -->
+<div class="flex items-start space-x-3 p-2 border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-high cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary mt-0.5 text-[20px]" data-icon="description">description</span>
+<div class="flex-1 min-w-0">
+<div class="font-body-md text-sm text-on-surface font-medium truncate">Vocational Training Enrollment</div>
+<div class="font-data-mono text-[10px] text-on-surface-variant mt-0.5">Aug 2021 | 1 Page</div>
+</div>
+<button class="opacity-0 group-hover:opacity-100 text-primary transition-opacity">
+<span class="material-symbols-outlined text-[18px]" data-icon="post_add">post_add</span>
+</button>
+</div>
+<!-- Doc Item 3 -->
+<div class="flex items-start space-x-3 p-2 border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-high cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary mt-0.5 text-[20px]" data-icon="folder_shared">folder_shared</span>
+<div class="flex-1 min-w-0">
+<div class="font-body-md text-sm text-on-surface font-medium truncate">Employment Records - Riverside</div>
+<div class="font-data-mono text-[10px] text-on-surface-variant mt-0.5">2019-2022 | 45 Pages</div>
+</div>
+<button class="opacity-0 group-hover:opacity-100 text-primary transition-opacity">
+<span class="material-symbols-outlined text-[18px]" data-icon="post_add">post_add</span>
+</button>
+</div>
+</div>
+<!-- Bottom Action -->
+<div class="p-sm border-t border-outline-variant bg-surface-container-low mt-auto">
+<button class="w-full bg-surface-bright border border-outline-variant text-on-surface hover:border-primary hover:text-primary transition-all duration-150 font-label-caps text-label-caps py-sm flex justify-center items-center space-x-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="search">search</span>
+<span>SEARCH RECORD ROOM</span>
+</button>
+</div>
+</section>
+</main>
+</body></html>
