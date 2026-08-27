@@ -126,7 +126,13 @@ export class ComputerUseCourtAdapter {
     }
 
     try {
-      const challenge: unknown = JSON.parse(token);
+      const MAX_TOKEN_LENGTH = 4096; // bytes or characters for JSON challenge
+    if (token.length > MAX_TOKEN_LENGTH) {
+      logger.warn("Human gate verification failed: token exceeds maximum allowed length.");
+      return false;
+    }
+
+    const challenge: unknown = JSON.parse(token);
       if (!isFilingGateChallenge(challenge)) {
         logger.warn("Human gate verification failed: invalid challenge structure.");
         return false;

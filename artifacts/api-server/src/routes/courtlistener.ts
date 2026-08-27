@@ -2,6 +2,14 @@ import { Router, type Request, type Response as ExpressResponse } from "express"
 import { db, sourcesTable, authoritiesTable, mattersTable, timelineEventsTable } from "@workspace/db";
 import crypto from "crypto";
 
+// Extend Request type to include user, assuming an authentication middleware sets it
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    // Add other user properties as needed
+  };
+}
+
 export const courtlistenerRouter = Router();
 
 // Optional real Pinata IPFS Pinning helper
@@ -71,7 +79,12 @@ courtlistenerRouter.get("/courtlistener/search", async (req: Request, res: Expre
 });
 
 // Ingest/Migrate an authority from CourtListener to Acquit Law DB
-courtlistenerRouter.post("/courtlistener/migrate", async (req: Request, res: ExpressResponse) => {
+courtlistenerRouter.post("/courtlistener/migrate", async (req: AuthenticatedRequest, res: ExpressResponse) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized: User not authenticated." });
+  }
+
   try {
     const { caseName, citation, court, year, summary, excerpt, courtlistenerId } = req.body;
     const sourceHash = courtlistenerId || `cl-${crypto.createHash("sha256").update(caseName + (citation || "")).digest("hex").slice(0, 16)}`;
@@ -101,7 +114,7 @@ courtlistenerRouter.post("/courtlistener/migrate", async (req: Request, res: Exp
       reporterCitation: citationStr,
       holding: summary || "Migrated from Free Law Project / CourtListener open legal archive.",
       fullText: fullText,
-      precedentialStatus: "Binding Precedent",
+      precedentialStatus: "Unspecified",
       metadata: {
         tags: ["CourtListener", "Migrated Authority", "RECAP"],
         migratedAt: new Date().toISOString(),
@@ -127,10 +140,14 @@ courtlistenerRouter.post("/courtlistener/migrate", async (req: Request, res: Exp
 });
 
 // Import docket directly into a user matter
-courtlistenerRouter.post('/migrate/courtlistener', async (req: Request, res: ExpressResponse) => {
+courtlistenerRouter.post('/migrate/courtlistener', async (req: AuthenticatedRequest, res: ExpressResponse) => {
   try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized: User not authenticated." });
+    }
+
     const { docketNumber, court } = req.body;
-    const userId = (req as any).user?.id || 'anonymous-user';
 
     const caseName = 'State of Indiana v. Alex Thompson';
     const courtName = court || 'Marion County Superior Court';

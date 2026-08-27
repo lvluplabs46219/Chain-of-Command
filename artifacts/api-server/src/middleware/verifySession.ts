@@ -24,12 +24,6 @@ export async function verifySession(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  // Allow bypassing auth in development if explicitly requested or if Supabase is missing
-  if (process.env.NODE_ENV === 'development' && process.env.BYPASS_AUTH === 'true') {
-    next();
-    return;
-  }
-
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith('Bearer ')) {

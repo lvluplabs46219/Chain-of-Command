@@ -33,6 +33,9 @@ app.use(
 const parseAllowedOrigins = (): (string | RegExp)[] => {
   const envOrigins = process.env.ALLOWED_ORIGINS;
   if (!envOrigins) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("ALLOWED_ORIGINS environment variable must be set in production.");
+    }
     return ["http://localhost:3000", "http://localhost:5173"];
   }
   const origins = envOrigins.split(",").map(o => o.trim()).filter(Boolean);
@@ -54,7 +57,7 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'"],
       connectSrc: [
         "'self'",
         "https://*.supabase.co",
@@ -62,7 +65,7 @@ app.use(helmet({
         "https://*.googleapis.com",
         "https://api.openai.com",
       ],
-      imgSrc: ["'self'", "data:", "https:"],
+      imgSrc: ["'self'", "data:", "https://*.googleusercontent.com"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: []
     }

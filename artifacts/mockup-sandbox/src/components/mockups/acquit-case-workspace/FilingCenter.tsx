@@ -26,12 +26,17 @@ export function FilingCenter() {
         if (e.key === 'Escape') setShowDraftModal(false);
       };
       window.addEventListener('keydown', handleKeyDown);
-          } else {
+    } else {
       document.body.style.overflow = 'unset';
     }
     return () => {
       document.body.style.overflow = 'unset';
-      if (typeof handleKeyDown !== 'undefined') window.removeEventListener('keydown', handleKeyDown);
+      if (typeof window !== 'undefined') {
+        const handleKeyDown = (e: KeyboardEvent) => {
+          if (e.key === 'Escape') setShowDraftModal(false);
+        };
+        window.removeEventListener('keydown', handleKeyDown);
+      }
     };
   }, [showDraftModal]);
 

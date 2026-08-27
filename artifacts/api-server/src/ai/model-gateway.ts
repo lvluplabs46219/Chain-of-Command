@@ -37,6 +37,10 @@ export interface ChatMessage {
 export interface ModelRequest {
   provider?: ModelProvider;
   model: string;
+  /**
+   * @remark ChatMessage.content should be sanitized and validated against prompt injection
+   *         at the application layer before being passed to the ModelGateway.
+   */
   messages: ChatMessage[];
   maxTokens?: number;
 }
@@ -323,7 +327,9 @@ export class OpenAiAdapter implements ModelAdapter {
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI API request failed with HTTP ${response.status}: ${await response.text()}`);
+      // Avoid exposing raw upstream error messages. Log details internally if needed.
+      // const errorDetails = await response.text(); console.error("OpenAI API detailed error:", errorDetails);
+      throw new Error(`OpenAI API request failed with HTTP ${response.status}.`);
     }
 
     const payloadRaw = await response.json();
@@ -377,7 +383,9 @@ export class OpenAiAdapter implements ModelAdapter {
       });
 
       if (!response.ok) {
-        throw new Error(`OpenAI API request failed with HTTP ${response.status}: ${await response.text()}`);
+        // Avoid exposing raw upstream error messages. Log details internally if needed.
+      // const errorDetails = await response.text(); console.error("OpenAI API detailed error:", errorDetails);
+      throw new Error(`OpenAI API request failed with HTTP ${response.status}.`);
       }
 
       if (!response.body) {
@@ -480,6 +488,12 @@ export class ModelGateway {
     this.adapters.set(adapter.provider, adapter);
   }
 
+  /**
+   * Resolves the appropriate ModelAdapter for a given provider and model.
+   * @remark Authorization checks for specific models or providers for a user/role
+   *         must be implemented upstream of the ModelGateway. This method only
+   *         validates model existence, not user permission.
+   */
   async resolve(provider: ModelProvider, model: string): Promise<ModelAdapter> {
     const adapter = this.adapters.get(provider);
     if (!adapter) {

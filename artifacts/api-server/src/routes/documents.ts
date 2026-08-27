@@ -1,4 +1,12 @@
 import { Router, type Request, type Response } from 'express';
+import rateLimit from "express-rate-limit";
+import { verifySession } from '../middleware/verifySession';
+
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+  };
+}
 import multer from 'multer';
 import { db, documentsTable, documentChunksTable, timelineEventsTable } from '@workspace/db';
 import { eq, desc } from 'drizzle-orm';
@@ -6,6 +14,15 @@ import { GoogleGenAI } from '@google/genai';
 import crypto from 'crypto';
 
 export const documentsRouter = Router();
+
+// Apply authentication middleware to all document routes
+documentsRouter.use(verifySession);
+
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // Max 20 uploads per 15 mins per IP
+  message: "Too many document uploads from this IP, please try again later"
+});
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 25 * 1024 * 1024 }, // 25MB max
@@ -19,9 +36,14 @@ function getAI(): GoogleGenAI | null {
 }
 
 // Generate signed upload URL for direct client storage upload (Supabase/S3)
-documentsRouter.post('/documents/signed-upload-url', async (req: Request, res: Response) => {
+documentsRouter.post('/documents/signed-upload-url', async (req: AuthenticatedRequest, res: Response) => {
   try {
+
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
     const { filename, fileType, matterId } = req.body;
+
     if (!filename || !matterId) {
       return res.status(400).json({ error: 'filename and matterId are required' });
     }
@@ -39,14 +61,19 @@ documentsRouter.post('/documents/signed-upload-url', async (req: Request, res: R
       },
     });
   } catch (err: any) {
-    console.error('Signed upload URL error:', err);
+    // console.error('Signed upload URL error details:', err);
+    console.error('Signed upload URL error occurred');
     return res.status(500).json({ error: 'Failed to generate signed upload URL' });
   }
 });
 
 // Full multimodal document upload, OCR parsing, chunking, and pgvector indexing
-documentsRouter.post('/documents/upload', upload.single('document'), async (req: Request, res: Response) => {
+documentsRouter.post('/documents/upload', uploadLimiter, upload.single('document'), async (req: AuthenticatedRequest, res: Response) => {
   try {
+
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
     if (!req.file) {
       return res.status(400).json({ error: 'No document file uploaded' });
     }
@@ -148,14 +175,19 @@ Analyze this legal document image/PDF and produce:
       message: 'Document successfully parsed, chunked, and indexed for RAG retrieval.',
     });
   } catch (error: any) {
-    console.error('Document Pipeline Error:', error);
+    // console.error('Document Pipeline Error details:', error);
+    console.error('Document Pipeline Error occurred');
     return res.status(500).json({ error: error.message || 'Document pipeline processing failed' });
   }
 });
 
 // List documents for a matter
-documentsRouter.get('/matters/:matterId/documents', async (req: Request, res: Response) => {
+documentsRouter.get('/matters/:matterId/documents', async (req: AuthenticatedRequest, res: Response) => {
   try {
+
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
     const { matterId } = req.params;
     let docs = [];
     try {

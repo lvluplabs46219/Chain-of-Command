@@ -5,63 +5,6 @@ import type { ModelProvider } from "../ai/model-gateway";
 import { Redis } from "@upstash/redis";
 import crypto from "crypto";
 
-export const AiRunRequest = z.object({
-  agentId: z.string(),
-  provider: z.enum(["demo", "ollama", "openai", "gemini"]).optional(),
-  model: z.string().optional(),
-  input: z.string(),
-  sources: z.array(z.any()).optional(),
-  matterId: z.string().optional(),
-});
-
-export const AiRunResponse = z.object({
-  runId: z.string(),
-  status: z.string(),
-  streamUrl: z.string(),
-  disclaimer: z.string(),
-  humanReviewRequired: z.boolean(),
-  agentName: z.string().optional(),
-});
-
-const router: IRouter = Router();
-
-interface RunRecord {
-  events: AgentEvent[];
-  done: boolean;
-  listeners: Set<(event: AgentEvent) => void>;
-  request: z.infer<typeof AiRunRequest>;
-  createdAt: number;
-}
-
-// In-memory active stream listeners map
-const memoryRuns = new Map<string, RunRecord>();
-
-// Upstash Redis instance with 60-min TTL (HIGH-1 resolution)
-let redisClient: Redis | null = null;
-if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
-  redisClient = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  });
-}
-
-// Helper to save run events with 60 min TTL (3600s)
-async function persistRunState(runId: string, record: RunRecord): Promise<void> {
-  if (!redisClient) return;
-  try {
-    const payload = {
-      runId,
-      events: record.events,
-      done: record.done,
-      request: record.request,
-      createdAt: record.createdAt,
-    };
-    await redisClient.set(`agent_run:${runId}`, JSON.stringify(payload), { ex: 3600 });
-  } catch (err) {
-    console.warn("Redis run state persistence warning:", err);
-  }
-}
-
 export const SPECIALIST_AGENTS: Record<string, { name: string; roleDescription: string; policy: AgentPolicy }> = {
   "lead-counsel": {
     name: "Lead Counsel Coordinator",
@@ -163,12 +106,78 @@ export const SPECIALIST_AGENTS: Record<string, { name: string; roleDescription: 
   },
 };
 
+
+const AgentSourceSchema = z.object({
+  id: z.string(),
+  content: z.string(),
+  url: z.string().url().optional(),
+  metadata: z.any().optional(),
+}).strict();
+
+export const AiRunRequest = z.object({
+  agentId: z.enum(Object.keys(SPECIALIST_AGENTS) as [string, ...string[]]),
+  provider: z.enum(["demo", "ollama", "openai", "gemini"]).optional(),
+  model: z.string().optional(),
+  input: z.string(),
+  sources: z.array(AgentSourceSchema).optional(),
+  matterId: z.string().optional(),
+});
+
+export const AiRunResponse = z.object({
+  runId: z.string(),
+  status: z.string(),
+  streamUrl: z.string(),
+  disclaimer: z.string(),
+  humanReviewRequired: z.boolean(),
+  agentName: z.string().optional(),
+});
+
+const router: IRouter = Router();
+
+interface RunRecord {
+  events: AgentEvent[];
+  done: boolean;
+  listeners: Set<(event: AgentEvent) => void>;
+  request: z.infer<typeof AiRunRequest>;
+  createdAt: number;
+}
+
+// In-memory active stream listeners map
+const memoryRuns = new Map<string, RunRecord>();
+
+// Upstash Redis instance with 60-min TTL (HIGH-1 resolution)
+let redisClient: Redis | null = null;
+if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+  redisClient = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  });
+}
+
+// Helper to save run events with 60 min TTL (3600s)
+async function persistRunState(runId: string, record: RunRecord): Promise<void> {
+  if (!redisClient) return;
+  try {
+    const payload = {
+      runId,
+      events: record.events,
+      done: record.done,
+      request: record.request,
+      createdAt: record.createdAt,
+    };
+    await redisClient.set(`agent_run:${runId}`, JSON.stringify(payload), { ex: 3600 });
+  } catch (err) {
+    console.warn("Redis run state persistence warning:", err);
+  }
+}
+
+
 function writeEvent(res: Response, event: AgentEvent): void {
   res.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
 }
 
 async function executeRun(runId: string, record: RunRecord): Promise<void> {
-  const agent = SPECIALIST_AGENTS[record.request.agentId] ?? SPECIALIST_AGENTS["paralegal"];
+  const agent = SPECIALIST_AGENTS[record.request.agentId];
   const provider = (record.request.provider ?? "demo") as ModelProvider;
   const sources = (record.request.sources ?? []) as AgentSource[];
 
@@ -190,6 +199,9 @@ async function executeRun(runId: string, record: RunRecord): Promise<void> {
     record.done = true;
     void persistRunState(runId, record);
     for (const listener of record.listeners) record.listeners.delete(listener);
+    setTimeout(() => {
+        memoryRuns.delete(runId);
+    }, 5 * 60 * 1000);
   }
 }
 
@@ -228,7 +240,7 @@ router.post("/ai/agents/:agentId/runs", (req: Request, res: Response) => {
   memoryRuns.set(runId, record);
   void executeRun(runId, record);
 
-  const agent = SPECIALIST_AGENTS[parsed.data.agentId] ?? SPECIALIST_AGENTS["paralegal"];
+  const agent = SPECIALIST_AGENTS[parsed.data.agentId];
 
   const response = AiRunResponse.parse({
     runId,

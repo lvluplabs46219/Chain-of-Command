@@ -1,4 +1,5 @@
 import { Router, type IRouter, type Request, type Response } from "express";
+import rateLimit from "express-rate-limit";
 
 const router: IRouter = Router();
 
@@ -154,6 +155,11 @@ router.get("/directory/lawyers", (req: Request, res: Response) => {
 
   let results = [...mockLawyers];
 
+    const validTiers = ["basic", "featured", "premium"];
+  if (tier && !validTiers.includes(tier as string)) {
+    return res.status(400).json({ message: "Invalid listing tier specified." });
+  }
+
   if (practiceArea) {
     const paStr = String(practiceArea).toLowerCase();
     results = results.filter((l) =>
@@ -222,7 +228,15 @@ router.get("/directory/lawyers", (req: Request, res: Response) => {
   });
 });
 
-router.post("/directory/referrals", (req: Request, res: Response) => {
+const referralLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 10, // Max 10 requests per 1 minute per IP
+  message: "Too many referral requests from this IP, please try again after a minute",
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+router.post("/directory/referrals", referralLimiter, (req: Request, res: Response) => {
   const { lawyerId, referralContext } = req.body;
   
   if (!lawyerId || !referralContext) {

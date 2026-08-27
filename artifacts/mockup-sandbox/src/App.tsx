@@ -92,7 +92,16 @@ function PreviewRenderer({
     );
   }
 
-  if (!Component) return null;
+  if (!Component) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#0A0A0A]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#174E48] border-t-[#D4AF37]" />
+          <p className="text-[#D4AF37] font-mono text-sm tracking-widest animate-pulse">LOADING WORKSPACE...</p>
+        </div>
+      </div>
+    );
+  }
 
   return <Component />;
 }
