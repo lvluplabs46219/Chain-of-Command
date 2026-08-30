@@ -4,6 +4,8 @@
 
 This document records the live Supabase schema state reconciled on 2026-08-21. The live project remains authoritative for pre-existing objects until a complete CLI `supabase db pull` baseline is committed.
 
+**Security Audit Update (2026-08-30)**: Critical security issues identified and remediated. See `supabase/migrations/20260830_*` migrations and `20260830_AUDIT_REMEDIATION.md` for details.
+
 ## Reconciled migration history
 
 - 20260606184834 new-migration
@@ -32,6 +34,8 @@ This document records the live Supabase schema state reconciled on 2026-08-21. T
 - 20260821204104 create_charges_and_hearings_tables
 - 20260821204638 harden_existing_rls
 - 20260821204950 add_agent_runtime_domain_tables
+- 20260830_security_hardening_critical_fixes
+- 20260830_storage_bucket_rls_and_cleanup
 
 ## Live domains confirmed
 
