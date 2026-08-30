@@ -1,0 +1,77 @@
+theme = "ansi-dark"
+applied_migrations = [
+    "bash_read_only_defaults_v1",
+]
+
+[tools.bash]
+allowlist = [
+    "/home/andrew/.config/Code/*",
+    "/home/andrew/.config/Code/User/*",
+    "/home/andrew/.vibe/*",
+    "/home/andrew/Development/Tools/AI/Engines/computer-use-agent/cua2-core/*",
+    "basename",
+    "cat",
+    "cd",
+    "comm",
+    "cut",
+    "date",
+    "diff",
+    "dirname",
+    "du",
+    "echo",
+    "file",
+    "find",
+    "fmt",
+    "fold",
+    "git diff",
+    "git log",
+    "git status",
+    "grep",
+    "head",
+    "join",
+    "less",
+    "ls",
+    "md5sum",
+    "more",
+    "nl",
+    "od",
+    "paste",
+    "pwd",
+    "python3",
+    "readlink",
+    "sha1sum",
+    "sha256sum",
+    "shasum",
+    "sort",
+    "stat",
+    "sum",
+    "tac",
+    "tail",
+    "tr",
+    "tree",
+    "uname",
+    "uniq",
+    "wc",
+    "which",
+    "whoami",
+]
+
+[tools.read_file]
+allowlist = [
+    "/home/andrew/.config/Code/User/*",
+    "/home/andrew/.vibe/*",
+    "/home/andrew/Development/Tools/AI/Engines/computer-use-agent/cua2-core/*",
+]
+
+[tools.edit]
+allowlist = [
+    "/home/andrew/.config/Code/User/*",
+    "/home/andrew/.vibe/*",
+]
+
+[mcp.servers.stitch]
+type = "http"
+url = "https://stitch.googleapis.com/mcp"
+
+[mcp.servers.stitch.headers]
+X-Goog-Api-Key = "AQ.Ab8RN6L96CR5ey_d6FEMkeq44nwMzMEKVzlli3KkNmxO-p9CEw"
