@@ -22,7 +22,7 @@
     "harvard:preview": "python3 scripts/harvard_cases.py --action preview --limit 5",
     "harvard:ingest": "python3 scripts/harvard_cases.py --action ingest --limit 10",
     "start": "tsx apps/api/src/index.ts",
-    "prepare": "husky",
+    "prepare": "[ "$VERCEL" = "1" ] || [ "$CI" = "1" ] || husky",
     "test": "tsx scripts/test_compliance_and_security.ts",
     "patcher": "tsx scripts/acquit-patcher.ts"
   },
