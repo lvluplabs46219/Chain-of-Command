@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Open a Matter - Acquit.ai</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-bright": "#3a3939",
+                      "primary": "#c6c6c9",
+                      "on-surface-variant": "#c5c6ca",
+                      "on-secondary-container": "#a4b7cd",
+                      "secondary-container": "#36485b",
+                      "surface-container-low": "#1c1b1b",
+                      "primary-fixed-dim": "#c6c6c9",
+                      "error-container": "#93000a",
+                      "inverse-surface": "#e5e2e1",
+                      "outline-variant": "#44474a",
+                      "primary-fixed": "#e2e2e5",
+                      "on-secondary": "#203243",
+                      "on-tertiary": "#352f2b",
+                      "on-secondary-fixed": "#091d2e",
+                      "primary-container": "#1a1c1e",
+                      "secondary-fixed-dim": "#b5c8df",
+                      "error": "#ffb4ab",
+                      "on-primary-container": "#838486",
+                      "surface-container": "#201f1f",
+                      "on-tertiary-container": "#8b837d",
+                      "tertiary-fixed-dim": "#cfc5be",
+                      "surface-container-highest": "#353435",
+                      "secondary-fixed": "#d1e4fb",
+                      "surface-container-lowest": "#0e0e0e",
+                      "secondary": "#b5c8df",
+                      "on-tertiary-fixed": "#201b17",
+                      "surface-variant": "#353435",
+                      "on-error": "#690005",
+                      "on-background": "#e5e2e1",
+                      "background": "#141313",
+                      "on-surface": "#e5e2e1",
+                      "on-error-container": "#ffdad6",
+                      "tertiary": "#cfc5be",
+                      "surface-dim": "#141313",
+                      "tertiary-container": "#201b17",
+                      "surface-tint": "#c6c6c9",
+                      "tertiary-fixed": "#ebe0da",
+                      "surface-container-high": "#2a2a2a",
+                      "inverse-primary": "#5d5e61",
+                      "surface": "#141313",
+                      "inverse-on-surface": "#313030",
+                      "on-primary": "#2f3133",
+                      "on-tertiary-fixed-variant": "#4c4641",
+                      "outline": "#8f9194",
+                      "on-primary-fixed": "#1a1c1e",
+                      "on-secondary-fixed-variant": "#36485b",
+                      "on-primary-fixed-variant": "#454749"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "4px",
+                      "xs": "4px",
+                      "gutter": "16px",
+                      "lg": "24px",
+                      "xl": "40px",
+                      "margin-safe": "32px",
+                      "sm": "8px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Domine"],
+                      "body-lg": ["Hanken Grotesk"],
+                      "body-md": ["Hanken Grotesk"],
+                      "label-caps": ["Hanken Grotesk"],
+                      "headline-lg-mobile": ["Domine"],
+                      "headline-lg": ["Domine"],
+                      "data-mono": ["JetBrains Mono"],
+                      "display-case": ["Domine"]
+              },
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                      "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                      "display-case": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          }
+        }
+    </script>
+<style>
+        /* Custom scrollbar for density */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #141313; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #44474a; 
+            border-radius: 0;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8f9194; 
+        }
+        
+        /* Brutalist Input Focus Utility */
+        .brutalist-input:focus {
+            border-bottom-width: 1px;
+            border: 1px solid #c6c6c9; /* primary */
+            box-shadow: 2px 2px 0px 0px #c6c6c9;
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface h-screen w-screen flex flex-col overflow-hidden selection:bg-primary selection:text-on-primary">
+<!-- Header: Focused Task mode, suppresses main nav -->
+<header class="h-16 shrink-0 border-b border-outline-variant bg-surface-container-low flex items-center justify-between px-lg z-50">
+<div class="flex items-center gap-md">
+<div class="w-8 h-8 bg-primary flex items-center justify-center rounded-sm">
+<span class="material-symbols-outlined text-on-primary" data-icon="gavel" style="font-variation-settings: 'FILL' 1;">gavel</span>
+</div>
+<h1 class="font-headline-md text-headline-md font-bold tracking-tight uppercase text-primary">Acquit.ai</h1>
+<span class="text-outline-variant px-sm font-data-mono">/</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Open a Matter</span>
+</div>
+<button class="flex items-center gap-xs px-sm py-xs border border-transparent hover:border-outline-variant text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps uppercase" title="Cancel Intake">
+<span class="material-symbols-outlined text-[16px]" data-icon="close">close</span>
+            ABORT
+        </button>
+</header>
+<!-- Main Workspace -->
+<main class="flex flex-1 overflow-hidden relative">
+<!-- Left: Progress Rail (The Docket Ledger) -->
+<aside class="w-[280px] hidden md:flex flex-col border-r border-outline-variant bg-surface-container-low shrink-0 pt-xl">
+<div class="px-lg pb-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Intake Protocol</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Complete the required fields to establish a new record on the ledger.</p>
+</div>
+<!-- Stepper Container -->
+<div class="mt-lg relative px-lg">
+<!-- Connecting Line -->
+<div class="absolute left-[39px] top-6 bottom-6 w-[2px] bg-outline-variant z-0"></div>
+<nav class="relative z-10 flex flex-col gap-xl">
+<!-- Step 1: Active -->
+<div class="flex items-start gap-md group cursor-default">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 border-[3px] border-surface-container-low shadow-[0_0_0_2px_#c6c6c9]">
+<span class="font-data-mono text-data-mono text-on-primary">1</span>
+</div>
+<div class="pt-1">
+<span class="block font-label-caps text-label-caps text-primary uppercase">Current Step</span>
+<span class="block font-headline-md text-[16px] leading-[24px] font-semibold text-on-surface mt-1">Jurisdiction &amp; Details</span>
+</div>
+</div>
+<!-- Step 2: Pending -->
+<div class="flex items-start gap-md group opacity-60">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center shrink-0 border-2 border-outline-variant">
+<span class="font-data-mono text-data-mono text-on-surface-variant">2</span>
+</div>
+<div class="pt-1">
+<span class="block font-label-caps text-label-caps text-on-surface-variant uppercase">Pending</span>
+<span class="block font-headline-md text-[16px] leading-[24px] font-medium text-on-surface-variant mt-1">Charges &amp; Statutes</span>
+</div>
+</div>
+<!-- Step 3: Pending -->
+<div class="flex items-start gap-md group opacity-60">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center shrink-0 border-2 border-outline-variant">
+<span class="font-data-mono text-data-mono text-on-surface-variant">3</span>
+</div>
+<div class="pt-1">
+<span class="block font-label-caps text-label-caps text-on-surface-variant uppercase">Pending</span>
+<span class="block font-headline-md text-[16px] leading-[24px] font-medium text-on-surface-variant mt-1">Parties &amp; Counsel</span>
+</div>
+</div>
+<!-- Step 4: Pending -->
+<div class="flex items-start gap-md group opacity-60">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center shrink-0 border-2 border-outline-variant">
+<span class="font-data-mono text-data-mono text-on-surface-variant">4</span>
+</div>
+<div class="pt-1">
+<span class="block font-label-caps text-label-caps text-on-surface-variant uppercase">Pending</span>
+<span class="block font-headline-md text-[16px] leading-[24px] font-medium text-on-surface-variant mt-1">Initial Sync</span>
+</div>
+</div>
+</nav>
+</div>
+<div class="mt-auto p-lg border-t border-outline-variant bg-surface-container/50">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="encrypted">encrypted</span>
+<span class="font-data-mono text-[12px] leading-tight text-on-surface-variant">End-to-End Encrypted Ledger</span>
+</div>
+</div>
+</aside>
+<!-- Right: Form Canvas (The Document) -->
+<section class="flex-1 overflow-y-auto bg-background relative flex flex-col items-center pt-xl pb-[100px]">
+<!-- Central Form Container max-w for readability -->
+<div class="w-full max-w-3xl px-md">
+<div class="mb-xl pb-md border-b border-outline-variant">
+<h2 class="font-display-case text-display-case text-on-surface">Jurisdiction &amp; Core Details</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-xs">Establish the primary identifiers for this legal matter. These fields dictate the metadata classification for future intelligence queries.</p>
+</div>
+<form class="flex flex-col gap-xl">
+<!-- Matter Title -->
+<div class="flex flex-col gap-xs group">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase flex items-center gap-xs" for="matter_title">
+                            Matter Title / Caption
+                            <span class="text-error" title="Required">*</span>
+</label>
+<input autocomplete="off" autofocus="" class="w-full bg-transparent border-b border-outline-variant px-0 py-sm font-data-mono text-[16px] text-on-surface placeholder:text-outline-variant transition-all brutalist-input focus:px-sm focus:-mx-sm" id="matter_title" name="matter_title" placeholder="e.g., State of New York v. John Doe" required="" type="text"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Court / Jurisdiction -->
+<div class="flex flex-col gap-xs relative">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase flex items-center gap-xs" for="jurisdiction">
+                                Presiding Court / Jurisdiction
+                                <span class="text-error" title="Required">*</span>
+</label>
+<div class="relative">
+<select class="appearance-none w-full bg-transparent border-b border-outline-variant px-0 py-sm font-data-mono text-[16px] text-on-surface focus:outline-none focus:border-primary focus:border-b transition-colors cursor-pointer rounded-none" id="jurisdiction" name="jurisdiction">
+<option class="bg-surface-container text-outline-variant" disabled="" selected="" value="">Select Jurisdiction...</option>
+<option class="bg-surface-container text-on-surface" value="ny_sdny">SDNY - Southern District of New York</option>
+<option class="bg-surface-container text-on-surface" value="ny_edny">EDNY - Eastern District of New York</option>
+<option class="bg-surface-container text-on-surface" value="ny_sup_man">New York Supreme Court, NY County</option>
+<option class="bg-surface-container text-on-surface" value="federal_app_2">2nd Circuit Court of Appeals</option>
+</select>
+<span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" data-icon="arrow_drop_down">arrow_drop_down</span>
+</div>
+</div>
+<!-- Case Number -->
+<div class="flex flex-col gap-xs group">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase" for="case_number">
+                                Docket / Case Number <span class="text-outline-variant lowercase ml-1">(Optional)</span>
+</label>
+<input autocomplete="off" class="w-full bg-transparent border-b border-outline-variant px-0 py-sm font-data-mono text-[16px] text-on-surface placeholder:text-outline-variant transition-all brutalist-input focus:px-sm focus:-mx-sm" id="case_number" name="case_number" placeholder="e.g., 1:23-cv-01234" type="text"/>
+</div>
+</div>
+<!-- Intake Summary / Memo -->
+<div class="flex flex-col gap-xs mt-md group">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase flex justify-between items-end" for="intake_summary">
+<span>Initial Intake Summary / Memo</span>
+<span class="font-data-mono text-[10px] text-outline-variant tracking-normal normal-case">Supports markdown formatting</span>
+</label>
+<div class="relative border border-outline-variant bg-surface-container-lowest focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
+<!-- Formatting Toolbar (Decorative) -->
+<div class="h-10 border-b border-outline-variant bg-surface-container-low flex items-center px-sm gap-sm">
+<button class="w-7 h-7 flex items-center justify-center hover:bg-surface-variant text-on-surface-variant hover:text-on-surface transition-colors rounded-sm" title="Bold" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="format_bold">format_bold</span>
+</button>
+<button class="w-7 h-7 flex items-center justify-center hover:bg-surface-variant text-on-surface-variant hover:text-on-surface transition-colors rounded-sm" title="Italic" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="format_italic">format_italic</span>
+</button>
+<div class="w-[1px] h-4 bg-outline-variant mx-1"></div>
+<button class="w-7 h-7 flex items-center justify-center hover:bg-surface-variant text-on-surface-variant hover:text-on-surface transition-colors rounded-sm" title="Bullet List" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="format_list_bulleted">format_list_bulleted</span>
+</button>
+<button class="w-7 h-7 flex items-center justify-center hover:bg-surface-variant text-on-surface-variant hover:text-on-surface transition-colors rounded-sm" title="Attach Document" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="attach_file">attach_file</span>
+</button>
+</div>
+<textarea class="w-full bg-transparent border-none p-md font-body-md text-body-md text-on-surface placeholder:text-outline-variant resize-y focus:ring-0 focus:outline-none" id="intake_summary" name="intake_summary" placeholder="Briefly describe the nature of the dispute, initial client goals, or paste the preliminary consultation notes..." rows="8"></textarea>
+</div>
+</div>
+</form>
+</div>
+</section>
+<!-- Persistent Action Bar (Bottom Right context) -->
+<div class="absolute bottom-0 left-0 md:left-[280px] right-0 h-[80px] border-t border-outline-variant bg-surface-container-low/95 backdrop-blur-sm flex items-center justify-between px-xl z-20">
+<button class="px-md py-sm border border-outline hover:border-primary text-on-surface font-data-mono text-data-mono uppercase tracking-wider transition-colors flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="save">save</span>
+                Save Draft
+            </button>
+<button class="px-lg py-sm bg-primary text-on-primary font-label-caps text-[14px] leading-tight uppercase tracking-widest hover:bg-white transition-colors flex items-center gap-md font-bold">
+                Next: Charges
+                <span class="material-symbols-outlined text-[20px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</main>
+</body></html>

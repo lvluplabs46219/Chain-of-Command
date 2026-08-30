@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ACQUIT.AI - Counsel Directory - Pro Bono &amp; Legal Aid</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400..700&amp;family=Hanken+Grotesk:wght@400..700&amp;family=JetBrains+Mono:wght@400..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-container": "#1a1c1e",
+                      "on-tertiary-fixed": "#201b17",
+                      "surface-container-highest": "#353435",
+                      "tertiary-container": "#201b17",
+                      "secondary-fixed": "#d1e4fb",
+                      "on-tertiary": "#352f2b",
+                      "error": "#ffb4ab",
+                      "surface-container-lowest": "#0e0e0e",
+                      "surface-container": "#201f1f",
+                      "background": "#141313",
+                      "on-surface": "#e5e2e1",
+                      "surface-tint": "#c6c6c9",
+                      "primary-fixed-dim": "#c6c6c9",
+                      "outline-variant": "#44474a",
+                      "on-primary-container": "#838486",
+                      "on-surface-variant": "#c5c6ca",
+                      "inverse-primary": "#5d5e61",
+                      "on-background": "#e5e2e1",
+                      "primary-fixed": "#e2e2e5",
+                      "on-secondary-fixed": "#091d2e",
+                      "tertiary-fixed-dim": "#cfc5be",
+                      "tertiary-fixed": "#ebe0da",
+                      "secondary-container": "#36485b",
+                      "on-secondary-fixed-variant": "#36485b",
+                      "inverse-surface": "#e5e2e1",
+                      "on-tertiary-fixed-variant": "#4c4641",
+                      "on-primary-fixed": "#1a1c1e",
+                      "outline": "#8f9194",
+                      "tertiary": "#cfc5be",
+                      "on-primary-fixed-variant": "#454749",
+                      "surface-container-high": "#2a2a2a",
+                      "error-container": "#93000a",
+                      "surface-variant": "#353435",
+                      "secondary-fixed-dim": "#b5c8df",
+                      "on-secondary-container": "#a4b7cd",
+                      "surface-dim": "#141313",
+                      "on-error-container": "#ffdad6",
+                      "on-error": "#690005",
+                      "surface": "#141313",
+                      "on-tertiary-container": "#8b837d",
+                      "on-primary": "#2f3133",
+                      "surface-container-low": "#1c1b1b",
+                      "inverse-on-surface": "#313030",
+                      "surface-bright": "#3a3939",
+                      "secondary": "#b5c8df",
+                      "primary": "#c6c6c9",
+                      "on-secondary": "#203243"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "margin-safe": "32px",
+                      "sm": "8px",
+                      "lg": "24px",
+                      "xl": "40px",
+                      "xs": "4px",
+                      "base": "4px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-lg": [
+                              "Domine"
+                      ],
+                      "label-caps": [
+                              "Hanken Grotesk"
+                      ],
+                      "data-mono": [
+                              "JetBrains Mono"
+                      ],
+                      "body-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-md": [
+                              "Domine"
+                      ],
+                      "headline-lg-mobile": [
+                              "Domine"
+                      ],
+                      "display-case": [
+                              "Domine"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.08em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "data-mono": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-case": [
+                              "40px",
+                              {
+                                      "lineHeight": "48px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #141313;
+            color: #e5e2e1;
+        }
+        /* Custom scrollbar for War Room aesthetic */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #141313; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #353435; 
+            border: 1px solid #141313;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #44474a; 
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface flex flex-col md:flex-row h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="hidden md:flex w-[280px] h-screen fixed left-0 top-0 bg-background border-r border-outline-variant flex-col py-md z-40">
+<div class="px-md mb-8">
+<h1 class="font-headline-md text-headline-md font-bold text-on-surface tracking-tighter">ACQUIT.AI</h1>
+<p class="font-data-mono text-data-mono text-on-surface-variant">Legal OS v1.0</p>
+</div>
+<div class="px-md mb-6">
+<button class="w-full bg-[#D4AF37] text-[#000000] font-data-mono text-data-mono py-2 flex items-center justify-center gap-2 hover:bg-[#b5952f] transition-colors border border-[#D4AF37]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+                New Filing
+            </button>
+</div>
+<ul class="flex-1 overflow-y-auto space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md uppercase tracking-wider hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                    Command Center
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md uppercase tracking-wider hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+                    The Docket
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md uppercase tracking-wider hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="meeting_room">meeting_room</span>
+                    Chambers
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md uppercase tracking-wider hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="library_books">library_books</span>
+                    Law Library
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md uppercase tracking-wider hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+                    Record Room
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md uppercase tracking-wider hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+                    Investigations
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md uppercase tracking-wider hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+                    Case Timeline
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md uppercase tracking-wider hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+                    Court Watch
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-primary border-l-4 border-primary bg-primary-container/10 px-4 py-3 font-bold font-body-md text-body-md uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined" data-icon="contact_page">contact_page</span>
+                    Counsel Directory
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md uppercase tracking-wider hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+                    Motions &amp; Tasks
+                </a>
+</li>
+</ul>
+<div class="mt-auto px-md pt-4 border-t border-outline-variant flex items-center gap-3">
+<img alt="Lawyer Profile" class="w-10 h-10 rounded-full border border-outline-variant object-cover" data-alt="A professional headshot of a legal counsel in a dimly lit, high-end corporate office setting. The lighting is cinematic, highlighting authority and experience. Dark modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5oi7wFqOCRWEbJYXNABl0xQd6aXbFuiJBUaTdfaoj7gLEPI5X62BZtxW73QkS-S7nU2Q3Frcv3udE2boRIOhzBcPJhIEo4Jwuy-kNAb1f7YDbsUKLSfwxbZ3p9ufX2UjNd7fUgimRE7yakwf-TCesrykmtmPM4h4GzBQ5Y5YKSG6meNq8rowUnI4gBbzvpt9g-yEspYsNqEq9hZINgaCl-7u-JgCPSjN9FIjW0rGD0Yj0_FxpDuhTPQ"/>
+<div>
+<p class="font-data-mono text-data-mono text-on-surface">J. Sterling</p>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Lead Counsel</p>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col md:ml-[280px] h-screen relative">
+<!-- TopAppBar -->
+<header class="h-16 fixed top-0 right-0 left-0 md:left-[280px] z-30 bg-surface border-b border-outline-variant flex items-center justify-between px-md w-full">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-on-surface hover:text-primary transition-opacity">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="font-data-mono text-data-mono text-on-surface-variant">Active Docket:</div>
+<div class="font-headline-md text-headline-md text-on-surface tracking-tight">2024-CV-8821</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container border border-outline-variant text-on-surface font-data-mono text-data-mono pl-8 pr-4 py-1.5 focus:ring-1 focus:ring-primary focus:border-primary focus:outline-none transition-all w-64" placeholder="Search directory..." type="text"/>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-opacity relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-opacity hidden sm:block">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-opacity hidden sm:block">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+</header>
+<!-- Canvas -->
+<div class="flex-1 overflow-y-auto mt-16 p-lg bg-background">
+<div class="max-w-7xl mx-auto">
+<!-- Page Header -->
+<div class="mb-lg border-b border-outline-variant pb-md flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+<div>
+<h2 class="font-display-case text-display-case text-on-surface mb-2">Pro Bono &amp; Legal Aid</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Verified directory of free and low-cost legal assistance organizations. Priority routing available for urgent civil rights and immigration matters.</p>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 border border-outline-variant text-on-surface font-data-mono text-data-mono hover:bg-surface-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                             Filter
+                         </button>
+<button class="px-4 py-2 border border-outline-variant text-on-surface font-data-mono text-data-mono hover:bg-surface-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">download</span>
+                             Export List
+                         </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Main Directory List -->
+<div class="md:col-span-8 lg:col-span-9 space-y-4">
+<!-- Organization Card 1 -->
+<div class="border border-outline-variant bg-surface p-6 flex flex-col md:flex-row gap-6 relative group hover:border-[#44474a] transition-colors">
+<div class="absolute top-0 right-0 p-4">
+<div class="flex items-center gap-1 text-on-surface border border-outline-variant px-2 py-1 bg-surface-container">
+<span class="material-symbols-outlined text-sm text-[#D4AF37]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-caps text-label-caps">Community Verified</span>
+</div>
+</div>
+<div class="w-16 h-16 bg-surface-container flex items-center justify-center border border-outline-variant shrink-0">
+<span class="material-symbols-outlined text-3xl text-on-surface-variant">account_balance</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<h3 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Justice Center for Civil Rights</h3>
+</div>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="border border-outline-variant px-2 py-0.5 font-data-mono text-data-mono text-on-surface-variant bg-background">Civil Rights</span>
+<span class="border border-outline-variant px-2 py-0.5 font-data-mono text-data-mono text-on-surface-variant bg-background">Constitutional Law</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 max-w-2xl">
+                                    Provides free legal representation in high-impact civil rights cases, focusing on systemic equality and constitutional protections for marginalized communities.
+                                </p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-outline-variant pt-4 mt-4">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mt-1">location_on</span>
+<div>
+<p class="font-data-mono text-data-mono text-on-surface">1200 Legal Ave, Suite 400</p>
+<p class="font-data-mono text-data-mono text-on-surface-variant">Metropolis, NY 10001</p>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">phone</span>
+<span class="font-data-mono text-data-mono text-on-surface">1-800-555-0199</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">mail</span>
+<span class="font-data-mono text-data-mono text-on-surface">intake@jccr.org</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Organization Card 2 -->
+<div class="border border-outline-variant bg-surface p-6 flex flex-col md:flex-row gap-6 relative group hover:border-[#44474a] transition-colors">
+<div class="absolute top-0 right-0 p-4">
+<div class="flex items-center gap-1 text-on-surface border border-outline-variant px-2 py-1 bg-surface-container">
+<span class="material-symbols-outlined text-sm text-[#D4AF37]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-caps text-label-caps">Community Verified</span>
+</div>
+</div>
+<div class="w-16 h-16 bg-surface-container flex items-center justify-center border border-outline-variant shrink-0">
+<span class="material-symbols-outlined text-3xl text-on-surface-variant">public</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<h3 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Immigration Defense Network</h3>
+</div>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="border border-outline-variant px-2 py-0.5 font-data-mono text-data-mono text-on-surface-variant bg-background">Immigration</span>
+<span class="border border-outline-variant px-2 py-0.5 font-data-mono text-data-mono text-on-surface-variant bg-background">Asylum</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 max-w-2xl">
+                                    Specialized legal network offering pro bono defense for asylum seekers and undocumented individuals facing removal proceedings.
+                                </p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-outline-variant pt-4 mt-4">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mt-1">location_on</span>
+<div>
+<p class="font-data-mono text-data-mono text-on-surface">88 Border St, 2nd Floor</p>
+<p class="font-data-mono text-data-mono text-on-surface-variant">El Paso, TX 79901</p>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">phone</span>
+<span class="font-data-mono text-data-mono text-on-surface">1-888-555-2022</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">language</span>
+<span class="font-data-mono text-data-mono text-on-surface">www.idn-defense.org</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Inspector Panel (Right Side) -->
+<div class="md:col-span-4 lg:col-span-3 space-y-4">
+<!-- Quick Stats Widget -->
+<div class="border border-outline-variant bg-surface p-4">
+<h4 class="font-label-caps text-label-caps text-on-surface-variant mb-4 border-b border-outline-variant pb-2">Directory Metrics</h4>
+<div class="space-y-4">
+<div>
+<div class="font-data-mono text-data-mono text-on-surface-variant">Active Organizations</div>
+<div class="font-headline-md text-headline-md text-on-surface">142</div>
+</div>
+<div>
+<div class="font-data-mono text-data-mono text-on-surface-variant">Verified Partners</div>
+<div class="font-headline-md text-headline-md text-[#D4AF37]">89</div>
+</div>
+</div>
+</div>
+<!-- Regional Coverage Map placeholder -->
+<div class="border border-outline-variant bg-surface p-4">
+<h4 class="font-label-caps text-label-caps text-on-surface-variant mb-4 border-b border-outline-variant pb-2">Coverage Area</h4>
+<div class="w-full h-48 bg-surface-container border border-outline-variant relative overflow-hidden" data-location="United States" style="">
+<div class="bg-cover bg-center w-full h-full opacity-60" data-alt="A stylized, dark-mode wireframe map of the United States. The map uses a monochrome palette with glowing gold points indicating legal aid centers. The aesthetic is high-tech, corporate, and dense, fitting a digital war room interface." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCBEGLUBsL9uRfeBRxgRlCHkXqfR5QU0GUbUaCSaaKQ3kZ6y5hD6Fha7FrQiYT06GV5lwnkaq1JYabsr3b7gpXM_HiU9Hz42Rtlbt1VWIxq8FNqyhPX6RqqpLW577cuXim3RDD1U-OhN2kzv2pMBm2EBhDFdmWxY_98-WJFMw29fBbQQTlEzQhcWnGz50k53GHOqfMgVbOhhzYoWMBEMJQA45R9kBy_Ec9qsjgrBiJK07TFCK-JlrXcNw')"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="font-data-mono text-data-mono text-on-surface bg-background/80 px-2 py-1 border border-outline-variant backdrop-blur-sm">National View</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) - Suppressed per rules since this is a sub-section/tool, but if it were a top level destination it would go here. Directory is top level in SideNav, so rendering for mobile consistency -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-outline-variant z-50 flex justify-around items-center h-16 px-2">
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2" href="#">
+<span class="material-symbols-outlined">gavel</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary p-2" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">contact_page</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2" href="#">
+<span class="material-symbols-outlined">assignment</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2" href="#">
+<span class="material-symbols-outlined">menu</span>
+</a>
+</nav>
+</body></html>
