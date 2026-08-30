@@ -68,10 +68,10 @@ documentsRouter.post('/documents/signed-upload-url', async (req: AuthenticatedRe
 });
 
 // Full multimodal document upload, OCR parsing, chunking, and pgvector indexing
-documentsRouter.post('/documents/upload', uploadLimiter, upload.single('document'), async (req: AuthenticatedRequest, res: Response) => {
+documentsRouter.post('/documents/upload', uploadLimiter, upload.single('document') as any, async (req, res) => {
+  const authenticatedReq = req as AuthenticatedRequest;
   try {
-
-    if (!req.user || !req.user.id) {
+    if (!authenticatedReq.user || !authenticatedReq.user.id) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
     if (!req.file) {

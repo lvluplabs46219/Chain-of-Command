@@ -150,7 +150,7 @@ export function AcquitAcademy() {
                     <div className="mt-0.5">
                       {lesson.completed ? (
                         <CheckCircle2 size={16} className="text-white/70" />
-                      ) : lesson.type === "simulation" ? (
+                      ) : (lesson as any).type === "simulation" ? (
                         <MessageSquare size={16} className="text-white/70" />
                       ) : (
                         <PlayCircle size={16} className="text-white/70" />

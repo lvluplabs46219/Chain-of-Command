@@ -201,7 +201,7 @@ export function SovereignCylinder() {
     return idx;
   }, [rotation]);
 
-  const activeCard = JUSTICE_CARDS[activeIndex];
+  const activeCard = cards[activeIndex];
 
   const handlePointerDown = (e: React.PointerEvent) => {
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -480,7 +480,7 @@ export function SovereignCylinder() {
                 <div className="rounded-[14px] bg-[rgba(10,10,10,0.7)] p-3 ring-1 ring-white/10">
                   <div className="text-[10px] tracking-widest text-white/40">PREVIEW • OCR LINES</div>
                   <div className="mt-2 space-y-1.5">
-                    {activeCard.lines.map((line, i) => (
+                    {activeCard.lines.map((line: string, i: number) => (
                       <div key={i} className="text-[11px] tracking-[0.02em] text-white/60">› {line}</div>
                     ))}
                   </div>

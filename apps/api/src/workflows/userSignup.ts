@@ -51,7 +51,7 @@ export async function handleUserSignup(email: string) {
   const user = await createUser(email);
   await sendWelcomeEmail(user);
 
-  await sleep("5s");
+  await sleep(5000);
 
   await sendOnboardingEmail(user);
   return { userId: user.id, status: "onboarded" };

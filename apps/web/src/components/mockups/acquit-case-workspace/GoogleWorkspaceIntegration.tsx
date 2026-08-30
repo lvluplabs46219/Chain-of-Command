@@ -41,6 +41,9 @@ export interface GmailThreadLog {
   id: string;
   subject: string;
   sender: string;
+  recipient?: string;
+  date?: string;
+  category?: string;
   receivedTime: string;
   snippet: string;
   threadUrl: string;
@@ -52,6 +55,9 @@ export interface WorkspaceSyncState {
   lastSyncDocs: string;
   lastSyncCalendar: string;
   lastSyncGmail: string;
+  userEmail?: string;
+  lastSyncedAt?: string;
+  calendarId?: string;
   isSyncing: boolean;
   status: "Healthy" | "Syncing" | "Error" | "Disconnected";
 }

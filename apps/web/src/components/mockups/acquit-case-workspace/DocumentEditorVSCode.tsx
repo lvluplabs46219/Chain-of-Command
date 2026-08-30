@@ -13,7 +13,7 @@ const mockFiles = [
 ];
 
 export function DocumentEditorVSCode() {
-  const [activeTab, setActiveTab] = useState(mockFiles[0]);
+  const [activeTab, setActiveTab] = useState<typeof mockFiles[0] | null>(mockFiles[0]);
   const [openFiles, setOpenFiles] = useState([mockFiles[0], mockFiles[3]]);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [editorContent, setEditorContent] = useState(`[DRAFTING AREA]

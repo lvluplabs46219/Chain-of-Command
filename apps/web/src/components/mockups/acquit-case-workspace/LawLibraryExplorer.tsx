@@ -140,7 +140,7 @@ export function LawLibraryExplorer({ initialSelectedAuthority, onCiteAuthority }
                       {auth.jurisdiction}
                     </span>
                     <span>{auth.type}</span>
-                    {auth.precedentialStatus === "Binding" && (
+                    {auth.precedentialStatus === "Binding Precedent" && (
                       <span className="flex items-center gap-1 text-emerald-400">
                         <CheckCircle2 size={10} /> BINDING
                       </span>

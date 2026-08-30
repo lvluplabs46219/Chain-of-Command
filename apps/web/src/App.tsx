@@ -1,5 +1,6 @@
 import { useEffect, useState, type ComponentType } from "react";
 import { modules as discoveredModules } from "./.generated/mockup-components";
+import { CaseWorkspace } from "./components/mockups/acquit-case-workspace/CaseWorkspace";
 
 type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
 
@@ -167,7 +168,7 @@ function App() {
     );
   }
 
-  return <Gallery />;
+  return <CaseWorkspace />;
 }
 
 export default App;

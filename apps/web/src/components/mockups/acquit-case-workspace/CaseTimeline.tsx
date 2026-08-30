@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
 import { Sparkles, 
   CalendarDays,
   Check,
@@ -281,12 +280,12 @@ export function CaseTimeline({ onSelectEventDoc, onOpenFilingCenter }: CaseTimel
                       <div className="space-y-2">
                         {selectedEvent.linkedDocs.map((doc) => (
                           <button
-                            key={doc}
-                            onClick={() => onSelectEventDoc && onSelectEventDoc(doc)}
+                            key={doc.id}
+                            onClick={() => onSelectEventDoc && onSelectEventDoc(doc.id)}
                             className="flex w-full items-center gap-3 rounded-[12px] border border-white/5 bg-black/40 p-3 text-left hover:bg-white/5/5 transition"
                           >
                             <FileCheck2 size={16} className="text-white/70" />
-                            <span className="flex-1 truncate text-xs font-medium text-white">{doc}</span>
+                            <span className="flex-1 truncate text-xs font-medium text-white">{doc.name}</span>
                             <ChevronRight size={14} className="text-white/30" />
                           </button>
                         ))}

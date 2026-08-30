@@ -32,5 +32,5 @@ export async function getRawCourtFile(fileKey: string): Promise<string> {
   });
 
   const response = await client.send(command);
-  return (await response.body?.transformToString()) ?? '';
+  return (await response.Body?.transformToString()) ?? '';
 }

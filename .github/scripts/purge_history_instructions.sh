@@ -1,51 +1,12 @@
-#!/bin/bash
-set -e
-
-echo "========================================================="
-echo "  ACQUIT.AI — REPOSITORY PURGE AND HISTORY REWRITE SCRIPT "
-echo "========================================================="
-echo "This script provides instructions and commands to purge"
-echo "large assets and leaked secrets from your git history."
-echo ""
-echo "WARNING: This rewrites history. All developers will need"
-echo "to clone a fresh copy of the repository after this runs."
-echo "========================================================="
-
-echo ""
-echo "Step 1: Download BFG Repo Cleaner (Requires Java)"
-echo "---------------------------------------------------------"
-echo "wget https://repo1.maven.org/maven2/com/madgag/bfg/1.14.0/bfg-1.14.0.jar"
-echo ""
-
-echo "Step 2: Clone a fresh bare repository (do this outside your current workspace)"
-echo "---------------------------------------------------------"
-echo "git clone --mirror git@github.com:YOUR_ORG/YOUR_REPO.git"
-echo "cd YOUR_REPO.git"
-echo ""
-
-echo "Step 3: Purge large assets (PDFs, ZIPs) from history"
-echo "---------------------------------------------------------"
-echo "java -jar ../bfg-1.14.0.jar --delete-files \"*.zip\""
-echo "java -jar ../bfg-1.14.0.jar --delete-files \"*.pdf\""
-echo "java -jar ../bfg-1.14.0.jar --delete-folders \"attached_assets\""
-echo ""
-
-echo "Step 4: Purge specific leaked secrets by replacing them"
-echo "---------------------------------------------------------"
-echo "First, create a text file named 'passwords.txt' containing the leaked URL:"
-echo "echo 'postgresql://postgres:REDACTED_DB_PASSWORD@db.YOUR_PROJECT_REF.supabase.co:5432/postgres' > passwords.txt"
-echo ""
-echo "Then, run BFG to replace that string with '***REMOVED***' everywhere in history:"
-echo "java -jar ../bfg-1.14.0.jar --replace-text passwords.txt"
-echo ""
-
-echo "Step 5: Clean up git references and force push"
-echo "---------------------------------------------------------"
-echo "git reflog expire --expire=now --all && git gc --prune=now --aggressive"
-echo "git push --force"
-echo ""
-echo "Step 6: Inform your team"
-echo "---------------------------------------------------------"
-echo "Tell all other developers to delete their local clones and clone"
-echo "a fresh copy of the repository. Do NOT let them 'git pull', or they"
-echo "will merge the dirty history back in."
+{
+  "version": 2,
+  "buildCommand": "npm run build --workspace=artifacts/mockup-sandbox",
+  "outputDirectory": "artifacts/mockup-sandbox/dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

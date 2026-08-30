@@ -1,4 +1,1 @@
-import { sleep } from "workflow";
-
-export { sleep };
-export * from "workflow";
+export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

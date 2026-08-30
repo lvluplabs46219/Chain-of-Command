@@ -13,6 +13,7 @@ import {
   Gavel,
   GraduationCap,
   HelpCircle,
+  Layout,
   LockKeyhole,
   Menu,
   MoreHorizontal,
@@ -37,6 +38,7 @@ import { AILab } from "./AILab";
 import { SovereignCylinder } from "./SovereignCylinder";
 import { FilingCenter } from "./FilingCenter";
 import { GoogleWorkspaceIntegration } from "./GoogleWorkspaceIntegration";
+import { StitchGallery } from "./StitchGallery";
 import { MOCK_RAG_MESSAGES, type LegalAuthority } from "./legalData";
 
 type IconType = typeof Scale;
@@ -50,6 +52,7 @@ const navItems: { label: string; icon: IconType }[] = [
   { label: "Documents", icon: FileText },
   { label: "Filing center", icon: BookOpen },
   { label: "Acquit Academy", icon: GraduationCap },
+  { label: "Stitch OS Designs", icon: Layout },
 ];
 
 function Pill({
@@ -380,6 +383,8 @@ export function CaseWorkspace() {
               />
             ) : activeNav === "Acquit Academy" ? (
               <AcquitAcademy />
+            ) : activeNav === "Stitch OS Designs" ? (
+              <StitchGallery />
             ) : activeNav === "Filing center" ? (
               <FilingCenter />
             ) : activeNav === "Timeline" || activeTab === "Timeline" || activeTab === "Evidence" ? (
