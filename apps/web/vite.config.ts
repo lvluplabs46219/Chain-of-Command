@@ -3,8 +3,8 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
-import { mockupPreviewPlugin } from "./mockupPreviewPlugin";
-import { apiPlugin } from "./apiPlugin";
+import { mockupPreviewPlugin } from "./mockupPreviewPlugin.ts";
+import { apiPlugin } from "./apiPlugin.ts";
 
 const rawPort = process.env.PORT || "3000";
 const port = Number(rawPort) || 3000;
