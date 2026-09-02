@@ -45,7 +45,7 @@ export function StitchGallery() {
         </div>
         <div className="flex-1 overflow-auto p-4 flex justify-center">
           <img 
-            src={`/design/${selectedMockup}/screen.png`} 
+            src={`/assets/stitch/${selectedMockup}/screen.png`} 
             alt={formatName(selectedMockup)}
             className="max-w-full h-auto rounded-xl border border-white/10 shadow-2xl"
           />
@@ -72,7 +72,7 @@ export function StitchGallery() {
           >
             <div className="aspect-video w-full bg-white/5 p-2">
               <img 
-                src={`/design/${m}/screen.png`} 
+                src={`/assets/stitch/${m}/screen.png`} 
                 alt={formatName(m)}
                 className="h-full w-full object-cover rounded opacity-80 transition group-hover:opacity-100"
                 loading="lazy"
