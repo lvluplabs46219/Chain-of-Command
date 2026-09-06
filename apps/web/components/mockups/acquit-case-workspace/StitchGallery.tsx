@@ -31,7 +31,7 @@ function formatName(name: string) {
     .join(" ");
 }
 
-export function StitchGallery() {
+export default function StitchGallery() {
   const router = useRouter();
   const [selectedMockup, setSelectedMockup] = useState<string | null>(null);
 

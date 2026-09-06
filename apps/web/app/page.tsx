@@ -1,4 +1,4 @@
-import { StitchGallery } from "../components/mockups/acquit-case-workspace/StitchGallery";
+import StitchGallery from "../components/mockups/acquit-case-workspace/StitchGallery";
 
 export default function Home() {
   return <StitchGallery />;
