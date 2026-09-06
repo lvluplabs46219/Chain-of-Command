@@ -1,18 +1,8 @@
 {
-  "name": "Acquit AI",
-  "description": "Legal AI case workspace platform for self-represented litigants.",
+  "name": "Acquit.ai",
+  "description": "AI-powered legal self-representation workspace and case intelligence platform.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ],
-  "version": 2,
-  "buildCommand": "npm run build --workspace=apps/web",
-  "outputDirectory": "apps/web/dist",
-  "framework": "vite",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
   ]
 }

@@ -1,693 +1,301 @@
-import { useState, useEffect, type ReactNode } from "react";
-import {
-  ArrowRight,
-  Bell,
-  BookOpen,
-  BriefcaseBusiness,
-  Check,
-  ChevronDown,
-  ChevronRight,
-  CircleHelp,
-  FileText,
-  FolderOpen,
-  Gavel,
-  GraduationCap,
-  HelpCircle,
-  Layout,
-  LockKeyhole,
-  Menu,
-  MoreHorizontal,
-  PanelLeft,
-  Plus,
-  Scale,
-  Search,
-  ShieldCheck,
-  Sparkles,
-  Upload,
-  UsersRound,
-  X,
-  UserCheck,
-} from "lucide-react";
-import { AttorneyDirectory } from "./AttorneyDirectory";
-import { RagCitationViewer } from "./RagCitationViewer";
-import { CaseTimeline } from "./CaseTimeline";
-import { EvidenceCarousel } from "./EvidenceCarousel";
-import { LawLibraryExplorer } from "./LawLibraryExplorer";
-import { AcquitAcademy } from "./AcquitAcademy";
-import { AILab } from "./AILab";
-import { SovereignCylinder } from "./SovereignCylinder";
-import { FilingCenter } from "./FilingCenter";
-import { GoogleWorkspaceIntegration } from "./GoogleWorkspaceIntegration";
-import { StitchGallery } from "./StitchGallery";
-import { MOCK_RAG_MESSAGES, type LegalAuthority } from "./legalData";
-
-type IconType = typeof Scale;
-
-const navItems: { label: string; icon: IconType }[] = [
-  { label: "Case overview", icon: BriefcaseBusiness },
-  { label: "AI Lab", icon: Sparkles },
-  { label: "Google Workspace", icon: Sparkles },
-  { label: "Find an attorney", icon: UserCheck },
-  { label: "Timeline", icon: FolderOpen },
-  { label: "Documents", icon: FileText },
-  { label: "Filing center", icon: BookOpen },
-  { label: "Acquit Academy", icon: GraduationCap },
-  { label: "Stitch OS Designs", icon: Layout },
-];
-
-function Pill({
-  children,
-  tone = "gold",
-}: {
-  children: ReactNode;
-  tone?: "gold" | "glass" | "sand";
-}) {
-  const tones = {
-    gold: "bg-[#D4AF37]/15 text-[#D4AF37] ring-[#D4AF37]/20",
-    glass: "bg-white/10 text-white/60 ring-white/10",
-    sand: "bg-[#D4AF37]/10 text-[#EFE6D0] ring-[#D4AF37]/10",
-  };
-  return (
-    <span
-      className={`rounded-full px-2 py-0.5 text-[9px] font-bold tracking-widest ring-1 ${tones[tone]}`}
-    >
-      {children}
-    </span>
-  );
-}
-
-function SectionHeading({
-  icon: Icon,
-  eyebrow,
-  title,
-  action,
-}: {
-  icon: IconType;
-  eyebrow: string;
-  title: string;
-  action?: string;
-}) {
-  return (
-    <div className="mb-5 flex items-center justify-between">
-      <div>
-        <div className="flex items-center gap-2 text-[10px] tracking-widest text-[#D4AF37]">
-          <Icon size={14} className="opacity-80" />
-          {eyebrow.toUpperCase()}
-        </div>
-        <h2 className="mt-1 font-serif text-[24px] text-white">
-          {title}
-        </h2>
-      </div>
-      {action && (
-        <button className="text-[11px] font-bold tracking-widest text-[#D4AF37] hover:text-white transition">
-          {action.toUpperCase()}
-        </button>
-      )}
-    </div>
-  );
-}
+import React from 'react';
 
 export function CaseWorkspace() {
-  const [activeNav, setActiveNav] = useState("Case overview");
-  const [mobileNav, setMobileNav] = useState(false);
-  const [activeTab, setActiveTab] = useState("Overview");
-  const [agentOpen, setAgentOpen] = useState<string | null>("Paralegal AI");
-  const [plainEnglish, setPlainEnglish] = useState(true);
-  const [showNotice, setShowNotice] = useState(true);
-  const [selectedLawAuth, setSelectedLawAuth] = useState<LegalAuthority | undefined>();
-  const [matters, setMatters] = useState<any[]>([]);
-
-
-  useEffect(() => {
-    fetch('/api/matters')
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then(data => {
-        if (data?.success && Array.isArray(data.matters)) {
-          setMatters(data.matters);
-        }
-      })
-      .catch(err => {
-        console.warn("Could not fetch matters:", err);
-      });
-  }, []);
-
-  const agents = [
-    {
-      name: "Lead Counsel Coordinator",
-      role: "Strategy & Issue Synthesis",
-      initials: "LC",
-      color: "bg-[#D4AF37] text-black",
-      note: "Synthesized 3 strategic lines of inquiry for discovery.",
-    },
-    {
-      name: "Paralegal AI",
-      role: "Deadlines & Procedural Rules",
-      initials: "PL",
-      color: "bg-white/10 border border-white/20 text-white",
-      note: "Calculated 14-day statutory cutoff for omnibus hearing.",
-    },
-    {
-      name: "Investigator AI",
-      role: "Timeline & Fact Verification",
-      initials: "IN",
-      color: "bg-white/10 border border-white/20 text-white",
-      note: "Cross-referenced dashcam timeline with patrol log.",
-    },
-    {
-      name: "Evidence Analyst AI",
-      role: "Chain of Custody & Hash Checks",
-      initials: "EA",
-      color: "bg-white/10 border border-white/20 text-white",
-      note: "Verified SHA-256 checksums across all 7 uploaded exhibits.",
-    },
-    {
-      name: "Court Preparation AI",
-      role: "Hearing Q&A & Advocacy",
-      initials: "CP",
-      color: "bg-white/10 border border-white/20 text-white",
-      note: "Formulated 5 judicial procedural questions for appearance.",
-    },
-    {
-      name: "Rights Checker AI",
-      role: "Constitutional & Miranda Audits",
-      initials: "RC",
-      color: "bg-white/10 border border-white/20 text-white",
-      note: "Audited initial stop duration against 4th Amendment standards.",
-    },
-    {
-      name: "Charge Explainer AI",
-      role: "Statutory Elements Breakdown",
-      initials: "CE",
-      color: "bg-white/10 border border-white/20 text-white",
-      note: "Broken down IC § 9-21-8-24 into clear required proof elements.",
-    },
-  ];
-
-  // If the active view is Sovereign Cylinder, we mount it directly, filling the screen.
-  if (activeNav === "Documents" || activeTab === "Documents") {
-    return (
-      <div className="flex h-screen w-full flex-col bg-[#0A0A0A] font-mono text-white">
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-white/10 px-4 sm:px-8 relative z-20">
-          <div className="flex items-center gap-3">
-             <button
-              onClick={() => setActiveTab("Overview")}
-              className="flex items-center gap-2 text-xs font-semibold text-white/50 hover:text-white transition"
-            >
-              <ArrowRight size={14} className="rotate-180" /> Back to Dashboard
-            </button>
-          </div>
-          <div className="flex items-center gap-4 text-xs font-semibold">
-            <span className="text-[#D4AF37] font-serif tracking-widest">AQUIT.AI</span>
-          </div>
-        </header>
-        <div className="flex-1 overflow-hidden relative">
-           <SovereignCylinder />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex min-h-[100dvh] pt-[env(safe-area-inset-top)] w-full flex-col bg-[#0A0A0A] font-mono text-white selection:bg-[#D4AF37]/30 md:flex-row">
-      {/* Mobile nav overlay */}
-      {mobileNav && (
-        <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
-          onClick={() => setMobileNav(false)}
-        />
-      )}
+    <div className="flex flex-col h-screen overflow-hidden text-body-md font-body-md antialiased selection:bg-secondary selection:text-on-secondary bg-surface text-on-surface">
+      
 
-      {/* Sidebar */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col border-r border-white/10 bg-[#0A0A0A]/95 backdrop-blur-md transition-transform md:static md:translate-x-0 ${
-          mobileNav ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        <div className="flex h-[76px] items-center px-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#D4AF37] text-[14px] font-black text-black shadow-[0_0_20px_rgba(212,175,55,0.35)]">
-              A
-            </div>
-            <div>
-              <p className="text-[12px] font-bold tracking-[0.18em] text-[#D4AF37]">
-                ACQUIT.AI
-              </p>
-              <p className="text-[10px] tracking-widest text-white/40">
-                SOVEREIGN OS
-              </p>
-            </div>
-          </div>
-          <button
-            className="ml-auto text-white/40 sm:hidden"
-            onClick={() => setMobileNav(false)}
-          >
-            <X size={18} />
-          </button>
-        </div>
+<header className="bg-surface-container-low dark:bg-surface-container-low border-b border-outline-variant w-full shrink-0 z-50">
+<div className="flex justify-between items-center w-full px-gutter h-16">
+<div className="flex items-center gap-lg">
+<div className="text-headline-md font-headline-md font-bold text-on-surface dark:text-on-surface tracking-tight">Acquit.ai</div>
+<nav className="hidden md:flex gap-sm">
+<button className="text-on-surface-variant px-sm py-xs hover:bg-surface-variant hover:text-on-surface rounded text-data-mono font-data-mono transition-colors">File</button>
+<button className="text-on-surface-variant px-sm py-xs hover:bg-surface-variant hover:text-on-surface rounded text-data-mono font-data-mono transition-colors">Edit</button>
+<button className="text-on-surface-variant px-sm py-xs hover:bg-surface-variant hover:text-on-surface rounded text-data-mono font-data-mono transition-colors">View</button>
+<button className="text-on-surface-variant px-sm py-xs hover:bg-surface-variant hover:text-on-surface rounded text-data-mono font-data-mono transition-colors">Matter</button>
+<button className="text-on-surface-variant px-sm py-xs hover:bg-surface-variant hover:text-on-surface rounded text-data-mono font-data-mono transition-colors">Account</button>
+</nav>
+</div>
+<div className="flex items-center gap-sm">
 
-        <div className="flex-1 overflow-y-auto px-4 py-5">
-          <div className="mb-6 px-2">
-            <p className="text-[9px] font-bold tracking-widest text-white/30">
-              WORKSPACE
-            </p>
-          </div>
-          {navItems.map((item) => (
-            <button
-              key={item.label}
-              onClick={() => {
-                setActiveNav(item.label);
-                setMobileNav(false);
-              }}
-              className={`mb-1.5 flex w-full items-center gap-3 rounded-[12px] px-3 py-2.5 text-left text-xs tracking-widest transition ${
-                activeNav === item.label
-                  ? "bg-white/10 text-white ring-1 ring-white/10"
-                  : "text-white/60 hover:bg-white/5 hover:text-white"
-              }`}
-            >
-              <item.icon
-                size={16}
-                className={activeNav === item.label ? "text-[#D4AF37]" : ""}
-              />
-              {item.label}
-            </button>
-          ))}
+<div className="relative hidden lg:block mr-sm">
+<span className="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input className="bg-surface-container border border-outline-variant text-on-surface pl-[32px] pr-sm py-[4px] rounded text-data-mono font-data-mono w-48 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all placeholder:text-on-surface-variant" placeholder="Search Matter..." type="text" />
+</div>
+<button className="text-primary dark:text-primary p-xs rounded hover:bg-surface-variant hover:text-on-surface transition-colors">
+<span className="material-symbols-outlined">notifications</span>
+</button>
+<button className="text-primary dark:text-primary p-xs rounded hover:bg-surface-variant hover:text-on-surface transition-colors">
+<span className="material-symbols-outlined">settings</span>
+</button>
+<button className="text-primary dark:text-primary p-xs rounded hover:bg-surface-variant hover:text-on-surface transition-colors">
+<span className="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<div className="flex flex-1 overflow-hidden">
 
-          <div className="mb-3 mt-8 px-2">
-            <p className="text-[9px] font-bold tracking-widest text-white/30">
-              INTELLIGENCE
-            </p>
-          </div>
-          <button
-            onClick={() => {
-              setActiveNav("AI legal team");
-              setMobileNav(false);
-            }}
-            className="mb-1.5 flex w-full items-center gap-3 rounded-[12px] px-3 py-2.5 text-left text-xs tracking-widest text-white/60 hover:bg-white/5 hover:text-white transition"
-          >
-            <UsersRound size={16} /> AI legal team
-          </button>
-          <button
-            onClick={() => {
-              setActiveNav("Law library");
-              setMobileNav(false);
-            }}
-            className="mb-1.5 flex w-full items-center gap-3 rounded-[12px] px-3 py-2.5 text-left text-xs tracking-widest text-white/60 hover:bg-white/5 hover:text-white transition"
-          >
-            <BookOpen size={16} /> Law library
-          </button>
-        </div>
+<aside className="hidden md:flex bg-surface-container dark:bg-surface-container border-r border-outline-variant w-[280px] shrink-0 flex-col justify-between z-40 transition-all duration-200 ease-in-out">
+<div className="flex flex-col">
 
-        <div className="mt-auto border-t border-white/10 p-4">
-          <div className="rounded-[14px] bg-white/5 p-4 ring-1 ring-white/10 backdrop-blur-md">
-            <div className="mb-2 flex items-center gap-2 text-[10px] font-bold tracking-widest text-[#D4AF37]">
-              <ShieldCheck size={14} /> ENCLAVE SECURED
-            </div>
-            <p className="text-[10px] leading-[1.6] text-white/50">
-              Your case data is stored in a private vault. No third-party training.
-            </p>
-          </div>
-          <div className="mt-5 flex items-center gap-3 px-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[10px] font-bold text-white ring-1 ring-white/20">
-              AT
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-[11px] font-semibold text-white">
-                Alex Thompson
-              </p>
-              <p className="text-[10px] text-white/50">Pro Se Litigant</p>
-            </div>
-            <MoreHorizontal size={16} className="ml-auto text-white/30" />
-          </div>
-        </div>
-      </aside>
+<div className="p-gutter border-b border-outline-variant flex items-center gap-md">
+<div className="w-10 h-10 rounded bg-surface-variant flex items-center justify-center border border-outline-variant">
+<span className="material-symbols-outlined text-on-surface-variant">balance</span>
+</div>
+<div>
+<div className="text-label-caps font-label-caps tracking-widest text-on-surface uppercase">Legal OS</div>
+<div className="text-data-mono font-data-mono text-on-surface-variant text-[12px]">Matter 2024-772B</div>
+</div>
+</div>
 
-      {/* Main Area */}
-      <main className="min-w-0 flex-1 flex flex-col h-full bg-[#0A0A0A] relative z-0">
-        <header className="flex h-[76px] shrink-0 items-center justify-between border-b border-white/10 bg-black/40 px-5 md:px-8 backdrop-blur-md z-10">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setMobileNav(true)}
-              className="text-white/60 md:hidden hover:text-white"
-            >
-              <Menu size={20} />
-            </button>
-            <div>
-              <div className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-white/40">
-                <span>CASES</span>
-                <ChevronRight size={12} />
-                <span className="text-white">{activeNav.toUpperCase()}</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <div className="hidden sm:flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] font-bold tracking-widest text-white/50 backdrop-blur-md">
-              <span className="text-[#D4AF37]">DOCKET:</span> {matters[0]?.caseNumber || "IN-MAR-24-0187"}
-            </div>
-            <button 
-              onClick={() => setActiveNav("Law library")}
-              className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-bold tracking-widest text-white/70 hover:bg-white/10 hover:text-white transition sm:flex"
-            >
-              <Search size={14} /> SEARCH
-            </button>
-            <button 
-              onClick={() => setActiveNav("AI Lab")}
-              className="relative rounded-full p-2 text-white/60 hover:bg-white/10 transition"
-              title="Intelligence Notifications"
-            >
-              <Bell size={18} />
-              <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#D4AF37]" />
-            </button>
-          </div>
-        </header>
+<div className="p-sm border-b border-outline-variant">
+<button className="w-full bg-surface-variant text-on-surface hover:bg-surface-container-high border border-outline-variant rounded py-sm px-md flex items-center justify-center gap-sm transition-all duration-200 group">
+<span className="material-symbols-outlined text-[18px] group-hover:scale-110 transition-transform">add</span>
+<span className="text-label-caps font-label-caps tracking-widest uppercase">Court Watch</span>
+</button>
+</div>
 
-        <div className="flex-1 overflow-y-auto min-h-[100dvh] pb-32">
-          <div className="mx-auto max-w-[1260px] px-5 pb-32 pt-8 sm:px-8">
-            
+<nav className="flex flex-col py-sm">
+<a className="flex items-center gap-md px-gutter py-sm text-on-surface border-l-4 border-secondary bg-surface-variant font-bold transition-all duration-200" href="#">
+<span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
+<span className="text-label-caps font-label-caps tracking-widest uppercase">Command Center</span>
+</a>
+<a className="flex items-center gap-md px-gutter py-sm text-on-surface-variant font-medium hover:bg-surface-container-high hover:text-on-surface border-l-4 border-transparent transition-all duration-200" href="#">
+<span className="material-symbols-outlined">gavel</span>
+<span className="text-label-caps font-label-caps tracking-widest uppercase">The Docket</span>
+</a>
+<a className="flex items-center gap-md px-gutter py-sm text-on-surface-variant font-medium hover:bg-surface-container-high hover:text-on-surface border-l-4 border-transparent transition-all duration-200" href="#">
+<span className="material-symbols-outlined">groups</span>
+<span className="text-label-caps font-label-caps tracking-widest uppercase">Chambers</span>
+</a>
+<a className="flex items-center gap-md px-gutter py-sm text-on-surface-variant font-medium hover:bg-surface-container-high hover:text-on-surface border-l-4 border-transparent transition-all duration-200" href="#">
+<span className="material-symbols-outlined">menu_book</span>
+<span className="text-label-caps font-label-caps tracking-widest uppercase">Law Library</span>
+</a>
+<a className="flex items-center gap-md px-gutter py-sm text-on-surface-variant font-medium hover:bg-surface-container-high hover:text-on-surface border-l-4 border-transparent transition-all duration-200" href="#">
+<span className="material-symbols-outlined">folder_shared</span>
+<span className="text-label-caps font-label-caps tracking-widest uppercase">Record Room</span>
+</a>
+</nav>
+</div>
 
-            {/* Sub-routing */}
-            {activeNav === "Google Workspace" || activeNav === "Google Drive & Docs" ? (
-              <GoogleWorkspaceIntegration
-                matterTitle="State of Indiana v. Alex Thompson"
-                caseNumber="IN-MAR-24-0187"
-                courtName="Marion County Superior Court, Criminal Division 3"
-              />
-            ) : activeNav === "AI Lab" ? (
-              <AILab />
-            ) : activeNav === "Find an attorney" ? (
-              <AttorneyDirectory
-                initialPracticeFilter="Criminal Defense"
-                initialJurisdictionFilter="Indiana"
-              />
-            ) : activeNav === "Acquit Academy" ? (
-              <AcquitAcademy />
-            ) : activeNav === "Stitch OS Designs" ? (
-              <StitchGallery />
-            ) : activeNav === "Filing center" ? (
-              <FilingCenter />
-            ) : activeNav === "Timeline" || activeTab === "Timeline" || activeTab === "Evidence" ? (
-              <div>
-                <div className="mb-8 flex gap-4 border-b border-white/10 overflow-x-auto whitespace-nowrap">
-                  {["Overview", "Evidence", "Timeline", "Documents", "Court activity"].map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => {
-                        setActiveTab(tab);
-                        if (tab === "Overview") setActiveNav("Case overview");
-                        if (tab === "Documents") setActiveNav("Documents");
-                      }}
-                      className={`relative px-2 pb-4 text-[11px] font-bold tracking-widest transition ${
-                        activeTab === tab || (activeNav === "Timeline" && tab === "Timeline")
-                          ? "text-[#D4AF37]"
-                          : "text-white/40 hover:text-white/70"
-                      }`}
-                    >
-                      {tab.toUpperCase()}
-                      {(activeTab === tab || (activeNav === "Timeline" && tab === "Timeline")) && (
-                        <span className="absolute inset-x-0 -bottom-px h-[2px] rounded-full bg-[#D4AF37] shadow-[0_0_10px_rgba(212,175,55,0.5)]" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-                
-                {(activeTab === "Evidence" || activeTab === "Timeline" || activeNav === "Timeline") && (
-                  <div className="mb-10 space-y-4">
-                    <EvidenceCarousel />
-                  </div>
-                )}
-                
-                <CaseTimeline
-                  onOpenFilingCenter={() => setActiveNav("Filing center")}
-                />
-              </div>
-            ) : activeNav === "Law library" ? (
-              <LawLibraryExplorer
-                initialSelectedAuthority={selectedLawAuth}
-                onCiteAuthority={(auth) => {
-                  setActiveNav("Case overview");
-                  setActiveTab("Overview");
-                }}
-              />
-            ) : activeNav === "Case overview" && activeTab === "Overview" ? (
-              <>
-                <div className="mb-8 flex gap-4 border-b border-white/10">
-                  {["Overview", "Evidence", "Timeline", "Documents", "Court activity"].map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => {
-                        setActiveTab(tab);
-                        if (tab === "Timeline") setActiveNav("Timeline");
-                        if (tab === "Documents") setActiveNav("Documents");
-                      }}
-                      className={`relative px-2 pb-4 text-[11px] font-bold tracking-widest transition ${
-                        activeTab === tab
-                          ? "text-[#D4AF37]"
-                          : "text-white/40 hover:text-white/70"
-                      }`}
-                    >
-                      {tab.toUpperCase()}
-                      {activeTab === tab && (
-                        <span className="absolute inset-x-0 -bottom-px h-[2px] rounded-full bg-[#D4AF37] shadow-[0_0_10px_rgba(212,175,55,0.5)]" />
-                      )}
-                    </button>
-                  ))}
-                </div>
+<div className="border-t border-outline-variant p-sm flex flex-col gap-xs">
+<a className="flex items-center gap-md px-sm py-sm text-on-surface-variant font-medium hover:bg-surface-container-high hover:text-on-surface rounded transition-all duration-200" href="#">
+<span className="material-symbols-outlined text-[18px]">help</span>
+<span className="text-label-caps font-label-caps tracking-widest uppercase">Support</span>
+</a>
+<a className="flex items-center gap-md px-sm py-sm text-on-surface-variant font-medium hover:bg-surface-container-high hover:text-on-surface rounded transition-all duration-200" href="#">
+<span className="material-symbols-outlined text-[18px]">archive</span>
+<span className="text-label-caps font-label-caps tracking-widest uppercase">Archive</span>
+</a>
+</div>
+</aside>
 
-                <div className="grid gap-6 lg:grid-cols-3">
-                  <div className="space-y-6 lg:col-span-2">
-                    {/* Status Card */}
-                    <section className="rounded-[18px] border border-white/10 bg-[rgba(255,255,255,0.03)] p-6 backdrop-blur-xl shadow-2xl">
-                      <div className="mb-6 flex items-start justify-between">
-                        <div>
-                          <div className="mb-2 flex items-center gap-2">
-                            <span className="relative flex h-2 w-2">
-                              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D4AF37] opacity-75"></span>
-                              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#D4AF37]"></span>
-                            </span>
-                            <span className="text-[10px] font-bold tracking-widest text-[#D4AF37]">
-                              UPCOMING DEADLINE
-                            </span>
-                          </div>
-                          <h2 className="font-serif text-[28px] text-white">
-                            Pretrial Conference
-                          </h2>
-                          <p className="mt-2 text-xs text-white/50 tracking-wide">
-                            Thursday, Oct 12 · 9:00 AM EST
-                          </p>
-                        </div>
-                        <div className="rounded-[12px] border border-white/10 bg-black/40 p-3 text-center">
-                          <p className="text-[20px] font-light text-white">14</p>
-                          <p className="text-[9px] font-bold tracking-widest text-white/40">
-                            DAYS
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-3 border-t border-white/10 pt-5">
-                        <button 
-                          onClick={() => setActiveNav("Timeline")}
-                          className="rounded-full bg-white px-5 py-2.5 text-[10px] font-bold tracking-widest text-black hover:bg-[#EFE6D0] transition cursor-pointer"
-                        >
-                          REVIEW AGENDA
-                        </button>
-                        <button 
-                          onClick={() => setActiveNav("AI Lab")}
-                          className="rounded-full border border-white/20 bg-white/5 px-5 py-2.5 text-[10px] font-bold tracking-widest text-white hover:bg-white/10 transition cursor-pointer"
-                        >
-                          GENERATE QUESTIONS
-                        </button>
-                      </div>
-                    </section>
+<main className="flex-1 overflow-y-auto bg-surface flex flex-col relative pb-xl">
 
-                    {/* AI Assessment */}
-                    <section className="rounded-[18px] border border-white/10 bg-[rgba(255,255,255,0.03)] p-6 backdrop-blur-xl">
-                      <SectionHeading
-                        icon={Sparkles}
-                        eyebrow="Intelligence"
-                        title="Acquit Assessment"
-                      />
-                      <div className="space-y-4">
-                        <div className="rounded-[14px] border border-white/10 bg-black/40 p-4">
-                          <div className="mb-3 flex items-center gap-2 text-[11px] font-bold tracking-widest text-[#D4AF37]">
-                            <Scale size={14} /> PROCEDURAL POSTURE
-                          </div>
-                          <p className="text-xs leading-[1.6] text-white/70">
-                            Discovery phase is active. The prosecution has produced the police report, but body camera footage is still pending. We recommend filing a Motion to Compel if not received within 7 days.
-                          </p>
-                        </div>
-                        <div className="rounded-[14px] border border-white/10 bg-black/40 p-4">
-                          <div className="mb-3 flex items-center gap-2 text-[11px] font-bold tracking-widest text-[#D4AF37]">
-                            <BookOpen size={14} /> STATUTORY EXPOSURE
-                          </div>
-                          <p className="text-xs leading-[1.6] text-white/70">
-                            You are charged under IC 35-43-2-1. This is a Level 6 felony carrying a potential sentence of 6 months to 2.5 years.
-                          </p>
-                          <button 
-                            onClick={() => setActiveNav("Law library")}
-                            className="mt-3 text-[10px] font-bold tracking-widest text-[#D4AF37] hover:text-white transition cursor-pointer"
-                          >
-                            VIEW STATUTE DETAILS →
-                          </button>
-                        </div>
-                      </div>
-                    </section>
-                  </div>
+<div className="bg-error-container text-on-error-container px-gutter py-sm flex items-center justify-between border-b border-error/30 shrink-0">
+<div className="flex items-center gap-md">
+<span className="material-symbols-outlined text-error" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
+<div>
+<span className="text-label-caps font-label-caps uppercase font-bold tracking-widest mr-sm">Deadline Alert:</span>
+<span className="text-data-mono font-data-mono text-[13px]">Motion to Dismiss response due in 48 hours (Oct 24, 17:00 EST).</span>
+</div>
+</div>
+<button className="text-on-error-container hover:text-error transition-colors">
+<span className="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div className="p-lg max-w-[1400px] w-full mx-auto flex flex-col gap-lg flex-1">
 
-                  {/* Right Column */}
-                  <div className="space-y-6">
-                    {/* Legal Team */}
-                    <section className="rounded-[18px] border border-white/10 bg-[rgba(255,255,255,0.03)] p-6 backdrop-blur-xl">
-                      <div className="mb-4 flex items-center justify-between">
-                        <div>
-                          <div className="text-[10px] font-bold tracking-widest text-white/40 mb-1">
-                            COORDINATED
-                          </div>
-                          <h2 className="font-serif text-[22px] text-white">
-                            Your Legal Team
-                          </h2>
-                        </div>
-                        <button 
-                          onClick={() => setActiveNav("AI Lab")}
-                          className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 transition cursor-pointer"
-                          title="Add Specialist Agent"
-                        >
-                          <Plus size={14} />
-                        </button>
-                      </div>
-
-                      <div className="space-y-3">
-                        {agents.map((agent) => (
-                          <div
-                            key={agent.name}
-                            className="overflow-hidden rounded-[14px] border border-white/10 bg-black/40"
-                          >
-                            <button
-                              onClick={() =>
-                                setAgentOpen(agentOpen === agent.name ? null : agent.name)
-                              }
-                              className="flex w-full items-center gap-3 p-3 text-left hover:bg-white/5 transition cursor-pointer"
-                            >
-                              <div
-                                className={`flex h-9 w-9 items-center justify-center rounded-[10px] text-[11px] font-bold ${agent.color}`}
-                              >
-                                {agent.initials}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="text-xs font-bold text-white">{agent.name}</p>
-                                <p className="mt-0.5 text-[10px] text-white/50">{agent.role}</p>
-                              </div>
-                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                              {agentOpen === agent.name ? (
-                                <ChevronDown size={14} className="text-white/40" />
-                              ) : (
-                                <ChevronRight size={14} className="text-white/40" />
-                              )}
+<section className="bg-surface-container border border-outline-variant p-lg rounded flex flex-col gap-sm relative overflow-hidden group">
+<div className="absolute top-0 right-0 p-md opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
+<span className="material-symbols-outlined text-[120px]">account_balance</span>
+</div>
+<div className="flex items-start justify-between relative z-10">
+<div className="flex flex-col gap-xs">
+<div className="flex items-center gap-sm mb-xs">
+<span className="bg-secondary/10 text-secondary border border-secondary/30 px-sm py-[2px] rounded text-data-mono font-data-mono text-[11px] flex items-center gap-xs">
+<span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                                    ACTIVE
+                                </span>
+<span className="text-data-mono font-data-mono text-on-surface-variant text-[13px]">#2024-CR-04821</span>
+</div>
+<h1 className="text-display-case font-display-case text-on-surface m-0 leading-none">State v. Doe</h1>
+<p className="text-data-mono font-data-mono text-on-surface-variant mt-sm">Superior Court of California, County of San Francisco</p>
+</div>
+<div className="flex flex-col items-end gap-sm">
+<button className="bg-secondary text-on-secondary px-md py-sm rounded text-label-caps font-label-caps tracking-widest uppercase hover:bg-secondary-fixed transition-colors font-bold shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)]">
+                                View Full Dossier
                             </button>
-                            {agentOpen === agent.name && (
-                              <div className="border-t border-white/10 px-3 pb-3 pt-3 text-[11px] leading-[1.5] text-white/70">
-                                <span className="mr-2 font-bold text-[#D4AF37]">LATEST:</span>
-                                {agent.note}
-                                <button 
-                                  onClick={() => setActiveNav("AI Lab")}
-                                  className="mt-3 flex items-center gap-1 text-[10px] font-bold tracking-widest text-white hover:text-[#D4AF37] transition cursor-pointer"
-                                >
-                                  OPEN CONVERSATION <ArrowRight size={12} />
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                      
-                      <button
-                        onClick={() => setActiveNav("Find an attorney")}
-                        className="mt-5 flex w-full items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 py-3 text-[10px] font-bold tracking-widest text-white hover:bg-white/10 transition"
-                      >
-                        <UserCheck size={14} /> FIND ATTORNEY
-                      </button>
-                    </section>
+</div>
+</div>
+</section>
 
-                    {/* Evidence */}
-                    <section className="rounded-[18px] border border-white/10 bg-[rgba(255,255,255,0.03)] p-6 backdrop-blur-xl">
-                      <SectionHeading
-                        icon={FolderOpen}
-                        eyebrow="Materials"
-                        title="Evidence"
-                        action="Open Vault"
-                      />
-                      <div className="mb-5 flex items-end justify-between">
-                        <div>
-                          <p className="font-serif text-[32px] text-white leading-none">82<span className="text-[20px] text-white/40">%</span></p>
-                          <p className="mt-1 text-[10px] tracking-widest text-white/40">ORGANIZED</p>
-                        </div>
-                        <div className="h-1 w-[58%] overflow-hidden rounded-full bg-white/10 mb-2">
-                          <div className="h-full w-[82%] rounded-full bg-[#D4AF37] shadow-[0_0_10px_rgba(212,175,55,0.5)]" />
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-3 rounded-[12px] bg-black/40 p-3 border border-white/5">
-                          <FileText size={16} className="text-[#D4AF37]" />
-                          <div className="flex-1">
-                            <p className="text-[11px] font-bold text-white">Police report</p>
-                            <p className="text-[10px] text-white/40 mt-0.5">May 03 · 8 pages</p>
-                          </div>
-                          <Check size={14} className="text-emerald-400" />
-                        </div>
-                        <div className="flex items-center gap-3 rounded-[12px] bg-black/40 p-3 border border-white/5">
-                          <Upload size={16} className="text-white/40" />
-                          <div className="flex-1">
-                            <p className="text-[11px] font-bold text-white">Body cam footage</p>
-                            <p className="text-[10px] text-[#D4AF37] mt-0.5">Needs description</p>
-                          </div>
-                          <Pill tone="glass">Review</Pill>
-                        </div>
-                      </div>
-                      
-                      <button 
-                        onClick={() => { setActiveTab("Documents"); setActiveNav("Documents"); }}
-                        className="mt-4 flex items-center gap-1 text-[10px] font-bold tracking-widest text-[#D4AF37] hover:text-white transition"
-                      >
-                        SEE ALL 12 ITEMS <ArrowRight size={13} />
-                      </button>
-                    </section>
-                  </div>
-                </div>
-              </>
-            ) : null}
+<section className="grid grid-cols-2 lg:grid-cols-4 gap-md">
 
-            {/* Footer Control Info */}
-            {activeNav !== "Documents" && activeTab !== "Documents" && (
-              <div className="mt-8 rounded-[16px] border border-white/10 bg-black/40 px-5 py-4 backdrop-blur-md">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex gap-3 text-[11px] leading-[1.5] text-white/50">
-                    <CircleHelp size={16} className="mt-px shrink-0 text-white/30" />
-                    <span>
-                      Acquit provides intelligence and organization. It does not provide legal advice. Nothing is filed or sent without your explicit review and approval.
-                    </span>
-                  </div>
-                  <label className="flex shrink-0 items-center gap-3 text-[10px] font-bold tracking-widest text-white/70 cursor-pointer">
-                    <span>PLAIN ENGLISH</span>
-                    <button
-                      onClick={() => setPlainEnglish(!plainEnglish)}
-                      className={`relative h-5 w-9 rounded-full transition-colors ${
-                        plainEnglish ? "bg-[#D4AF37]" : "bg-white/20"
-                      }`}
-                    >
-                      <span
-                        className={`absolute top-0.5 h-4 w-4 rounded-full bg-black shadow-sm transition-transform ${
-                          plainEnglish ? "translate-x-4.5" : "translate-x-0.5"
-                        }`}
-                      />
-                    </button>
-                  </label>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
+<div className="bg-surface-container border border-outline-variant p-md rounded flex flex-col gap-sm hover:bg-surface-container-high transition-colors cursor-pointer">
+<div className="flex justify-between items-center text-on-surface-variant">
+<span className="text-label-caps font-label-caps uppercase tracking-widest">Charges</span>
+<span className="material-symbols-outlined text-[18px]">gavel</span>
+</div>
+<div className="text-headline-lg font-headline-lg text-on-surface">2</div>
+<div className="text-data-mono font-data-mono text-error text-[12px]">Felony level</div>
+</div>
+
+<div className="bg-surface-container border border-outline-variant p-md rounded flex flex-col gap-sm hover:bg-surface-container-high transition-colors cursor-pointer hard-shadow-active border-secondary/50">
+<div className="flex justify-between items-center text-secondary">
+<span className="text-label-caps font-label-caps uppercase tracking-widest">Hearing</span>
+<span className="material-symbols-outlined text-[18px]">calendar_today</span>
+</div>
+<div className="text-headline-lg font-headline-lg text-on-surface">14d</div>
+<div className="text-data-mono font-data-mono text-on-surface-variant text-[12px]">Pre-trial Conf.</div>
+</div>
+
+<div className="bg-surface-container border border-outline-variant p-md rounded flex flex-col gap-sm hover:bg-surface-container-high transition-colors cursor-pointer">
+<div className="flex justify-between items-center text-on-surface-variant">
+<span className="text-label-caps font-label-caps uppercase tracking-widest">Records</span>
+<span className="material-symbols-outlined text-[18px]">folder_copy</span>
+</div>
+<div className="text-headline-lg font-headline-lg text-on-surface">23</div>
+<div className="text-data-mono font-data-mono text-secondary text-[12px]">+3 this week</div>
+</div>
+
+<div className="bg-surface-container border border-outline-variant p-md rounded flex flex-col gap-sm hover:bg-surface-container-high transition-colors cursor-pointer">
+<div className="flex justify-between items-center text-on-surface-variant">
+<span className="text-label-caps font-label-caps uppercase tracking-widest">Tasks</span>
+<span className="material-symbols-outlined text-[18px]">checklist</span>
+</div>
+<div className="text-headline-lg font-headline-lg text-on-surface">7</div>
+<div className="text-data-mono font-data-mono text-error text-[12px]">2 overdue</div>
+</div>
+</section>
+
+<div className="grid grid-cols-1 lg:grid-cols-12 gap-lg flex-1 min-h-0">
+
+<section className="lg:col-span-7 flex flex-col bg-surface-container border border-outline-variant rounded overflow-hidden">
+<div className="bg-surface-container-high px-md py-sm border-b border-outline-variant flex justify-between items-center">
+<h2 className="text-label-caps font-label-caps tracking-widest uppercase text-on-surface">Chronology Rail</h2>
+<button className="text-on-surface-variant hover:text-on-surface text-data-mono font-data-mono text-[12px] flex items-center gap-xs">
+<span className="material-symbols-outlined text-[14px]">filter_list</span> Filter
+                            </button>
+</div>
+<div className="p-md flex-1 overflow-y-auto scrollbar-hide relative">
+
+<div className="absolute left-[27px] top-md bottom-md w-[2px] bg-outline-variant/30"></div>
+<div className="flex flex-col gap-lg relative z-10">
+
+<div className="flex gap-md group">
+<div className="w-6 h-6 rounded-full bg-surface border-2 border-secondary flex items-center justify-center shrink-0 mt-1 shadow-[0_0_8px_rgba(181,200,223,0.5)] z-10">
+<div className="w-2 h-2 rounded-full bg-secondary"></div>
+</div>
+<div className="flex-1 bg-surface-variant/30 border border-outline-variant/50 p-sm rounded group-hover:border-secondary/50 transition-colors">
+<div className="flex justify-between items-start mb-xs">
+<span className="text-data-mono font-data-mono text-secondary text-[12px]">Today, 09:30 AM</span>
+<span className="bg-surface-container-highest text-on-surface-variant px-xs py-[2px] rounded text-[10px] font-data-mono uppercase">Filing</span>
+</div>
+<div className="text-body-md font-body-md text-on-surface font-medium">Defense filed Motion to Suppress Evidence</div>
+<div className="text-data-mono font-data-mono text-on-surface-variant text-[12px] mt-xs flex items-center gap-xs">
+<span className="material-symbols-outlined text-[14px]">attach_file</span> doc_442_motion.pdf
+                                        </div>
+</div>
+</div>
+
+<div className="flex gap-md group">
+<div className="w-6 h-6 rounded-full bg-surface border-2 border-outline-variant flex items-center justify-center shrink-0 mt-1 z-10"></div>
+<div className="flex-1 bg-surface-variant/10 border border-outline-variant/30 p-sm rounded group-hover:border-outline-variant transition-colors opacity-80">
+<div className="flex justify-between items-start mb-xs">
+<span className="text-data-mono font-data-mono text-on-surface-variant text-[12px]">Oct 20, 14:15 PM</span>
+<span className="bg-surface-container-highest text-on-surface-variant px-xs py-[2px] rounded text-[10px] font-data-mono uppercase">Discovery</span>
+</div>
+<div className="text-body-md font-body-md text-on-surface font-medium">Prosecution provided Batch #3 Discovery</div>
+<div className="text-data-mono font-data-mono text-on-surface-variant text-[12px] mt-xs">142 pages indexed by AI Chambers.</div>
+</div>
+</div>
+
+<div className="flex gap-md group">
+<div className="w-6 h-6 rounded-full bg-surface border-2 border-outline-variant flex items-center justify-center shrink-0 mt-1 z-10"></div>
+<div className="flex-1 bg-surface-variant/10 border border-outline-variant/30 p-sm rounded group-hover:border-outline-variant transition-colors opacity-80">
+<div className="flex justify-between items-start mb-xs">
+<span className="text-data-mono font-data-mono text-on-surface-variant text-[12px]">Oct 15, 10:00 AM</span>
+<span className="bg-surface-container-highest text-on-surface-variant px-xs py-[2px] rounded text-[10px] font-data-mono uppercase">Hearing</span>
+</div>
+<div className="text-body-md font-body-md text-on-surface font-medium">Arraignment Hearing Concluded</div>
+<div className="text-data-mono font-data-mono text-on-surface-variant text-[12px] mt-xs">Plea entered: Not Guilty. Bail set at $50,000.</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section className="lg:col-span-5 flex flex-col bg-surface-container border border-outline-variant rounded overflow-hidden">
+<div className="bg-surface-container-high px-md py-sm border-b border-outline-variant flex justify-between items-center">
+<h2 className="text-label-caps font-label-caps tracking-widest uppercase text-on-surface flex items-center gap-sm">
+<span className="material-symbols-outlined text-[16px]">groups</span> Chambers Roster
+                            </h2>
+</div>
+<div className="p-md flex flex-col gap-sm flex-1 overflow-y-auto">
+
+<div className="border border-outline-variant bg-surface rounded p-sm flex items-start gap-md">
+<div className="w-10 h-10 rounded bg-secondary/10 border border-secondary flex items-center justify-center shrink-0">
+<span className="material-symbols-outlined text-secondary">psychology</span>
+</div>
+<div className="flex-1 min-w-0">
+<div className="flex justify-between items-center mb-xs">
+<span className="text-label-caps font-label-caps text-on-surface uppercase">Paralegal AI</span>
+<span className="flex items-center gap-xs text-[10px] text-data-mono font-data-mono text-secondary"><span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span> Analyzing</span>
+</div>
+<p className="text-data-mono font-data-mono text-[12px] text-on-surface-variant truncate">Processing Discovery Batch #3...</p>
+<div className="w-full bg-surface-container-highest h-1 mt-sm rounded overflow-hidden">
+<div className="bg-secondary h-full w-[65%]"></div>
+</div>
+</div>
+</div>
+
+<div className="border border-outline-variant bg-surface rounded p-sm flex items-start gap-md opacity-70">
+<div className="w-10 h-10 rounded bg-surface-variant border border-outline flex items-center justify-center shrink-0">
+<span className="material-symbols-outlined text-on-surface-variant">edit_document</span>
+</div>
+<div className="flex-1 min-w-0">
+<div className="flex justify-between items-center mb-xs">
+<span className="text-label-caps font-label-caps text-on-surface uppercase">Drafting Agent</span>
+<span className="flex items-center gap-xs text-[10px] text-data-mono font-data-mono text-on-surface-variant">Idle</span>
+</div>
+<p className="text-data-mono font-data-mono text-[12px] text-on-surface-variant truncate">Awaiting prompt for next motion.</p>
+</div>
+</div>
+
+<div className="border border-outline-variant bg-surface rounded p-sm flex items-start gap-md opacity-70">
+<div className="w-10 h-10 rounded bg-surface-variant border border-outline flex items-center justify-center shrink-0">
+<span className="material-symbols-outlined text-on-surface-variant">policy</span>
+</div>
+<div className="flex-1 min-w-0">
+<div className="flex justify-between items-center mb-xs">
+<span className="text-label-caps font-label-caps text-on-surface uppercase">Precedent Researcher</span>
+<span className="flex items-center gap-xs text-[10px] text-data-mono font-data-mono text-on-surface-variant">Standby</span>
+</div>
+<p className="text-data-mono font-data-mono text-[12px] text-on-surface-variant truncate">Last run: 4hrs ago (CA Penal Code § 1538.5)</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+
+<section className="bg-surface-container border border-outline-variant rounded p-sm flex items-center gap-md shrink-0">
+<span className="bg-surface-variant px-sm py-[2px] rounded text-label-caps font-label-caps tracking-widest text-on-surface-variant uppercase shrink-0">System Log</span>
+<div className="flex-1 overflow-hidden relative h-6">
+<div className="absolute inset-0 flex flex-col justify-center text-data-mono font-data-mono text-[12px] text-on-surface-variant truncate animate-[slideUp_4s_ease-in-out_infinite]">
+                            [10:42:01] System: Synchronized with Court E-File API.
+                        </div>
+</div>
+</section>
+</div>
+</main>
+</div>
+
+
+
     </div>
   );
 }

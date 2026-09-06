@@ -254,7 +254,7 @@ function MainApp() {
       <Navigation />
       <div className="flex-1 relative">
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<CaseWorkspace />} />
           <Route path="/case-workspace" element={<CaseWorkspace />} />
           <Route path="/workspace" element={<CaseWorkspace />} />
           <Route path="/ai-lab" element={<AILab />} />

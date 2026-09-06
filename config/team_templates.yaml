@@ -1,0 +1,173 @@
+# team_templates.yaml — Counsel Room legal team assembly seeds
+# Aliases follow the architecture PDF naming system:
+#   YHWH=MainLLM, Michael=Orchestrator, Gabriel=Agents,
+#   Raphael=TaskBot, Metatron=LLM Router, Seraphim=external LLMs.
+
+version: "1.0"
+
+# ---------------------------------------------------------------------------
+# Reusable agent roster (referenced by slug from every template).
+# Each maps to a Gabriel-class agent + a persona shown in Counsel Room chat.
+# ---------------------------------------------------------------------------
+agents:
+  lead_counsel:
+    alias: Gabriel_LeadCounsel
+    display_name: "Lead Counsel AI"
+    class: gabriel
+    model_policy: frontier_reasoning            # routed by Metatron
+    permission_set: counsel_default             # see permission_sets below
+    persona_prompt: >
+      You are Lead Counsel AI for matter {{context.matter_name}} in
+      {{context.jurisdiction}}. Synthesize specialist findings into strategy.
+      You never file, never advise as attorney of record, and always cite
+      linked documents/evidence by id.
+
+  research_ai:
+    alias: Gabriel_Research
+    display_name: "Research AI"
+    class: gabriel
+    model_policy: chain_of_thought
+    permission_set: research_default
+    persona_prompt: >
+      You are Research AI. Answer statutory and case-law questions for
+      {{context.jurisdiction}}, cite sources, flag uncertainty explicitly.
+
+  evidence_analyst:
+    alias: Gabriel_Evidence
+    display_name: "Evidence Analyst AI"
+    class: gabriel
+    model_policy: pattern_matching
+    permission_set: evidence_default
+    persona_prompt: >
+      You are Evidence Analyst AI. Rank exhibits by strength, identify gaps,
+      and verify SHA-256 chain-of-custody metadata for
+      {{context.matter_name}}.
+
+  paralegal_ai:
+    alias: Gabriel_Paralegal
+    display_name: "Paralegal AI"
+    class: gabriel
+    model_policy: cost_optimized
+    permission_set: paralegal_default
+    persona_prompt: >
+      You are Paralegal AI. Draft documents, prepare filing packages, and
+      route everything to the Filing Center — never submit.
+
+  task_runner:
+    alias: Raphael
+    display_name: "Task Runner"
+    class: raphael                                # TaskBot — broadcast/consensus
+    model_policy: multi_seraphim
+    permission_set: raphael_default
+
+# ---------------------------------------------------------------------------
+# Permission sets (enforced per channel; stricter set wins in privileged rooms)
+# ---------------------------------------------------------------------------
+permission_sets:
+  counsel_default:
+    tools: [documents.read, evidence.read, timeline.read, research.run,
+            drafts.create]
+    external_llm_routing: allowed               # via Metatron only
+    filing_submit: forbidden                    # Filing Center approval only
+
+  research_default:
+    tools: [research.run, documents.read]
+    external_llm_routing: allowed
+    filing_submit: forbidden
+
+  evidence_default:
+    tools: [evidence.read, evidence.verify_hash, evidence.gap_scan]
+    external_llm_routing: allowed
+    filing_submit: forbidden
+
+  paralegal_default:
+    tools: [documents.read, drafts.create, filing.package]
+    external_llm_routing: allowed
+    filing_submit: forbidden
+
+  raphael_default:
+    tools: [broadcast.all, broadcast.first_response, consensus.run]
+    external_llm_routing: orchestrated          # owns Seraphim fan-out
+    filing_submit: forbidden
+
+  privileged_mode_overrides:                    # applied when channel.privileged
+    external_llm_routing: forbidden_unless_consented   # per-message consent
+    data_residency: local_only                  # FrawdBot/ExhibitCTL pattern
+
+# ---------------------------------------------------------------------------
+# Team templates — what "Assemble My Legal Team" instantiates
+# ---------------------------------------------------------------------------
+team_templates:
+
+  tenant_defense:
+    name: "Tenant Defense Team"
+    matter_types: [landlord_tenant, habitability, eviction_defense]
+    ai_roster: [lead_counsel, research_ai, evidence_analyst, paralegal_ai]
+    human_roles:
+      - { role: attorney, required: false, privileged_on_join: true }
+      - { role: friend,   required: false, privileged_on_join: false }
+    default_channels:
+      - { slug: strategy,  type: matter_scoped, privileged: true,
+          members: [owner, attorney, lead_counsel, research_ai] }
+      - { slug: evidence,  type: matter_scoped, privileged: true,
+          members: [owner, attorney, evidence_analyst, paralegal_ai] }
+      - { slug: support,   type: group,         privileged: false,
+          members: [owner, friend, paralegal_ai] }
+    consensus_default:
+      mode: consensus                            # Raphael consensus mode
+      threshold: 0.7
+      panel: [lead_counsel, research_ai, evidence_analyst]
+
+  llc_dispute:
+    name: "LLC / Business Dispute Team"
+    matter_types: [llc_dispute, breach_of_contract, partnership_dispute]
+    ai_roster: [lead_counsel, research_ai, evidence_analyst, paralegal_ai]
+    human_roles:
+      - { role: attorney, required: true, privileged_on_join: true }
+      - { role: friend,   required: false, privileged_on_join: false }
+    default_channels:
+      - { slug: strategy,  type: matter_scoped, privileged: true,
+          members: [owner, attorney, lead_counsel, research_ai] }
+      - { slug: financials, type: matter_scoped, privileged: true,
+          members: [owner, attorney, evidence_analyst] }
+    consensus_default:
+      mode: consensus
+      threshold: 0.75                            # higher bar for $ exposure
+      panel: [lead_counsel, research_ai, evidence_analyst]
+
+  small_claims_pro_se:
+    name: "Small Claims (Self-Represented)"
+    matter_types: [small_claims, consumer_dispute]
+    ai_roster: [lead_counsel, paralegal_ai]
+    human_roles:
+      - { role: friend, required: false, privileged_on_join: false }
+    default_channels:
+      - { slug: my_case, type: matter_scoped, privileged: false,
+          members: [owner, lead_counsel, paralegal_ai, friend] }
+    consensus_default:
+      mode: first_response                       # cost-optimized for low stakes
+      panel: [lead_counsel, paralegal_ai]
+
+  custom:
+    name: "Custom Team"
+    matter_types: [any]
+    ai_roster: [lead_counsel]                    # user adds agents in builder
+    human_roles:
+      - { role: attorney, required: false, privileged_on_join: true }
+    default_channels:
+      - { slug: general, type: matter_scoped, privileged: false,
+          members: [owner, lead_counsel] }
+    consensus_default:
+      mode: first_response
+      panel: [lead_counsel]
+
+# ---------------------------------------------------------------------------
+# Assembly defaults
+# ---------------------------------------------------------------------------
+assembly:
+  activation_requires_review: true   # step 5 of the assembly flow: show
+                                     # PermissionSets + access scopes before
+                                     # creating matter_teams record
+  attorney_invite_expiry_hours: 72
+  upl_disclaimer_required: true      # "AI counsel is not your attorney of
+                                     # record" header on every channel

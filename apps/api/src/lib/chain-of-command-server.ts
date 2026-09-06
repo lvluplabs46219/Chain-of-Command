@@ -17,7 +17,7 @@ import {
   type NewChainEvent,
   type NewChainMetadata,
   type NewChainVerificationLog,
-} from '../../../packages/database/schema/chain-of-command';
+} from '../../../../packages/database/schema/chain-of-command';
 import {
   ChainOfCommand,
   type ChainEvent,
@@ -684,7 +684,6 @@ export function createResourceChain(
 // ============================================================================
 
 export {
-  SupabaseChainOfCommand,
   chainEvents,
   chainMetadata,
   chainVerificationLog,

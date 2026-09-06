@@ -7,8 +7,8 @@
 
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import * as schema from '../../../packages/database/schema';
-import * as chainSchema from '../../../packages/database/schema/chain-of-command';
+import * as schema from '../../../../packages/database/schema/sic-audit';
+import * as chainSchema from '../../../../packages/database/schema/chain-of-command';
 
 // Get database connection string from environment
 const DATABASE_URL = process.env.DATABASE_URL || 
