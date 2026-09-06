@@ -5,21 +5,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  webpack: (config) => {
-    config.module.rules.push({
-      test: /\.html$/,
-      use: [
-        {
-          loader: 'file-loader',
-          options: {
-            publicPath: '/',
-            name: 'static/media/[name].[hash].[ext]',
-          },
-        },
-      ],
-    });
-    return config;
-  },
+  turbopack: {},
   async headers() {
     return [
       {
@@ -35,4 +21,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
