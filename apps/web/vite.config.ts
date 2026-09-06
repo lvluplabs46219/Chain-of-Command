@@ -46,6 +46,9 @@ export default defineConfig({
     allowedHosts: true,
     fs: {
       strict: false,
+      allow: [
+        path.resolve(import.meta.dirname, "src/assets/stitch"),
+      ],
     },
   },
   preview: {
@@ -54,6 +57,9 @@ export default defineConfig({
     allowedHosts: true,
     fs: {
       strict: false,
+      allow: [
+        path.resolve(import.meta.dirname, "src/assets/stitch"),
+      ],
     },
   },
 });

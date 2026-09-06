@@ -13,6 +13,7 @@ import { CaseTimeline } from "./components/mockups/acquit-case-workspace/CaseTim
 import { EvidenceCarousel } from "./components/mockups/acquit-case-workspace/EvidenceCarousel";
 import { SovereignCylinder } from "./components/mockups/acquit-case-workspace/SovereignCylinder";
 import { StitchGallery } from "./components/mockups/acquit-case-workspace/StitchGallery";
+import { StitchMockup } from "./components/mockups/acquit-case-workspace/StitchMockup";
 import { GoogleWorkspaceIntegration } from "./components/mockups/acquit-case-workspace/GoogleWorkspaceIntegration";
 import { RagCitationViewer } from "./components/mockups/acquit-case-workspace/RagCitationViewer";
 import { FeaturedAttorneysCarousel } from "./components/mockups/acquit-case-workspace/FeaturedAttorneysCarousel";
@@ -273,6 +274,7 @@ function MainApp() {
           <Route path="/cylinder" element={<SovereignCylinder />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/stitch" element={<StitchGallery />} />
+          <Route path="/stitch/:mockupName" element={<StitchMockup />} />
           <Route path="/google-workspace" element={<GoogleWorkspaceIntegration matterTitle="Sample Matter" caseNumber="IN-12345" courtName="Sample Court" />} />
           <Route path="/google" element={<GoogleWorkspaceIntegration matterTitle="Sample Matter" caseNumber="IN-12345" courtName="Sample Court" />} />
           <Route path="/rag-citations" element={<div className="p-8"><RagCitationViewer message={MOCK_RAG_MESSAGES[0]} onOpenLawLibrary={() => {}} /></div>} />

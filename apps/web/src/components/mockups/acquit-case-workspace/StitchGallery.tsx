@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ChevronRight,  } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const mockups = [
   "accessibility_settings", "ai_engine_settings", "case_timeline_chronology",
@@ -29,6 +30,7 @@ function formatName(name: string) {
 }
 
 export function StitchGallery() {
+  const navigate = useNavigate();
   const [selectedMockup, setSelectedMockup] = useState<string | null>(null);
 
   if (selectedMockup) {
@@ -60,6 +62,7 @@ export function StitchGallery() {
         <h2 className="text-2xl font-serif text-white">Stitch OS Design Gallery</h2>
         <p className="mt-2 text-sm text-white/50">
           Viewing {mockups.length} uploaded UI/UX mockups for the Acquit Legal Operating System.
+          <span className="text-[#D4AF37] text-xs ml-2">Click any mockup to view it live</span>
         </p>
       </div>
 
@@ -67,7 +70,7 @@ export function StitchGallery() {
         {mockups.map((m) => (
           <div 
             key={m}
-            onClick={() => setSelectedMockup(m)}
+            onClick={() => navigate(`/stitch/${m}`)}
             className="group cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-black/40 transition hover:border-[#D4AF37]/50 hover:bg-white/5"
           >
             <div className="aspect-video w-full bg-white/5 p-2">
