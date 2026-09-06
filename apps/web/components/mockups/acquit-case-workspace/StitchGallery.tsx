@@ -1,5 +1,8 @@
+"use client";
+
 import { useState } from "react";
-import { ChevronRight,  } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const mockups = [
   "accessibility_settings", "ai_engine_settings", "case_timeline_chronology",
@@ -13,7 +16,7 @@ const mockups = [
   "integrations_settings", "investigations_evidence_locker", "investigations_exhibit_analysis",
   "investigations_issue_spotter", "investigations_research_memo", "law_library_case_folders",
   "law_library_citation_web", "law_library_prior_research", "law_library_research",
-  "lex_operating_system", "motions_tasks_court_calendar", "motions_tasks_motion_board",
+  "motions_tasks_court_calendar", "motions_tasks_motion_board",
   "record_room_documents", "record_room_draft_desk", "record_room_exhibit_gallery",
   "record_room_file_a_record", "record_room_record_preview", "system_audit",
   "the_clerk_notification_settings", "the_docket_cases", "the_docket_closed_matters",
@@ -29,6 +32,7 @@ function formatName(name: string) {
 }
 
 export function StitchGallery() {
+  const router = useRouter();
   const [selectedMockup, setSelectedMockup] = useState<string | null>(null);
 
   if (selectedMockup) {
@@ -60,6 +64,7 @@ export function StitchGallery() {
         <h2 className="text-2xl font-serif text-white">Stitch OS Design Gallery</h2>
         <p className="mt-2 text-sm text-white/50">
           Viewing {mockups.length} uploaded UI/UX mockups for the Acquit Legal Operating System.
+          <span className="text-[#D4AF37] text-xs ml-2">Click any mockup to view it live</span>
         </p>
       </div>
 
@@ -67,7 +72,7 @@ export function StitchGallery() {
         {mockups.map((m) => (
           <div 
             key={m}
-            onClick={() => setSelectedMockup(m)}
+            onClick={() => router.push(`/stitch/${m}`)}
             className="group cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-black/40 transition hover:border-[#D4AF37]/50 hover:bg-white/5"
           >
             <div className="aspect-video w-full bg-white/5 p-2">
