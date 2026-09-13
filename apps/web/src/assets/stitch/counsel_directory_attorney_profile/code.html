@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ACQUIT.AI - Counsel Directory</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;600;700&amp;family=Hanken+Grotesk:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#1a1c1e",
+                        "on-tertiary-fixed": "#201b17",
+                        "surface-container-highest": "#353435",
+                        "tertiary-container": "#201b17",
+                        "secondary-fixed": "#d1e4fb",
+                        "on-tertiary": "#352f2b",
+                        "error": "#ffb4ab",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container": "#201f1f",
+                        "background": "#141313",
+                        "on-surface": "#e5e2e1",
+                        "surface-tint": "#c6c6c9",
+                        "primary-fixed-dim": "#c6c6c9",
+                        "outline-variant": "#44474a",
+                        "on-primary-container": "#838486",
+                        "on-surface-variant": "#c5c6ca",
+                        "inverse-primary": "#5d5e61",
+                        "on-background": "#e5e2e1",
+                        "primary-fixed": "#e2e2e5",
+                        "on-secondary-fixed": "#091d2e",
+                        "tertiary-fixed-dim": "#cfc5be",
+                        "tertiary-fixed": "#ebe0da",
+                        "secondary-container": "#36485b",
+                        "on-secondary-fixed-variant": "#36485b",
+                        "inverse-surface": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#4c4641",
+                        "on-primary-fixed": "#1a1c1e",
+                        "outline": "#8f9194",
+                        "tertiary": "#cfc5be",
+                        "on-primary-fixed-variant": "#454749",
+                        "surface-container-high": "#2a2a2a",
+                        "error-container": "#93000a",
+                        "surface-variant": "#353435",
+                        "secondary-fixed-dim": "#b5c8df",
+                        "on-secondary-container": "#a4b7cd",
+                        "surface-dim": "#141313",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "surface": "#141313",
+                        "on-tertiary-container": "#8b837d",
+                        "on-primary": "#2f3133",
+                        "surface-container-low": "#1c1b1b",
+                        "inverse-on-surface": "#313030",
+                        "surface-bright": "#3a3939",
+                        "secondary": "#b5c8df",
+                        "primary": "#c6c6c9",
+                        "on-secondary": "#203243"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin-safe": "32px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xl": "40px",
+                        "xs": "4px",
+                        "base": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Hanken Grotesk"],
+                        "headline-lg": ["Domine"],
+                        "label-caps": ["Hanken Grotesk"],
+                        "data-mono": ["JetBrains Mono"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-md": ["Domine"],
+                        "headline-lg-mobile": ["Domine"],
+                        "display-case": ["Domine"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-case": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        .glass-panel { background: rgba(32, 31, 31, 0.7); backdrop-filter: blur(12px); border: 1px solid theme('colors.outline-variant'); }
+        .legal-gold { color: #D4AF37; }
+        .bg-legal-gold { background-color: #D4AF37; }
+        .border-legal-gold { border-color: #D4AF37; }
+        .war-room-border { border: 1px solid #2C3E50; }
+        
+        /* Webkit Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: theme('colors.surface-container-lowest'); }
+        ::-webkit-scrollbar-thumb { background: theme('colors.outline-variant'); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: theme('colors.outline'); }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden bg-background text-on-background font-body-md selection:bg-primary selection:text-on-primary">
+<!-- SideNavBar -->
+<nav class="w-[280px] h-screen fixed left-0 top-0 bg-background dark:bg-background border-r border-outline-variant dark:border-outline-variant flex flex-col h-full py-md z-40">
+<div class="px-lg mb-xl mt-sm">
+<h1 class="font-headline-md text-headline-md font-bold text-on-surface dark:text-on-surface tracking-tighter">ACQUIT.AI</h1>
+<p class="font-data-mono text-data-mono text-on-surface-variant text-[11px] uppercase tracking-widest mt-1">Legal OS v1.0</p>
+</div>
+<div class="flex-1 overflow-y-auto px-sm flex flex-col gap-1">
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider rounded-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+                Command Center
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider rounded-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="gavel">gavel</span>
+                The Docket
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider rounded-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="meeting_room">meeting_room</span>
+                Chambers
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider rounded-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="library_books">library_books</span>
+                Law Library
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider rounded-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="folder_open">folder_open</span>
+                Record Room
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider rounded-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="query_stats">query_stats</span>
+                Investigations
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider rounded-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="history_edu">history_edu</span>
+                Case Timeline
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider rounded-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+                Court Watch
+            </a>
+<!-- Active Tab -->
+<a class="flex items-center gap-3 text-primary dark:text-primary border-l-4 border-primary bg-primary-container/10 px-4 py-3 font-bold font-body-md text-body-md uppercase tracking-wider rounded-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="contact_page" data-weight="fill" style="font-variation-settings: 'FILL' 1;">contact_page</span>
+                Counsel Directory
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider rounded-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="assignment">assignment</span>
+                Motions &amp; Tasks
+            </a>
+</div>
+<div class="px-lg mt-auto pt-lg border-t border-outline-variant/30">
+<button class="w-full bg-legal-gold text-black font-data-mono text-data-mono py-3 px-4 rounded-sm font-bold hover:bg-[#E5C158] transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                New Filing
+            </button>
+</div>
+</nav>
+<!-- Main Layout wrapper to account for fixed sidebar -->
+<div class="flex-1 ml-[280px] flex flex-col h-screen relative">
+<!-- TopAppBar -->
+<header class="h-16 fixed top-0 right-0 left-[280px] z-50 bg-surface dark:bg-surface border-b border-outline-variant dark:border-outline-variant flex items-center justify-between px-md w-[calc(100%-280px)]">
+<div class="flex items-center gap-4">
+<div class="font-headline-md text-headline-md text-on-surface dark:text-on-surface flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-legal-gold"></span>
+                    2024-CV-8821
+                </div>
+</div>
+<div class="flex items-center gap-6">
+<!-- Search -->
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="bg-surface-container-high border border-outline-variant rounded-sm py-1.5 pl-10 pr-4 font-data-mono text-data-mono text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all w-64" placeholder="Search directory..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary dark:hover:text-primary transition-opacity rounded-sm hover:bg-surface-container focus:ring-1 focus:ring-primary">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary dark:hover:text-primary transition-opacity rounded-sm hover:bg-surface-container focus:ring-1 focus:ring-primary">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary dark:hover:text-primary transition-opacity rounded-sm hover:bg-surface-container focus:ring-1 focus:ring-primary">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+<div class="h-8 w-8 rounded-full border border-outline-variant overflow-hidden">
+<img alt="Lead Counsel" class="w-full h-full object-cover" data-alt="A small, professional headshot portrait of an authoritative senior lawyer in a dark tailored suit, cinematic lighting, corporate setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3ij8oJBsy2JExtX0DRAXo4S9vFASY9HhKJfR7PuHZqXt7WYe1TvJ6IscdPS3Vd-XatI1VZ3SYOSv3oj642AZg-0BEovpR7eKM2slHVikGWwxDlUM3yX0foUqgv_FzYk2ZqlWdHvNG_Lw7GhPELe2Y3Dmoo9bC_f91gCh2dPcJxDHSDPKB720NrhJuceF7S9EOKQ5_w3uBb68dEmQ6amuSSD3j3KstVbAv8z_J_mdY8F9Faw9wrsHDNA"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 mt-16 overflow-y-auto bg-background p-lg relative">
+<!-- Grid Layout -->
+<div class="max-w-7xl mx-auto grid grid-cols-12 gap-lg">
+<!-- Left Column (Profile Core) -->
+<div class="col-span-12 md:col-span-4 flex flex-col gap-lg">
+<!-- Headshot & Primary Info -->
+<div class="war-room-border bg-surface-container-lowest p-1 rounded-sm relative">
+<div class="absolute top-4 right-4 z-10 flex items-center gap-2">
+<span class="px-2 py-1 bg-green-900/40 border border-green-500/50 text-green-400 font-data-mono text-[10px] uppercase flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                Active Bar
+                            </span>
+</div>
+<div class="aspect-[3/4] w-full relative mb-1 border border-outline-variant overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10"></div>
+<img alt="Attorney Headshot" class="w-full h-full object-cover filter grayscale contrast-125" data-alt="A striking, high-contrast, black and white professional portrait of a formidable attorney in a starkly lit corporate environment. The lighting is cinematic, emphasizing sharp facial features and conveying immense authority and gravitas, characteristic of a high-stakes legal drama." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzqPGaIJ6smgFiGTfcC_2STc-k9T7BPqtdFmTu4uOkohRObQElGp3A3CfEGQa4FD0_vQcnB6KsedcPA5oDhb6h5B5vEDSv-dPlTngG5upMvGhnx2xZBA2OK9N2u1zNwvOJTf_BuhAMBQH_FDHUuDEsSbThPt8ULc701sROeXOR5ugAJioZHbelYYngsbm0O0b0kpKkEdxLCeTvM1l03TtHKuy-4SIwxSqrlT9IXGrok_k54a36N7yI8Q"/>
+<div class="absolute bottom-0 left-0 w-full p-4 z-20">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-1">Elias Vance</h2>
+<p class="font-data-mono text-data-mono text-primary uppercase tracking-wider">Senior Partner</p>
+</div>
+</div>
+<div class="p-4 flex flex-col gap-4">
+<div class="grid grid-cols-2 gap-4 border-b border-outline-variant pb-4">
+<div>
+<span class="block font-label-caps text-label-caps text-on-surface-variant mb-1">Jurisdiction</span>
+<span class="font-data-mono text-data-mono text-on-surface">SDNY / 2nd Circ.</span>
+</div>
+<div>
+<span class="block font-label-caps text-label-caps text-on-surface-variant mb-1">Bar Number</span>
+<span class="font-data-mono text-data-mono text-on-surface">NY-448921</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<span class="block font-label-caps text-label-caps text-on-surface-variant mb-1">Experience</span>
+<span class="font-data-mono text-data-mono text-on-surface text-lg">24 Years</span>
+</div>
+<div class="w-10 h-10 rounded-full border border-legal-gold flex items-center justify-center bg-surface">
+<span class="material-symbols-outlined legal-gold text-[20px]">workspace_premium</span>
+</div>
+</div>
+<button class="w-full mt-4 bg-transparent border border-outline-variant text-on-surface font-data-mono text-data-mono py-2 hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                                Request Dossier
+                            </button>
+</div>
+</div>
+</div>
+<!-- Center/Right Column (Details & Cases) -->
+<div class="col-span-12 md:col-span-8 flex flex-col gap-lg">
+<!-- Top Data Row -->
+<div class="grid grid-cols-3 gap-4">
+<div class="war-room-border bg-surface-container p-4 rounded-sm">
+<span class="block font-label-caps text-label-caps text-on-surface-variant mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">school</span> Education
+                            </span>
+<div class="font-body-md text-body-md text-on-surface">J.D., Harvard Law School, '99</div>
+<div class="font-data-mono text-[11px] text-on-surface-variant mt-1">Magna Cum Laude</div>
+</div>
+<div class="war-room-border bg-surface-container p-4 rounded-sm">
+<span class="block font-label-caps text-label-caps text-on-surface-variant mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">business_center</span> Firm Affiliation
+                            </span>
+<div class="font-body-md text-body-md text-on-surface">Vance, Sterling &amp; Cross</div>
+<div class="font-data-mono text-[11px] text-on-surface-variant mt-1">Founding Partner</div>
+</div>
+<div class="war-room-border bg-surface-container p-4 rounded-sm relative overflow-hidden">
+<div class="absolute right-0 top-0 w-16 h-full bg-gradient-to-l from-primary/10 to-transparent"></div>
+<span class="block font-label-caps text-label-caps text-on-surface-variant mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">military_tech</span> Win Rate (Est.)
+                            </span>
+<div class="font-headline-md text-headline-md text-primary">87.4%</div>
+<div class="font-data-mono text-[11px] text-on-surface-variant mt-1">Based on 142 known civil trials</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

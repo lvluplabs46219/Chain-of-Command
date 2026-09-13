@@ -33,7 +33,6 @@
     "@sentry/profiling-node": "^10.70.0",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
-    "@vercel/analytics": "^2.0.1",
     "cors": "^2.8.5",
     "dotenv": "^17.4.2",
     "embla-carousel-autoplay": "^8.6.0",
@@ -61,8 +60,5 @@
     "supabase": "^2.115.0",
     "tsx": "^4.23.12",
     "typescript": "~5.9.3"
-  },
-  "overrides": {
-    "react-resizable-panels": "^2.1.0"
   }
 }
