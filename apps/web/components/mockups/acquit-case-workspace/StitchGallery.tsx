@@ -37,21 +37,21 @@ export default function StitchGallery() {
 
   if (selectedMockup) {
     return (
-      <div className="flex h-full flex-col bg-[#0A0A0A]">
-        <div className="flex items-center gap-4 border-b border-white/10 p-4">
+      <div className="flex h-full flex-col bg-[#141313]">
+        <div className="flex items-center gap-4 border-b border-[#44474a] p-4">
           <button 
             onClick={() => setSelectedMockup(null)}
-            className="text-xs font-bold tracking-widest text-[#D4AF37] hover:text-white"
+            className="text-xs font-bold tracking-widest text-[#D4AF37] hover:text-[#c5c6ca]"
           >
             ← BACK TO GALLERY
           </button>
-          <span className="text-sm font-semibold text-white/50">{formatName(selectedMockup)}</span>
+          <span className="text-sm font-semibold text-[#c5c6ca]">{formatName(selectedMockup)}</span>
         </div>
         <div className="flex-1 overflow-auto p-4 flex justify-center">
           <img 
             src={`/assets/stitch/${selectedMockup}/screen.png`} 
             alt={formatName(selectedMockup)}
-            className="max-w-full h-auto rounded-xl border border-white/10 shadow-2xl"
+            className="max-w-full h-auto rounded-xl border border-[#44474a] shadow-2xl"
           />
         </div>
       </div>
@@ -59,23 +59,15 @@ export default function StitchGallery() {
   }
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h2 className="text-2xl font-serif text-white">Stitch OS Design Gallery</h2>
-        <p className="mt-2 text-sm text-white/50">
-          Viewing {mockups.length} uploaded UI/UX mockups for the Acquit Legal Operating System.
-          <span className="text-[#D4AF37] text-xs ml-2">Click any mockup to view it live</span>
-        </p>
-      </div>
-
+    <div className="min-h-screen bg-[#141313] p-8">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {mockups.map((m) => (
           <div 
             key={m}
             onClick={() => router.push(`/stitch/${m}`)}
-            className="group cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-black/40 transition hover:border-[#D4AF37]/50 hover:bg-white/5"
+            className="group cursor-pointer overflow-hidden rounded-xl border border-[#44474a] bg-[#201f1f] transition hover:border-[#D4AF37] hover:bg-[#353435]"
           >
-            <div className="aspect-video w-full bg-white/5 p-2">
+            <div className="aspect-video w-full bg-[#1c1b1b] p-2">
               <img 
                 src={`/assets/stitch/${m}/screen.png`} 
                 alt={formatName(m)}
@@ -84,10 +76,10 @@ export default function StitchGallery() {
               />
             </div>
             <div className="p-4 flex items-center justify-between">
-              <span className="text-xs font-bold tracking-wider text-white/70 group-hover:text-[#D4AF37]">
+              <span className="text-xs font-bold tracking-wider text-[#c5c6ca] group-hover:text-[#D4AF37]">
                 {formatName(m)}
               </span>
-              <ChevronRight size={14} className="text-white/30 group-hover:text-[#D4AF37]" />
+              <ChevronRight size={14} className="text-[#8f9194] group-hover:text-[#D4AF37]" />
             </div>
           </div>
         ))}

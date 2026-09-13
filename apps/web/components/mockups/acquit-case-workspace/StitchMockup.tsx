@@ -76,7 +76,7 @@ export default function StitchMockup({ mockupName }: { mockupName: string }) {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#0A0A0A]">
+      <main className="flex min-h-screen items-center justify-center bg-[#141313]">
         <div className="text-center">
           <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-[#174E48] border-t-[#D4AF37]" />
           <p className="font-mono text-sm tracking-widest text-[#D4AF37]">LOADING STITCH MOCKUP...</p>
@@ -87,15 +87,15 @@ export default function StitchMockup({ mockupName }: { mockupName: string }) {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-[#0A0A0A] p-8 text-white">
+      <main className="min-h-screen bg-[#141313] p-8 text-[#c5c6ca]">
         <button
           onClick={() => router.back()}
-          className="mb-6 flex items-center gap-2 text-xs font-bold tracking-widest text-[#D4AF37] hover:text-white"
+          className="mb-6 flex items-center gap-2 text-xs font-bold tracking-widest text-[#D4AF37] hover:text-[#c5c6ca]"
         >
           ← BACK
         </button>
         <h1 className="mb-3 text-xl font-semibold text-[#D4AF37]">Mockup Load Error</h1>
-        <pre className="max-w-3xl whitespace-pre-wrap rounded-lg border border-white/10 bg-white/5 p-4 text-sm text-red-300">
+        <pre className="max-w-3xl whitespace-pre-wrap rounded-lg border border-[#44474a] bg-[#201f1f] p-4 text-sm text-[#ffb4ab]">
           {error}
         </pre>
       </main>
@@ -103,20 +103,20 @@ export default function StitchMockup({ mockupName }: { mockupName: string }) {
   }
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] p-4 md:p-6">
-      <div className="flex items-center gap-4 border-b border-white/10 pb-4 mb-6">
+    <main className="min-h-screen bg-[#141313] p-4 md:p-6">
+      <div className="flex items-center gap-4 border-b border-[#44474a] pb-4 mb-6">
         <button
           onClick={() => router.back()}
-          className="text-xs font-bold tracking-widest text-[#D4AF37] hover:text-white"
+          className="text-xs font-bold tracking-widest text-[#D4AF37] hover:text-[#c5c6ca]"
         >
           ← BACK
         </button>
-        <span className="text-sm font-semibold text-white/50">{formatName(mockupName || "")}</span>
+        <span className="text-sm font-semibold text-[#c5c6ca]">{formatName(mockupName || "")}</span>
       </div>
       <div className="flex-1 overflow-auto">
         <iframe
           srcDoc={htmlContent}
-          className="w-full h-full min-h-[calc(100vh-200px)] rounded-xl border border-white/10 shadow-2xl"
+          className="w-full h-full min-h-[calc(100vh-200px)] rounded-xl border border-[#44474a] shadow-2xl"
           title={formatName(mockupName || "")}
           sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
         />
