@@ -4,6 +4,6 @@
   "private": true,
   "main": "index.ts",
   "dependencies": {
-    "drizzle-orm": "^0.30.0"
+    "drizzle-orm": "^0.45.2"
   }
 }

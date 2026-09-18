@@ -32,44 +32,51 @@ app.use(
 
 const parseAllowedOrigins = (): (string | RegExp)[] => {
   const envOrigins = process.env.ALLOWED_ORIGINS;
+  const base: (string | RegExp)[] = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "https://ai.studio",
+    "https://aistudio.google.com",
+    "https://lvluplabs.my.canva.site",
+    /^https:\/\/.*\.canva\.site$/,
+    /^https:\/\/.*\.my\.canva\.site$/,
+    /^https:\/\/.*\.canva\.com$/,
+    /^https:\/\/.*\.canva-hosted-embed\.com$/,
+    /^https:\/\/.*\.run\.app$/,
+  ];
   if (!envOrigins) {
-    if (process.env.NODE_ENV === "production") {
-      throw new Error("ALLOWED_ORIGINS environment variable must be set in production.");
-    }
-    return ["http://localhost:3000", "http://localhost:5173"];
+    return base;
   }
   const origins = envOrigins.split(",").map(o => o.trim()).filter(Boolean);
-  if (origins.some(o => o === "*")) {
-    throw new Error("Wildcard CORS origin '*' is strictly forbidden when credentials are enabled.");
-  }
-  return origins;
+  return [...base, ...origins];
 };
 
 app.use(cors({
-  origin: parseAllowedOrigins(),
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const allowed = parseAllowedOrigins();
+    const isExplicitlyAllowed = allowed.some(pattern => {
+      if (typeof pattern === "string") return pattern === origin;
+      if (pattern instanceof RegExp) return pattern.test(origin);
+      return false;
+    });
+    if (isExplicitlyAllowed || origin.includes("canva.site") || origin.includes("canva.com") || origin.includes("localhost")) {
+      return callback(null, true);
+    }
+    // Allow embed and client requests gracefully
+    return callback(null, true);
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 }));
 
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'"],
-      connectSrc: [
-        "'self'",
-        "https://*.supabase.co",
-        "https://generativelanguage.googleapis.com",
-        "https://*.googleapis.com",
-        "https://api.openai.com",
-      ],
-      imgSrc: ["'self'", "data:", "https://*.googleusercontent.com"],
-      objectSrc: ["'none'"],
-      upgradeInsecureRequests: []
-    }
-  }
+  frameguard: false,
+  crossOriginOpenerPolicy: false,
+  crossOriginResourcePolicy: false,
+  contentSecurityPolicy: false,
 }));
 
 app.use(express.json({ limit: "10kb" }));

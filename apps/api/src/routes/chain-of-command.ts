@@ -371,7 +371,7 @@ router.get('/chains/:chainId/metadata', async (req, res) => {
 router.post('/verify', async (req, res) => {
   try {
     const body = VerifyChainSchema.parse(req.body);
-    const requestedBy = req.user?.id || 'anonymous';
+    const requestedBy = (req as any).user?.id || 'anonymous';
     
     const chain = new SupabaseChainOfCommand({ signingSecret: CHAIN_SIGNING_SECRET });
     
@@ -405,7 +405,7 @@ router.post('/verify', async (req, res) => {
 router.get('/verify/:chainId', async (req, res) => {
   try {
     const { chainId } = req.params;
-    const requestedBy = req.user?.id || 'anonymous';
+    const requestedBy = (req as any).user?.id || 'anonymous';
     
     const chain = new SupabaseChainOfCommand({ signingSecret: CHAIN_SIGNING_SECRET });
     

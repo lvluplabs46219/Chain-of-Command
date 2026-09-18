@@ -8,7 +8,11 @@ import sys
 import json
 import argparse
 from datetime import datetime
-from datasets import load_dataset
+
+try:
+    from datasets import load_dataset
+except ImportError:
+    load_dataset = None
 
 try:
     import psycopg2
@@ -16,14 +20,44 @@ try:
 except ImportError:
     psycopg2 = None
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
-if not DATABASE_URL:
-    print("Warning: DATABASE_URL environment variable is not set.")
+def get_database_url():
+    url = os.environ.get("DATABASE_URL")
+    if url:
+        return url
+    root_env = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
+    if os.path.exists(root_env):
+        with open(root_env, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith("DATABASE_URL="):
+                    val = line.split("=", 1)[1].strip()
+                    if (val.startswith('"') and val.endswith('"')) or (val.startswith("'") and val.endswith("'")):
+                        val = val[1:-1]
+                    return val
+    return None
+
+DATABASE_URL = get_database_url()
+
+def check_dependencies(needs_db=False):
+    missing = []
+    if load_dataset is None:
+        missing.append("datasets")
+    if needs_db and psycopg2 is None:
+        missing.append("psycopg2-binary")
+    
+    if missing:
+        print("[-] Required Python package(s) missing:")
+        for pkg in missing:
+            print(f"    - {pkg}")
+        print(f"\n[!] Please install them using pip:\n    pip install {' '.join(missing)}\n")
+        sys.exit(1)
 
 def preview_dataset(limit=5, jurisdiction=None, court=None):
     """
     Stream and preview records from harvard-lil/cold-cases without downloading the entire multi-gigabyte dataset.
     """
+    check_dependencies(needs_db=False)
+
     print("=" * 70)
     print("  HARVARD LIL 'COLD CASES' DATASET EXPLORER")
     print("=" * 70)
@@ -77,12 +111,15 @@ def preview_dataset(limit=5, jurisdiction=None, court=None):
     print(f"[+] Preview complete ({count} cases inspected).")
     print("=" * 70)
 
+
 def ingest_to_postgres(limit=10, jurisdiction=None):
     """
     Ingest streaming records from harvard-lil/cold-cases into Supabase PostgreSQL.
     """
-    if not psycopg2:
-        print("[-] psycopg2 is required for database ingestion.")
+    check_dependencies(needs_db=True)
+    
+    if not DATABASE_URL:
+        print("[-] DATABASE_URL is not set. Please set it in your environment or .env file.")
         sys.exit(1)
 
     print("=" * 70)
@@ -171,6 +208,7 @@ def ingest_to_postgres(limit=10, jurisdiction=None):
     print("\n" + "=" * 70)
     print(f"[+] Successfully ingested {count} cases from Harvard LIL dataset into database.")
     print("=" * 70)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Harvard LIL Cold Cases Dataset Utility")

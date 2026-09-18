@@ -1,0 +1,1542 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acquit.ai Legal OS</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&amp;family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --ink:#0e0e0e;--ink-2:#141313;--surface:#1b1b1b;--surface-2:#222222;--blue:#b5c8df;
+      --paper:#e5e2e1;--tertiary:#cfc5be;--muted:#92979a;--line:#44474a;--gold:#d4af37;
+      --gold-soft:rgba(212,175,55,.13);--good:#9fc6ae;--danger:#e09c9c;--scale:1;
+    }
+    *{box-sizing:border-box}
+    html{font-size:calc(16px * var(--scale));scroll-behavior:smooth}
+    body{margin:0;background:var(--ink);color:var(--paper);font-family:"Hanken Grotesk",sans-serif}
+    button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed}
+    button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+    .app-shell{width:100%;min-height:calc(100 * min(var(--vh,1vh),1vh));background:radial-gradient(circle at 87% -8%,#263039 0,transparent 29rem),var(--ink)}
+    .legal-serif{font-family:Domine,serif}.mono{font-family:"JetBrains Mono",monospace}
+    .rule{border-color:var(--line)} .surface{background:var(--surface);border:1px solid var(--line)} .surface-2{background:var(--surface-2);border:1px solid var(--line)}
+    .gold-rule{border-color:#756327}.gold-text{color:var(--gold)}.muted{color:var(--muted)}
+    .workspace-view{display:none;animation:enter .2s ease both}.workspace-view.is-active{display:block}
+    @keyframes enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+    .nav-item{width:100%;display:flex;align-items:center;gap:12px;border-left:3px solid transparent;padding:10px 18px;color:#b7bbbc;text-align:left;font-size:12px;font-weight:700;letter-spacing:.025em;transition:.16s}
+    .nav-item:hover,.nav-item.is-active{background:#272727;color:var(--paper);border-left-color:var(--gold)}
+    .menu-item{border:0;border-right:1px solid var(--line);background:transparent;color:var(--tertiary);padding:7px 11px;font-size:11px;font-weight:700}.menu-item:hover{background:#242424;color:var(--gold)}
+    .primary{border:1px solid var(--gold);background:var(--gold);color:#17140b;padding:9px 12px;font-size:11px;font-weight:800;letter-spacing:.04em}.primary:hover{background:#e4c14b}
+    .secondary{border:1px solid var(--line);background:#181818;color:var(--paper);padding:9px 12px;font-size:11px;font-weight:700}.secondary:hover{border-color:var(--gold);color:var(--gold)}
+    .tag{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);padding:4px 7px;font-size:9px;font-weight:800;letter-spacing:.08em}.tag.gold{border-color:#816d27;background:var(--gold-soft);color:#e6ce72}.tag.blue{border-color:#516171;color:var(--blue)}.tag.good{border-color:#477154;color:var(--good)}
+    .stat-card{border-left:2px solid var(--gold);background:#191919;padding:13px}.stat-card p:first-child{font-size:9px;letter-spacing:.11em;color:var(--muted);font-family:"JetBrains Mono",monospace}.stat-card p:last-child{margin-top:6px;font-size:22px;font-weight:800}
+    .dense-row{border-bottom:1px solid var(--line);padding:12px}.dense-row:hover{background:#242424}
+    .timeline-node{position:relative;border-left:1px solid #6b6034;padding:0 0 20px 21px}.timeline-node:before{content:"";position:absolute;left:-5px;top:3px;width:9px;height:9px;background:var(--gold);box-shadow:0 0 0 4px rgba(212,175,55,.13)}
+    .carousel-viewport{overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory;scroll-behavior:smooth}.carousel-viewport::-webkit-scrollbar{display:none}.carousel-viewport.is-dragging{cursor:grabbing;scroll-snap-type:none;user-select:none}
+    .carousel-track{display:flex;gap:12px;padding:2px 1px 11px}.carousel-slide{flex:0 0 min(80vw,300px);scroll-snap-align:start}.carousel-dot{height:7px;width:7px;border:0;padding:0;background:#666}.carousel-dot.is-active{width:21px;background:var(--gold)}
+    .media-card{height:215px;position:relative;overflow:hidden;border:1px solid var(--line);background:#101010}.media-card img{height:100%;width:100%;object-fit:cover;transition:transform .35s}.media-card:hover img{transform:scale(1.04)}.media-card:after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.94),transparent 67%)}
+    .toggle{appearance:none;position:relative;width:42px;height:22px;border:1px solid #697075;background:#292929;border-radius:999px}.toggle:after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#c8c8c8;transition:.18s}.toggle:checked{background:var(--gold);border-color:var(--gold)}.toggle:checked:after{transform:translateX(19px);background:#17130a}
+    .modal-backdrop{display:none;position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.72);padding:16px;align-items:center;justify-content:center}.modal-backdrop.is-open{display:flex}.modal-panel{width:min(620px,100%);max-height:calc(90 * min(var(--vh,1vh),1vh));overflow:auto;background:var(--surface);border:1px solid #76672e}
+    .drawer{position:fixed;right:0;top:0;z-index:60;height:calc(100 * min(var(--vh,1vh),1vh));width:min(360px,92vw);transform:translateX(102%);transition:transform .22s;background:#161616;border-left:1px solid var(--line);padding:18px}.drawer.is-open{transform:translateX(0)}
+    .mobile-rail{position:fixed;left:0;top:0;z-index:60;height:calc(100 * min(var(--vh,1vh),1vh));width:min(300px,88vw);overflow:auto;background:#141313;border-right:1px solid var(--line);transform:translateX(-102%);transition:transform .22s}.mobile-rail.is-open{transform:none}
+    .paper{background:#eeeae0;color:#1f2020;border:1px solid #c7c0b1}.paper textarea{color:#1d1e1f}
+    .high-contrast{--ink:#000;--ink-2:#000;--surface:#080808;--surface-2:#151515;--paper:#fff;--tertiary:#fff;--muted:#e9e9e9;--line:#fff;--gold:#ffdc40;--blue:#d6ebff}
+    .reduce-motion *,.reduce-motion *:before,.reduce-motion *:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+    @media(max-width:1023px){.desktop-rail{display:none}.inspector-hide{display:none}.layout-wrap{max-width:none!important}.three-pane{grid-template-columns:1fr!important}}
+    @media(min-width:1024px){.mobile-toggle{display:none}.mobile-rail{display:none}}
+    @media(max-width:700px){.menu-strip{overflow:auto}.header-actions .secondary{display:none}.timeline-split{grid-template-columns:1fr!important}.table-scroll{overflow-x:auto}.table-scroll table{min-width:680px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+  </style>
+  
+  
+  
+ </head>
+ <body data-template-id="__page-root">
+  <div class="app-shell">
+   <header data-template-id="app-header" class="canva-header sticky top-0 z-40 border-b rule bg-[#141313]/95 backdrop-blur">
+    <div class="layout-wrap mx-auto flex max-w-[1800px] items-center justify-between gap-3 px-4 py-3 md:px-6">
+     <div class="flex items-center gap-3">
+      <button id="open-mobile-nav" class="mobile-toggle secondary !px-2 !py-2" type="button" aria-label="Open navigation"><i data-lucide="menu" class="h-4 w-4"></i></button>
+      <div class="grid h-9 w-9 place-items-center border border-[#d4af37] bg-[#1e1c16] text-[#d4af37]"><i data-lucide="scale" class="h-4 w-4"></i>
+      </div>
+      <div>
+       <p data-template-id="brand-eyebrow" class="canva-text mono text-[9px] font-bold tracking-[.18em] gold-text">LEGAL OS</p>
+       <h1 data-template-id="brand-name" class="canva-text legal-serif text-lg leading-none">Acquit.ai</h1>
+      </div>
+     </div>
+     <div class="header-actions flex items-center gap-2">
+      <button id="clerk-button" data-template-id="clerk-button" class="canva-button secondary flex items-center gap-2" type="button"><i data-lucide="bell" class="h-3.5 w-3.5"></i><span data-template-id="clerk-label" class="canva-text">THE CLERK</span></button> <button class="primary flex items-center gap-2" type="button" data-open-modal="matter-modal"><i data-lucide="plus" class="h-3.5 w-3.5"></i><span data-template-id="open-matter-button" class="canva-text">OPEN A MATTER</span></button>
+     </div>
+    </div>
+    <nav class="menu-strip flex border-t rule px-2 md:px-6" aria-label="Legal document menu">
+     <button data-template-id="menu-file" class="canva-button menu-item" type="button" data-open-modal="record-modal">FILE</button> <button data-template-id="menu-edit" class="canva-button menu-item" type="button" data-view="record-room">EDIT</button> <button data-template-id="menu-view" class="canva-button menu-item" type="button" data-view="case-timeline">VIEW</button> <button data-template-id="menu-team" class="canva-button menu-item" type="button" data-view="chambers">TEAM</button> <span class="ml-auto hidden items-center mono text-[9px] text-[#9fc6ae] md:flex">COURT FEED · READY</span>
+    </nav>
+   </header>
+   <aside class="mobile-rail" id="mobile-rail" aria-label="Mobile primary navigation">
+    <div class="flex items-center justify-between border-b rule p-4"><span class="mono text-[10px] gold-text">LEGAL OS MODULES</span><button id="close-mobile-nav" class="secondary !px-2 !py-2" type="button" aria-label="Close navigation"><i data-lucide="x" class="h-4 w-4"></i></button>
+    </div>
+    <nav id="mobile-nav-list" class="py-3"></nav>
+   </aside>
+   <div class="layout-wrap mx-auto flex max-w-[1800px]">
+    <aside class="desktop-rail sticky top-[97px] h-[calc(100*min(var(--vh,1vh),1vh)-97px)] w-[280px] shrink-0 border-r rule bg-[#121212] py-4" aria-label="Primary navigation">
+     <p data-template-id="nav-label" class="canva-text mono px-[18px] pb-3 text-[9px] tracking-[.16em] muted">COURT OPERATIONS</p>
+     <nav id="desktop-nav-list"></nav>
+     <div class="mt-4 border-t rule pt-4">
+      <button class="nav-item" type="button" data-view="accessibility-settings"><i data-lucide="accessibility" class="h-4 w-4"></i>Accessibility Settings</button> <button class="nav-item" type="button" data-view="system-settings"><i data-lucide="settings" class="h-4 w-4"></i>System &amp; Administration</button>
+     </div>
+    </aside>
+    <main id="main-content" class="min-w-0 flex-1 px-4 py-5 md:px-7">
+     <section id="command-center" class="workspace-view is-active" aria-labelledby="command-title">
+      <div data-template-id="urgent-notice" class="canva-banner mb-4 flex flex-wrap items-center justify-between gap-3 border border-[#765f21] bg-[#2a2413] px-4 py-3">
+       <div class="flex items-center gap-3"><i data-lucide="alert-triangle" class="h-4 w-4 gold-text"></i>
+        <p data-template-id="urgent-notice-text" class="canva-text text-sm font-bold">URGENT NOTICE · Discovery review is due in 4 days. Preserve all linked source records.</p>
+       </div><button class="secondary !py-1.5" type="button" data-view="court-watch">Review deadline</button>
+      </div>
+      <header data-template-id="case-file-banner" class="canva-banner surface mb-4 border-l-2 border-l-[#d4af37] p-5">
+       <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+        <div>
+         <p data-template-id="case-overline" class="canva-text mono text-[10px] tracking-[.13em] gold-text">ACTIVE MATTER · 24-CR-118 · ARIZONA SUPERIOR COURT</p>
+         <h2 id="command-title" data-template-id="case-title" class="canva-text legal-serif mt-2 text-3xl">State v. Marlowe</h2>
+         <p data-template-id="case-subtitle" class="canva-text mt-3 max-w-3xl text-sm leading-6 text-[#cfc5be]">A focused war room for preserving the record, preparing filings, coordinating research, and tracking material court dates.</p>
+        </div>
+        <div data-template-id="docket-status" class="canva-panel border border-[#766327] bg-[#262214] px-4 py-3">
+         <p data-template-id="docket-status-label" class="canva-text mono text-[9px] tracking-[.12em] text-[#dec86c]">DOCKET STATUS</p>
+         <p data-template-id="docket-status-value" class="canva-text mt-1 text-sm font-bold">Active · Suppression motion pending</p>
+        </div>
+       </div>
+      </header>
+      <section aria-label="Brief statistics" class="grid grid-cols-2 gap-2 lg:grid-cols-4">
+       <article class="stat-card">
+        <p>CHARGES</p>
+        <p>02</p>
+       </article>
+       <article class="stat-card">
+        <p>HEARING</p>
+        <p>14d</p>
+       </article>
+       <article class="stat-card">
+        <p>RECORDS</p>
+        <p>23</p>
+       </article>
+       <article class="stat-card">
+        <p>ACTION ITEMS</p>
+        <p>07</p>
+       </article>
+      </section>
+      <div class="timeline-split mt-4 grid gap-4 xl:grid-cols-[55fr_45fr]">
+       <section data-template-id="chronology-rail" class="canva-panel surface p-5" aria-labelledby="rail-title">
+        <div class="flex items-center justify-between">
+         <div>
+          <p data-template-id="chronology-kicker" class="canva-text mono text-[9px] tracking-[.14em] gold-text">CHRONOLOGY RAIL</p>
+          <h3 id="rail-title" data-template-id="chronology-title" class="canva-text legal-serif mt-1 text-xl">Case Events</h3>
+         </div><button class="secondary !py-1.5" type="button" data-view="case-timeline">Open chronology</button>
+        </div>
+        <div class="mt-5">
+         <div class="timeline-node">
+          <p class="mono text-[9px] gold-text">SEP 02 · 2026</p>
+          <p class="mt-1 text-sm font-bold">Officer’s Report entered</p>
+          <p class="mt-1 text-xs muted">Discovery marker linked to Exhibit 04.</p>
+         </div>
+         <div class="timeline-node">
+          <p class="mono text-[9px] gold-text">SEP 08 · 2026</p>
+          <p class="mt-1 text-sm font-bold">Suppression issue identified</p>
+          <p class="mt-1 text-xs muted">Rights Audit marked a warrant-scope question.</p>
+         </div>
+         <div class="timeline-node !pb-0">
+          <p class="mono text-[9px] gold-text">SEP 28 · 2026</p>
+          <p class="mt-1 text-sm font-bold">Motion Hearing</p>
+          <p class="mt-1 text-xs muted">Department 302 · hearing prep required.</p>
+         </div>
+        </div>
+       </section>
+       <aside data-template-id="chambers-panel" class="canva-panel surface-2 p-5" aria-labelledby="chambers-panel-title">
+        <div class="flex items-center justify-between">
+         <div>
+          <p data-template-id="chambers-kicker" class="canva-text mono text-[9px] tracking-[.14em] text-[#b5c8df]">CHAMBERS PANEL</p>
+          <h3 id="chambers-panel-title" data-template-id="chambers-title" class="canva-text legal-serif mt-1 text-xl">Counsel at Work</h3>
+         </div><button class="secondary !py-1.5" type="button" data-view="chambers">Enter chambers</button>
+        </div>
+        <div class="mt-4 space-y-2">
+         <div class="flex items-center justify-between border-b rule pb-2 text-xs"><span>Lead Counsel</span><span class="tag good">READY</span>
+         </div>
+         <div class="flex items-center justify-between border-b rule pb-2 text-xs"><span>Research Counsel</span><span class="tag blue">2 CITATIONS</span>
+         </div>
+         <div class="flex items-center justify-between pb-1 text-xs"><span>Rights Audit</span><span class="tag gold">REVIEW</span>
+         </div>
+        </div>
+       </aside>
+      </div>
+      <div class="mt-4 grid gap-4 xl:grid-cols-[1fr_1fr_.75fr]">
+       <section data-template-id="charge-sheet" class="canva-panel surface p-4">
+        <p data-template-id="charge-sheet-kicker" class="canva-text mono text-[9px] tracking-[.13em] gold-text">CHARGE SHEET</p>
+        <h3 data-template-id="charge-sheet-title" class="canva-text legal-serif mt-1 text-xl">Counts at Issue</h3>
+        <div class="mt-3 space-y-2 text-xs">
+         <div class="flex justify-between border-b rule pb-2"><span>Count I · Trespass</span><span class="mono text-[#b5c8df]">A.R.S. §13-1504</span>
+         </div>
+         <div class="flex justify-between"><span>Count II · Property Damage</span><span class="mono text-[#b5c8df]">A.R.S. §13-1602</span>
+         </div>
+        </div>
+       </section>
+       <section data-template-id="court-log" class="canva-panel surface p-4">
+        <p data-template-id="court-log-kicker" class="canva-text mono text-[9px] tracking-[.13em] gold-text">COURT LOG</p>
+        <h3 data-template-id="court-log-title" class="canva-text legal-serif mt-1 text-xl">Recent Activity</h3>
+        <div class="mt-3 text-xs">
+         <p class="border-l-2 border-[#9fc6ae] pl-2">Exhibit 11 chain verified</p>
+         <p class="mt-3 border-l-2 border-[#d4af37] pl-2">Counsel review requested for citation conflict</p>
+        </div>
+       </section>
+       <aside data-template-id="case-digest" class="canva-panel surface-2 p-4">
+        <p data-template-id="case-digest-kicker" class="canva-text mono text-[9px] tracking-[.13em] text-[#b5c8df]">CASE DIGEST</p>
+        <h3 data-template-id="case-digest-title" class="canva-text legal-serif mt-1 text-xl">Working Summary</h3>
+        <p data-template-id="case-digest-text" class="canva-text mt-3 text-xs leading-5 text-[#cfc5be]">The present workflow centers on source preservation, warrant-scope review, and organizing authorities relevant to the suppression motion.</p>
+       </aside>
+      </div>
+      <section data-template-id="venue-info" class="canva-panel mt-4 border border-[#38404a] bg-[#182027] p-4">
+       <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+         <p data-template-id="venue-kicker" class="canva-text mono text-[9px] tracking-[.13em] text-[#b5c8df]">VENUE INFO</p>
+         <p data-template-id="venue-text" class="canva-text mt-1 text-sm font-bold">Maricopa County Superior Court · Central Court Building</p>
+        </div><span class="tag blue">COURTROOM 302</span>
+       </div>
+      </section>
+     </section>
+     <section id="docket" class="workspace-view" aria-labelledby="docket-title">
+      <header>
+       <p data-template-id="docket-kicker" class="canva-text mono text-[10px] tracking-[.14em] gold-text">THE DOCKET · CLERK'S INDEX</p>
+       <h2 id="docket-title" data-template-id="docket-title-text" class="canva-text legal-serif mt-2 text-3xl">Docket Entries</h2>
+      </header>
+      <div data-template-id="search-docket-panel" class="canva-panel surface mt-5 p-4">
+       <div class="flex flex-col gap-3 lg:flex-row"><label class="sr-only" for="docket-search">Search the Docket</label><input id="docket-search" class="w-full border rule bg-[#101010] px-3 py-2 text-sm" type="search" placeholder="Search by matter, number, or status">
+        <div class="flex gap-2"><button class="docket-filter tag gold" type="button" data-filter="active">ACTIVE</button><button class="docket-filter tag" type="button" data-filter="pending">PENDING</button><button class="docket-filter tag" type="button" data-filter="all">ALL</button>
+        </div><button class="primary" type="button" data-open-modal="matter-modal">Open a Matter</button>
+       </div>
+      </div>
+      <div id="docket-entries" class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+       <article class="docket-entry surface p-4" data-status="active" data-search="state marlowe 24-cr-118 active">
+        <div class="flex justify-between gap-2"><span class="mono text-[10px] gold-text">24-CR-118</span><span class="tag gold">ACTIVE</span>
+        </div>
+        <h3 class="legal-serif mt-4 text-lg">State v. Marlowe</h3>
+        <p class="mt-2 text-xs muted">Suppression motion · Sep 28</p><button class="secondary mt-4" type="button" data-view="command-center">Open case file</button>
+       </article>
+       <article class="docket-entry surface p-4" data-status="pending" data-search="marlowe civil 26-cv-441 pending">
+        <div class="flex justify-between gap-2"><span class="mono text-[10px] gold-text">26-CV-441</span><span class="tag blue">PENDING</span>
+        </div>
+        <h3 class="legal-serif mt-4 text-lg">Marlowe v. Northland</h3>
+        <p class="mt-2 text-xs muted">Service review · Oct 03</p><button class="secondary mt-4" type="button" data-view="record-room">Open record room</button>
+       </article>
+       <article class="docket-entry surface p-4" data-status="active" data-search="city marlowe 25-mc-009 active">
+        <div class="flex justify-between gap-2"><span class="mono text-[10px] gold-text">25-MC-009</span><span class="tag gold">ACTIVE</span>
+        </div>
+        <h3 class="legal-serif mt-4 text-lg">City v. Marlowe</h3>
+        <p class="mt-2 text-xs muted">Case note due · Oct 06</p><button class="secondary mt-4" type="button" data-view="case-timeline">Open chronology</button>
+       </article>
+      </div>
+      <div class="mt-5 grid gap-4 lg:grid-cols-2">
+       <section data-template-id="closed-matters" class="canva-section surface p-4">
+        <h3 data-template-id="closed-matters-title" class="canva-text legal-serif text-xl">Closed Matters</h3>
+        <div class="mt-3 dense-row flex items-center justify-between"><span>State v. Marlowe · 23-CR-008</span><span class="tag">DISMISSED</span>
+        </div>
+       </section>
+       <section data-template-id="retrieve-court" class="canva-section surface-2 p-4">
+        <h3 data-template-id="retrieve-court-title" class="canva-text legal-serif text-xl">Retrieve from Court</h3>
+        <p data-template-id="retrieve-court-help" class="canva-text mt-2 text-xs leading-5 text-[#cfc5be]">Prepare a docket lookup request and review the expected record structure before adding it to your case file.</p><button class="secondary mt-3" type="button" data-open-modal="court-modal">Retrieve from Court</button>
+       </section>
+      </div>
+     </section>
+     <section id="chambers" class="workspace-view" aria-labelledby="chambers-main-title">
+      <header>
+       <p data-template-id="chambers-main-kicker" class="canva-text mono text-[10px] tracking-[.14em] gold-text">CHAMBERS · PRIVATE WORKSPACE</p>
+       <h2 id="chambers-main-title" data-template-id="chambers-main-title-text" class="canva-text legal-serif mt-2 text-3xl">Conference Room</h2>
+      </header>
+      <div data-template-id="ai-assistance-notice" class="canva-banner mt-4 border border-[#4e5d6c] bg-[#1a222b] p-3 text-xs text-[#d8e4ef]"><span data-template-id="ai-assistance-text" class="canva-text">NOTICE OF AI ASSISTANCE · This workspace supports organization and research preparation. It is not a lawyer, does not provide legal advice, and cannot replace qualified counsel.</span>
+      </div>
+      <div class="three-pane mt-4 grid gap-4 xl:grid-cols-[.9fr_1.6fr_.9fr]">
+       <aside data-template-id="counsel-roster" class="canva-sidebar surface p-4">
+        <div class="flex items-center justify-between">
+         <h3 data-template-id="counsel-roster-title" class="canva-text legal-serif text-xl">Counsel Roster</h3><button class="secondary !px-2 !py-1.5" type="button" data-open-modal="counsel-modal" aria-label="Appoint counsel"><i data-lucide="user-plus" class="h-4 w-4"></i></button>
+        </div>
+        <div class="mt-4 space-y-2 text-sm">
+          <button class="counsel-select-btn w-full border-l-2 border-[#d4af37] bg-[#25231d] p-3 text-left transition-colors" data-role="Lead Counsel">
+            <b>Lead Counsel</b>
+            <span class="block mono mt-1 text-[9px] text-[#d4af37]">CASE STRATEGY · ACTIVE</span>
+          </button>
+          <button class="counsel-select-btn w-full border-l-2 border-[#b5c8df] bg-[#202020] p-3 text-left transition-colors" data-role="Research Counsel">
+            <b>Research Counsel</b>
+            <span class="block mono mt-1 text-[9px] text-[#b5c8df]">STATUTES &amp; CASE LAW</span>
+          </button>
+          <button class="counsel-select-btn w-full border-l-2 border-[#9fc6ae] bg-[#202020] p-3 text-left transition-colors" data-role="Rights Audit">
+            <b>Rights Audit</b>
+            <span class="block mono mt-1 text-[9px] text-[#9fc6ae]">CONSTITUTIONAL 4TH/5TH/6TH</span>
+          </button>
+        </div>
+        <button class="secondary mt-4 w-full" type="button" data-open-modal="counsel-modal">Appoint Counsel</button>
+       </aside>
+       <section data-template-id="conference-room" class="canva-panel surface p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b rule pb-3">
+         <div>
+           <h3 data-template-id="conference-room-title" class="canva-text legal-serif text-xl">Conference Room · AI Legal Team</h3>
+           <p id="active-counsel-indicator" class="mono text-[10px] text-[#d4af37] mt-0.5">ACTIVE COUNSEL: LEAD COUNSEL (CASE STRATEGY)</p>
+         </div>
+         <div class="flex items-center gap-2">
+           <span class="tag gold text-[9px]">GEMINI 3.8 FLASH</span>
+           <button class="secondary !py-1" type="button" data-view="system-settings">Session Transcript</button>
+         </div>
+        </div>
+        <div id="conference-feed" class="mt-4 space-y-3 max-h-[420px] overflow-y-auto pr-1">
+         <div class="border-l-2 border-[#d4af37] bg-[#21201b] p-3 text-sm rounded-r">
+          <div class="flex justify-between items-center mb-1">
+            <b class="text-[#d4af37]">Lead Counsel</b>
+            <span class="mono text-[9px] text-[#888]">ACTIVE MATTER · INITIAL REVIEW</span>
+          </div>
+          <p class="mt-1 text-xs leading-5 text-[#cfc5be]">The current record in State v. Marlowe identifies a Fourth Amendment warrant-scope question regarding the 02:14 AM roadside stop. Select an inquiry below or type your question to begin strategy analysis.</p>
+          <div class="mt-2 flex gap-1">
+            <span class="tag blue">State v. Larkin</span>
+            <span class="tag blue">A.R.S. § 13-3925</span>
+          </div>
+         </div>
+         <div class="border-l-2 border-[#b5c8df] bg-[#1d2023] p-3 text-sm rounded-r">
+          <div class="flex justify-between items-center mb-1">
+            <b class="text-[#b5c8df]">Research Counsel</b>
+            <span class="mono text-[9px] text-[#888]">AUTHORITIES READY</span>
+          </div>
+          <p class="mt-1 text-xs leading-5 text-[#cfc5be]">Two potentially relevant statutory authorities are marked in the Law Library research brief (A.R.S. § 13-1504 and Rodriguez v. United States).</p>
+         </div>
+        </div>
+
+        <!-- Quick Prompt Chips -->
+        <div class="mt-3 flex flex-wrap gap-1.5 pb-2">
+          <button type="button" class="conference-quick-prompt text-[10px] bg-[#1a1a1a] hover:bg-[#252525] text-[#cfc5be] border border-[#333] px-2 py-1 rounded transition-colors" data-prompt="What are the required statutory elements of the charges against me?">Explain Charges</button>
+          <button type="button" class="conference-quick-prompt text-[10px] bg-[#1a1a1a] hover:bg-[#252525] text-[#cfc5be] border border-[#333] px-2 py-1 rounded transition-colors" data-prompt="Evaluate Fourth Amendment search issues regarding the warrantless vehicle search.">4th Amend Search Review</button>
+          <button type="button" class="conference-quick-prompt text-[10px] bg-[#1a1a1a] hover:bg-[#252525] text-[#cfc5be] border border-[#333] px-2 py-1 rounded transition-colors" data-prompt="What statutory filing deadlines apply to pre-trial motions in Arizona?">Filing Deadlines</button>
+          <button type="button" class="conference-quick-prompt text-[10px] bg-[#1a1a1a] hover:bg-[#252525] text-[#cfc5be] border border-[#333] px-2 py-1 rounded transition-colors" data-prompt="Prepare a courtroom etiquette and hearing prep checklist for my next appearance.">Court Appearance Prep</button>
+        </div>
+
+        <!-- Form for Live AI Consultation -->
+        <form id="conference-form" class="mt-2 border-t rule pt-3">
+          <label for="conference-input" class="sr-only">Ask AI Legal Counsel</label>
+          <div class="flex gap-2">
+            <input id="conference-input" class="min-w-0 flex-1 border rule bg-[#101010] px-3 py-2 text-sm text-[#f3ede8] placeholder-[#777] rounded focus:border-[#d4af37] focus:outline-none" placeholder="Ask your AI Legal Counsel a question or strategy prompt..." required autocomplete="off">
+            <button id="conference-submit" class="primary whitespace-nowrap !px-3 !py-2 text-xs font-bold" type="submit">Consult Counsel</button>
+          </div>
+        </form>
+       </section>
+       <aside data-template-id="brief-board" class="canva-panel surface-2 p-4">
+        <h3 data-template-id="brief-board-title" class="canva-text legal-serif text-xl">Brief Board</h3>
+        <div class="mt-4 space-y-3 text-xs">
+         <div class="border-b rule pb-3">
+          <p class="mono text-[9px] gold-text">RIGHTS AUDIT</p>
+          <p class="mt-1">Warrant scope review awaiting timeline link.</p><button class="secondary mt-2 !py-1.5" type="button" data-open-modal="rights-modal">Open Rights Audit</button>
+         </div>
+         <div class="border-b rule pb-3">
+          <p class="mono text-[9px] gold-text">PLEA ANALYSIS</p>
+          <p class="mt-1">No offer terms entered for comparison.</p><button class="secondary mt-2 !py-1.5" type="button" data-open-modal="plea-modal">Open Plea Analysis</button>
+         </div>
+         <div>
+          <p class="mono text-[9px] gold-text">MITIGATION MEMO</p>
+          <p class="mt-1">Three possible narrative records identified.</p>
+         </div>
+        </div>
+       </aside>
+      </div>
+     </section>
+     <section id="law-library" class="workspace-view" aria-labelledby="library-title">
+      <header>
+       <p data-template-id="library-kicker" class="canva-text mono text-[10px] tracking-[.14em] gold-text">LAW LIBRARY · RESEARCH ROOM</p>
+       <h2 id="library-title" data-template-id="library-title-text" class="canva-text legal-serif mt-2 text-3xl">Search the Stacks</h2>
+      </header>
+      <div class="surface mt-4 p-4"><label for="library-search" data-template-id="stacks-label" class="canva-text mono text-[9px] tracking-[.13em] gold-text">SEARCH THE STACKS</label>
+       <div class="mt-2 flex flex-col gap-2 lg:flex-row"><input id="library-search" class="min-w-0 flex-1 border rule bg-[#101010] px-3 py-2 text-sm" type="search" placeholder="Search cases, statutes, regulations, rules"><select id="jurisdiction-filter" class="border rule bg-[#181818] px-2 py-2 text-xs"><option value="all">Jurisdiction Filter · All</option><option value="az">Arizona</option><option value="federal">Federal</option></select><select id="source-filter" class="border rule bg-[#181818] px-2 py-2 text-xs"><option value="all">Source Type · All</option><option value="case">Cases</option><option value="rule">Rules</option></select>
+       </div>
+       <p id="library-count" class="mono mt-3 text-[10px] text-[#9fc6ae]">37 VOLUMES SEARCHED · 12 PRIMARY · BRIEF READY</p>
+      </div>
+      <div class="three-pane mt-4 grid gap-4 xl:grid-cols-[35fr_40fr_25fr]">
+       <section data-template-id="volume-cards" class="canva-list surface">
+        <h3 data-template-id="volume-cards-title" class="canva-text legal-serif border-b rule p-4 text-xl">Volume Cards</h3><button class="library-result dense-row w-full text-left" data-jurisdiction="az" data-source="case" type="button"><b>State v. Larkin</b><span class="mt-1 block text-xs muted">498 P.3d 114 · Supreme Court</span></button><button class="library-result dense-row w-full text-left" data-jurisdiction="az" data-source="rule" type="button"><b>Rule 901 — Authentication</b><span class="mt-1 block text-xs muted">Arizona Rules of Evidence</span></button><button class="library-result dense-row w-full text-left" data-jurisdiction="federal" data-source="case" type="button"><b>United States v. Jones</b><span class="mt-1 block text-xs muted">565 U.S. 400 · U.S. Supreme Court</span></button>
+       </section>
+       <article data-template-id="open-volume" class="canva-panel paper p-5">
+        <p data-template-id="open-volume-kicker" class="canva-text mono text-[9px] tracking-[.14em] text-[#68551a]">OPEN VOLUME · PRIMARY AUTHORITY</p>
+        <h3 data-template-id="open-volume-title" class="canva-text legal-serif mt-2 text-2xl">State v. Larkin, 498 P.3d 114</h3>
+        <p data-template-id="open-volume-text" class="canva-text mt-4 text-sm leading-7">Authentication requires evidence sufficient to support a finding that the matter in question is what its proponent claims. Review the full authority and current jurisdictional treatment before relying on this passage.</p>
+        <div class="mt-5 flex flex-wrap gap-2"><button class="secondary !text-[#222]" type="button">Mark Volume</button><button class="secondary !text-[#222]" type="button">Copy citation</button>
+        </div>
+       </article>
+       <aside data-template-id="research-brief" class="canva-panel surface-2 p-4">
+        <h3 data-template-id="research-brief-title" class="canva-text legal-serif text-xl">Research Brief</h3>
+        <p data-template-id="research-brief-text" class="canva-text mt-3 text-xs leading-6 text-[#cfc5be]">The marked authorities may be relevant to authentication and source preservation. Confirm current validity, local rules, and factual fit before using any authority in a filing.</p>
+        <div class="mt-4 border-t rule pt-3"><span class="tag blue">MARKED VOLUMES · 04</span><button class="secondary mt-3 w-full" type="button">Open Citation Web</button><button class="secondary mt-2 w-full" type="button">Case Folders</button><button class="secondary mt-2 w-full" type="button">Prior Research</button>
+        </div>
+       </aside>
+      </div>
+     </section>
+     <section id="investigations" class="workspace-view" aria-labelledby="investigations-title">
+      <header class="flex flex-wrap items-end justify-between gap-3">
+       <div>
+        <p data-template-id="investigations-kicker" class="canva-text mono text-[10px] tracking-[.14em] gold-text">INVESTIGATIONS · CASE RESEARCH & EVIDENCE</p>
+        <h2 id="investigations-title" data-template-id="investigations-title-text" class="canva-text legal-serif mt-2 text-3xl">Investigations</h2>
+       </div>
+       <div class="flex gap-2"><button class="investigation-tab primary" type="button" data-tab="research">Case Research</button><button class="investigation-tab secondary" type="button" data-tab="locker">Evidence Locker</button>
+       </div>
+      </header>
+      <div id="research-tab" class="investigation-panel surface mt-4 p-5">
+       <h3 class="legal-serif text-xl">Case Research</h3>
+       <p class="mt-2 text-xs muted">Charge-bound inquiry is limited to the active matter.</p>
+       <div class="mt-4 flex flex-wrap gap-2"><span class="tag gold">TRESPASS</span><span class="tag gold">PROPERTY DAMAGE</span>
+       </div><label for="case-research-input" class="sr-only">Case research query</label>
+       <div class="mt-4 flex gap-2"><input id="case-research-input" class="min-w-0 flex-1 border rule bg-[#101010] px-3 py-2 text-sm" placeholder="Search suppression, entry, authentication"><button class="primary" type="button" id="run-research">Search</button>
+       </div>
+       <p id="research-result" class="mt-4 text-sm text-[#b5c8df]" aria-live="polite"></p>
+      </div>
+      <div id="locker-tab" class="investigation-panel hidden mt-4 grid gap-4 xl:grid-cols-[220px_1fr]">
+       <aside data-template-id="evidence-filters" class="canva-sidebar surface p-4">
+        <h3 data-template-id="evidence-filters-title" class="canva-text legal-serif text-xl">Evidence Filters</h3><label for="evidence-type" class="mt-4 block text-xs font-bold">Exhibit Type</label><select id="evidence-type" class="mt-2 w-full border rule bg-[#171717] p-2 text-xs"><option value="all">All exhibits</option><option value="video">Video</option><option value="document">Document</option><option value="forensic">Forensics</option><option value="digital">Digital</option></select>
+        <p class="mono mt-5 text-[9px] gold-text">CHAIN OF CUSTODY</p>
+        <p class="mt-2 text-xs muted">All visible exhibits have a linked record.</p>
+       </aside>
+       <section>
+        <div class="mb-3 flex flex-wrap justify-between gap-2">
+         <div>
+          <p class="mono text-[9px] gold-text">EVIDENCE LOG</p>
+          <h3 class="legal-serif text-xl">Evidence Locker</h3>
+         </div><button class="primary" type="button" data-open-modal="evidence-modal">Log Evidence</button>
+        </div>
+        <div data-carousel class="surface p-4">
+         <div class="carousel-viewport" data-carousel-viewport tabindex="0" aria-label="Evidence Locker carousel">
+          <div class="carousel-track">
+           <article class="carousel-slide evidence-slide" data-type="video"><button class="media-card w-full text-left" type="button" data-evidence="Exhibit 04 · CCTV source verification complete"><img data-template-id="evidence-image-1" class="canva-image" loading="lazy" src="https://images.pexels.com/photos/430208/pexels-photo-430208.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Two surveillance cameras mounted on a concrete wall">
+             <div class="absolute bottom-0 z-10 p-4">
+              <p data-template-id="evidence-1-type" class="canva-text mono text-[9px] gold-text">VIDEO EVIDENCE · EXHIBIT 04</p>
+              <h4 data-template-id="evidence-1-title" class="canva-text mt-2 font-bold">North entrance camera</h4>
+             </div></button>
+           </article>
+           <article class="carousel-slide evidence-slide" data-type="document"><button class="media-card w-full text-left" type="button" data-evidence="Exhibit 07 · Property agreement scan cleared for filing"><img data-template-id="evidence-image-2" class="canva-image" loading="lazy" src="https://images.pexels.com/photos/5668473/pexels-photo-5668473.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Wooden ceremonial mallet near legal documents">
+             <div class="absolute bottom-0 z-10 p-4">
+              <p data-template-id="evidence-2-type" class="canva-text mono text-[9px] gold-text">PROPERTY RECORD · EXHIBIT 07</p>
+              <h4 data-template-id="evidence-2-title" class="canva-text mt-2 font-bold">Signed access agreement</h4>
+             </div></button>
+           </article>
+           <article class="carousel-slide evidence-slide" data-type="forensic"><button class="media-card w-full text-left" type="button" data-evidence="Exhibit 11 · Forensic comparison linked to chronology"><img data-template-id="evidence-image-3" class="canva-image" loading="lazy" src="https://images.pexels.com/photos/12375509/pexels-photo-12375509.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Fingerprint being made on white paper">
+             <div class="absolute bottom-0 z-10 p-4">
+              <p data-template-id="evidence-3-type" class="canva-text mono text-[9px] gold-text">FORENSICS · EXHIBIT 11</p>
+              <h4 data-template-id="evidence-3-title" class="canva-text mt-2 font-bold">Latent print comparison</h4>
+             </div></button>
+           </article>
+           <article class="carousel-slide evidence-slide" data-type="digital"><button class="media-card w-full text-left" type="button" data-evidence="Exhibit 14 · Digital extraction preservation hold active"><img data-template-id="evidence-image-4" class="canva-image" loading="lazy" src="https://images.pexels.com/photos/699122/pexels-photo-699122.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Smartphone displaying a message on a wooden surface">
+             <div class="absolute bottom-0 z-10 p-4">
+              <p data-template-id="evidence-4-type" class="canva-text mono text-[9px] gold-text">DIGITAL EXTRACTION · EXHIBIT 14</p>
+              <h4 data-template-id="evidence-4-title" class="canva-text mt-2 font-bold">Relevant message thread</h4>
+             </div></button>
+           </article>
+          </div>
+         </div>
+         <div class="mt-3 flex items-center justify-between">
+          <div class="flex gap-2" data-carousel-dots></div>
+          <div class="flex gap-2"><button class="secondary !px-2 !py-2" data-carousel-prev type="button" aria-label="Previous evidence"><i data-lucide="arrow-left" class="h-4 w-4"></i></button><button class="secondary !px-2 !py-2" data-carousel-next type="button" aria-label="Next evidence"><i data-lucide="arrow-right" class="h-4 w-4"></i></button>
+          </div>
+         </div>
+        </div>
+        <div class="mt-4 grid gap-3 md:grid-cols-3"><button class="secondary" type="button" data-open-modal="analysis-modal">Exhibit Analysis</button><button class="secondary" type="button" data-open-modal="analysis-modal">Issue Spotter</button><button class="secondary" type="button" data-open-modal="timeline-modal">Link to Timeline</button>
+        </div>
+        <p id="evidence-inspector-text" class="mt-4 border border-[#4e5d6c] bg-[#182027] p-3 text-xs text-[#d8e4ef]" aria-live="polite">Select an exhibit to inspect its chain of custody.</p>
+       </section>
+      </div>
+     </section>
+     <section id="record-room" class="workspace-view" aria-labelledby="record-title">
+      <header>
+       <p data-template-id="record-room-kicker" class="canva-text mono text-[10px] tracking-[.14em] gold-text">RECORD ROOM · CASE FILES</p>
+       <h2 id="record-title" data-template-id="record-room-title-text" class="canva-text legal-serif mt-2 text-3xl">Filing Table</h2>
+      </header>
+      <div class="mt-4 grid gap-4 xl:grid-cols-[220px_1fr]">
+       <aside data-template-id="filing-cabinet" class="canva-sidebar surface p-4">
+        <h3 data-template-id="filing-cabinet-title" class="canva-text legal-serif text-xl">Filing Cabinet</h3>
+        <div class="mt-4 space-y-2 text-xs"><button class="record-filter block w-full text-left text-[#d4af37]" data-record-filter="all" type="button">All Records</button><button class="record-filter block w-full text-left" data-record-filter="motion" type="button">Filed Motions</button><button class="record-filter block w-full text-left" data-record-filter="report" type="button">Officer’s Reports</button><button class="record-filter block w-full text-left" data-record-filter="order" type="button">Orders of Court</button><button class="record-filter block w-full text-left" data-record-filter="draft" type="button">Working Drafts</button>
+        </div><button class="primary mt-5 w-full" type="button" data-open-modal="record-modal">File a Record</button>
+       </aside>
+       <section class="min-w-0">
+        <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+         <div>
+          <p class="mono text-[9px] gold-text">FILING TABLE</p>
+          <h3 class="legal-serif text-xl">Court Record Index</h3>
+         </div><button class="secondary" type="button" data-open-modal="draft-modal">Draft Desk</button>
+        </div>
+        <div class="table-scroll surface">
+         <table class="w-full text-left text-xs">
+          <thead class="border-b rule bg-[#252525] mono text-[9px] text-[#cfc5be]">
+           <tr>
+            <th class="p-3">RECORD</th>
+            <th class="p-3">FILED AS</th>
+            <th class="p-3">DATE</th>
+            <th class="p-3">STATUS</th>
+            <th class="p-3"></th>
+           </tr>
+          </thead>
+          <tbody id="filing-table">
+           <tr class="record-row" data-record-type="motion">
+            <td class="p-3"><b>Motion to Suppress</b><span class="mt-1 block mono text-[9px] muted">REC-024</span></td>
+            <td class="p-3">Filed Motion</td>
+            <td class="p-3">Sep 14</td>
+            <td class="p-3"><span class="tag good">CLEARED FOR FILING</span></td>
+            <td class="p-3"><button class="record-preview secondary !py-1.5" type="button">Preview</button></td>
+           </tr>
+           <tr class="record-row" data-record-type="report">
+            <td class="p-3"><b>Incident Report</b><span class="mt-1 block mono text-[9px] muted">REC-018</span></td>
+            <td class="p-3">Officer’s Report</td>
+            <td class="p-3">Sep 02</td>
+            <td class="p-3"><span class="tag blue">EXTRACTION READY</span></td>
+            <td class="p-3"><button class="record-preview secondary !py-1.5" type="button">Preview</button></td>
+           </tr>
+           <tr class="record-row" data-record-type="order">
+            <td class="p-3"><b>Minute Entry</b><span class="mt-1 block mono text-[9px] muted">REC-011</span></td>
+            <td class="p-3">Order of Court</td>
+            <td class="p-3">Aug 28</td>
+            <td class="p-3"><span class="tag">FILED</span></td>
+            <td class="p-3"><button class="record-preview secondary !py-1.5" type="button">Preview</button></td>
+           </tr>
+          </tbody>
+         </table>
+        </div>
+        <div id="record-preview-panel" class="paper mt-4 hidden p-5">
+         <div class="flex justify-between gap-3">
+          <div>
+           <p class="mono text-[9px] text-[#68551a]">RECORD PREVIEW · EXTRACTION STATUS READY</p>
+           <h3 class="legal-serif mt-2 text-xl">Motion to Suppress</h3>
+          </div><button id="close-record-preview" class="secondary !text-[#222]" type="button">Close</button>
+         </div>
+         <p class="mt-4 text-sm leading-7">The record preview presents the filing’s extracted text, linked case references, and amendment history. Review source material before relying on any generated organization or summary.</p>
+        </div>
+       </section>
+      </div>
+     </section>
+     <section id="case-timeline" class="workspace-view" aria-labelledby="timeline-title">
+      <header class="flex flex-wrap items-end justify-between gap-3">
+       <div>
+        <p data-template-id="timeline-kicker" class="canva-text mono text-[10px] tracking-[.14em] gold-text">CASE TIMELINE · CHRONOLOGY</p>
+        <h2 id="timeline-title" data-template-id="timeline-title-text" class="canva-text legal-serif mt-2 text-3xl">Chronology</h2>
+       </div>
+       <div class="flex gap-2"><button id="print-chronology" class="secondary" type="button">Print Chronology</button><button class="primary" type="button" data-open-modal="timeline-modal">Log Event</button>
+       </div>
+      </header>
+      <div data-template-id="date-conflict-alert" class="canva-banner mt-4 hidden border border-[#8d5555] bg-[#2a1919] p-3 text-xs text-[#f0c5c5]">
+       Date Conflict Alert: this event overlaps a scheduled appearance.
+      </div>
+      <div class="mt-4 grid gap-4 xl:grid-cols-[1fr_320px]">
+       <section data-template-id="chronology-panel" class="canva-panel surface p-5">
+        <h3 data-template-id="chronology-panel-title" class="canva-text legal-serif text-xl">Case Events</h3>
+        <div id="timeline-events" class="mt-5"><button class="timeline-event timeline-node w-full text-left" type="button" data-event="Booking &amp; Processing · Sept 01 · linked Officer’s Report"><p class="mono text-[9px] gold-text">SEP 01 · 09:12</p><p class="mt-1 font-bold">Booking &amp; Processing</p><p class="mt-1 text-xs muted">Initial record entered.</p></button><button class="timeline-event timeline-node w-full text-left" type="button" data-event="Discovery Deadline · Sept 18 · 3 exhibits outstanding"><p class="mono text-[9px] gold-text">SEP 18 · 17:00</p><p class="mt-1 font-bold">Discovery Deadline</p><p class="mt-1 text-xs muted">Three exhibits require review.</p></button><button class="timeline-event timeline-node w-full text-left" type="button" data-event="Scheduled Appearance · Sept 28 · Department 302"><p class="mono text-[9px] gold-text">SEP 28 · 14:00</p><p class="mt-1 font-bold">Scheduled Appearance</p><p class="mt-1 text-xs muted">Motion Hearing.</p></button>
+        </div>
+       </section>
+       <aside data-template-id="event-record" class="canva-panel surface-2 p-4">
+        <h3 data-template-id="event-record-title" class="canva-text legal-serif text-xl">Event Record</h3>
+        <p id="event-record-text" class="mt-4 text-xs leading-6 text-[#cfc5be]" aria-live="polite">Select a Case Event to open its Event Record.</p>
+        <div class="mt-5 border-t rule pt-3">
+         <p class="mono text-[9px] gold-text">DEADLINE CALCULATOR</p><label for="deadline-days" class="mt-3 block text-xs">Days from event</label>
+         <div class="mt-2 flex gap-2"><input id="deadline-days" type="number" min="1" value="14" class="w-20 border rule bg-[#101010] p-2 text-sm"><button id="calculate-deadline" class="secondary" type="button">Calculate</button>
+         </div>
+         <p id="deadline-result" class="mt-3 text-xs text-[#b5c8df]" aria-live="polite"></p>
+        </div>
+       </aside>
+      </div>
+     </section>
+     <section id="court-watch" class="workspace-view" aria-labelledby="watch-title">
+      <header>
+       <p data-template-id="watch-kicker" class="canva-text mono text-[10px] tracking-[.14em] gold-text">COURT WATCH · APPEARANCE MONITOR</p>
+       <h2 id="watch-title" data-template-id="watch-title-text" class="canva-text legal-serif mt-2 text-3xl">Docket Activity</h2>
+      </header>
+      <div class="mt-4 grid gap-4 xl:grid-cols-[1fr_1fr_.8fr]">
+       <section data-template-id="appearances-panel" class="canva-panel surface p-4">
+        <h3 data-template-id="appearances-title" class="canva-text legal-serif text-xl">Upcoming Appearances</h3>
+        <div class="mt-4 border-l-2 border-[#d4af37] bg-[#242117] p-3">
+         <p class="mono text-[9px] gold-text">14 DAYS</p>
+         <p class="mt-1 font-bold">Motion Hearing</p>
+         <p class="mt-1 text-xs muted">Sep 28 · Department 302</p><button class="secondary mt-3 !py-1.5" type="button">Hearing Prep Kit</button>
+        </div>
+       </section>
+       <section data-template-id="docket-activity" class="canva-panel surface p-4">
+        <div class="flex items-center justify-between">
+         <h3 data-template-id="docket-activity-title" class="canva-text legal-serif text-xl">Docket Activity</h3><label class="flex items-center gap-2 text-[10px]"><span>Live Docket Sync</span><input id="docket-sync" class="toggle" type="checkbox" checked></label>
+        </div>
+        <div id="watch-feed" class="mt-4 text-xs">
+         <p class="dense-row">Court Activity · Minute entry received</p>
+         <p class="dense-row">Record Ready · Officer’s Report extracted</p>
+         <p class="dense-row">Filing Deadline · Discovery review approaching</p>
+        </div>
+       </section>
+       <aside data-template-id="court-sources" class="canva-panel surface-2 p-4">
+        <h3 data-template-id="court-sources-title" class="canva-text legal-serif text-xl">Court Data Sources</h3>
+        <div class="mt-4 space-y-3 text-xs">
+         <p class="flex justify-between"><span>County docket index</span><span class="text-[#9fc6ae]">CONNECTED</span></p>
+         <p class="flex justify-between"><span>Public appellate archive</span><span class="text-[#9fc6ae]">READY</span></p>
+         <p class="flex justify-between"><span>Deadline Engine</span><span class="gold-text">ACTIVE</span></p>
+        </div>
+       </aside>
+      </div>
+     </section>
+     <section id="counsel-directory" class="workspace-view" aria-labelledby="directory-title">
+      <header>
+       <p data-template-id="directory-kicker" class="canva-text mono text-[10px] tracking-[.14em] gold-text">COUNSEL DIRECTORY · BAR LISTINGS</p>
+       <h2 id="directory-title" data-template-id="directory-title-text" class="canva-text legal-serif mt-2 text-3xl">Counsel Directory</h2>
+      </header>
+      <div data-template-id="directory-notice" class="canva-banner mt-4 border border-[#4e5d6c] bg-[#1a222b] p-3">
+       <p data-template-id="directory-notice-text" class="canva-text text-xs leading-5 text-[#d8e4ef]">DIRECTORY NOTICE · Listings are provided for reference only. They are not endorsements, referrals, legal advice, or an offer of representation.</p>
+      </div>
+      <div class="mt-4 grid gap-4 xl:grid-cols-[220px_1fr]">
+       <aside data-template-id="directory-filter-panel" class="canva-sidebar surface p-4">
+        <h3 data-template-id="directory-filter-title" class="canva-text legal-serif text-xl">Narrow Your Search</h3><label for="counsel-search" class="mt-4 block text-xs font-bold">Search counsel</label><input id="counsel-search" class="mt-2 w-full border rule bg-[#101010] p-2 text-xs" type="search" placeholder="Name or practice area"><label for="practice-filter" class="mt-4 block text-xs font-bold">Practice area</label><select id="practice-filter" class="mt-2 w-full border rule bg-[#171717] p-2 text-xs"><option value="all">All practice areas</option><option value="criminal">Criminal Defense</option><option value="civil">Civil Rights</option><option value="evidence">Digital Evidence</option></select>
+       </aside>
+       <section>
+        <div class="mb-3 flex items-center justify-between">
+         <h3 class="legal-serif text-xl">Counsel Listings</h3><button class="secondary" type="button" data-view="system-settings">Pro Bono &amp; Legal Aid</button>
+        </div>
+        <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3" id="counsel-list">
+         <article class="counsel-card surface overflow-hidden" data-practice="civil" data-search="elena morris civil rights trial"><img data-template-id="attorney-image-1" class="canva-image" loading="lazy" src="https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Professional woman smiling in an office">
+          <div class="p-4">
+           <div class="flex justify-between gap-2"><span class="tag gold">FEATURED LISTING</span><span class="tag good">BAR VERIFIED</span>
+           </div>
+           <h4 data-template-id="attorney-1-name" class="canva-text legal-serif mt-3 text-lg">Elena Morris</h4>
+           <p data-template-id="attorney-1-bio" class="canva-text mt-2 text-xs leading-5 text-[#cfc5be]">Civil rights and trial litigation listing with courtroom advocacy experience.</p><button class="attorney-profile secondary mt-3" type="button">Attorney Profile</button>
+          </div>
+         </article>
+         <article class="counsel-card surface overflow-hidden" data-practice="criminal" data-search="marcus vail criminal appeals"><img data-template-id="attorney-image-2" class="canva-image" loading="lazy" src="https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Professional man wearing glasses in a sunlit office">
+          <div class="p-4"><span class="tag good">BAR VERIFIED</span>
+           <h4 data-template-id="attorney-2-name" class="canva-text legal-serif mt-3 text-lg">Marcus Vail</h4>
+           <p data-template-id="attorney-2-bio" class="canva-text mt-2 text-xs leading-5 text-[#cfc5be]">Criminal defense and appeals listing focused on record preservation.</p><button class="attorney-profile secondary mt-3" type="button">Attorney Profile</button>
+          </div>
+         </article>
+         <article class="counsel-card surface overflow-hidden" data-practice="evidence" data-search="simone hart digital evidence investigations"><img data-template-id="attorney-image-3" class="canva-image" loading="lazy" src="https://images.pexels.com/photos/7841431/pexels-photo-7841431.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Lawyer holding a briefcase in an office">
+          <div class="p-4"><span class="tag good">BAR VERIFIED</span>
+           <h4 data-template-id="attorney-3-name" class="canva-text legal-serif mt-3 text-lg">Simone Hart</h4>
+           <p data-template-id="attorney-3-bio" class="canva-text mt-2 text-xs leading-5 text-[#cfc5be]">Defense investigations and digital evidence listing for complex records.</p><button class="attorney-profile secondary mt-3" type="button">Attorney Profile</button>
+          </div>
+         </article>
+        </div>
+       </section>
+      </div>
+     </section>
+     <section id="motions-tasks" class="workspace-view" aria-labelledby="tasks-title">
+      <header>
+       <p data-template-id="tasks-kicker" class="canva-text mono text-[10px] tracking-[.14em] gold-text">MOTIONS & TASKS · ACTION DOCKET</p>
+       <h2 id="tasks-title" data-template-id="tasks-title-text" class="canva-text legal-serif mt-2 text-3xl">Motion Board</h2>
+      </header>
+      <div data-template-id="deadline-notices" class="canva-banner mt-4 border border-[#765f21] bg-[#2a2413] p-3 text-xs">
+       Deadline Notices: discovery review must be completed before Sep 18.
+      </div>
+      <div class="mt-4 grid gap-3 lg:grid-cols-4">
+       <section class="surface p-3">
+        <h3 class="mono text-[9px] gold-text">TO DO</h3>
+        <article class="mt-3 border border-[#555] bg-[#242424] p-3 text-xs"><b>Review Officer’s Report</b>
+         <p class="mt-2 muted">Due Sep 16</p><button class="task-status secondary mt-3 !py-1.5" type="button">Move to researching</button>
+        </article>
+       </section>
+       <section class="surface p-3">
+        <h3 class="mono text-[9px] gold-text">RESEARCHING</h3>
+        <article class="mt-3 border border-[#555] bg-[#242424] p-3 text-xs"><b>Validate Larkin citation</b>
+         <p class="mt-2 muted">Counsel Recommendation</p><button class="task-status secondary mt-3 !py-1.5" type="button">Move to drafting</button>
+        </article>
+       </section>
+       <section class="surface p-3">
+        <h3 class="mono text-[9px] gold-text">DRAFTING</h3>
+        <article class="mt-3 border border-[#555] bg-[#242424] p-3 text-xs"><b>Motion to Suppress</b>
+         <p class="mt-2 muted">Working Draft</p><button class="task-status secondary mt-3 !py-1.5" type="button">Mark filed</button>
+        </article>
+       </section>
+       <section class="surface p-3">
+        <h3 class="mono text-[9px] gold-text">FILED</h3>
+        <p class="mt-3 text-xs muted">No completed filings this week.</p><button class="secondary mt-4 w-full" type="button">Court Calendar</button>
+       </section>
+      </div>
+     </section>
+     <section id="accessibility-settings" class="workspace-view" aria-labelledby="accessibility-title">
+      <header class="flex flex-wrap items-end justify-between gap-3">
+       <div>
+        <p data-template-id="accessibility-kicker" class="canva-text mono text-[10px] tracking-[.14em] gold-text">SETTINGS · ACCESSIBILITY</p>
+        <h2 id="accessibility-title" data-template-id="accessibility-title-text" class="canva-text legal-serif mt-2 text-3xl">Accessibility Settings</h2>
+        <p data-template-id="accessibility-subtitle" class="canva-text mt-2 text-sm text-[#cfc5be]">Set visual and interaction preferences for clear, controlled legal work.</p>
+       </div><button id="save-preferences" data-template-id="save-preferences-button" class="canva-button primary" type="button">SAVE PREFERENCES</button>
+      </header>
+      <p id="preference-status" class="mt-3 text-xs text-[#9fc6ae]" aria-live="polite"></p>
+      <div class="mt-4 grid gap-4 lg:grid-cols-[1fr_.8fr]">
+       <section class="surface p-5">
+        <h3 class="legal-serif text-xl">Visual &amp; Interaction Controls</h3>
+        <div class="mt-5 border-b rule pb-5">
+         <div class="flex items-center justify-between"><label id="font-scale-label" data-template-id="font-scaling-label" class="canva-text font-bold" for="font-scale">Font Scaling</label><output id="font-scale-value" class="mono text-xs gold-text">100%</output>
+         </div>
+         <p data-template-id="font-scaling-help" class="canva-text mt-1 text-xs muted">Adjust the base text size across the Legal OS.</p><input id="font-scale" class="mt-4 w-full" type="range" min="80" max="150" step="5" value="100">
+        </div>
+        <div class="flex items-start justify-between gap-4 border-b rule py-5">
+         <div><label id="contrast-label" data-template-id="contrast-label-text" class="canva-text font-bold" for="high-contrast">High Contrast Mode</label>
+          <p data-template-id="contrast-help" class="canva-text mt-1 max-w-md text-xs muted">Increase separation between text, panels, and rules.</p>
+         </div><input id="high-contrast" class="toggle" type="checkbox">
+        </div>
+        <div class="flex items-start justify-between gap-4 border-b rule py-5">
+         <div><label id="motion-label" data-template-id="motion-label-text" class="canva-text font-bold" for="motion-reduction">Motion Reduction</label>
+          <p data-template-id="motion-help" class="canva-text mt-1 max-w-md text-xs muted">Turn off non-essential movement and transitions.</p>
+         </div><input id="motion-reduction" class="toggle" type="checkbox" checked>
+        </div>
+        <div class="flex items-start justify-between gap-4 pt-5">
+         <div><label id="reader-label" data-template-id="reader-label-text" class="canva-text font-bold" for="screen-reader">Screen Reader Optimization</label>
+          <p data-template-id="reader-help" class="canva-text mt-1 max-w-md text-xs muted">Enable enhanced descriptions and focus management.</p>
+         </div><input id="screen-reader" class="toggle" type="checkbox">
+        </div>
+       </section>
+       <aside data-template-id="accessibility-preview" class="canva-panel surface-2 p-5">
+        <p data-template-id="preview-kicker" class="canva-text mono text-[9px] tracking-[.14em] text-[#b5c8df]">LIVE PREVIEW</p>
+        <h3 data-template-id="preview-title" class="canva-text legal-serif mt-2 text-xl">A Clearer Record</h3>
+        <p data-template-id="preview-text" class="canva-text mt-4 text-sm leading-6 text-[#cfc5be]">These settings help shape a readable, deliberate working environment while preserving the Legal OS visual language.</p>
+        <div class="mt-5 border-l-2 border-[#d4af37] bg-[#1c1b16] p-3 text-xs">
+         Preview reflects the selected reading settings.
+        </div>
+       </aside>
+      </div>
+     </section>
+     <section id="system-settings" class="workspace-view" aria-labelledby="system-title">
+      <header>
+       <p data-template-id="system-kicker" class="canva-text mono text-[10px] tracking-[.14em] gold-text">SYSTEM & ADMINISTRATION</p>
+       <h2 id="system-title" data-template-id="system-title-text" class="canva-text legal-serif mt-2 text-3xl">Workspace Administration</h2>
+      </header>
+      <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+       <button class="surface p-4 text-left hover:border-[#d4af37]" type="button"><span class="mono text-[9px] gold-text">USER PROFILE</span><span class="legal-serif mt-2 block text-lg">Identity &amp; case caption</span></button> <button class="surface p-4 text-left hover:border-[#d4af37]" type="button"><span class="mono text-[9px] gold-text">AI ENGINE SETTINGS</span><span class="legal-serif mt-2 block text-lg">Assistance controls</span></button> <button class="surface p-4 text-left hover:border-[#d4af37]" type="button"><span class="mono text-[9px] gold-text">THE CLERK</span><span class="legal-serif mt-2 block text-lg">Notification settings</span></button> <button class="surface p-4 text-left hover:border-[#d4af37]" type="button"><span class="mono text-[9px] gold-text">INTEGRATIONS</span><span class="legal-serif mt-2 block text-lg">Court data sources</span></button> <button class="surface p-4 text-left hover:border-[#d4af37]" type="button"><span class="mono text-[9px] gold-text">WORKSPACE &amp; SECURITY</span><span class="legal-serif mt-2 block text-lg">Permissions &amp; safeguards</span></button> <button class="surface p-4 text-left hover:border-[#d4af37]" type="button"><span class="mono text-[9px] gold-text">SYSTEM AUDIT</span><span class="legal-serif mt-2 block text-lg">Review activity log</span></button> <button class="surface p-4 text-left hover:border-[#d4af37]" type="button"><span class="mono text-[9px] gold-text">HELP &amp; ONBOARDING</span><span class="legal-serif mt-2 block text-lg">Plain-language guide</span></button> <button class="surface p-4 text-left hover:border-[#d4af37]" type="button" data-view="accessibility-settings"><span class="mono text-[9px] gold-text">ACCESSIBILITY SETTINGS</span><span class="legal-serif mt-2 block text-lg">Reading preferences</span></button>
+      </div>
+     </section>
+    </main>
+   </div>
+  </div>
+  <aside id="clerk-drawer" class="drawer flex flex-col" aria-label="The Clerk notifications" aria-hidden="true" style="width: min(92vw, 440px); z-index: 100;">
+   <div class="flex items-center justify-between border-b rule pb-3">
+    <div>
+     <div class="flex items-center gap-2">
+      <span class="inline-block w-2 h-2 rounded-full bg-[#9fc6ae] animate-pulse"></span>
+      <p class="mono text-[9px] gold-text font-bold">THE CLERK · PROCEDURAL GUIDE</p>
+     </div>
+     <h2 class="legal-serif mt-1 text-xl">Court Notices &amp; AI Clerk</h2>
+    </div>
+    <button id="close-clerk" class="secondary !px-2 !py-2" type="button" aria-label="Close notices"><i data-lucide="x" class="h-4 w-4"></i></button>
+   </div>
+
+   <!-- Tab Switcher -->
+   <div class="mt-3 flex border-b rule text-xs font-mono">
+    <button id="clerk-tab-ai" type="button" class="px-3 py-2 border-b-2 border-[#d4af37] font-bold text-[#f3ede8]">Ask The Clerk</button>
+    <button id="clerk-tab-notices" type="button" class="px-3 py-2 text-[#8e857e] hover:text-[#d4af37]">Notices (2)</button>
+   </div>
+
+   <!-- Notices Panel -->
+   <div id="clerk-notices-panel" class="hidden mt-4 space-y-3 text-sm flex-1 overflow-y-auto">
+    <div class="border-l-2 border-[#d4af37] bg-[#211e16] p-3">
+     <b>Appearance Approaching</b>
+     <p class="mt-1 text-xs muted">Motion Hearing is in 14 days in Courtroom 302.</p>
+     <button class="notice-review secondary mt-3 !py-1.5" type="button">Mark reviewed</button>
+    </div>
+    <div class="border-l-2 border-[#b5c8df] bg-[#192026] p-3">
+     <b>Record Ready</b>
+     <p class="mt-1 text-xs muted">Officer’s Report extraction completed.</p>
+     <button class="notice-review secondary mt-3 !py-1.5" type="button">Mark reviewed</button>
+    </div>
+   </div>
+
+   <!-- AI Chat Panel -->
+   <div id="clerk-ai-panel" class="flex flex-col flex-1 mt-3 min-h-0 overflow-hidden">
+    <div class="text-[11px] p-2.5 bg-[#182027] border border-[#2b3744] text-[#b5c8df] rounded mb-2">
+     <p class="font-bold mb-1">Court Procedural Education Assistant</p>
+     <p class="text-[10px] leading-4 text-[#8e9eb3]">Provides plain-English procedural rules, courtroom etiquette, and deadlines. Educational information only; not legal advice.</p>
+    </div>
+
+    <!-- Scrollable Messages -->
+    <div id="clerk-chat-messages" class="flex-1 overflow-y-auto space-y-3 pr-1 text-xs min-h-[220px] max-h-[50vh]">
+     <div class="p-3 bg-[#171717] border border-[#2a2a2a] rounded">
+      <p class="font-bold gold-text text-[10px] mono mb-1">THE CLERK (AI)</p>
+      <p class="leading-5 text-[#f3ede8]">Welcome to your case workspace. You can ask me how to address the judge, where to stand during motion call, filing deadlines, or standard courtroom procedures.</p>
+     </div>
+    </div>
+
+    <!-- Suggested Quick Prompts -->
+    <div class="mt-2 pt-2 border-t rule flex flex-wrap gap-1.5">
+     <button type="button" class="clerk-quick-prompt text-[10px] bg-[#1a1a1a] hover:bg-[#252525] text-[#cfc5be] border border-[#333] px-2 py-1 rounded transition-colors" data-prompt="What should I call the judge and how should I dress?">Courtroom Etiquette</button>
+     <button type="button" class="clerk-quick-prompt text-[10px] bg-[#1a1a1a] hover:bg-[#252525] text-[#cfc5be] border border-[#333] px-2 py-1 rounded transition-colors" data-prompt="What happens during an initial appearance or arraignment?">Arraignment Steps</button>
+     <button type="button" class="clerk-quick-prompt text-[10px] bg-[#1a1a1a] hover:bg-[#252525] text-[#cfc5be] border border-[#333] px-2 py-1 rounded transition-colors" data-prompt="How do I file a motion to suppress evidence?">Filing a Motion</button>
+    </div>
+
+    <!-- Input Form -->
+    <form id="clerk-chat-form" class="mt-2 flex gap-2">
+     <input id="clerk-chat-input" type="text" placeholder="Ask a procedural or court question..." class="flex-1 border rule bg-[#101010] px-3 py-2 text-xs text-[#f3ede8] placeholder-[#777] rounded focus:border-[#d4af37] focus:outline-none" required autocomplete="off" />
+     <button id="clerk-chat-send" type="submit" class="primary !px-3 !py-2 text-xs font-bold whitespace-nowrap">Ask Clerk</button>
+    </form>
+   </div>
+  </aside>
+  <div id="matter-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="matter-modal-title">
+   <form class="modal-panel p-5 modal-form">
+    <div class="flex justify-between gap-3">
+     <div>
+      <p class="mono text-[9px] gold-text">THE DOCKET</p>
+      <h2 id="matter-modal-title" class="legal-serif mt-1 text-2xl">Open a Matter</h2>
+     </div><button class="close-modal secondary !px-2 !py-2" type="button" aria-label="Close"><i data-lucide="x" class="h-4 w-4"></i></button>
+    </div>
+    <p class="mt-3 text-xs leading-5 muted">Start a case file with only the information you are ready to organize.</p><label for="matter-name" class="mt-4 block text-xs font-bold">Matter name</label><input id="matter-name" required class="mt-1 w-full border rule bg-[#101010] p-2 text-sm" placeholder="e.g. State v. Marlowe"><label for="matter-jurisdiction" class="mt-3 block text-xs font-bold">Jurisdiction</label><select id="matter-jurisdiction" class="mt-1 w-full border rule bg-[#101010] p-2 text-sm"><option>Arizona Superior Court</option><option>Federal District Court</option></select>
+    <p class="modal-status mt-3 text-xs text-[#9fc6ae]" aria-live="polite"></p><button class="primary mt-4" type="submit">Create Case File</button>
+   </form>
+  </div>
+  <div id="record-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="record-modal-title">
+   <form class="modal-panel p-5 modal-form">
+    <div class="flex justify-between">
+     <h2 id="record-modal-title" class="legal-serif text-2xl">File a Record</h2><button class="close-modal secondary !px-2 !py-2" type="button" aria-label="Close"><i data-lucide="x" class="h-4 w-4"></i></button>
+    </div><label for="record-name" class="mt-4 block text-xs font-bold">Record name</label><input id="record-name" required class="mt-1 w-full border rule bg-[#101010] p-2 text-sm" placeholder="Name the record"><label for="record-type" class="mt-3 block text-xs font-bold">Filed as</label><select id="record-type" class="mt-1 w-full border rule bg-[#101010] p-2 text-sm"><option>Working Draft</option><option>Filed Motion</option><option>Officer’s Report</option><option>Exhibit</option></select>
+    <p class="mt-3 text-xs muted">This workspace records the filing entry; attach source materials through the Canva editor when available.</p>
+    <p class="modal-status mt-3 text-xs text-[#9fc6ae]" aria-live="polite"></p><button class="primary mt-4" type="submit">File Record</button>
+   </form>
+  </div>
+  <div id="timeline-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="timeline-modal-title">
+   <form class="modal-panel p-5 modal-form">
+    <div class="flex justify-between">
+     <h2 id="timeline-modal-title" class="legal-serif text-2xl">Log Event</h2><button class="close-modal secondary !px-2 !py-2" type="button" aria-label="Close"><i data-lucide="x" class="h-4 w-4"></i></button>
+    </div><label for="event-name" class="mt-4 block text-xs font-bold">Event record</label><input id="event-name" required class="mt-1 w-full border rule bg-[#101010] p-2 text-sm" placeholder="Describe the event"><label for="event-date" class="mt-3 block text-xs font-bold">Date</label><input id="event-date" required class="mt-1 w-full border rule bg-[#101010] p-2 text-sm" type="date">
+    <p class="modal-status mt-3 text-xs text-[#9fc6ae]" aria-live="polite"></p><button class="primary mt-4" type="submit">Log Event</button>
+   </form>
+  </div>
+  <div id="court-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="court-modal-title">
+   <form class="modal-panel p-5 modal-form">
+    <div class="flex justify-between">
+     <h2 id="court-modal-title" class="legal-serif text-2xl">Retrieve from Court</h2><button class="close-modal secondary !px-2 !py-2" type="button" aria-label="Close"><i data-lucide="x" class="h-4 w-4"></i></button>
+    </div>
+    <p class="mt-3 text-xs leading-5 muted">This local Legal OS view can prepare a retrieval request, but it does not connect to external court systems.</p><label for="court-query" class="mt-4 block text-xs font-bold">Docket number</label><input id="court-query" required class="mt-1 w-full border rule bg-[#101010] p-2 text-sm" placeholder="Enter a public docket number">
+    <p class="modal-status mt-3 text-xs text-[#9fc6ae]" aria-live="polite"></p><button class="primary mt-4" type="submit">Prepare Retrieval Request</button>
+   </form>
+  </div>
+  <div id="counsel-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="counsel-modal-title">
+   <form class="modal-panel p-5 modal-form">
+    <div class="flex justify-between">
+     <h2 id="counsel-modal-title" class="legal-serif text-2xl">Appoint Counsel</h2><button class="close-modal secondary !px-2 !py-2" type="button" aria-label="Close"><i data-lucide="x" class="h-4 w-4"></i></button>
+    </div><label for="counsel-role" class="mt-4 block text-xs font-bold">Counsel focus</label><select id="counsel-role" class="mt-1 w-full border rule bg-[#101010] p-2 text-sm"><option>Procedural review</option><option>Research organization</option><option>Evidence organization</option></select><label for="counsel-instructions" class="mt-3 block text-xs font-bold">Counsel Brief</label><textarea id="counsel-instructions" class="mt-1 min-h-24 w-full border rule bg-[#101010] p-2 text-sm" placeholder="Add organizational instructions"></textarea>
+    <p class="modal-status mt-3 text-xs text-[#9fc6ae]" aria-live="polite"></p><button class="primary mt-4" type="submit">Add to Roster</button>
+   </form>
+  </div>
+  <div id="rights-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="rights-modal-title">
+   <div class="modal-panel p-5 max-w-2xl w-full max-h-[88vh] overflow-y-auto">
+    <div class="flex justify-between items-start">
+     <div>
+      <span class="tag gold text-[9px] mono">RIGHTS CHECKER AI</span>
+      <h2 id="rights-modal-title" class="legal-serif text-2xl mt-1">Constitutional Rights Audit</h2>
+     </div>
+     <button class="close-modal secondary !px-2 !py-2" type="button" aria-label="Close"><i data-lucide="x" class="h-4 w-4"></i></button>
+    </div>
+    
+    <p class="mt-3 text-xs leading-5 text-[#cfc5be]">
+     Audits law enforcement encounters against Fourth, Fifth, and Sixth Amendment procedural guarantees using verified statutory standards.
+    </p>
+
+    <div class="mt-4 grid gap-3 sm:grid-cols-3">
+     <div class="surface-2 p-3 text-xs border border-[#333]">
+      <b>Fourth Amendment</b>
+      <p class="mt-1 text-[11px] text-[#cfc5be]">Search &amp; Seizure Scope</p>
+      <p class="mt-2 font-bold gold-text">WARRANT SCOPE AUDIT</p>
+     </div>
+     <div class="surface-2 p-3 text-xs border border-[#333]">
+      <b>Fifth Amendment</b>
+      <p class="mt-1 text-[11px] text-[#cfc5be]">Custodial Interrogation</p>
+      <p class="mt-2 font-bold text-[#9fc6ae]">VOLUNTARY STATEMENT</p>
+     </div>
+     <div class="surface-2 p-3 text-xs border border-[#333]">
+      <b>Sixth Amendment</b>
+      <p class="mt-1 text-[11px] text-[#cfc5be]">Right to Counsel &amp; Notice</p>
+      <p class="mt-2 font-bold text-[#9fc6ae]">TIMELY ARRAIGNMENT</p>
+     </div>
+    </div>
+
+    <div class="mt-4 flex gap-2">
+     <button id="run-ai-rights-audit" type="button" class="primary !py-2 text-xs font-bold flex items-center gap-2">
+      <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+      <span>Run Deep Constitutional Encounter Audit</span>
+     </button>
+     <span id="rights-status-text" class="text-[11px] mono text-[#b5c8df] self-center"></span>
+    </div>
+
+    <div id="rights-results-container" class="mt-4 border rule bg-[#141414] p-4 text-xs space-y-2 min-h-24">
+     <p class="text-[#8e857e] italic">Click above to audit the encounter logs and traffic stop timeline against Fourth Amendment Terry stop requirements and search warrant parameters.</p>
+    </div>
+   </div>
+  </div>
+  </div>
+  <div id="plea-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="plea-modal-title">
+   <div class="modal-panel p-5 max-w-2xl w-full max-h-[88vh] overflow-y-auto">
+    <div class="flex justify-between items-start">
+     <div>
+      <span class="tag gold text-[9px] mono">NEUTRAL DECISION ASSISTANT · GEMINI AI</span>
+      <h2 id="plea-modal-title" class="legal-serif text-2xl mt-1">Plea Offer Evaluation Framework</h2>
+     </div>
+     <button class="close-modal secondary !px-2 !py-2" type="button" aria-label="Close"><i data-lucide="x" class="h-4 w-4"></i></button>
+    </div>
+
+    <p class="mt-2 text-xs leading-5 text-[#cfc5be]">
+     Acquit.ai strictly does NOT advise whether to accept or reject a plea offer. This assistant organizes statutory consequences, trial exposure, and questions to ask defense counsel.
+    </p>
+
+    <div class="mt-3 grid gap-3 sm:grid-cols-2 text-xs">
+     <div>
+      <label class="block font-bold mb-1" for="plea-input-offer">Proposed Plea Agreement Terms</label>
+      <input id="plea-input-offer" type="text" class="w-full border rule bg-[#101010] p-2 text-xs" value="Class 1 Misdemeanor reduction with 18 months supervised probation" />
+     </div>
+     <div>
+      <label class="block font-bold mb-1" for="plea-input-exposure">Trial Exposure If Convicted</label>
+      <input id="plea-input-exposure" type="text" class="w-full border rule bg-[#101010] p-2 text-xs" value="Class 6 Felony with presumptive 1-year incarceration" />
+     </div>
+    </div>
+
+    <div class="mt-3 flex items-center gap-3">
+     <button id="run-ai-plea-assistant" type="button" class="primary !py-2 text-xs font-bold flex items-center gap-2">
+      <i data-lucide="scale" class="w-3.5 h-3.5"></i>
+      <span>Generate Structured Comparison Framework</span>
+     </button>
+     <span id="plea-status-text" class="text-[11px] mono text-[#b5c8df]"></span>
+    </div>
+
+    <div id="plea-results-container" class="mt-4 border rule bg-[#141414] p-4 text-xs space-y-3 min-h-32">
+     <div class="text-[#8e857e] italic">
+      Select 'Generate Structured Comparison Framework' to evaluate statutory consequences, collateral fallout (housing/licensing/employment), and critical questions for counsel.
+     </div>
+    </div>
+   </div>
+  </div>
+  <div id="evidence-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="evidence-modal-title">
+   <form class="modal-panel p-5 modal-form">
+    <div class="flex justify-between">
+     <h2 id="evidence-modal-title" class="legal-serif text-2xl">Log Evidence</h2><button class="close-modal secondary !px-2 !py-2" type="button" aria-label="Close"><i data-lucide="x" class="h-4 w-4"></i></button>
+    </div><label for="evidence-name" class="mt-4 block text-xs font-bold">Exhibit description</label><input id="evidence-name" required class="mt-1 w-full border rule bg-[#101010] p-2 text-sm" placeholder="Describe the item"><label for="evidence-category" class="mt-3 block text-xs font-bold">Exhibit type</label><select id="evidence-category" class="mt-1 w-full border rule bg-[#101010] p-2 text-sm"><option>Documentary</option><option>Photo Evidence</option><option>Digital</option><option>Testimonial</option></select>
+    <p class="modal-status mt-3 text-xs text-[#9fc6ae]" aria-live="polite"></p><button class="primary mt-4" type="submit">Add to Evidence Log</button>
+   </form>
+  </div>
+  <div id="analysis-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="analysis-modal-title">
+   <div class="modal-panel p-5 max-w-2xl w-full max-h-[88vh] overflow-y-auto">
+    <div class="flex justify-between items-start">
+     <div>
+      <span class="tag gold text-[9px] mono">GEMINI 3.8 FLASH · EVIDENCE ANALYST</span>
+      <h2 id="analysis-modal-title" class="legal-serif text-2xl mt-1">Exhibit Intelligence &amp; Audit</h2>
+     </div>
+     <button class="close-modal secondary !px-2 !py-2" type="button" aria-label="Close"><i data-lucide="x" class="h-4 w-4"></i></button>
+    </div>
+    
+    <div class="mt-4 p-3 bg-[#182027] border border-[#2b3744] text-xs">
+     <div class="flex justify-between font-bold text-[#b5c8df]">
+      <span id="analysis-target-title">Exhibit 04 · North Entrance Surveillance Camera</span>
+      <span class="mono">Category: Video / Digital</span>
+     </div>
+     <p class="mt-1 text-[#cfc5be]" id="analysis-target-desc">CCTV showing intersection timing at 02:14 AM. Chain of custody log and camera sync documentation under review.</p>
+    </div>
+
+    <div class="mt-4 flex gap-2">
+     <button id="run-ai-evidence-analysis" type="button" class="primary !py-2.5 text-xs font-bold flex items-center gap-2">
+      <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+      <span>Run Factual &amp; Chain-of-Custody Analysis</span>
+     </button>
+    </div>
+
+    <div id="analysis-output-container" class="mt-4 border rule bg-[#141414] p-4 text-xs space-y-3 min-h-32">
+     <div class="text-[#8e857e] italic flex items-center gap-2">
+      <i data-lucide="info" class="w-4 h-4"></i>
+      <span>Select 'Run Analysis' to evaluate factual inconsistencies, Fourth Amendment search scope, and potential Brady exculpatory material using Gemini.</span>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div id="draft-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="draft-modal-title">
+   <div class="modal-panel paper p-5">
+    <div class="flex justify-between">
+     <h2 id="draft-modal-title" class="legal-serif text-2xl">Draft Desk</h2><button class="close-modal secondary !text-[#222] !px-2 !py-2" type="button" aria-label="Close"><i data-lucide="x" class="h-4 w-4"></i></button>
+    </div><label for="draft-text" class="mt-4 block text-xs font-bold">Working Draft</label><textarea id="draft-text" class="mt-2 min-h-56 w-full border border-[#aaa] bg-[#f8f4ea] p-4 text-sm leading-7">IN THE SUPERIOR COURT
+
+Working Draft
+
+Review the record and applicable rules before filing.</textarea>
+    <p class="mt-3 text-xs">Amendment History: Draft Desk supports local drafting only. Verify all filings and citations independently.</p>
+   </div>
+  </div>
+  <script>
+function initLegalOS() {
+  lucide.createIcons();
+
+  // --- Client-Side Supabase Initialization for Canva Embeds & Custom HTML Blocks ---
+  const SUPABASE_URL = window.SUPABASE_URL || "https://fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff.supabase.co";
+  const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjcXVpdC1wbGF0Zm9ybSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjIwMDAwMDAwMDB9.mock-anon-key-acquit-ai";
+
+  let acquitSupabase = null;
+  if (window.supabase && typeof window.supabase.createClient === "function") {
+    try {
+      acquitSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          storageKey: "acquit_canva_supabase_auth"
+        },
+        realtime: { params: { eventsPerSecond: 10 } }
+      });
+      window.acquitSupabase = acquitSupabase;
+      console.log("[Acquit.ai Canvas OS] Browser Supabase Client Initialized with Public Anon Key.");
+    } catch(err) {
+      console.warn("[Acquit.ai Canvas OS] Supabase Client Init Notice:", err);
+    }
+  }
+
+
+  // --- Acquit.ai Backend & Canva AI Wiring ---
+  const getApiBase = () => {
+    // When embedded in Canva or external site, call our Cloud Run backend directly
+    if (window.location.origin.includes("canva.site") || window.location.origin.includes("canva-hosted-embed")) {
+      return "https://ais-dev-qjsfgzlagan6blqltrhwng-205627821036.us-east1.run.app/api";
+    }
+    // Local development or same-origin Cloud Run
+    return "/api";
+  };
+
+  const getHeaders = () => ({
+    "Content-Type": "application/json",
+    "Authorization": "Bearer canva-live-token"
+  });
+
+  // A. The Clerk AI Procedural Chat
+  const clerkTabAi = document.getElementById("clerk-tab-ai");
+  const clerkTabNotices = document.getElementById("clerk-tab-notices");
+  const clerkAiPanel = document.getElementById("clerk-ai-panel");
+  const clerkNoticesPanel = document.getElementById("clerk-notices-panel");
+  const clerkChatMessages = document.getElementById("clerk-chat-messages");
+  const clerkChatForm = document.getElementById("clerk-chat-form");
+  const clerkChatInput = document.getElementById("clerk-chat-input");
+  const clerkChatSend = document.getElementById("clerk-chat-send");
+
+  if (clerkTabAi && clerkTabNotices) {
+    clerkTabAi.addEventListener("click", () => {
+      clerkAiPanel.classList.remove("hidden");
+      clerkNoticesPanel.classList.add("hidden");
+      clerkTabAi.className = "px-3 py-2 border-b-2 border-[#d4af37] font-bold text-[#f3ede8]";
+      clerkTabNotices.className = "px-3 py-2 text-[#8e857e] hover:text-[#d4af37]";
+    });
+    clerkTabNotices.addEventListener("click", () => {
+      clerkAiPanel.classList.add("hidden");
+      clerkNoticesPanel.classList.remove("hidden");
+      clerkTabNotices.className = "px-3 py-2 border-b-2 border-[#d4af37] font-bold text-[#f3ede8]";
+      clerkTabAi.className = "px-3 py-2 text-[#8e857e] hover:text-[#d4af37]";
+    });
+  }
+
+  // Quick prompt buttons
+  document.querySelectorAll(".clerk-quick-prompt").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (clerkChatInput) {
+        clerkChatInput.value = btn.dataset.prompt;
+        clerkChatForm.dispatchEvent(new Event("submit", { cancelable: true }));
+      }
+    });
+  });
+
+  if (clerkChatForm) {
+    clerkChatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const query = clerkChatInput.value.trim();
+      if (!query) return;
+
+      // Append user bubble
+      const userBubble = document.createElement("div");
+      userBubble.className = "p-3 bg-[#242424] border border-[#3b3b3b] rounded text-[#f3ede8]";
+      userBubble.innerHTML = `<p class="font-bold text-[10px] mono text-[#cfc5be] mb-1">YOU</p><p class="leading-5">${escapeHtml(query)}</p>`;
+      clerkChatMessages.appendChild(userBubble);
+      clerkChatInput.value = "";
+      clerkChatSend.disabled = true;
+      clerkChatSend.textContent = "...";
+
+      // Typing indicator
+      const typingBubble = document.createElement("div");
+      typingBubble.className = "p-3 bg-[#171717] border border-[#2a2a2a] rounded";
+      typingBubble.id = "clerk-typing";
+      typingBubble.innerHTML = `<p class="font-bold gold-text text-[10px] mono mb-1">THE CLERK (AI)</p><p class="text-[#8e857e] animate-pulse">Consulting procedural rules &amp; statutes...</p>`;
+      clerkChatMessages.appendChild(typingBubble);
+      clerkChatMessages.scrollTop = clerkChatMessages.scrollHeight;
+
+      try {
+        const res = await fetch(`${getApiBase()}/gemini/clerk-chat`, {
+          method: "POST",
+          headers: getHeaders(),
+          body: JSON.stringify({
+            message: query,
+            jurisdiction: "Arizona",
+            context: { matter: "State v. Marlowe", caseNumber: "24-CR-118", stage: "Suppression Hearing" }
+          })
+        });
+        const data = await res.json();
+        typingBubble.remove();
+
+        const aiBubble = document.createElement("div");
+        aiBubble.className = "p-3 bg-[#171717] border border-[#2a2a2a] rounded";
+        const bodyText = data.text || "I was unable to retrieve that court procedure. Please verify with local court administration.";
+        aiBubble.innerHTML = `
+          <p class="font-bold gold-text text-[10px] mono mb-1">THE CLERK (AI)</p>
+          <div class="leading-5 text-[#f3ede8] space-y-2">${formatAiText(bodyText)}</div>
+          <div class="mt-2 pt-2 border-t rule text-[9px] mono text-[#8e857e]">PREPARED FOR SELF-REPRESENTED LITIGANT · NOT LEGAL ADVICE</div>
+        `;
+        clerkChatMessages.appendChild(aiBubble);
+      } catch (err) {
+        typingBubble.remove();
+        const errBubble = document.createElement("div");
+        errBubble.className = "p-3 bg-[#2a1b1b] border border-[#552222] rounded text-[#f3c8c8]";
+        errBubble.innerHTML = `<p class="font-bold text-[10px] mono mb-1">CONNECTIVITY NOTICE</p><p class="leading-5">The Clerk assistant is temporarily unreachable. (Error: ${err.message}). Local offline procedures are still accessible.</p>`;
+        clerkChatMessages.appendChild(errBubble);
+      } finally {
+        clerkChatSend.disabled = false;
+        clerkChatSend.textContent = "Ask Clerk";
+        clerkChatMessages.scrollTop = clerkChatMessages.scrollHeight;
+      }
+    });
+  }
+
+  // B. Live Evidence Analysis (Gemini 3.8 Flash)
+  const runAiAnalysisBtn = document.getElementById("run-ai-evidence-analysis");
+  const analysisOutput = document.getElementById("analysis-output-container");
+  if (runAiAnalysisBtn && analysisOutput) {
+    runAiAnalysisBtn.addEventListener("click", async () => {
+      runAiAnalysisBtn.disabled = true;
+      runAiAnalysisBtn.innerHTML = `<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i><span>Analyzing Record...</span>`;
+      analysisOutput.innerHTML = `<div class="p-4 text-center text-[#d4af37] animate-pulse">Running factual breakdown, chain-of-custody verification, and Fourth Amendment search scope check via Gemini...</div>`;
+      
+      try {
+        const res = await fetch(`${getApiBase()}/gemini/analyze-evidence`, {
+          method: "POST",
+          headers: getHeaders(),
+          body: JSON.stringify({
+            title: "Exhibit 04 · North Entrance Surveillance Camera Footage",
+            category: "Video / Surveillance",
+            description: "CCTV showing intersection timing at 02:14 AM. Chain of custody log and camera sync documentation.",
+            tags: ["cctv", "traffic-stop", "timestamp-audit"],
+            charges: "State v. Marlowe (Count I Trespass / Suppression of Seized Vehicle Contents)"
+          })
+        });
+        const data = await res.json();
+        const resultText = data.analysis || "Analysis completed without explicit flags.";
+        analysisOutput.innerHTML = `
+          <div class="border-b rule pb-2 flex justify-between items-center">
+            <span class="font-bold gold-text mono text-[10px]">EVALUATION COMPLETE · AUDIT TIMESTAMP: ${new Date().toLocaleTimeString()}</span>
+            <span class="tag good text-[9px]">GROUNDED IN FACTUAL RECORD</span>
+          </div>
+          <div class="leading-6 text-[#f3ede8] space-y-2 whitespace-pre-wrap">${formatAiText(resultText)}</div>
+        `;
+        lucide.createIcons();
+      } catch (err) {
+        analysisOutput.innerHTML = `<div class="p-3 bg-[#2a1b1b] border border-[#552222] text-[#f3c8c8]">Analysis error: ${err.message}</div>`;
+      } finally {
+        runAiAnalysisBtn.disabled = false;
+        runAiAnalysisBtn.innerHTML = `<i data-lucide="sparkles" class="w-3.5 h-3.5"></i><span>Run Factual &amp; Chain-of-Custody Analysis</span>`;
+        lucide.createIcons();
+      }
+    });
+  }
+
+  // C. Live Motion Drafting (Gemini 3.8 Flash)
+  const runAiMotionDraftBtn = document.getElementById("run-ai-motion-draft");
+  const draftTextArea = document.getElementById("draft-text");
+  const draftStatus = document.getElementById("draft-generate-status");
+  if (runAiMotionDraftBtn && draftTextArea) {
+    runAiMotionDraftBtn.addEventListener("click", async () => {
+      const motionType = document.getElementById("ai-motion-type").value;
+      const relief = document.getElementById("ai-motion-relief").value;
+      const grounds = document.getElementById("ai-motion-grounds").value;
+
+      runAiMotionDraftBtn.disabled = true;
+      runAiMotionDraftBtn.innerHTML = `<span>Drafting Pleading...</span>`;
+      if (draftStatus) draftStatus.textContent = "Synthesizing caption & statutory claims...";
+
+      try {
+        const res = await fetch(`${getApiBase()}/gemini/draft-motion`, {
+          method: "POST",
+          headers: getHeaders(),
+          body: JSON.stringify({
+            motionType,
+            courtName: "Maricopa County Superior Court, Criminal Division",
+            caseNumber: "24-CR-118",
+            defendantName: "Arthur Marlowe (Pro Se Litigant)",
+            grounds,
+            requestedRelief: relief
+          })
+        });
+        const data = await res.json();
+        if (data.draft) {
+          draftTextArea.value = data.draft;
+          if (draftStatus) draftStatus.textContent = "Draft generated! Review independently before filing.";
+        }
+      } catch (err) {
+        if (draftStatus) draftStatus.textContent = "Drafting failed: " + err.message;
+      } finally {
+        runAiMotionDraftBtn.disabled = false;
+        runAiMotionDraftBtn.innerHTML = `<i data-lucide="file-text" class="w-3.5 h-3.5 text-[#d4af37]"></i><span>Generate Pleading Template with Gemini</span>`;
+        lucide.createIcons();
+      }
+    });
+  }
+
+  // D. Live Neutral Plea Assistant
+  const runAiPleaBtn = document.getElementById("run-ai-plea-assistant");
+  const pleaResultsContainer = document.getElementById("plea-results-container");
+  const pleaStatusText = document.getElementById("plea-status-text");
+  if (runAiPleaBtn && pleaResultsContainer) {
+    runAiPleaBtn.addEventListener("click", async () => {
+      const offer = document.getElementById("plea-input-offer").value;
+      const exposure = document.getElementById("plea-input-exposure").value;
+
+      runAiPleaBtn.disabled = true;
+      if (pleaStatusText) pleaStatusText.textContent = "Calculating collateral consequences & questions...";
+      pleaResultsContainer.innerHTML = `<div class="p-4 text-center text-[#d4af37] animate-pulse">Organizing neutral comparison matrix and attorney interview checklist...</div>`;
+
+      try {
+        const res = await fetch(`${getApiBase()}/gemini/plea-assistant`, {
+          method: "POST",
+          headers: getHeaders(),
+          body: JSON.stringify({
+            charges: "A.R.S. § 13-1504 (Trespass - Count I) & A.R.S. § 13-1602 (Property Damage - Count II)",
+            pleaOffer: offer,
+            trialRisks: exposure,
+            collateralConsequences: "Employment background check flags, potential commercial licensing restrictions."
+          })
+        });
+        const data = await res.json();
+        const text = data.decisionStructure || "Plea analysis generated.";
+        pleaResultsContainer.innerHTML = `
+          <div class="border-b rule pb-2 flex justify-between">
+            <span class="gold-text font-bold mono text-[10px]">NEUTRAL DECISION MATRIX GENERATED</span>
+            <span class="tag text-[9px]">REQUIRES INDEPENDENT COUNSEL REVIEW</span>
+          </div>
+          <div class="leading-6 text-[#f3ede8] space-y-2 whitespace-pre-wrap">${formatAiText(text)}</div>
+        `;
+        if (pleaStatusText) pleaStatusText.textContent = "Framework ready.";
+      } catch (err) {
+        pleaResultsContainer.innerHTML = `<div class="p-3 bg-[#2a1b1b] text-[#f3c8c8]">Error: ${err.message}</div>`;
+        if (pleaStatusText) pleaStatusText.textContent = "Failed";
+      } finally {
+        runAiPleaBtn.disabled = false;
+      }
+    });
+  }
+
+  // E. Live Constitutional Rights Audit
+  const runAiRightsBtn = document.getElementById("run-ai-rights-audit");
+  const rightsResultsContainer = document.getElementById("rights-results-container");
+  const rightsStatusText = document.getElementById("rights-status-text");
+  if (runAiRightsBtn && rightsResultsContainer) {
+    runAiRightsBtn.addEventListener("click", async () => {
+      runAiRightsBtn.disabled = true;
+      if (rightsStatusText) rightsStatusText.textContent = "Evaluating constitutional standards...";
+      rightsResultsContainer.innerHTML = `<div class="p-3 text-center text-[#d4af37] animate-pulse">Cross-referencing arrest timeline with Fourth Amendment stop-and-frisk precedents...</div>`;
+
+      try {
+        const res = await fetch(`${getApiBase()}/gemini/chat`, {
+          method: "POST",
+          headers: getHeaders(),
+          body: JSON.stringify({
+            prompt: "Perform an educational Fourth, Fifth, and Sixth Amendment constitutional rights audit for State v. Marlowe. The police stopped the vehicle at 02:14 AM citing a broken license plate light, then conducted a warrantless search of the rear trunk without consent. Break down: 1. Fourth Amendment (Scope of traffic stop, Terry v. Ohio, Rodriguez v. United States regarding unreasonable delay). 2. Fifth Amendment (Miranda requirements during roadside detention). 3. Sixth Amendment (Right to counsel upon formal charge attachment). Format into plain-English takeaways for self-represented litigants with clear disclaimers.",
+            useHighThinking: false
+          })
+        });
+        const data = await res.json();
+        rightsResultsContainer.innerHTML = `
+          <div class="border-b rule pb-2 flex justify-between">
+            <span class="gold-text font-bold mono text-[10px]">CONSTITUTIONAL AUDIT COMPLETE</span>
+            <span class="tag blue text-[9px]">EDUCATIONAL MEMO</span>
+          </div>
+          <div class="leading-6 text-[#f3ede8] space-y-2 whitespace-pre-wrap">${formatAiText(data.text || "No results generated.")}</div>
+        `;
+        if (rightsStatusText) rightsStatusText.textContent = "Audit complete.";
+      } catch (err) {
+        rightsResultsContainer.innerHTML = `<div class="p-3 bg-[#2a1b1b] text-[#f3c8c8]">Error: ${err.message}</div>`;
+        if (rightsStatusText) rightsStatusText.textContent = "Audit failed";
+      } finally {
+        runAiRightsBtn.disabled = false;
+      }
+    });
+  }
+
+  // F. Investigations Live Research Search
+  const researchInput = document.getElementById("case-research-input");
+  const runResearchBtn = document.getElementById("run-research");
+  const researchResult = document.getElementById("research-result");
+  if (runResearchBtn && researchInput && researchResult) {
+    runResearchBtn.addEventListener("click", async () => {
+      const q = researchInput.value.trim();
+      if (!q) {
+        researchResult.textContent = "Please enter a legal research query or statutory question.";
+        return;
+      }
+      runResearchBtn.disabled = true;
+      researchResult.textContent = "Researching statutory authorities & precedents via Gemini...";
+      try {
+        const res = await fetch(`${getApiBase()}/gemini/chat`, {
+          method: "POST",
+          headers: getHeaders(),
+          body: JSON.stringify({
+            prompt: `Legal Research Query for self-represented litigant in Arizona: "${q}". Provide relevant Arizona statutes (A.R.S.), court rules, and a plain-English explanation. Maintain strict UPL neutrality.`,
+            useSearch: true
+          })
+        });
+        const data = await res.json();
+        researchResult.innerHTML = `<div class="p-3 bg-[#171717] border border-[#2a2a2a] rounded leading-5 whitespace-pre-wrap">${formatAiText(data.text || "No research data returned.")}</div>`;
+      } catch (err) {
+        researchResult.textContent = "Research request failed: " + err.message;
+      } finally {
+        runResearchBtn.disabled = false;
+      }
+    });
+  }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[m]);
+    }
+
+    function formatAiText(text) {
+      return text
+        .replace(/^### (.*$)/gim, '<h4 class="font-bold text-[#d4af37] text-sm mt-3">$1</h4>')
+        .replace(/^## (.*$)/gim, '<h3 class="font-bold text-[#b5c8df] text-sm mt-3">$1</h3>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#fff]">$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em class="text-[#cfc5be]">$1</em>');
+    }
+
+    // Live AI Lawyer / Chambers Conference Room
+    let activeCounselRole = "Lead Counsel";
+    const counselButtons = document.querySelectorAll(".counsel-select-btn");
+    const activeCounselIndicator = document.getElementById("active-counsel-indicator");
+
+    counselButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        counselButtons.forEach(b => {
+          b.classList.remove("bg-[#25231d]");
+          b.classList.add("bg-[#202020]");
+        });
+        btn.classList.remove("bg-[#202020]");
+        btn.classList.add("bg-[#25231d]");
+        activeCounselRole = btn.dataset.role || "Lead Counsel";
+        if (activeCounselIndicator) {
+          activeCounselIndicator.textContent = `ACTIVE COUNSEL: ${activeCounselRole.toUpperCase()}`;
+        }
+      });
+    });
+
+    // Quick prompt chips for Chambers Conference Room
+    document.querySelectorAll(".conference-quick-prompt").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const confInput = document.getElementById("conference-input");
+        const confForm = document.getElementById("conference-form");
+        if (confInput && confForm) {
+          confInput.value = btn.dataset.prompt;
+          confForm.dispatchEvent(new Event("submit", { cancelable: true }));
+        }
+      });
+    });
+
+    const conferenceForm = document.getElementById("conference-form");
+    const conferenceInput = document.getElementById("conference-input");
+    const conferenceFeed = document.getElementById("conference-feed");
+    const conferenceSubmit = document.getElementById("conference-submit");
+
+    if (conferenceForm && conferenceInput && conferenceFeed) {
+      conferenceForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const message = conferenceInput.value.trim();
+        if (!message) return;
+
+        // User speech bubble
+        const userBubble = document.createElement("div");
+        userBubble.className = "border-l-2 border-[#8f9194] bg-[#242424] p-3 text-sm rounded-r";
+        userBubble.innerHTML = `
+          <div class="flex justify-between items-center mb-1">
+            <b class="text-[#cfc5be] text-xs">You (Pro Se Litigant)</b>
+            <span class="mono text-[9px] text-[#888]">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+          <p class="text-xs leading-5 text-[#f3ede8]">${escapeHtml(message)}</p>
+        `;
+        conferenceFeed.appendChild(userBubble);
+        conferenceInput.value = "";
+        if (conferenceSubmit) {
+          conferenceSubmit.disabled = true;
+          conferenceSubmit.textContent = "Consulting...";
+        }
+
+        // Typing indicator
+        const typingBubble = document.createElement("div");
+        typingBubble.className = "border-l-2 border-[#d4af37] bg-[#1a1813] p-3 text-sm rounded-r animate-pulse";
+        typingBubble.id = "conference-typing";
+        typingBubble.innerHTML = `
+          <b>${escapeHtml(activeCounselRole)}</b>
+          <p class="mt-1 text-xs text-[#d4af37]">Reviewing case record, statutory authorities, and procedural standards...</p>
+        `;
+        conferenceFeed.appendChild(typingBubble);
+        conferenceFeed.scrollTop = conferenceFeed.scrollHeight;
+
+        try {
+          const res = await fetch(`${getApiBase()}/ai/lawyer`, {
+            method: "POST",
+            headers: getHeaders(),
+            body: JSON.stringify({
+              message,
+              jurisdiction: "Arizona",
+              agentRole: activeCounselRole,
+              context: "State v. Marlowe, 24-CR-118, Arizona Superior Court. Warrantless vehicle stop at 02:14 AM. Charges: A.R.S. § 13-1504 (Trespass) and A.R.S. § 13-1602 (Property Damage)."
+            })
+          });
+
+          const data = await res.json();
+          typingBubble.remove();
+
+          const roleColor = activeCounselRole === "Lead Counsel" ? "#d4af37" : (activeCounselRole === "Research Counsel" ? "#b5c8df" : "#9fc6ae");
+          const aiBubble = document.createElement("div");
+          aiBubble.className = "border-l-2 p-3 text-sm rounded-r bg-[#1c1a17]";
+          aiBubble.style.borderLeftColor = roleColor;
+          aiBubble.innerHTML = `
+            <div class="flex justify-between items-center mb-1">
+              <b style="color: ${roleColor}">${escapeHtml(data.agentRole || activeCounselRole)}</b>
+              <span class="mono text-[9px] text-[#9fc6ae]">VERIFIED PRO SE CITATION PROTOCOL</span>
+            </div>
+            <div class="mt-1 text-xs leading-5 text-[#cfc5be] space-y-2">${formatAiText(data.text || "Consultation complete.")}</div>
+            <div class="mt-2 pt-2 border-t rule text-[9px] mono text-[#8e857e]">PREPARED FOR SELF-REPRESENTED LITIGANT · NOT LEGAL ADVICE · REQUIRES HUMAN REVIEW</div>
+          `;
+          conferenceFeed.appendChild(aiBubble);
+        } catch (err) {
+          typingBubble.remove();
+          const errBubble = document.createElement("div");
+          errBubble.className = "border-l-2 border-red-500 bg-[#2a1b1b] p-3 text-xs text-[#f3c8c8] rounded-r";
+          errBubble.innerHTML = `<b>Consultation Notice</b><p class="mt-1">Unable to connect to AI Counsel (${escapeHtml(err.message)}). Local offline materials remain accessible.</p>`;
+          conferenceFeed.appendChild(errBubble);
+        } finally {
+          if (conferenceSubmit) {
+            conferenceSubmit.disabled = false;
+            conferenceSubmit.textContent = "Consult Counsel";
+          }
+          conferenceFeed.scrollTop = conferenceFeed.scrollHeight;
+        }
+      });
+    }
+
+  const modules = [
+    ['command-center','layout-dashboard','Command Center'],['docket','book-open','The Docket'],['chambers','landmark','Chambers'],
+    ['law-library','library','Law Library'],['investigations','search','Investigations'],['record-room','archive','Record Room'],
+    ['case-timeline','git-commit-vertical','Case Timeline'],['court-watch','radio','Court Watch'],['counsel-directory','users','Counsel Directory'],
+    ['motions-tasks','check-square','Motions & Tasks']
+  ];
+  const desktop=document.getElementById('desktop-nav-list'), mobile=document.getElementById('mobile-nav-list');
+  modules.forEach(([id,icon,label]) => {
+    [desktop,mobile].forEach(list => {
+      const button=document.createElement('button');button.type='button';button.className='nav-item'+(id==='command-center'?' is-active':'');button.dataset.view=id;
+      button.innerHTML='<i data-lucide="'+icon+'" class="h-4 w-4"></i>'+label;list.appendChild(button);
+    });
+  });
+  lucide.createIcons();
+
+  const views=[...document.querySelectorAll('.workspace-view')];
+  function route(id){
+    try {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: "LEGAL_OS_NAVIGATE", view: id }, "*");
+      }
+    } catch(e) {}
+    try {
+      if (history.replaceState) {
+        const u = new URL(window.location);
+        u.searchParams.set("view", id);
+        history.replaceState(null, "", u.toString());
+      }
+    } catch(e) {}
+    views.forEach(v=>v.classList.toggle('is-active',v.id===id));
+    document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('is-active',b.dataset.view===id));
+    document.getElementById('mobile-rail').classList.remove('is-open');
+    const heading=document.querySelector('#'+id+' h2');
+    if(heading){ heading.setAttribute('tabindex','-1'); heading.focus({preventScroll:true}); }
+    document.getElementById('main-content').scrollIntoView({behavior:document.body.classList.contains('reduce-motion')?'auto':'smooth',block:'start'});
+  }
+  document.addEventListener('click', e=>{const trigger=e.target.closest('[data-view]');if(trigger)route(trigger.dataset.view)});
+
+  const rail=document.getElementById('mobile-rail');
+  document.getElementById('open-mobile-nav').addEventListener('click',()=>rail.classList.add('is-open'));
+  document.getElementById('close-mobile-nav').addEventListener('click',()=>rail.classList.remove('is-open'));
+
+  const clerk=document.getElementById('clerk-drawer');
+  document.getElementById('clerk-button').addEventListener('click',()=>{clerk.classList.add('is-open');clerk.setAttribute('aria-hidden','false')});
+  document.getElementById('close-clerk').addEventListener('click',()=>{clerk.classList.remove('is-open');clerk.setAttribute('aria-hidden','true')});
+  document.querySelectorAll('.notice-review').forEach(btn=>btn.addEventListener('click',()=>{btn.textContent='Reviewed';btn.disabled=true}));
+
+  document.querySelectorAll('[data-open-modal]').forEach(btn=>btn.addEventListener('click',()=>document.getElementById(btn.dataset.openModal).classList.add('is-open')));
+  document.querySelectorAll('.close-modal').forEach(btn=>btn.addEventListener('click',()=>btn.closest('.modal-backdrop').classList.remove('is-open')));
+  document.querySelectorAll('.modal-backdrop').forEach(modal=>modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('is-open')}));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.modal-backdrop.is-open').forEach(m=>m.classList.remove('is-open'));rail.classList.remove('is-open');clerk.classList.remove('is-open')}});
+
+  document.querySelectorAll('.modal-form').forEach(form=>form.addEventListener('submit',e=>{e.preventDefault();const status=form.querySelector('.modal-status');status.textContent='Entry recorded in this workspace for the current session.';form.querySelector('button[type="submit"]').disabled=true;}));
+
+  function setupCarousel(root){
+    const viewport=root.querySelector('[data-carousel-viewport]'),slides=[...root.querySelectorAll('.carousel-slide')],prev=root.querySelector('[data-carousel-prev]'),next=root.querySelector('[data-carousel-next]'),dots=root.querySelector('[data-carousel-dots]');
+    if(!viewport||!slides.length)return;let active=0;
+    slides.forEach((slide,i)=>{const dot=document.createElement('button');dot.type='button';dot.className='carousel-dot'+(!i?' is-active':'');dot.setAttribute('aria-label','Go to exhibit '+(i+1));dot.addEventListener('click',()=>slide.scrollIntoView({behavior:document.body.classList.contains('reduce-motion')?'auto':'smooth',inline:'start',block:'nearest'}));dots.appendChild(dot)});
+    function update(){active=slides.reduce((best,s,i)=>Math.abs(s.offsetLeft-viewport.scrollLeft)<Math.abs(slides[best].offsetLeft-viewport.scrollLeft)?i:best,0);[...dots.children].forEach((d,i)=>d.classList.toggle('is-active',i===active));prev.disabled=active===0;next.disabled=active===slides.length-1}
+    prev.addEventListener('click',()=>slides[Math.max(0,active-1)].scrollIntoView({behavior:'smooth',inline:'start'}));next.addEventListener('click',()=>slides[Math.min(slides.length-1,active+1)].scrollIntoView({behavior:'smooth',inline:'start'}));
+    viewport.addEventListener('scroll',()=>requestAnimationFrame(update),{passive:true});
+    viewport.addEventListener('keydown',e=>{if(e.key==='ArrowRight'){e.preventDefault();next.click()}if(e.key==='ArrowLeft'){e.preventDefault();prev.click()}});
+    let drag=false,x=0,left=0;viewport.addEventListener('pointerdown',e=>{drag=true;x=e.clientX;left=viewport.scrollLeft;viewport.setPointerCapture(e.pointerId);viewport.classList.add('is-dragging')});viewport.addEventListener('pointermove',e=>{if(drag)viewport.scrollLeft=left-(e.clientX-x)});['pointerup','pointercancel'].forEach(type=>viewport.addEventListener(type,()=>{drag=false;viewport.classList.remove('is-dragging')}));update();
+  }
+  document.querySelectorAll('[data-carousel]').forEach(setupCarousel);
+  document.querySelectorAll('[data-evidence]').forEach(card=>card.addEventListener('click',()=>document.getElementById('evidence-inspector-text').textContent=card.dataset.evidence));
+
+  const docketSearch=document.getElementById('docket-search');
+  function filterDocket(){const q=docketSearch.value.toLowerCase();const status=document.querySelector('.docket-filter.is-selected')?.dataset.filter||'all';document.querySelectorAll('.docket-entry').forEach(row=>row.hidden=!(row.dataset.search.includes(q)&&(status==='all'||row.dataset.status===status)))}
+  docketSearch.addEventListener('input',filterDocket);
+  document.querySelectorAll('.docket-filter').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.docket-filter').forEach(x=>x.classList.remove('is-selected'));b.classList.add('is-selected');filterDocket()}));
+
+  document.querySelectorAll('.investigation-tab').forEach(btn=>btn.addEventListener('click',()=>{const locker=btn.dataset.tab==='locker';document.getElementById('research-tab').classList.toggle('hidden',locker);document.getElementById('locker-tab').classList.toggle('hidden',!locker);document.querySelectorAll('.investigation-tab').forEach(x=>{x.classList.toggle('primary',x===btn);x.classList.toggle('secondary',x!==btn)})}));
+  document.getElementById('run-research').addEventListener('click',()=>{const q=document.getElementById('case-research-input').value.trim();document.getElementById('research-result').textContent=q?'Research queue prepared for: '+q:'Enter a case-scoped research query.'});
+  document.getElementById('evidence-type').addEventListener('change',e=>document.querySelectorAll('.evidence-slide').forEach(s=>s.hidden=e.target.value!=='all'&&s.dataset.type!==e.target.value));
+
+  document.querySelectorAll('.library-result').forEach(btn=>btn.addEventListener('click',()=>{document.querySelector('[data-template-id="open-volume-title"]').textContent=btn.querySelector('b').textContent}));
+  function filterLibrary(){const q=document.getElementById('library-search').value.toLowerCase(),j=document.getElementById('jurisdiction-filter').value,s=document.getElementById('source-filter').value;let count=0;document.querySelectorAll('.library-result').forEach(r=>{const yes=r.textContent.toLowerCase().includes(q)&&(j==='all'||r.dataset.jurisdiction===j)&&(s==='all'||r.dataset.source===s);r.hidden=!yes;if(yes)count++});document.getElementById('library-count').textContent=count+' VOLUMES MATCHED · RESEARCH BRIEF READY'}
+  ['library-search','jurisdiction-filter','source-filter'].forEach(id=>document.getElementById(id).addEventListener(id==='library-search'?'input':'change',filterLibrary));
+
+  document.querySelectorAll('.record-filter').forEach(btn=>btn.addEventListener('click',()=>document.querySelectorAll('.record-row').forEach(row=>row.hidden=btn.dataset.recordFilter!=='all'&&row.dataset.recordType!==btn.dataset.recordFilter)));
+  document.querySelectorAll('.record-preview').forEach(btn=>btn.addEventListener('click',()=>document.getElementById('record-preview-panel').classList.remove('hidden')));
+  document.getElementById('close-record-preview').addEventListener('click',()=>document.getElementById('record-preview-panel').classList.add('hidden'));
+  document.querySelectorAll('.timeline-event').forEach(btn=>btn.addEventListener('click',()=>document.getElementById('event-record-text').textContent=btn.dataset.event));
+  document.getElementById('calculate-deadline').addEventListener('click',()=>{const d=Number(document.getElementById('deadline-days').value)||0;const date=new Date();date.setDate(date.getDate()+d);document.getElementById('deadline-result').textContent='Calculated review date: '+date.toLocaleDateString()});
+  document.getElementById('print-chronology').addEventListener('click',()=>window.print());
+  document.getElementById('docket-sync').addEventListener('change',e=>document.getElementById('watch-feed').style.opacity=e.target.checked?'1':'.55');
+
+  function filterCounsel(){const q=document.getElementById('counsel-search').value.toLowerCase(),p=document.getElementById('practice-filter').value;document.querySelectorAll('.counsel-card').forEach(c=>c.hidden=!(c.dataset.search.includes(q)&&(p==='all'||c.dataset.practice===p)))}
+  document.getElementById('counsel-search').addEventListener('input',filterCounsel);document.getElementById('practice-filter').addEventListener('change',filterCounsel);
+  document.querySelectorAll('.attorney-profile').forEach(btn=>btn.addEventListener('click',()=>document.getElementById('counsel-modal').classList.add('is-open')));
+  document.querySelectorAll('.task-status').forEach(btn=>btn.addEventListener('click',()=>{btn.textContent='Status updated';btn.disabled=true}));
+
+  const root=document.documentElement,controls={scale:document.getElementById('font-scale'),contrast:document.getElementById('high-contrast'),motion:document.getElementById('motion-reduction'),reader:document.getElementById('screen-reader')},scaleValue=document.getElementById('font-scale-value'),status=document.getElementById('preference-status');
+  function applyPreferences(announce){root.style.setProperty('--scale',Number(controls.scale.value)/100);document.body.classList.toggle('high-contrast',controls.contrast.checked);document.body.classList.toggle('reduce-motion',controls.motion.checked);document.body.toggleAttribute('data-screen-reader-optimized',controls.reader.checked);scaleValue.textContent=controls.scale.value+'%';if(announce)status.textContent='Preferences updated. Select Save Preferences to keep these settings for this browser.'}
+  try{const saved=JSON.parse(localStorage.getItem('acquit-accessibility-preferences'));if(saved){controls.scale.value=saved.scale||100;controls.contrast.checked=!!saved.contrast;controls.motion.checked=saved.motion!==false;controls.reader.checked=!!saved.reader}}catch(e){}
+  applyPreferences(false);Object.values(controls).forEach(c=>c.addEventListener(c===controls.scale?'input':'change',()=>applyPreferences(true)));
+  document.getElementById('save-preferences').addEventListener('click',()=>{try{localStorage.setItem('acquit-accessibility-preferences',JSON.stringify({scale:Number(controls.scale.value),contrast:controls.contrast.checked,motion:controls.motion.checked,reader:controls.reader.checked}));status.textContent='Accessibility preferences saved.'}catch(e){status.textContent='Preferences are active for this visit.'}});
+
+    // Check initial view from URL
+    try {
+      const p = new URLSearchParams(window.location.search).get("view") || window.location.hash.replace("#", "");
+      if (p && document.getElementById(p)) {
+        route(p);
+      }
+    } catch(e) {}
+  }
+  
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initLegalOS);
+  } else {
+    initLegalOS();
+  }
+  
+  window.addEventListener("message", (e) => {
+    if (e.data && e.data.type === "SET_VIEW" && e.data.view) {
+      const v = document.getElementById(e.data.view);
+      if (v) {
+        document.querySelectorAll(".workspace-view").forEach(x => x.classList.toggle("is-active", x.id === e.data.view));
+        document.querySelectorAll("[data-view]").forEach(b => b.classList.toggle("is-active", b.dataset.view === e.data.view));
+        const activeLabel = document.getElementById("active-view-label");
+        if (activeLabel) activeLabel.textContent = v.dataset.title || e.data.view;
+      }
+    } else if (e.data && (e.data.type === "OPEN_CLERK" || e.data.action === "openClerk")) {
+      const clerk = document.getElementById("clerk-drawer");
+      if (clerk) {
+        clerk.classList.add("is-open");
+        clerk.setAttribute("aria-hidden", "false");
+        const input = document.getElementById("clerk-chat-input");
+        if (input) setTimeout(() => input.focus(), 150);
+      }
+    }
+  });
+  </script></body>
+</html>

@@ -1,24 +1,21 @@
 import { useEffect, useState, type ComponentType } from "react";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from "react-router-dom";
 import { modules as discoveredModules } from "./.generated/mockup-components";
-import { Navigation } from "./components/Navigation";
-import { CaseWorkspace } from "./components/mockups/acquit-case-workspace/CaseWorkspace";
-import { AILab } from "./components/mockups/acquit-case-workspace/AILab";
-import { AttorneyDirectory } from "./components/mockups/acquit-case-workspace/AttorneyDirectory";
-import { AcquitAcademy } from "./components/mockups/acquit-case-workspace/AcquitAcademy";
-import { FilingCenter } from "./components/mockups/acquit-case-workspace/FilingCenter";
-import { LawLibraryExplorer } from "./components/mockups/acquit-case-workspace/LawLibraryExplorer";
-import { DocumentEditorVSCode } from "./components/mockups/acquit-case-workspace/DocumentEditorVSCode";
-import { CaseTimeline } from "./components/mockups/acquit-case-workspace/CaseTimeline";
-import { EvidenceCarousel } from "./components/mockups/acquit-case-workspace/EvidenceCarousel";
-import { SovereignCylinder } from "./components/mockups/acquit-case-workspace/SovereignCylinder";
+import { CanvaLegalOSViewer } from "./components/canva/CanvaLegalOSViewer";
+import { StitchMasterNav } from "./components/stitch/StitchMasterNav";
+import { StitchCategoryPage } from "./components/stitch/StitchCategoryPage";
+import { StitchMockupDirectPage } from "./components/stitch/StitchMockupDirectPage";
 import { StitchGallery } from "./components/mockups/acquit-case-workspace/StitchGallery";
+import { AcquitAcademy } from "./components/mockups/acquit-case-workspace/AcquitAcademy";
+import { DocumentEditorVSCode } from "./components/mockups/acquit-case-workspace/DocumentEditorVSCode";
+import { SovereignCylinder } from "./components/mockups/acquit-case-workspace/SovereignCylinder";
 import { GoogleWorkspaceIntegration } from "./components/mockups/acquit-case-workspace/GoogleWorkspaceIntegration";
 import { RagCitationViewer } from "./components/mockups/acquit-case-workspace/RagCitationViewer";
 import { FeaturedAttorneysCarousel } from "./components/mockups/acquit-case-workspace/FeaturedAttorneysCarousel";
 import { FeaturedCoursesCarousel } from "./components/mockups/acquit-case-workspace/FeaturedCoursesCarousel";
 import { MOCK_RAG_MESSAGES } from "./components/mockups/acquit-case-workspace/legalData";
 import { ChainOfCommandWorkspace } from "./components/mockups/chain-of-command/ChainOfCommandWorkspace";
+import { AuthProvider, WorkspaceGuard } from "./contexts/AuthContext";
 
 type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
 
@@ -248,41 +245,170 @@ function HomePage() {
   );
 }
 
+function StitchCategoryPageRoute() {
+  const { categoryId } = useParams<{ categoryId: string }>();
+  return <StitchCategoryPage categoryId={categoryId || "command_center"} />;
+}
+
 function MainApp() {
+  const location = useLocation();
+  const isStitchOrTool =
+    location.pathname.startsWith("/stitch") ||
+    location.pathname.startsWith("/stitch-view") ||
+    location.pathname.startsWith("/category") ||
+    location.pathname === "/gallery" ||
+    location.pathname === "/chain-of-command" ||
+    location.pathname === "/document-editor" ||
+    location.pathname === "/editor" ||
+    location.pathname === "/document-vault" ||
+    location.pathname === "/cylinder" ||
+    location.pathname === "/academy" ||
+    location.pathname === "/google-workspace" ||
+    location.pathname === "/google" ||
+    location.pathname === "/rag-citations" ||
+    location.pathname === "/rag" ||
+    location.pathname === "/featured-attorneys" ||
+    location.pathname === "/carousel-attorneys" ||
+    location.pathname === "/featured-courses" ||
+    location.pathname === "/carousel-courses";
+
   return (
-    <div className="flex flex-col min-h-screen bg-[#0A0A0A]">
-      <Navigation />
+    <div className="flex flex-col min-h-screen bg-[#0e0e0e]">
+      {isStitchOrTool && <StitchMasterNav />}
       <div className="flex-1 relative">
         <Routes>
-          <Route path="/" element={<CaseWorkspace />} />
-          <Route path="/case-workspace" element={<CaseWorkspace />} />
-          <Route path="/workspace" element={<CaseWorkspace />} />
-          <Route path="/ai-lab" element={<AILab />} />
-          <Route path="/attorney-directory" element={<AttorneyDirectory />} />
-          <Route path="/directory" element={<AttorneyDirectory />} />
-          <Route path="/academy" element={<AcquitAcademy />} />
-          <Route path="/filing-center" element={<FilingCenter />} />
-          <Route path="/filing" element={<FilingCenter />} />
-          <Route path="/law-library" element={<LawLibraryExplorer />} />
-          <Route path="/library" element={<LawLibraryExplorer />} />
-          <Route path="/document-editor" element={<DocumentEditorVSCode />} />
-          <Route path="/editor" element={<DocumentEditorVSCode />} />
-          <Route path="/timeline" element={<CaseTimeline onSelectEventDoc={() => {}} onOpenFilingCenter={() => {}} />} />
-          <Route path="/evidence" element={<EvidenceCarousel />} />
-          <Route path="/document-vault" element={<SovereignCylinder />} />
-          <Route path="/cylinder" element={<SovereignCylinder />} />
-          <Route path="/gallery" element={<Gallery />} />
+          {/* Primary Legal OS Workspace Pages (Mirroring https://lvluplabs.my.canva.site/) */}
+          <Route path="/" element={<CanvaLegalOSViewer defaultView="command-center" />} />
+          <Route path="/command-center" element={<CanvaLegalOSViewer defaultView="command-center" />} />
+          <Route path="/docket" element={<CanvaLegalOSViewer defaultView="docket" />} />
+          <Route path="/cases" element={<CanvaLegalOSViewer defaultView="docket" />} />
+          <Route path="/case-workspace" element={<CanvaLegalOSViewer defaultView="docket" />} />
+          <Route path="/workspace" element={<CanvaLegalOSViewer defaultView="docket" />} />
+          <Route path="/chambers" element={<CanvaLegalOSViewer defaultView="chambers" />} />
+          <Route path="/ai-lab" element={<CanvaLegalOSViewer defaultView="chambers" />} />
+          <Route path="/ai-legal-team" element={<CanvaLegalOSViewer defaultView="chambers" />} />
+          <Route path="/timeline" element={<CanvaLegalOSViewer defaultView="case-timeline" />} />
+          <Route path="/case-timeline" element={<CanvaLegalOSViewer defaultView="case-timeline" />} />
+          <Route path="/investigations" element={<CanvaLegalOSViewer defaultView="investigations" />} />
+          <Route path="/evidence" element={<CanvaLegalOSViewer defaultView="investigations" />} />
+          <Route path="/record-room" element={<CanvaLegalOSViewer defaultView="record-room" />} />
+          <Route path="/documents" element={<CanvaLegalOSViewer defaultView="record-room" />} />
+          <Route path="/records" element={<CanvaLegalOSViewer defaultView="record-room" />} />
+          <Route path="/law-library" element={<CanvaLegalOSViewer defaultView="law-library" />} />
+          <Route path="/library" element={<CanvaLegalOSViewer defaultView="law-library" />} />
+          <Route path="/motions" element={<CanvaLegalOSViewer defaultView="motions-tasks" />} />
+          <Route path="/motions-tasks" element={<CanvaLegalOSViewer defaultView="motions-tasks" />} />
+          <Route path="/calendar" element={<CanvaLegalOSViewer defaultView="motions-tasks" />} />
+          <Route path="/tasks" element={<CanvaLegalOSViewer defaultView="motions-tasks" />} />
+          <Route path="/court-watch" element={<CanvaLegalOSViewer defaultView="court-watch" />} />
+          <Route path="/hearings" element={<CanvaLegalOSViewer defaultView="court-watch" />} />
+          <Route path="/counsel" element={<CanvaLegalOSViewer defaultView="counsel-directory" />} />
+          <Route path="/directory" element={<CanvaLegalOSViewer defaultView="counsel-directory" />} />
+          <Route path="/attorney-directory" element={<CanvaLegalOSViewer defaultView="counsel-directory" />} />
+          <Route path="/filing" element={<CanvaLegalOSViewer defaultView="record-room" />} />
+          <Route path="/filing-center" element={<CanvaLegalOSViewer defaultView="record-room" />} />
+          <Route path="/accessibility" element={<CanvaLegalOSViewer defaultView="accessibility-settings" />} />
+          <Route path="/accessibility-settings" element={<CanvaLegalOSViewer defaultView="accessibility-settings" />} />
+          <Route path="/security" element={<CanvaLegalOSViewer defaultView="system-settings" />} />
+          <Route path="/audit" element={<CanvaLegalOSViewer defaultView="system-settings" />} />
+          <Route path="/settings" element={<CanvaLegalOSViewer defaultView="system-settings" />} />
+          <Route path="/system" element={<CanvaLegalOSViewer defaultView="system-settings" />} />
+          <Route path="/system-settings" element={<CanvaLegalOSViewer defaultView="system-settings" />} />
+
+          {/* Stitch Category Deep Screens */}
+          <Route path="/stitch-view/:categoryId" element={<StitchCategoryPageRoute />} />
+          <Route path="/category/:categoryId" element={<StitchCategoryPageRoute />} />
+
+          {/* Direct Mockup and Matrix Gallery */}
+          <Route path="/stitch/:mockupName" element={<StitchMockupDirectPage />} />
+          <Route path="/gallery" element={<StitchGallery />} />
           <Route path="/stitch" element={<StitchGallery />} />
-          <Route path="/google-workspace" element={<GoogleWorkspaceIntegration matterTitle="Sample Matter" caseNumber="IN-12345" courtName="Sample Court" />} />
-          <Route path="/google" element={<GoogleWorkspaceIntegration matterTitle="Sample Matter" caseNumber="IN-12345" courtName="Sample Court" />} />
-          <Route path="/rag-citations" element={<div className="p-8"><RagCitationViewer message={MOCK_RAG_MESSAGES[0]} onOpenLawLibrary={() => {}} /></div>} />
-          <Route path="/rag" element={<div className="p-8"><RagCitationViewer message={MOCK_RAG_MESSAGES[0]} onOpenLawLibrary={() => {}} /></div>} />
-          <Route path="/chain-of-command" element={<ChainOfCommandWorkspace />} />
+
+          {/* Pro Workspace Tools (Protected with WorkspaceGuard) */}
+          <Route
+            path="/chain-of-command"
+            element={
+              <WorkspaceGuard>
+                <ChainOfCommandWorkspace />
+              </WorkspaceGuard>
+            }
+          />
+          <Route
+            path="/document-editor"
+            element={
+              <WorkspaceGuard>
+                <DocumentEditorVSCode />
+              </WorkspaceGuard>
+            }
+          />
+          <Route
+            path="/editor"
+            element={
+              <WorkspaceGuard>
+                <DocumentEditorVSCode />
+              </WorkspaceGuard>
+            }
+          />
+          <Route
+            path="/document-vault"
+            element={
+              <WorkspaceGuard>
+                <SovereignCylinder />
+              </WorkspaceGuard>
+            }
+          />
+          <Route
+            path="/cylinder"
+            element={
+              <WorkspaceGuard>
+                <SovereignCylinder />
+              </WorkspaceGuard>
+            }
+          />
+          <Route path="/academy" element={<AcquitAcademy />} />
+          <Route
+            path="/google-workspace"
+            element={
+              <WorkspaceGuard>
+                <GoogleWorkspaceIntegration matterTitle="State v. Doe" caseNumber="2024-CR-04821" courtName="SF Superior Court" />
+              </WorkspaceGuard>
+            }
+          />
+          <Route
+            path="/google"
+            element={
+              <WorkspaceGuard>
+                <GoogleWorkspaceIntegration matterTitle="State v. Doe" caseNumber="2024-CR-04821" courtName="SF Superior Court" />
+              </WorkspaceGuard>
+            }
+          />
+          <Route
+            path="/rag-citations"
+            element={
+              <WorkspaceGuard>
+                <div className="p-6 max-w-5xl mx-auto">
+                  <RagCitationViewer enableLiveStreaming={true} onOpenLawLibrary={() => {}} />
+                </div>
+              </WorkspaceGuard>
+            }
+          />
+          <Route
+            path="/rag"
+            element={
+              <WorkspaceGuard>
+                <div className="p-6 max-w-5xl mx-auto">
+                  <RagCitationViewer enableLiveStreaming={true} onOpenLawLibrary={() => {}} />
+                </div>
+              </WorkspaceGuard>
+            }
+          />
           <Route path="/featured-attorneys" element={<div className="p-8"><FeaturedAttorneysCarousel lawyers={[]} /></div>} />
           <Route path="/carousel-attorneys" element={<div className="p-8"><FeaturedAttorneysCarousel lawyers={[]} /></div>} />
           <Route path="/featured-courses" element={<div className="p-8"><FeaturedCoursesCarousel courses={[]} onSelect={() => {}} /></div>} />
           <Route path="/carousel-courses" element={<div className="p-8"><FeaturedCoursesCarousel courses={[]} onSelect={() => {}} /></div>} />
-          <Route path="*" element={<HomePage />} />
+
+          {/* Default Fallback to Command Center */}
+          <Route path="*" element={<CanvaLegalOSViewer defaultView="command-center" />} />
         </Routes>
       </div>
     </div>
@@ -307,13 +433,12 @@ function App() {
     );
   }
 
-  const activePath = ROUTES.some((route) => route.path === localPath) ? localPath : "";
-
   return (
-    <BrowserRouter>
-      <MainApp />
-      <MockupNavigation activePath={activePath} />
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <MainApp />
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

@@ -543,16 +543,23 @@ export class GeminiModelAdapter implements ModelAdapter {
 
   async listModels(): Promise<string[]> {
     return [
+      "gemini-3.1-flash-lite",
+      "gemini-flash-latest",
+      "gemini-3.8-flash",
+      "gemini-3.1-pro-preview",
       "gemini-2.5-flash",
       "gemini-2.5-pro",
-      "gemini-1.5-flash",
-      "gemini-1.5-pro",
     ];
   }
 
   async complete(request: ModelRequest): Promise<ModelResponse> {
     const ai = this.getClient();
-    const modelName = request.model || "gemini-2.5-flash";
+    const candidateModels = [
+      request.model || "gemini-3.1-flash-lite",
+      "gemini-3.1-flash-lite",
+      "gemini-flash-latest",
+      "gemini-3.8-flash",
+    ].filter((m, i, arr) => arr.indexOf(m) === i);
 
     const systemMessage = request.messages.find((m) => m.role === "system");
     const contents = request.messages
@@ -562,17 +569,34 @@ export class GeminiModelAdapter implements ModelAdapter {
         parts: [{ text: m.content }],
       }));
 
-    const response = await withTimeout(
-      ai.models.generateContent({
-        model: modelName,
-        contents: contents.length > 0 ? contents : [{ role: "user", parts: [{ text: "Hello" }] }],
-        config: {
-          systemInstruction: systemMessage?.content,
-          maxOutputTokens: request.maxTokens,
-        },
-      }),
-      30000
-    );
+    let response: any = null;
+    let modelUsed = candidateModels[0];
+    let lastError: any = null;
+
+    for (const m of candidateModels) {
+      try {
+        response = await withTimeout(
+          ai.models.generateContent({
+            model: m,
+            contents: contents.length > 0 ? contents : [{ role: "user", parts: [{ text: "Hello" }] }],
+            config: {
+              systemInstruction: systemMessage?.content,
+              maxOutputTokens: request.maxTokens,
+            },
+          }),
+          30000
+        );
+        modelUsed = m;
+        break;
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`[Gemini Complete Fallback] Model ${m} failed, trying next candidate...`);
+      }
+    }
+
+    if (!response) {
+      throw lastError || new Error("Gemini complete failed across all candidates");
+    }
 
     const text = response.text || "";
     const inputTokens = request.messages.reduce(
@@ -584,7 +608,7 @@ export class GeminiModelAdapter implements ModelAdapter {
     return {
       id: responseId(this.provider),
       provider: this.provider,
-      model: modelName,
+      model: modelUsed,
       content: text,
       finishReason: "stop",
       usage: {

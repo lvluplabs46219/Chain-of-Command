@@ -15,6 +15,7 @@ import {
   boolean,
   jsonb,
   index,
+  uniqueIndex,
   primaryKey,
 } from 'drizzle-orm/pg-core';
 
@@ -83,7 +84,7 @@ export const chainEvents = pgTable('chain_events', {
   previousHashIdx: index('chain_events_previous_hash_idx').on(table.previousHash),
   
   // Unique constraint: chain + sequence number must be unique
-  uniqueChainSequence: index('chain_events_unique_chain_sequence').on(table.chainId, table.sequenceNumber).unique(),
+  uniqueChainSequence: uniqueIndex('chain_events_unique_chain_sequence').on(table.chainId, table.sequenceNumber),
 }));
 
 // ============================================================================

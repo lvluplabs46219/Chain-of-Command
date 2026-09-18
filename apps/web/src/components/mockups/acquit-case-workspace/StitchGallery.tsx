@@ -1,92 +1,175 @@
 import { useState } from "react";
-import { ChevronRight,  } from "lucide-react";
-
-const mockups = [
-  "accessibility_settings", "ai_engine_settings", "case_timeline_chronology",
-  "case_timeline_event_record", "case_timeline_log_event", "chambers_ai_legal_team",
-  "chambers_appoint_counsel", "chambers_counsel_brief", "chambers_full_bench_view",
-  "chambers_mitigation_memo", "chambers_plea_analysis", "chambers_session_transcripts",
-  "command_center_dashboard", "counsel_directory_attorney_profile",
-  "counsel_directory_counsel_listings", "counsel_directory_pro_bono_legal_aid",
-  "counsel_directory_search", "court_watch_docket_activity", "court_watch_hearing_prep_kit",
-  "filing_center_court_submission", "hearing_prep_war_room", "help_onboarding",
-  "integrations_settings", "investigations_evidence_locker", "investigations_exhibit_analysis",
-  "investigations_issue_spotter", "investigations_research_memo", "law_library_case_folders",
-  "law_library_citation_web", "law_library_prior_research", "law_library_research",
-  "lex_operating_system", "motions_tasks_court_calendar", "motions_tasks_motion_board",
-  "record_room_documents", "record_room_draft_desk", "record_room_exhibit_gallery",
-  "record_room_file_a_record", "record_room_record_preview", "system_audit",
-  "the_clerk_notification_settings", "the_docket_cases", "the_docket_closed_matters",
-  "the_docket_open_a_matter", "the_docket_retrieve_from_court", "user_profile",
-  "workspace_security"
-];
-
-function formatName(name: string) {
-  return name
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
+import { Link } from "react-router-dom";
+import {
+  STITCH_CATEGORIES,
+  ALL_STITCH_MOCKUPS,
+  formatMockupName,
+  findCategoryForMockup,
+} from "../../stitch/stitchConfig";
+import {
+  Search,
+  ChevronRight,
+  ExternalLink,
+  Layers,
+  Sparkles,
+} from "lucide-react";
 
 export function StitchGallery() {
-  const [selectedMockup, setSelectedMockup] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  if (selectedMockup) {
-    return (
-      <div className="flex h-full flex-col bg-[#0A0A0A]">
-        <div className="flex items-center gap-4 border-b border-white/10 p-4">
-          <button 
-            onClick={() => setSelectedMockup(null)}
-            className="text-xs font-bold tracking-widest text-[#D4AF37] hover:text-white"
-          >
-            ← BACK TO GALLERY
-          </button>
-          <span className="text-sm font-semibold text-white/50">{formatName(selectedMockup)}</span>
-        </div>
-        <div className="flex-1 overflow-auto p-4 flex justify-center">
-          <img 
-            src={`/assets/stitch/${selectedMockup}/screen.png`} 
-            alt={formatName(selectedMockup)}
-            className="max-w-full h-auto rounded-xl border border-white/10 shadow-2xl"
-          />
-        </div>
-      </div>
-    );
-  }
+  const filteredMockups = ALL_STITCH_MOCKUPS.filter((m) => {
+    const matchesSearch =
+      m.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      formatMockupName(m).toLowerCase().includes(searchQuery.toLowerCase());
+
+    if (!matchesSearch) return false;
+    if (selectedCategory === "all") return true;
+
+    const cat = findCategoryForMockup(m);
+    return cat?.id === selectedCategory;
+  });
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h2 className="text-2xl font-serif text-white">Stitch OS Design Gallery</h2>
-        <p className="mt-2 text-sm text-white/50">
-          Viewing {mockups.length} uploaded UI/UX mockups for the Acquit Legal Operating System.
-        </p>
+    <div className="min-h-full bg-[#141313] p-6 lg:p-8 text-[#e5e2e1]">
+      {/* Header */}
+      <div className="mb-8 border-b border-[#44474a]/40 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="font-mono text-xs tracking-widest text-[#b5c8df] uppercase">
+              ACQUIT.AI / STITCH OS SPECIFICATION
+            </span>
+            <span className="rounded bg-[#36485b]/60 px-2 py-0.5 font-mono text-[10px] text-[#b5c8df]">
+              46 DESIGN SCREENS
+            </span>
+          </div>
+          <h1 className="font-serif text-3xl font-bold text-white tracking-tight">
+            Stitch OS Pages & Screen Matrix
+          </h1>
+          <p className="mt-1 text-sm text-[#8f9194] max-w-2xl">
+            Complete high-fidelity layouts created for the Acquit legal operating system. Click any card to launch the interactive live layout or inspect its visual spec.
+          </p>
+        </div>
+
+        {/* Search */}
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8f9194]" />
+            <input
+              type="text"
+              placeholder="Filter mockups..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-64 rounded border border-[#44474a]/60 bg-[#1c1b1b] pl-9 pr-3 py-1.5 text-xs text-white placeholder-[#8f9194] focus:outline-none focus:border-[#b5c8df]"
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {mockups.map((m) => (
-          <div 
-            key={m}
-            onClick={() => setSelectedMockup(m)}
-            className="group cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-black/40 transition hover:border-[#D4AF37]/50 hover:bg-white/5"
+      {/* Category Pills */}
+      <div className="mb-6 flex items-center gap-1.5 overflow-x-auto pb-2 hide-scrollbar">
+        <button
+          onClick={() => setSelectedCategory("all")}
+          className={`shrink-0 rounded px-3 py-1 text-xs font-semibold uppercase tracking-wider transition ${
+            selectedCategory === "all"
+              ? "bg-[#36485b] text-[#d1e4fb] border border-[#b5c8df]/40"
+              : "border border-[#44474a]/40 bg-[#1c1b1b] text-[#c5c6ca] hover:bg-[#2a2a2a] hover:text-white"
+          }`}
+        >
+          All Screens ({ALL_STITCH_MOCKUPS.length})
+        </button>
+        {STITCH_CATEGORIES.map((cat) => (
+          <button
+            key={cat.id}
+            onClick={() => setSelectedCategory(cat.id)}
+            className={`shrink-0 rounded px-3 py-1 text-xs font-medium uppercase tracking-wider transition ${
+              selectedCategory === cat.id
+                ? "bg-[#36485b] text-[#d1e4fb] border border-[#b5c8df]/40 font-semibold"
+                : "border border-[#44474a]/40 bg-[#1c1b1b] text-[#c5c6ca] hover:bg-[#2a2a2a] hover:text-white"
+            }`}
           >
-            <div className="aspect-video w-full bg-white/5 p-2">
-              <img 
-                src={`/assets/stitch/${m}/screen.png`} 
-                alt={formatName(m)}
-                className="h-full w-full object-cover rounded opacity-80 transition group-hover:opacity-100"
-                loading="lazy"
-              />
-            </div>
-            <div className="p-4 flex items-center justify-between">
-              <span className="text-xs font-bold tracking-wider text-white/70 group-hover:text-[#D4AF37]">
-                {formatName(m)}
-              </span>
-              <ChevronRight size={14} className="text-white/30 group-hover:text-[#D4AF37]" />
-            </div>
-          </div>
+            {cat.label} ({cat.screens.length})
+          </button>
         ))}
+      </div>
+
+      {/* Grid */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {filteredMockups.map((mockupId) => {
+          const category = findCategoryForMockup(mockupId);
+          const screenInfo = category?.screens.find((s) => s.id === mockupId);
+          const isPrimary = screenInfo?.isPrimary;
+
+          return (
+            <div
+              key={mockupId}
+              className="group flex flex-col overflow-hidden rounded-xl border border-[#44474a]/50 bg-[#1c1b1b] transition hover:border-[#b5c8df]/80 hover:bg-[#201f1f] shadow-lg"
+            >
+              {/* Thumbnail Container */}
+              <div className="relative aspect-video w-full overflow-hidden bg-[#0e0e0e]">
+                <img
+                  src={`/assets/stitch/${mockupId}/screen.png`}
+                  alt={formatMockupName(mockupId)}
+                  className="h-full w-full object-cover object-top opacity-85 transition group-hover:opacity-100 group-hover:scale-105 duration-300"
+                  loading="lazy"
+                />
+
+                {/* Primary Tag */}
+                {isPrimary && (
+                  <div className="absolute top-2 left-2 rounded bg-[#36485b]/90 border border-[#b5c8df]/40 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#b5c8df] uppercase tracking-wider backdrop-blur">
+                    Primary Route
+                  </div>
+                )}
+
+                {/* Direct Raw Link */}
+                <a
+                  href={`/assets/stitch/${mockupId}/code.html`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute top-2 right-2 rounded bg-black/60 p-1 text-white/70 hover:text-white hover:bg-black/90 opacity-0 group-hover:opacity-100 transition backdrop-blur"
+                  title="Open Raw HTML"
+                >
+                  <ExternalLink size={12} />
+                </a>
+              </div>
+
+              {/* Info & Action */}
+              <div className="flex flex-1 flex-col justify-between p-3.5">
+                <div>
+                  <div className="flex items-center justify-between text-[11px] font-mono text-[#8f9194] mb-1">
+                    <span className="uppercase tracking-wider">
+                      {category?.label || "Workspace"}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-white text-sm group-hover:text-[#b5c8df] transition-colors line-clamp-1">
+                    {formatMockupName(mockupId)}
+                  </h3>
+                  {screenInfo?.description && (
+                    <p className="mt-1 text-xs text-[#8f9194] line-clamp-2 leading-relaxed">
+                      {screenInfo.description}
+                    </p>
+                  )}
+                </div>
+
+                <div className="mt-3 pt-3 border-t border-[#44474a]/30 flex items-center justify-between">
+                  <Link
+                    to={`/stitch/${mockupId}`}
+                    className="flex items-center gap-1 text-xs font-semibold text-[#b5c8df] hover:text-white transition"
+                  >
+                    <span>Launch Page</span>
+                    <ChevronRight size={13} />
+                  </Link>
+
+                  <span className="font-mono text-[10px] text-[#8f9194]">
+                    code.html
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
+export default StitchGallery;

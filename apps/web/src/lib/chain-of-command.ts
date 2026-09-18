@@ -423,7 +423,7 @@ export class ChainOfCommand {
     const previousHash = previousEvent ? previousEvent.hash : null;
     
     // Create the event (without hash and signature first)
-    const event: Omit<ChainEvent, 'hash' | 'signature' | 'verified' | 'verificationErrors' | 'immutable'> = {
+    const event: Omit<ChainEvent, 'hash' | 'signature' | 'verified' | 'verificationErrors'> = {
       id,
       sequenceNumber,
       type: params.type,
@@ -441,6 +441,7 @@ export class ChainOfCommand {
       sessionId: params.sessionId,
       agentRunId: params.agentRunId,
       payload: params.payload || {},
+      immutable: true,
     };
     
     // Compute hash from canonical representation
@@ -695,6 +696,7 @@ export class ChainOfCommand {
         sessionId: event.sessionId,
         agentRunId: event.agentRunId,
         payload: event.payload,
+        immutable: event.immutable,
       });
       
       const computedHash = computeSHA256(canonical);
@@ -837,6 +839,7 @@ export class ChainOfCommand {
       sessionId: event.sessionId,
       agentRunId: event.agentRunId,
       payload: event.payload,
+      immutable: event.immutable,
     });
     
     const computedHash = computeSHA256(canonical);

@@ -102,7 +102,7 @@ function logChainOperation(
     eventId,
     ip: req.ip,
     userAgent: req.headers['user-agent'],
-    userId: req.user?.id,
+    userId: (req as any).user?.id,
     success,
     error,
   };
@@ -321,20 +321,3 @@ export function validateSignedRequest(
   
   return isSignatureValid && isTimestampRecent;
 }
-
-// ============================================================================
-// EXPORT
-// ============================================================================
-
-export {
-  CHAIN_SIGNING_SECRET,
-  verifyChainOfCommand,
-  chainCreationRateLimiter,
-  chainVerificationRateLimiter,
-  validateChainEventCreation,
-  validateChainVerification,
-  createSignedRequest,
-  validateSignedRequest,
-  logChainOperation,
-  generateRequestId,
-};
