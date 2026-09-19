@@ -6,14 +6,13 @@ export function apiPlugin(): Plugin {
   return {
     name: 'acquit-api-plugin',
     async configureServer(server) {
-      // Serve stitch and canva assets reliably from src/assets
+      // Serve stitch assets reliably from src/assets
       server.middlewares.use((req, res, next) => {
-        if (req.url && (req.url.startsWith('/assets/stitch/') || req.url.startsWith('/assets/canva/'))) {
-          const prefix = req.url.startsWith('/assets/stitch/') ? '/assets/stitch/' : '/assets/canva/';
-          const folder = req.url.startsWith('/assets/stitch/') ? 'stitch' : 'canva';
+        if (req.url && req.url.startsWith('/assets/stitch/')) {
+          const prefix = '/assets/stitch/';
           const rawPath = req.url.slice(prefix.length).split('?')[0];
           const decodedPath = decodeURIComponent(rawPath);
-          const localFilePath = path.resolve(__dirname, 'src/assets', folder, decodedPath);
+          const localFilePath = path.resolve(__dirname, 'src/assets', 'stitch', decodedPath);
 
           if (fs.existsSync(localFilePath) && fs.statSync(localFilePath).isFile()) {
             if (localFilePath.endsWith('.html')) {

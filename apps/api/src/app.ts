@@ -38,11 +38,9 @@ const parseAllowedOrigins = (): (string | RegExp)[] => {
     "http://localhost:5173",
     "https://ai.studio",
     "https://aistudio.google.com",
-    "https://lvluplabs.my.canva.site",
-    /^https:\/\/.*\.canva\.site$/,
-    /^https:\/\/.*\.my\.canva\.site$/,
-    /^https:\/\/.*\.canva\.com$/,
-    /^https:\/\/.*\.canva-hosted-embed\.com$/,
+    /^https:\/\/.*\.vercel\.app$/,
+    /^https:\/\/.*\.pages\.dev$/,
+    /^https:\/\/.*\.workers\.dev$/,
     /^https:\/\/.*\.run\.app$/,
   ];
   if (!envOrigins) {
@@ -61,10 +59,10 @@ app.use(cors({
       if (pattern instanceof RegExp) return pattern.test(origin);
       return false;
     });
-    if (isExplicitlyAllowed || origin.includes("canva.site") || origin.includes("canva.com") || origin.includes("localhost")) {
+    if (isExplicitlyAllowed || origin.includes("vercel.app") || origin.includes("pages.dev") || origin.includes("localhost")) {
       return callback(null, true);
     }
-    // Allow embed and client requests gracefully
+    // Allow client requests gracefully
     return callback(null, true);
   },
   credentials: true,

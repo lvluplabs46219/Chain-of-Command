@@ -1,7 +1,6 @@
 import { useEffect, useState, type ComponentType } from "react";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from "react-router-dom";
 import { modules as discoveredModules } from "./.generated/mockup-components";
-import { CanvaLegalOSViewer } from "./components/canva/CanvaLegalOSViewer";
 import { StitchMasterNav } from "./components/stitch/StitchMasterNav";
 import { StitchCategoryPage } from "./components/stitch/StitchCategoryPage";
 import { StitchMockupDirectPage } from "./components/stitch/StitchMockupDirectPage";
@@ -274,46 +273,46 @@ function MainApp() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0e0e0e]">
-      {isStitchOrTool && <StitchMasterNav />}
+      <StitchMasterNav />
       <div className="flex-1 relative">
         <Routes>
-          {/* Primary Legal OS Workspace Pages (Mirroring https://lvluplabs.my.canva.site/) */}
-          <Route path="/" element={<CanvaLegalOSViewer defaultView="command-center" />} />
-          <Route path="/command-center" element={<CanvaLegalOSViewer defaultView="command-center" />} />
-          <Route path="/docket" element={<CanvaLegalOSViewer defaultView="docket" />} />
-          <Route path="/cases" element={<CanvaLegalOSViewer defaultView="docket" />} />
-          <Route path="/case-workspace" element={<CanvaLegalOSViewer defaultView="docket" />} />
-          <Route path="/workspace" element={<CanvaLegalOSViewer defaultView="docket" />} />
-          <Route path="/chambers" element={<CanvaLegalOSViewer defaultView="chambers" />} />
-          <Route path="/ai-lab" element={<CanvaLegalOSViewer defaultView="chambers" />} />
-          <Route path="/ai-legal-team" element={<CanvaLegalOSViewer defaultView="chambers" />} />
-          <Route path="/timeline" element={<CanvaLegalOSViewer defaultView="case-timeline" />} />
-          <Route path="/case-timeline" element={<CanvaLegalOSViewer defaultView="case-timeline" />} />
-          <Route path="/investigations" element={<CanvaLegalOSViewer defaultView="investigations" />} />
-          <Route path="/evidence" element={<CanvaLegalOSViewer defaultView="investigations" />} />
-          <Route path="/record-room" element={<CanvaLegalOSViewer defaultView="record-room" />} />
-          <Route path="/documents" element={<CanvaLegalOSViewer defaultView="record-room" />} />
-          <Route path="/records" element={<CanvaLegalOSViewer defaultView="record-room" />} />
-          <Route path="/law-library" element={<CanvaLegalOSViewer defaultView="law-library" />} />
-          <Route path="/library" element={<CanvaLegalOSViewer defaultView="law-library" />} />
-          <Route path="/motions" element={<CanvaLegalOSViewer defaultView="motions-tasks" />} />
-          <Route path="/motions-tasks" element={<CanvaLegalOSViewer defaultView="motions-tasks" />} />
-          <Route path="/calendar" element={<CanvaLegalOSViewer defaultView="motions-tasks" />} />
-          <Route path="/tasks" element={<CanvaLegalOSViewer defaultView="motions-tasks" />} />
-          <Route path="/court-watch" element={<CanvaLegalOSViewer defaultView="court-watch" />} />
-          <Route path="/hearings" element={<CanvaLegalOSViewer defaultView="court-watch" />} />
-          <Route path="/counsel" element={<CanvaLegalOSViewer defaultView="counsel-directory" />} />
-          <Route path="/directory" element={<CanvaLegalOSViewer defaultView="counsel-directory" />} />
-          <Route path="/attorney-directory" element={<CanvaLegalOSViewer defaultView="counsel-directory" />} />
-          <Route path="/filing" element={<CanvaLegalOSViewer defaultView="record-room" />} />
-          <Route path="/filing-center" element={<CanvaLegalOSViewer defaultView="record-room" />} />
-          <Route path="/accessibility" element={<CanvaLegalOSViewer defaultView="accessibility-settings" />} />
-          <Route path="/accessibility-settings" element={<CanvaLegalOSViewer defaultView="accessibility-settings" />} />
-          <Route path="/security" element={<CanvaLegalOSViewer defaultView="system-settings" />} />
-          <Route path="/audit" element={<CanvaLegalOSViewer defaultView="system-settings" />} />
-          <Route path="/settings" element={<CanvaLegalOSViewer defaultView="system-settings" />} />
-          <Route path="/system" element={<CanvaLegalOSViewer defaultView="system-settings" />} />
-          <Route path="/system-settings" element={<CanvaLegalOSViewer defaultView="system-settings" />} />
+          {/* Primary Legal OS Workspace Pages */}
+          <Route path="/" element={<StitchCategoryPage categoryId="command_center" />} />
+          <Route path="/command-center" element={<StitchCategoryPage categoryId="command_center" />} />
+          <Route path="/docket" element={<StitchCategoryPage categoryId="the_docket" />} />
+          <Route path="/cases" element={<StitchCategoryPage categoryId="the_docket" />} />
+          <Route path="/case-workspace" element={<StitchCategoryPage categoryId="the_docket" />} />
+          <Route path="/workspace" element={<StitchCategoryPage categoryId="the_docket" />} />
+          <Route path="/chambers" element={<StitchCategoryPage categoryId="chambers" />} />
+          <Route path="/ai-lab" element={<StitchCategoryPage categoryId="chambers" />} />
+          <Route path="/ai-legal-team" element={<StitchCategoryPage categoryId="chambers" />} />
+          <Route path="/timeline" element={<StitchCategoryPage categoryId="case_timeline" />} />
+          <Route path="/case-timeline" element={<StitchCategoryPage categoryId="case_timeline" />} />
+          <Route path="/investigations" element={<StitchCategoryPage categoryId="investigations" />} />
+          <Route path="/evidence" element={<StitchCategoryPage categoryId="investigations" />} />
+          <Route path="/record-room" element={<StitchCategoryPage categoryId="record_room" />} />
+          <Route path="/documents" element={<StitchCategoryPage categoryId="record_room" />} />
+          <Route path="/records" element={<StitchCategoryPage categoryId="record_room" />} />
+          <Route path="/law-library" element={<StitchCategoryPage categoryId="law_library" />} />
+          <Route path="/library" element={<StitchCategoryPage categoryId="law_library" />} />
+          <Route path="/motions" element={<StitchCategoryPage categoryId="motions_tasks" />} />
+          <Route path="/motions-tasks" element={<StitchCategoryPage categoryId="motions_tasks" />} />
+          <Route path="/calendar" element={<StitchCategoryPage categoryId="motions_tasks" />} />
+          <Route path="/tasks" element={<StitchCategoryPage categoryId="motions_tasks" />} />
+          <Route path="/court-watch" element={<StitchCategoryPage categoryId="court_watch" />} />
+          <Route path="/hearings" element={<StitchCategoryPage categoryId="court_watch" />} />
+          <Route path="/counsel" element={<StitchCategoryPage categoryId="counsel_directory" />} />
+          <Route path="/directory" element={<StitchCategoryPage categoryId="counsel_directory" />} />
+          <Route path="/attorney-directory" element={<StitchCategoryPage categoryId="counsel_directory" />} />
+          <Route path="/filing" element={<StitchCategoryPage categoryId="record_room" />} />
+          <Route path="/filing-center" element={<StitchCategoryPage categoryId="record_room" />} />
+          <Route path="/accessibility" element={<StitchCategoryPage categoryId="accessibility" />} />
+          <Route path="/accessibility-settings" element={<StitchCategoryPage categoryId="accessibility" />} />
+          <Route path="/security" element={<StitchCategoryPage categoryId="system_settings" />} />
+          <Route path="/audit" element={<StitchCategoryPage categoryId="system_settings" />} />
+          <Route path="/settings" element={<StitchCategoryPage categoryId="system_settings" />} />
+          <Route path="/system" element={<StitchCategoryPage categoryId="system_settings" />} />
+          <Route path="/system-settings" element={<StitchCategoryPage categoryId="system_settings" />} />
 
           {/* Stitch Category Deep Screens */}
           <Route path="/stitch-view/:categoryId" element={<StitchCategoryPageRoute />} />
@@ -408,7 +407,7 @@ function MainApp() {
           <Route path="/carousel-courses" element={<div className="p-8"><FeaturedCoursesCarousel courses={[]} onSelect={() => {}} /></div>} />
 
           {/* Default Fallback to Command Center */}
-          <Route path="*" element={<CanvaLegalOSViewer defaultView="command-center" />} />
+          <Route path="*" element={<StitchCategoryPage categoryId="command_center" />} />
         </Routes>
       </div>
     </div>

@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } else {
         // Auto-provision standard pro se demo session for instant usability
-        const defaultToken = "canva-live-token";
+        const defaultToken = "acquit-pro-se-token";
         setAuthToken(defaultToken);
         setTokenState(defaultToken);
         setUser(DEFAULT_LITIGANT_USER);
@@ -129,7 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginAsLitigant = async (name = "Arthur Marlowe", email = "litigant@acquit.ai") => {
     setIsLoading(true);
-    const newToken = "canva-live-token";
+    const newToken = "acquit-pro-se-token";
     const newUser: AuthUser = {
       ...DEFAULT_LITIGANT_USER,
       name,

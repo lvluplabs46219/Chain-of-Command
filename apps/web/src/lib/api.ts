@@ -22,24 +22,21 @@ export class ApiError extends Error {
  */
 export function getApiBaseUrl(): string {
   if (typeof window !== "undefined") {
-    const origin = window.location.origin;
-    // When running in Canva preview or external embed, target Cloud Run
-    if (origin.includes("canva.site") || origin.includes("canva-hosted-embed")) {
-      return "https://ais-dev-qjsfgzlagan6blqltrhwng-205627821036.us-east1.run.app/api";
-    }
+    const envApi = (import.meta as any).env?.VITE_API_URL;
+    if (envApi) return envApi;
   }
   return "/api";
 }
 
 /**
- * Retrieves the active bearer token from storage or defaults to a valid live token.
+ * Retrieves the active bearer token from storage or defaults to a valid pro se session token.
  */
 export function getAuthToken(): string {
   if (typeof window !== "undefined") {
     const stored = localStorage.getItem("acquit_auth_token");
     if (stored) return stored;
   }
-  return "canva-live-token";
+  return "acquit-pro-se-token";
 }
 
 /**

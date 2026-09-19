@@ -44,7 +44,7 @@ export function getSupabaseClient(): SupabaseClient {
       },
     });
 
-    // Make available on window for custom embed scripts or Canva custom blocks
+    // Make available on window for custom client scripts
     if (typeof window !== "undefined") {
       (window as any).acquitSupabase = browserSupabaseInstance;
     }

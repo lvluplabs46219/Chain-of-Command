@@ -1,0 +1,57 @@
+providers:
+  openai:
+    name: openai
+    model: gpt-4
+    base_url: https://api.openai.com/v1
+    timeout: 60
+    max_retries: 3
+    capabilities:
+      - text_generation
+      - code_generation
+      - json_mode
+      - function_calling
+    cost_per_token: 0.00001
+    avg_latency: 1.0
+  anthropic:
+    name: anthropic
+    model: claude-3-opus-20240229
+    base_url: https://api.anthropic.com/v1
+    timeout: 60
+    max_retries: 3
+    capabilities:
+      - text_generation
+      - long_context
+      - reasoning
+      - tool_use
+    cost_per_token: 0.000015
+    avg_latency: 1.5
+  mistral:
+    name: mistral
+    model: mistral-large-latest
+    base_url: https://api.mistral.ai/v1
+    timeout: 60
+    max_retries: 3
+    capabilities:
+      - text_generation
+      - multilingual
+      - code_generation
+    cost_per_token: 0.000008
+    avg_latency: 0.8
+  local_ollama:
+    name: local_ollama
+    model: llama3:8b
+    base_url: http://localhost:11434
+    timeout: 120
+    max_retries: 2
+    capabilities:
+      - text_generation
+      - private_processing
+      - case_data_processing
+    cost_per_token: 0.0
+    avg_latency: 0.4
+
+fallback_chain:
+  - local_ollama
+  - anthropic
+  - openai
+  - mistral
