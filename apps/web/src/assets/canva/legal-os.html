@@ -952,8 +952,8 @@ function initLegalOS() {
   lucide.createIcons();
 
   // --- Client-Side Supabase Initialization for Canva Embeds & Custom HTML Blocks ---
-  const SUPABASE_URL = window.SUPABASE_URL || "https://fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff.supabase.co";
-  const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjcXVpdC1wbGF0Zm9ybSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjIwMDAwMDAwMDB9.mock-anon-key-acquit-ai";
+  const SUPABASE_URL = window.VITE_SUPABASE_URL || window.SUPABASE_URL || "https://YOUR_PROJECT_REF.supabase.co";
+  const SUPABASE_ANON_KEY = window.VITE_SUPABASE_PUBLISHABLE_KEY || window.VITE_SUPABASE_ANON_KEY || window.SUPABASE_PUBLISHABLE_KEY || window.SUPABASE_ANON_KEY || "sb_publishable_3GfWfA2a1RIjnBzXVUM6qg_8z7eh-pv";
 
   let acquitSupabase = null;
   if (window.supabase && typeof window.supabase.createClient === "function") {

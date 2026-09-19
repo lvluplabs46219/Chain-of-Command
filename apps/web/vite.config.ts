@@ -12,6 +12,7 @@ const basePath = process.env.BASE_PATH || "/";
 
 export default defineConfig({
   base: basePath,
+  envPrefix: ["VITE_", "NEXT_PUBLIC_"],
   plugins: [
     mockupPreviewPlugin(),
     apiPlugin(),

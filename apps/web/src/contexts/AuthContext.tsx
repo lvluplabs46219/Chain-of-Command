@@ -6,6 +6,7 @@
 
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { getAuthToken, setAuthToken } from "../lib/api";
+import { getSupabaseClient } from "../lib/supabaseClient";
 
 export interface AuthUser {
   id: string;
@@ -72,6 +73,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(DEFAULT_LITIGANT_USER);
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(DEFAULT_LITIGANT_USER));
       }
+
+      // Initialize Supabase auth listener for real session sync
+      const supabase = getSupabaseClient();
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) {
+          const supaUser: AuthUser = {
+            id: session.user.id,
+            name: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "Pro Se Litigant",
+            email: session.user.email || "litigant@lvluplabs.pro",
+            role: (session.user.user_metadata?.role as any) || "pro_se",
+            jurisdiction: session.user.user_metadata?.jurisdiction || "Self-Represented",
+            activeMatterId: session.user.user_metadata?.active_matter_id || "matter-001",
+            isVerifiedProSe: true,
+            createdAt: session.user.created_at,
+          };
+          setAuthToken(session.access_token);
+          setTokenState(session.access_token);
+          setUser(supaUser);
+          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(supaUser));
+        }
+      }).catch((err) => {
+        console.warn("[Acquit Auth] Supabase session check notice:", err);
+      });
+
+      const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          const supaUser: AuthUser = {
+            id: session.user.id,
+            name: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "Pro Se Litigant",
+            email: session.user.email || "litigant@lvluplabs.pro",
+            role: (session.user.user_metadata?.role as any) || "pro_se",
+            jurisdiction: session.user.user_metadata?.jurisdiction || "Self-Represented",
+            activeMatterId: session.user.user_metadata?.active_matter_id || "matter-001",
+            isVerifiedProSe: true,
+            createdAt: session.user.created_at,
+          };
+          setAuthToken(session.access_token);
+          setTokenState(session.access_token);
+          setUser(supaUser);
+          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(supaUser));
+        }
+      });
+
+      return () => {
+        authListener?.subscription?.unsubscribe();
+      };
     } catch (e) {
       console.warn("Auth initialization warning:", e);
       setUser(DEFAULT_LITIGANT_USER);
