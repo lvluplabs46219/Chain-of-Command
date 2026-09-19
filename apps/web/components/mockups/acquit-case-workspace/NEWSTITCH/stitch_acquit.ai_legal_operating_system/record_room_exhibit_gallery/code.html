@@ -1,0 +1,311 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Record Room - Exhibit Gallery | Acquit.ai</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;600;700&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#c5c6ca",
+                        "inverse-primary": "#5d5e61",
+                        "surface-container": "#201f1f",
+                        "secondary": "#b5c8df",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#e2e2e5",
+                        "surface-variant": "#353435",
+                        "on-secondary-container": "#a4b7cd",
+                        "on-primary": "#2f3133",
+                        "secondary-container": "#36485b",
+                        "primary": "#c6c6c9",
+                        "on-background": "#e5e2e1",
+                        "surface": "#141313",
+                        "on-primary-container": "#838486",
+                        "primary-fixed-dim": "#c6c6c9",
+                        "inverse-surface": "#e5e2e1",
+                        "on-tertiary-fixed": "#201b17",
+                        "tertiary-container": "#201b17",
+                        "on-secondary-fixed-variant": "#36485b",
+                        "inverse-on-surface": "#313030",
+                        "primary-container": "#1a1c1e",
+                        "on-surface": "#e5e2e1",
+                        "secondary-fixed-dim": "#b5c8df",
+                        "on-primary-fixed-variant": "#454749",
+                        "on-primary-fixed": "#1a1c1e",
+                        "background": "#141313",
+                        "on-error": "#690005",
+                        "on-tertiary-container": "#8b837d",
+                        "tertiary-fixed-dim": "#cfc5be",
+                        "secondary-fixed": "#d1e4fb",
+                        "on-tertiary": "#352f2b",
+                        "outline": "#8f9194",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-fixed": "#ebe0da",
+                        "error": "#ffb4ab",
+                        "on-secondary": "#203243",
+                        "tertiary": "#cfc5be",
+                        "outline-variant": "#44474a",
+                        "surface-dim": "#141313",
+                        "surface-container-highest": "#353435",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-bright": "#3a3939",
+                        "on-secondary-fixed": "#091d2e",
+                        "surface-tint": "#c6c6c9",
+                        "on-tertiary-fixed-variant": "#4c4641",
+                        "on-error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "margin-safe": "32px",
+                        "base": "4px",
+                        "gutter": "16px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "xl": "40px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Domine"],
+                        "headline-md": ["Domine"],
+                        "data-mono": ["JetBrains Mono"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "display-case": ["Domine"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Domine"],
+                        "label-caps": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-case": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md h-screen overflow-hidden flex selection:bg-primary selection:text-on-primary">
+<!-- SideNavBar (Shared Component) -->
+<nav class="w-[280px] h-screen fixed left-0 top-0 border-r border-outline-variant bg-background flex flex-col py-md z-40">
+<div class="px-lg pb-lg">
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary tracking-tighter uppercase">Acquit.ai</h1>
+<p class="font-data-mono text-data-mono text-on-surface-variant mt-1">Senior Counsel</p>
+</div>
+<button class="mx-lg mb-lg bg-primary text-on-primary font-label-caps text-label-caps py-sm px-md rounded hover:bg-primary-fixed-dim transition-colors duration-150 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+            NEW FILING
+        </button>
+<div class="flex-1 overflow-y-auto">
+<ul class="flex flex-col">
+<!-- Navigation Items -->
+<li>
+<a class="flex items-center gap-lg px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Command Center</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-lg px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-label-caps text-label-caps">The Docket</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-lg px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="font-label-caps text-label-caps">Chambers</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-lg px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">library_books</span>
+<span class="font-label-caps text-label-caps">Law Library</span>
+</a>
+</li>
+<!-- ACTIVE TAB -->
+<li>
+<a class="flex items-center gap-lg px-lg py-sm text-primary border-l-4 border-primary bg-secondary-container/30 font-bold hover:bg-surface-container-high transition-all duration-75" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">folder_open</span>
+<span class="font-label-caps text-label-caps">Record Room</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-lg px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">policy</span>
+<span class="font-label-caps text-label-caps">Investigations</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-lg px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">timeline</span>
+<span class="font-label-caps text-label-caps">Case Timeline</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-lg px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">visibility</span>
+<span class="font-label-caps text-label-caps">Court Watch</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-lg px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-caps text-label-caps">Counsel Directory</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-lg px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-caps text-label-caps">Motions &amp; Tasks</span>
+</a>
+</li>
+</ul>
+</div>
+<div class="pt-md border-t border-outline-variant mt-auto">
+<ul class="flex flex-col">
+<li>
+<a class="flex items-center gap-lg px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-lg px-lg py-sm text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-caps text-label-caps">Support</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- TopAppBar (Shared Component) -->
+<header class="h-16 fixed top-0 right-0 left-[280px] z-50 bg-surface-container-low border-b border-outline-variant flex justify-between items-center px-lg">
+<div class="flex items-center gap-lg">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="bg-surface-variant border-none text-on-surface font-data-mono text-data-mono pl-10 pr-4 py-1 focus:ring-1 focus:ring-primary rounded-none w-64 placeholder:text-on-surface-variant/50" placeholder="Search Record Room..." type="text">
+</div>
+<nav class="flex gap-lg">
+<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md" href="#">Case: 2024-CV-8821</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-body-md text-body-md" href="#">The Clerk</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-sm text-on-surface-variant hover:text-primary hover:bg-surface-bright rounded transition-colors duration-150">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-sm text-on-surface-variant hover:text-primary hover:bg-surface-bright rounded transition-colors duration-150">
+<span class="material-symbols-outlined">history</span>
+</button>
+<button class="px-md py-sm border border-primary text-primary font-label-caps text-label-caps hover:bg-primary hover:text-on-primary transition-colors duration-200">
+                AFFIX SIGNATURE
+            </button>
+<img alt="Counsel Avatar" class="w-8 h-8 rounded border border-outline-variant object-cover" data-alt="A small, professional headshot of a legal counsel, formal attire, dark background, stark lighting, conveying authority." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDee8WBCXB-5mS9gCIKBGG2399m-t621jlj1yJEaAVSYDQExEImeVpaoUgADs4Qt2GtCezSBVb64DXxdZQ0LcuE0k3op7V6283QZ-iSe7QFaCw6ctziCgbzfI4mgkjBE9K6Q1duRSFWPQYa6ccPGWd5ceAhAtJt5hlLOONZnTACuymB-bwXB2VbNlv9-wSY3mzMwgRlnQBG70z9bggbnOn9Rha3Qh7ASUk1U9vRY-ilCjzA2dKQliy8qQ">
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[280px] mt-16 flex-1 flex h-[calc(100vh-64px)] overflow-hidden bg-surface relative">
+<!-- Gallery Grid Area -->
+<section class="flex-1 p-lg overflow-y-auto">
+<div class="flex justify-between items-end mb-lg">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary mb-1">Exhibit Gallery</h2>
+<p class="font-data-mono text-data-mono text-on-surface-variant">142 Items | Verified Chain of Custody</p>
+</div>
+<button class="flex items-center gap-2 px-md py-sm bg-surface-container-high border border-outline-variant text-on-surface font-label-caps text-label-caps hover:bg-surface-bright hover:border-primary transition-all">
+<span class="material-symbols-outlined text-sm">download</span>
+                    BATCH EXPORT
+                </button>
+</div>
+<!-- Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-md pb-xl">
+<!-- Exhibit Card 1 (Image) -->
+<article class="bg-surface-container border border-outline-variant flex flex-col group hover:border-primary transition-colors duration-200 cursor-pointer relative overflow-hidden">
+<div class="h-48 relative border-b border-outline-variant">
+<img class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-300" data-alt="A high-contrast black and white forensic photograph of a modern glass building entrance, stark lighting, legal evidence style, slightly grainy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtoo8umvc9f_jcCVxlbQqfpQp_gZD2K8PhHs8rpwtscX5L6QNh-1YIXRuz_b1oCXD5VdvVh12yDyooSqFlQE6z9Wtj94_YHFz9TuGDK8GMsDoe4LuQA9o1zFs71bOdbBtm8mVF6sC_8XkzhXB1l2FRpNNr2HudMWum_XBr4HIMqokaSQBs1qmt_46-JyETE7128nr_XA0PbKVwn1r9ASv7s8gPdefyC3iSYd8nFsbGjYuKsMn6O1ZnvA">
+<div class="absolute top-sm right-sm bg-surface/80 backdrop-blur-sm px-2 py-1 border border-outline-variant rounded-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary">verified</span>
+<span class="font-data-mono text-[10px] text-primary">CUSTODY INTACT</span>
+</div>
+</div>
+<div class="p-sm flex flex-col justify-between flex-1 bg-surface-container-low group-hover:bg-surface-container transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="font-data-mono text-data-mono text-primary bg-primary/10 px-1 border border-primary/30">EX-001</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant px-2 py-0.5 border border-outline-variant rounded-full">FORENSIC</span>
+</div>
+<h3 class="font-body-md text-body-md text-on-surface line-clamp-2">Lobby Security Still - Frame 142A</h3>
+<p class="font-data-mono text-[11px] text-on-surface-variant mt-2">Added: 2024-10-24 14:32 EST</p>
+</div>
+</article>
+<!-- Exhibit Card 2 (Document) -->
+<article class="bg-surface-container border border-outline-variant flex flex-col group hover:border-primary transition-colors duration-200 cursor-pointer relative overflow-hidden">
+<div class="h-48 relative border-b border-outline-variant bg-surface-bright flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl text-on-surface-variant group-hover:text-primary transition-colors">description</span>
+<div class="absolute top-sm right-sm bg-surface/80 backdrop-blur-sm px-2 py-1 border border-outline-variant rounded-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary">verified</span>
+<span class="font-data-mono text-[10px] text-primary">CUSTODY INTACT</span>
+</div>
+</div>
+<div class="p-sm flex flex-col justify-between flex-1 bg-surface-container-low group-hover:bg-surface-container transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="font-data-mono text-data-mono text-primary bg-primary/10 px-1 border border-primary/30">EX-002</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant px-2 py-0.5 border border-outline-variant rounded-full">DEPOSITION</span>
+</div>
+<h3 class="font-body-md text-body-md text-on-surface line-clamp-2">Sworn Statement - Witness J. Doe</h3>
+<p class="font-data-mono text-[11px] text-on-surface-variant mt-2">Added: 2024-10-23 09:15 EST</p>
+</div>
+</article>
+</div>
+</section>
+<!-- Gallery Filter Sidebar (Inspector Pane) -->
+<aside class="w-[320px] bg-surface-container-low border-l border-outline-variant flex flex-col z-30">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface-container">
+<h3 class="font-label-caps text-label-caps text-on-surface tracking-widest">GALLERY FILTER</h3>
+<button class="text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-md space-y-lg">
+<!-- Tag Filter -->
+<div>
+<h4 class="font-data-mono text-[11px] text-on-surface-variant mb-sm uppercase">Exhibit Tags</h4>
+<div class="flex flex-wrap gap-2">
+<button class="px-2 py-1 bg-primary/10 border border-primary text-primary font-label-caps text-[10px] rounded-full">FORENSIC (42)</button>
+<button class="px-2 py-1 bg-surface-container-high border border-outline-variant text-on-surface-variant hover:text-on-surface font-label-caps text-[10px] rounded-full">DEPOSITION (18)</button>
+<button class="px-2 py-1 bg-surface-container-high border border-outline-variant text-on-surface-variant hover:text-on-surface font-label-caps text-[10px] rounded-full">FINANCIAL (84)</button>
+</div>
+</div>
+<hr class="border-outline-variant/50">
+<!-- Status Filter -->
+<div>
+<h4 class="font-data-mono text-[11px] text-on-surface-variant mb-sm uppercase">Chain of Custody</h4>
+<label class="flex items-center gap-2 text-body-md font-body-md text-on-surface cursor-pointer group mb-2">
+<input checked="" class="form-checkbox bg-surface-variant border-outline-variant text-primary focus:ring-primary focus:ring-offset-surface" type="checkbox">
+<span class="group-hover:text-primary transition-colors">Custody Intact</span>
+</label>
+<label class="flex items-center gap-2 text-body-md font-body-md text-on-surface cursor-pointer group">
+<input class="form-checkbox bg-surface-variant border-outline-variant text-primary focus:ring-primary focus:ring-offset-surface" type="checkbox">
+<span class="group-hover:text-primary transition-colors text-error">Custody Broken</span>
+</label>
+</div>
+</div>
+</aside>
+</main>
+</body></html>

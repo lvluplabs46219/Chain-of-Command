@@ -1,0 +1,493 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AI Engine Settings - Acquit.ai</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400..700&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface-variant": "#c5c6ca",
+                      "inverse-primary": "#5d5e61",
+                      "surface-container": "#201f1f",
+                      "secondary": "#b5c8df",
+                      "error-container": "#93000a",
+                      "primary-fixed": "#e2e2e5",
+                      "surface-variant": "#353435",
+                      "on-secondary-container": "#a4b7cd",
+                      "on-primary": "#2f3133",
+                      "secondary-container": "#36485b",
+                      "primary": "#c6c6c9",
+                      "on-background": "#e5e2e1",
+                      "surface": "#141313",
+                      "on-primary-container": "#838486",
+                      "primary-fixed-dim": "#c6c6c9",
+                      "inverse-surface": "#e5e2e1",
+                      "on-tertiary-fixed": "#201b17",
+                      "tertiary-container": "#201b17",
+                      "on-secondary-fixed-variant": "#36485b",
+                      "inverse-on-surface": "#313030",
+                      "primary-container": "#1a1c1e",
+                      "on-surface": "#e5e2e1",
+                      "secondary-fixed-dim": "#b5c8df",
+                      "on-primary-fixed-variant": "#454749",
+                      "on-primary-fixed": "#1a1c1e",
+                      "background": "#141313",
+                      "on-error": "#690005",
+                      "on-tertiary-container": "#8b837d",
+                      "tertiary-fixed-dim": "#cfc5be",
+                      "secondary-fixed": "#d1e4fb",
+                      "on-tertiary": "#352f2b",
+                      "outline": "#8f9194",
+                      "surface-container-high": "#2a2a2a",
+                      "tertiary-fixed": "#ebe0da",
+                      "error": "#ffb4ab",
+                      "on-secondary": "#203243",
+                      "tertiary": "#cfc5be",
+                      "outline-variant": "#44474a",
+                      "surface-dim": "#141313",
+                      "surface-container-highest": "#353435",
+                      "surface-container-lowest": "#0e0e0e",
+                      "surface-container-low": "#1c1b1b",
+                      "surface-bright": "#3a3939",
+                      "on-secondary-fixed": "#091d2e",
+                      "surface-tint": "#c6c6c9",
+                      "on-tertiary-fixed-variant": "#4c4641",
+                      "on-error-container": "#ffdad6"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "margin-safe": "32px",
+                      "base": "4px",
+                      "gutter": "16px",
+                      "xs": "4px",
+                      "lg": "24px",
+                      "xl": "40px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "headline-lg": [
+                              "Domine"
+                      ],
+                      "headline-md": [
+                              "Domine"
+                      ],
+                      "data-mono": [
+                              "JetBrains Mono"
+                      ],
+                      "body-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "display-case": [
+                              "Domine"
+                      ],
+                      "body-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-lg-mobile": [
+                              "Domine"
+                      ],
+                      "label-caps": [
+                              "Hanken Grotesk"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "data-mono": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-case": [
+                              "40px",
+                              {
+                                      "lineHeight": "48px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.08em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+          font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+      </style>
+</head>
+<body class="bg-background text-on-surface font-body-md text-body-md antialiased overflow-x-hidden min-h-screen">
+<!-- Top App Bar - Fixed -->
+<header class="bg-surface-container-low dark:bg-surface-container-low text-primary dark:text-primary h-16 fixed top-0 right-0 left-0 md:left-[280px] z-50 border-b border-outline-variant flex justify-between items-center px-lg">
+<div class="flex items-center gap-md">
+<h1 class="font-headline-md text-headline-md font-black text-primary hidden md:block">Acquit.ai</h1>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-black text-primary md:hidden">Acquit.ai</h1>
+<nav class="hidden md:flex gap-lg ml-lg">
+<a class="text-on-surface-variant hover:text-primary pb-1 text-data-mono font-data-mono" href="#">Case: 2024-CV-8821</a>
+<a class="text-on-surface-variant hover:text-primary pb-1 font-body-md text-body-md" href="#">The Clerk</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-sm">
+<button class="p-2 rounded-full hover:bg-surface-bright dark:hover:bg-surface-bright text-on-surface-variant hover:text-primary transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-bright dark:hover:bg-surface-bright text-on-surface-variant hover:text-primary transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-bright dark:hover:bg-surface-bright text-on-surface-variant hover:text-primary transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+<button class="hidden md:flex items-center justify-center bg-primary text-on-primary font-label-caps text-label-caps px-4 py-2 hover:bg-primary-fixed transition-colors font-bold uppercase tracking-wider border border-primary">
+                AFFIX SIGNATURE
+            </button>
+<img alt="Counsel Avatar" class="w-8 h-8 rounded-full border border-outline-variant ml-sm object-cover" data-alt="A highly detailed close-up portrait of a distinguished senior legal counsel. The subject is wearing a sharply tailored navy blue pinstripe suit with a crisp white shirt and a subtle patterned tie. The lighting is dramatic, high-contrast, casting a shadow on one side of the face, emphasizing authority and experience. The background is a deeply out-of-focus, dark wood-paneled law library. The overall mood is serious, professional, and uncompromising, fitting a high-stakes legal environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD71b6tIvdeh2yP5NF4rkqIMA9yg0EFYWHKjEX3XsRgf1E0hNBoO7zqPP4xvL0NbMFz2IALXwkuUr7v5IUqlsnpqk3dxAjK5OEhlt6eHCxSZHLZjG8I8xFqvc-y6HigeuoUh8WVeLOXob8yHD7mKz4DrjAb4fs8KxOFLylaneCXCAEUiHMjhwy0WyyjbcLJhG0DBT18ahyzHqBijGSPAbAXbX6hRLCMnwG-BDA6lCKOsJNrhw_DAX5LZA">
+</div>
+</header>
+<!-- Side Navigation - Fixed Desktop -->
+<nav class="bg-background dark:bg-background text-primary dark:text-primary w-[280px] h-screen fixed left-0 top-0 border-r border-outline-variant hidden md:flex flex-col py-md z-40">
+<div class="px-lg pb-lg border-b border-outline-variant mb-md flex flex-col">
+<h2 class="font-headline-lg text-headline-lg font-bold text-primary tracking-tighter uppercase mb-xs">Acquit.ai</h2>
+<span class="text-on-surface-variant font-data-mono text-data-mono">Senior Counsel</span>
+<button class="mt-lg w-full flex items-center justify-center gap-2 bg-primary text-on-primary font-label-caps text-label-caps px-4 py-3 hover:bg-primary-fixed transition-colors font-bold uppercase tracking-wider">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                NEW FILING
+            </button>
+</div>
+<div class="flex-1 overflow-y-auto px-sm py-2">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+                        Command Center
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="gavel">gavel</span>
+                        The Docket
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="account_balance">account_balance</span>
+                        Chambers
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="library_books">library_books</span>
+                        Law Library
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="folder_open">folder_open</span>
+                        Record Room
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="policy">policy</span>
+                        Investigations
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="timeline">timeline</span>
+                        Case Timeline
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+                        Court Watch
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="groups">groups</span>
+                        Counsel Directory
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="assignment">assignment</span>
+                        Motions &amp; Tasks
+                    </a>
+</li>
+</ul>
+</div>
+<div class="mt-auto px-sm pt-md border-t border-outline-variant">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-primary border-l-4 border-primary bg-secondary-container/30 font-bold transition-all duration-75 font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined text-[20px] fill" data-icon="settings">settings</span>
+                        Settings
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 font-label-caps text-label-caps uppercase" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="help">help</span>
+                        Support
+                    </a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="pt-20 md:ml-[280px] min-h-screen bg-background">
+<div class="px-4 md:px-lg max-w-7xl mx-auto py-lg grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Page Header -->
+<div class="lg:col-span-12 mb-md">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-outline-variant pb-md">
+<div>
+<span class="font-data-mono text-data-mono text-primary uppercase tracking-widest block mb-1">System Configuration</span>
+<h2 class="font-display-case text-display-case text-on-surface">AI Engine Settings</h2>
+</div>
+<div class="flex items-center gap-4 font-data-mono text-data-mono text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span>System Load: 42%</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-[#10b981]"></span>
+<span>API Status: Online</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Left Column: Primary Settings -->
+<div class="lg:col-span-8 space-y-lg">
+<!-- LLM Provider Configuration -->
+<section class="border border-outline-variant bg-surface-container">
+<div class="bg-secondary-container px-md py-sm border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface m-0 text-lg">Provider Configuration</h3>
+<span class="material-symbols-outlined text-on-surface-variant">vpn_key</span>
+</div>
+<div class="p-md space-y-md">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- OpenAI Config -->
+<div class="border border-outline-variant p-sm relative overflow-hidden group hover:border-primary transition-colors">
+<div class="flex justify-between items-center mb-sm">
+<label class="font-label-caps text-label-caps text-on-surface uppercase">OpenAI API Key</label>
+<span class="px-2 py-0.5 bg-primary/10 text-primary font-data-mono text-[10px] border border-primary/20">ACTIVE</span>
+</div>
+<div class="relative">
+<input class="w-full bg-surface border-0 border-b border-outline-variant text-on-surface font-data-mono text-data-mono py-2 px-0 focus:ring-0 focus:border-primary transition-colors" placeholder="Enter API Key" type="password" value="sk-proj-xxxxxxxxxxxxxxxxxxxxxxxx">
+<button class="absolute right-0 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined text-sm">visibility_off</span>
+</button>
+</div>
+<div class="mt-sm flex justify-between items-center text-on-surface-variant font-data-mono text-[11px]">
+<span>Model: gpt-4-turbo</span>
+<a class="text-primary hover:underline" href="#">Edit Models</a>
+</div>
+</div>
+<!-- Anthropic Config -->
+<div class="border border-outline-variant p-sm relative overflow-hidden group hover:border-primary transition-colors opacity-70 hover:opacity-100">
+<div class="flex justify-between items-center mb-sm">
+<label class="font-label-caps text-label-caps text-on-surface uppercase">Anthropic API Key</label>
+</div>
+<div class="relative">
+<input class="w-full bg-surface border-0 border-b border-outline-variant text-on-surface font-data-mono text-data-mono py-2 px-0 focus:ring-0 focus:border-primary transition-colors" placeholder="sk-ant-..." type="password">
+</div>
+<div class="mt-sm flex justify-between items-center text-on-surface-variant font-data-mono text-[11px]">
+<span>Model: claude-3-opus</span>
+<a class="text-primary hover:underline" href="#">Edit Models</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Local Inference & Parameters -->
+<section class="border border-outline-variant bg-surface-container">
+<div class="bg-surface-container-high px-md py-sm border-b border-outline-variant">
+<h3 class="font-headline-md text-headline-md text-on-surface m-0 text-lg">Inference Parameters</h3>
+</div>
+<div class="p-md">
+<!-- Local Toggle -->
+<div class="flex items-center justify-between p-sm border border-outline-variant bg-surface-container-low mb-lg">
+<div>
+<h4 class="font-label-caps text-label-caps text-on-surface uppercase mb-1">Local Inference Override</h4>
+<p class="font-body-md text-[13px] text-on-surface-variant leading-tight">Route sensitive queries to locally hosted Llama-3 instance. Overrides external API calls.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value="">
+<div class="w-11 h-6 bg-surface-variant border border-outline-variant peer-focus:outline-none rounded-none peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface-variant peer-checked:after:bg-primary after:border after:border-outline-variant after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary-container"></div>
+</label>
+</div>
+<!-- Sliders/Inputs -->
+<div class="space-y-md">
+<div>
+<div class="flex justify-between items-end mb-2">
+<label class="font-label-caps text-label-caps text-on-surface uppercase">Default Prompt Context Length</label>
+<span class="font-data-mono text-data-mono text-primary">32,000 tokens</span>
+</div>
+<input class="w-full h-1 bg-surface-variant appearance-none cursor-pointer accent-primary" max="128000" min="4000" type="range" value="32000">
+<div class="flex justify-between text-on-surface-variant font-data-mono text-[10px] mt-1">
+<span>4k</span>
+<span>128k</span>
+</div>
+</div>
+<div class="pt-sm border-t border-outline-variant/50">
+<div class="flex justify-between items-end mb-2">
+<label class="font-label-caps text-label-caps text-on-surface uppercase">Temperature (Creativity)</label>
+<span class="font-data-mono text-data-mono text-primary">0.2</span>
+</div>
+<input class="w-full h-1 bg-surface-variant appearance-none cursor-pointer accent-primary" max="100" min="0" type="range" value="20">
+<p class="font-body-md text-[12px] text-on-surface-variant mt-2 italic">Lower values recommended for factual legal analysis.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Action Bar -->
+<div class="flex justify-end gap-sm pt-4">
+<button class="px-6 py-2 border border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors font-label-caps text-label-caps uppercase tracking-wider">Revert</button>
+<button class="px-6 py-2 bg-primary text-on-primary font-bold hover:bg-primary-fixed transition-colors font-label-caps text-label-caps uppercase tracking-wider">Save Configuration</button>
+</div>
+</div>
+<!-- Right Column: Inspector / Stats -->
+<div class="lg:col-span-4 space-y-lg">
+<!-- Usage Stats Dossier -->
+<div class="border border-outline-variant bg-surface-container flex flex-col h-full max-h-[600px]">
+<div class="bg-secondary-container px-sm py-2 border-b border-outline-variant flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-on-surface uppercase tracking-widest">Telemetry</span>
+<span class="material-symbols-outlined text-[16px] text-primary">bar_chart</span>
+</div>
+<div class="p-md flex-1 overflow-y-auto">
+<div class="mb-md">
+<h4 class="font-data-mono text-data-mono text-on-surface-variant mb-1 text-[12px]">Total Tokens (Current Billing Cycle)</h4>
+<div class="text-3xl font-display-case text-primary font-bold">14,592,041</div>
+</div>
+<!-- Dense List Items for Stats -->
+<div class="border border-outline-variant divide-y divide-outline-variant">
+<div class="flex justify-between items-center p-2 bg-surface-container-low hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-primary"></span>
+<span class="font-body-md text-sm text-on-surface">gpt-4-turbo</span>
+</div>
+<span class="font-data-mono text-[12px] text-primary">8.2M</span>
+</div>
+<div class="flex justify-between items-center p-2 bg-surface-container-low hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-[#b5c8df]"></span>
+<span class="font-body-md text-sm text-on-surface">llama-3-70b-local</span>
+</div>
+<span class="font-data-mono text-[12px] text-primary">5.1M</span>
+</div>
+<div class="flex justify-between items-center p-2 bg-surface-container-low hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-outline-variant"></span>
+<span class="font-body-md text-sm text-on-surface">claude-3-opus</span>
+</div>
+<span class="font-data-mono text-[12px] text-primary">1.2M</span>
+</div>
+</div>
+<div class="mt-lg border-t border-outline-variant pt-sm">
+<div class="flex justify-between items-center mb-2">
+<span class="font-label-caps text-[10px] text-on-surface-variant uppercase">Estimated Cost</span>
+<span class="font-data-mono text-sm text-error-container font-bold dark:text-[#ffb4ab]">$412.50</span>
+</div>
+<div class="w-full bg-surface-variant h-1 mt-1">
+<div class="bg-error h-1" style="width: 75%"></div>
+</div>
+<span class="font-data-mono text-[10px] text-on-surface-variant block mt-1 text-right">75% of budget</span>
+</div>
+</div>
+</div>
+<!-- Status Node -->
+<div class="border border-outline-variant p-4 flex items-center gap-4 bg-surface-container-low">
+<div class="w-12 h-12 rounded-full border-2 border-primary flex items-center justify-center bg-primary/10">
+<span class="material-symbols-outlined text-primary" data-icon="verified">verified</span>
+</div>
+<div>
+<h4 class="font-label-caps text-label-caps text-on-surface uppercase">System Integrity</h4>
+<p class="font-data-mono text-[12px] text-on-surface-variant mt-1">All encryption protocols active. Logs sealed.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Mobile Bottom Nav -->
+<nav class="md:hidden fixed bottom-0 w-full bg-surface-container-low border-t border-outline-variant flex justify-around items-center h-16 z-50">
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:text-primary" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-[10px] mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:text-primary" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span class="font-label-caps text-[10px] mt-1">Files</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-primary border-t-2 border-primary bg-secondary-container/20" href="#">
+<span class="material-symbols-outlined fill" data-icon="settings">settings</span>
+<span class="font-label-caps text-[10px] mt-1 font-bold">Settings</span>
+</a>
+</nav>
+</body></html>

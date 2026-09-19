@@ -1,0 +1,386 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Acquit.ai - Integrations Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400..700&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#c5c6ca",
+                        "inverse-primary": "#5d5e61",
+                        "surface-container": "#201f1f",
+                        "secondary": "#b5c8df",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#e2e2e5",
+                        "surface-variant": "#353435",
+                        "on-secondary-container": "#a4b7cd",
+                        "on-primary": "#2f3133",
+                        "secondary-container": "#36485b",
+                        "primary": "#c6c6c9",
+                        "on-background": "#e5e2e1",
+                        "surface": "#141313",
+                        "on-primary-container": "#838486",
+                        "primary-fixed-dim": "#c6c6c9",
+                        "inverse-surface": "#e5e2e1",
+                        "on-tertiary-fixed": "#201b17",
+                        "tertiary-container": "#201b17",
+                        "on-secondary-fixed-variant": "#36485b",
+                        "inverse-on-surface": "#313030",
+                        "primary-container": "#1a1c1e",
+                        "on-surface": "#e5e2e1",
+                        "secondary-fixed-dim": "#b5c8df",
+                        "on-primary-fixed-variant": "#454749",
+                        "on-primary-fixed": "#1a1c1e",
+                        "background": "#141313",
+                        "on-error": "#690005",
+                        "on-tertiary-container": "#8b837d",
+                        "tertiary-fixed-dim": "#cfc5be",
+                        "secondary-fixed": "#d1e4fb",
+                        "on-tertiary": "#352f2b",
+                        "outline": "#8f9194",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-fixed": "#ebe0da",
+                        "error": "#ffb4ab",
+                        "on-secondary": "#203243",
+                        "tertiary": "#cfc5be",
+                        "outline-variant": "#44474a",
+                        "surface-dim": "#141313",
+                        "surface-container-highest": "#353435",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-bright": "#3a3939",
+                        "on-secondary-fixed": "#091d2e",
+                        "surface-tint": "#c6c6c9",
+                        "on-tertiary-fixed-variant": "#4c4641",
+                        "on-error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "margin-safe": "32px",
+                        "base": "4px",
+                        "gutter": "16px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "xl": "40px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Domine"],
+                        "headline-md": ["Domine"],
+                        "data-mono": ["JetBrains Mono"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "display-case": ["Domine"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Domine"],
+                        "label-caps": ["Hanken Grotesk"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for data tables */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #141313;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #353435;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #44474a;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md h-screen overflow-hidden flex selection:bg-primary selection:text-on-primary">
+<!-- Suppressed navigation shell due to "Settings" context (Transactional/Focused) -->
+<!-- The user intent here is focused configuration, thus we prioritize the canvas -->
+<!-- Creating a bespoke "Settings Canvas" overlay layout -->
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col h-full bg-background overflow-y-auto">
+<!-- Minimal Top Bar for Settings -->
+<header class="h-16 flex justify-between items-center px-lg border-b border-outline-variant bg-surface-container-low flex-shrink-0 z-10 sticky top-0">
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded hover:bg-surface-container-high transition-colors text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary tracking-tight">Integrations &amp; Data Hub</h1>
+<p class="font-data-mono text-[11px] text-on-surface-variant uppercase tracking-widest mt-1">Acquit.ai Core Systems</p>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<span class="flex items-center gap-2 font-data-mono text-[12px] text-secondary">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                    System Nominal
+                </span>
+</div>
+</header>
+<div class="flex-1 p-xl max-w-7xl mx-auto w-full grid grid-cols-12 gap-gutter">
+<!-- Left Column: Active Connections & API Status -->
+<div class="col-span-12 lg:col-span-8 flex flex-col gap-lg">
+<section class="flex flex-col gap-md">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest border-b border-outline-variant pb-sm">Active Gateways</h2>
+<!-- Integration Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- PACER Gateway -->
+<div class="bg-surface-container border border-outline-variant rounded p-md flex flex-col relative overflow-hidden group hover:border-primary transition-colors">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary"></div>
+<div class="flex justify-between items-start mb-lg">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded border border-outline-variant flex items-center justify-center bg-surface-container-low text-primary">
+<span class="material-symbols-outlined">account_balance</span>
+</div>
+<div>
+<h3 class="font-headline-md text-[18px] font-semibold text-primary">PACER Gateway</h3>
+<p class="font-data-mono text-[12px] text-on-surface-variant">Fed. Court Records</p>
+</div>
+</div>
+<div class="px-2 py-1 border border-secondary text-secondary font-data-mono text-[10px] uppercase rounded">
+                                    Connected
+                                </div>
+</div>
+<div class="mt-auto">
+<div class="flex justify-between text-[12px] text-on-surface-variant mb-1 font-data-mono">
+<span>Sync Interval</span>
+<span class="text-on-surface">15 mins</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden">
+<div class="bg-secondary h-full" style="width: 75%"></div>
+</div>
+<div class="mt-sm flex justify-between items-center">
+<span class="font-data-mono text-[10px] text-on-surface-variant">Last ping: 2m ago</span>
+<button class="text-[12px] text-primary hover:underline font-body-md">Configure</button>
+</div>
+</div>
+</div>
+<!-- LexisNexis -->
+<div class="bg-surface-container border border-outline-variant rounded p-md flex flex-col relative overflow-hidden group hover:border-primary transition-colors">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary"></div>
+<div class="flex justify-between items-start mb-lg">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded border border-outline-variant flex items-center justify-center bg-surface-container-low text-primary">
+<span class="material-symbols-outlined">menu_book</span>
+</div>
+<div>
+<h3 class="font-headline-md text-[18px] font-semibold text-primary">LexisNexis</h3>
+<p class="font-data-mono text-[12px] text-on-surface-variant">Precedent &amp; Caselaw</p>
+</div>
+</div>
+<div class="px-2 py-1 border border-secondary text-secondary font-data-mono text-[10px] uppercase rounded">
+                                    Connected
+                                </div>
+</div>
+<div class="mt-auto">
+<div class="flex justify-between text-[12px] text-on-surface-variant mb-1 font-data-mono">
+<span>Sync Interval</span>
+<span class="text-on-surface">Live / Query</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden">
+<div class="bg-secondary h-full" style="width: 100%"></div>
+</div>
+<div class="mt-sm flex justify-between items-center">
+<span class="font-data-mono text-[10px] text-on-surface-variant">API Status: OK</span>
+<button class="text-[12px] text-primary hover:underline font-body-md">Configure</button>
+</div>
+</div>
+</div>
+<!-- Westlaw -->
+<div class="bg-surface-container border border-outline-variant rounded p-md flex flex-col relative overflow-hidden group hover:border-primary transition-colors">
+<div class="absolute top-0 left-0 w-1 h-full bg-surface-variant"></div>
+<div class="flex justify-between items-start mb-lg">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded border border-outline-variant flex items-center justify-center bg-surface-container-low text-on-surface-variant opacity-50">
+<span class="material-symbols-outlined">gavel</span>
+</div>
+<div>
+<h3 class="font-headline-md text-[18px] font-semibold text-on-surface-variant">Westlaw</h3>
+<p class="font-data-mono text-[12px] text-on-surface-variant opacity-70">Legal Research</p>
+</div>
+</div>
+<div class="px-2 py-1 border border-outline-variant text-on-surface-variant font-data-mono text-[10px] uppercase rounded opacity-70">
+                                    Disconnected
+                                </div>
+</div>
+<div class="mt-auto">
+<div class="mt-sm flex justify-between items-center">
+<span class="font-data-mono text-[10px] text-on-surface-variant">Requires Auth Token</span>
+<button class="bg-primary text-on-primary px-3 py-1 rounded text-[12px] font-semibold hover:bg-primary-fixed transition-colors">Connect</button>
+</div>
+</div>
+</div>
+<!-- MyCase API -->
+<div class="bg-surface-container border border-outline-variant rounded p-md flex flex-col relative overflow-hidden group hover:border-primary transition-colors">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary"></div>
+<div class="flex justify-between items-start mb-lg">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded border border-outline-variant flex items-center justify-center bg-surface-container-low text-primary">
+<span class="material-symbols-outlined">cases</span>
+</div>
+<div>
+<h3 class="font-headline-md text-[18px] font-semibold text-primary">MyCase API</h3>
+<p class="font-data-mono text-[12px] text-on-surface-variant">Practice Management</p>
+</div>
+</div>
+<div class="px-2 py-1 border border-error text-error font-data-mono text-[10px] uppercase rounded">
+                                    Warning
+                                </div>
+</div>
+<div class="mt-auto">
+<div class="flex justify-between text-[12px] text-error mb-1 font-data-mono">
+<span>Sync Interval</span>
+<span>Delayed</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden">
+<div class="bg-error h-full" style="width: 45%"></div>
+</div>
+<div class="mt-sm flex justify-between items-center">
+<span class="font-data-mono text-[10px] text-error">Rate limit approaching</span>
+<button class="text-[12px] text-primary hover:underline font-body-md">Review</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Connection Logs / Activity Ledger -->
+<section class="flex flex-col gap-md flex-1 mt-lg">
+<div class="flex justify-between items-end border-b border-outline-variant pb-sm">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Connection Logs</h2>
+<button class="text-[12px] text-on-surface-variant hover:text-primary flex items-center gap-1 font-data-mono uppercase">
+<span class="material-symbols-outlined text-[16px]">download</span> Export CSV
+                        </button>
+</div>
+<div class="bg-surface-container border border-outline-variant rounded overflow-hidden flex flex-col flex-1 max-h-[300px]">
+<div class="grid grid-cols-12 gap-4 px-md py-2 border-b border-outline-variant bg-surface-container-low font-data-mono text-[11px] text-on-surface-variant uppercase tracking-wider">
+<div class="col-span-3">Timestamp</div>
+<div class="col-span-3">Service</div>
+<div class="col-span-4">Operation</div>
+<div class="col-span-2 text-right">Status</div>
+</div>
+<div class="overflow-y-auto flex-1 font-data-mono text-[13px]">
+<!-- Log Entry -->
+<div class="grid grid-cols-12 gap-4 px-md py-3 border-b border-outline-variant hover:bg-surface-container-high transition-colors">
+<div class="col-span-3 text-on-surface-variant">14:22:05 UTC</div>
+<div class="col-span-3 text-primary">PACER</div>
+<div class="col-span-4 text-on-surface truncate">GET /docket/2024-CV-8821</div>
+<div class="col-span-2 text-right text-secondary">200 OK</div>
+</div>
+<!-- Log Entry -->
+<div class="grid grid-cols-12 gap-4 px-md py-3 border-b border-outline-variant hover:bg-surface-container-high transition-colors">
+<div class="col-span-3 text-on-surface-variant">14:20:12 UTC</div>
+<div class="col-span-3 text-primary">LexisNexis</div>
+<div class="col-span-4 text-on-surface truncate">POST /query/shepardize</div>
+<div class="col-span-2 text-right text-secondary">200 OK</div>
+</div>
+<!-- Log Entry -->
+<div class="grid grid-cols-12 gap-4 px-md py-3 border-b border-outline-variant hover:bg-surface-container-high transition-colors bg-error-container/10">
+<div class="col-span-3 text-on-surface-variant">14:15:00 UTC</div>
+<div class="col-span-3 text-primary">MyCase</div>
+<div class="col-span-4 text-on-surface truncate">GET /sync/documents</div>
+<div class="col-span-2 text-right text-error">429 LIMIT</div>
+</div>
+<!-- Log Entry -->
+<div class="grid grid-cols-12 gap-4 px-md py-3 border-b border-outline-variant hover:bg-surface-container-high transition-colors">
+<div class="col-span-3 text-on-surface-variant">14:10:05 UTC</div>
+<div class="col-span-3 text-primary">PACER</div>
+<div class="col-span-4 text-on-surface truncate">GET /docket/2024-CV-8821</div>
+<div class="col-span-2 text-right text-secondary">200 OK</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Inspector / Settings Panel -->
+<div class="col-span-12 lg:col-span-4 border border-outline-variant bg-surface-container-low rounded p-lg flex flex-col gap-lg h-fit">
+<div>
+<h2 class="font-headline-md text-[20px] font-bold text-primary mb-1">Global Data Settings</h2>
+<p class="text-[13px] text-on-surface-variant leading-relaxed">Configure overarching data retention and synchronization protocols for the Acquit.ai ecosystem.</p>
+</div>
+<div class="space-y-6">
+<!-- Auto-Sync Master Switch -->
+<div class="flex items-center justify-between p-4 border border-outline-variant rounded bg-surface-container">
+<div>
+<span class="block font-semibold text-[14px] text-primary">Master Auto-Sync</span>
+<span class="block text-[12px] text-on-surface-variant font-data-mono mt-1">Background polling enabled</span>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-secondary appearance-none cursor-pointer transition-transform duration-200 ease-in-out translate-x-6 z-10" id="toggle" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-secondary cursor-pointer" for="toggle"></label>
+</div>
+</div>
+<!-- Sync Interval Setting -->
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-2">Default Polling Interval</label>
+<select class="w-full bg-surface-container border border-outline-variant text-on-surface text-[14px] rounded px-3 py-2 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors font-data-mono">
+<option>5 Minutes (High Priority)</option>
+<option selected="">15 Minutes (Standard)</option>
+<option>1 Hour (Eco)</option>
+<option>Manual Only</option>
+</select>
+</div>
+<!-- Security Protocol -->
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-2">Encryption Protocol</label>
+<div class="w-full bg-surface-container-highest border border-outline-variant text-on-surface-variant text-[14px] rounded px-3 py-2 font-data-mono cursor-not-allowed opacity-70 flex justify-between items-center">
+<span>AES-256 (Locked)</span>
+<span class="material-symbols-outlined text-[16px]">lock</span>
+</div>
+<p class="text-[11px] text-on-surface-variant mt-1">Enterprise tier requirement.</p>
+</div>
+</div>
+<div class="mt-auto pt-lg border-t border-outline-variant">
+<button class="w-full bg-surface-container border border-primary text-primary hover:bg-primary hover:text-on-primary transition-colors py-2 rounded font-semibold text-[14px] uppercase tracking-wider font-label-caps">
+                        Save Configurations
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<style>
+        /* Custom Toggle Switch Styles */
+        .toggle-checkbox:checked {
+          right: 0;
+          border-color: #68D391;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+          background-color: #68D391;
+        }
+        .toggle-checkbox {
+            right: 0;
+            border-color: #1a1c1e; /* primary-container approx */
+        }
+        .toggle-checkbox:checked {
+            border-color: #b5c8df; /* secondary */
+        }
+        .toggle-label {
+            background-color: #353435; /* surface-variant */
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #b5c8df; /* secondary */
+        }
+    </style>
+</body></html>

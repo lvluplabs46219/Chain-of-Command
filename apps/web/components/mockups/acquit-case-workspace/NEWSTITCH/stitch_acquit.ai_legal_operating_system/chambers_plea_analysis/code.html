@@ -1,0 +1,384 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Chambers - Plea Analysis</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;600;700&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "error-container": "#93000a",
+                        "outline": "#8f9194",
+                        "surface-container-highest": "#353435",
+                        "on-secondary-fixed-variant": "#36485b",
+                        "surface-bright": "#3a3939",
+                        "on-secondary-container": "#a4b7cd",
+                        "on-tertiary-fixed-variant": "#4c4641",
+                        "on-tertiary-container": "#8b837d",
+                        "tertiary": "#cfc5be",
+                        "on-secondary": "#203243",
+                        "on-error": "#690005",
+                        "surface-container-low": "#1c1b1b",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#cfc5be",
+                        "tertiary-container": "#201b17",
+                        "outline-variant": "#44474a",
+                        "secondary": "#b5c8df",
+                        "on-tertiary": "#352f2b",
+                        "on-secondary-fixed": "#091d2e",
+                        "inverse-on-surface": "#313030",
+                        "surface": "#141313",
+                        "on-tertiary-fixed": "#201b17",
+                        "on-surface-variant": "#c5c6ca",
+                        "on-primary-fixed": "#1a1c1e",
+                        "secondary-fixed": "#d1e4fb",
+                        "inverse-primary": "#5d5e61",
+                        "primary-fixed-dim": "#c6c6c9",
+                        "primary": "#c6c6c9",
+                        "on-primary-container": "#838486",
+                        "on-background": "#e5e2e1",
+                        "inverse-surface": "#e5e2e1",
+                        "error": "#ffb4ab",
+                        "on-surface": "#e5e2e1",
+                        "secondary-container": "#36485b",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-tint": "#c6c6c9",
+                        "secondary-fixed-dim": "#b5c8df",
+                        "surface-container": "#201f1f",
+                        "on-primary-fixed-variant": "#454749",
+                        "background": "#141313",
+                        "surface-variant": "#353435",
+                        "primary-container": "#1a1c1e",
+                        "on-primary": "#2f3133",
+                        "primary-fixed": "#e2e2e5",
+                        "tertiary-fixed": "#ebe0da",
+                        "surface-dim": "#141313",
+                        "surface-container-high": "#2a2a2a"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "base": "4px",
+                        "xs": "4px",
+                        "margin-safe": "32px",
+                        "gutter": "16px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "sm": "8px"
+                    },
+                    fontFamily: {
+                        "body-md": ["Hanken Grotesk"],
+                        "label-caps": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "data-mono": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Domine"],
+                        "display-case": ["Domine"],
+                        "headline-lg": ["Domine"],
+                        "headline-md": ["Domine"]
+                    },
+                    fontSize: {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-case": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom scrollbar for dense panels */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #44474a;
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8f9194;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface h-screen overflow-hidden selection:bg-secondary selection:text-on-secondary">
+<!-- Shared Component: SideNavBar -->
+<nav class="fixed left-0 top-0 bottom-0 flex flex-col z-40 bg-surface-container border-r border-outline-variant h-screen w-[280px]">
+<!-- Header -->
+<div class="p-gutter border-b border-outline-variant flex flex-col gap-sm">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">account_balance</span>
+</div>
+<h1 class="text-label-caps font-label-caps tracking-widest text-on-surface uppercase">Legal OS</h1>
+</div>
+<p class="text-data-mono font-data-mono text-on-surface-variant">Matter 2024-772B</p>
+</div>
+<!-- CTA -->
+<div class="p-gutter border-b border-outline-variant">
+<button class="w-full bg-secondary text-on-secondary font-label-caps text-label-caps py-sm px-md rounded flex justify-center items-center gap-xs hover:bg-secondary-fixed transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span>
+                New Filing
+            </button>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 overflow-y-auto py-sm flex flex-col gap-xs">
+<a class="flex items-center gap-md px-gutter py-sm text-on-surface-variant font-medium hover:bg-surface-container-high hover:text-on-surface transition-all 200ms ease-in-out text-label-caps font-label-caps" href="#">
+<span class="material-symbols-outlined text-[18px]">dashboard</span>
+                Command Center
+            </a>
+<a class="flex items-center gap-md px-gutter py-sm text-on-surface-variant font-medium hover:bg-surface-container-high hover:text-on-surface transition-all 200ms ease-in-out text-label-caps font-label-caps" href="#">
+<span class="material-symbols-outlined text-[18px]">gavel</span>
+                The Docket
+            </a>
+<!-- Active Tab: Chambers -->
+<a class="flex items-center gap-md px-gutter py-sm text-on-surface border-l-4 border-secondary bg-surface-variant font-bold transition-all 200ms ease-in-out text-label-caps font-label-caps" href="#">
+<span class="material-symbols-outlined text-[18px]">groups</span>
+                Chambers
+            </a>
+<a class="flex items-center gap-md px-gutter py-sm text-on-surface-variant font-medium hover:bg-surface-container-high hover:text-on-surface transition-all 200ms ease-in-out text-label-caps font-label-caps" href="#">
+<span class="material-symbols-outlined text-[18px]">menu_book</span>
+                Law Library
+            </a>
+<a class="flex items-center gap-md px-gutter py-sm text-on-surface-variant font-medium hover:bg-surface-container-high hover:text-on-surface transition-all 200ms ease-in-out text-label-caps font-label-caps" href="#">
+<span class="material-symbols-outlined text-[18px]">folder_shared</span>
+                Record Room
+            </a>
+</div>
+<!-- Footer Links -->
+<div class="mt-auto border-t border-outline-variant py-sm flex flex-col gap-xs">
+<a class="flex items-center gap-md px-gutter py-sm text-on-surface-variant font-medium hover:bg-surface-container-high hover:text-on-surface transition-all 200ms ease-in-out text-label-caps font-label-caps" href="#">
+<span class="material-symbols-outlined text-[18px]">help</span>
+                Support
+            </a>
+<a class="flex items-center gap-md px-gutter py-sm text-on-surface-variant font-medium hover:bg-surface-container-high hover:text-on-surface transition-all 200ms ease-in-out text-label-caps font-label-caps" href="#">
+<span class="material-symbols-outlined text-[18px]">archive</span>
+                Archive
+            </a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="ml-[280px] flex flex-col h-screen bg-background">
+<!-- Local Header: Analysis Context -->
+<header class="border-b border-outline-variant bg-surface px-lg py-md flex justify-between items-end shrink-0">
+<div class="flex flex-col gap-xs">
+<div class="flex items-center gap-sm">
+<span class="px-sm py-xs bg-surface-container-highest text-on-surface border border-outline-variant rounded font-label-caps text-label-caps uppercase">US v. Caldwell</span>
+<span class="text-outline font-data-mono text-data-mono">24-CR-0891</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Plea Analysis &amp; Scenario Matrix</h2>
+</div>
+<div class="flex items-center gap-md">
+<div class="text-right flex flex-col items-end">
+<span class="font-label-caps text-label-caps text-outline uppercase">Generated</span>
+<span class="font-data-mono text-data-mono text-on-surface-variant">2023.10.24 14:30 EST</span>
+</div>
+<button class="w-10 h-10 border border-outline-variant rounded bg-surface-container flex items-center justify-center hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-on-surface">print</span>
+</button>
+</div>
+</header>
+<!-- 3-Pane Layout Grid -->
+<div class="flex-1 overflow-hidden grid grid-cols-12 gap-base p-base">
+<!-- LEFT PANE: Plea Terms -->
+<section class="col-span-3 bg-surface-container-low border border-outline-variant flex flex-col overflow-hidden rounded">
+<div class="bg-surface-container border-b border-outline-variant px-md py-sm">
+<h3 class="font-label-caps text-label-caps text-on-surface uppercase tracking-widest">Plea Terms Summary</h3>
+</div>
+<div class="p-md flex-1 overflow-y-auto flex flex-col gap-md">
+<!-- Charges -->
+<div class="flex flex-col gap-xs">
+<h4 class="font-data-mono text-data-mono text-outline uppercase">Charges Conceded</h4>
+<div class="border-l-2 border-tertiary pl-sm flex flex-col gap-xs">
+<div class="flex justify-between items-start">
+<span class="font-body-md text-body-md text-on-surface">18 U.S.C. § 1343</span>
+<span class="font-label-caps text-label-caps bg-surface-variant text-on-surface px-1 rounded">Count 1</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-[14px]">Wire Fraud</p>
+</div>
+<div class="border-l-2 border-tertiary pl-sm flex flex-col gap-xs mt-sm">
+<div class="flex justify-between items-start">
+<span class="font-body-md text-body-md text-on-surface">18 U.S.C. § 371</span>
+<span class="font-label-caps text-label-caps bg-surface-variant text-on-surface px-1 rounded">Count 4</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-[14px]">Conspiracy to Defraud</p>
+</div>
+</div>
+<hr class="border-outline-variant border-dashed">
+<!-- Exposure -->
+<div class="flex flex-col gap-sm">
+<h4 class="font-data-mono text-data-mono text-outline uppercase">Sentencing Exposure</h4>
+<div class="bg-surface-container p-sm border border-outline-variant rounded flex justify-between items-center">
+<span class="font-body-md text-body-md text-on-surface-variant">Base Offense Lvl</span>
+<span class="font-data-mono text-data-mono text-on-surface">24</span>
+</div>
+<div class="bg-surface-container p-sm border border-outline-variant rounded flex justify-between items-center">
+<span class="font-body-md text-body-md text-on-surface-variant">Crim. History Cat</span>
+<span class="font-data-mono text-data-mono text-on-surface">I</span>
+</div>
+<div class="bg-surface-variant p-sm border border-secondary rounded flex justify-between items-center mt-xs">
+<span class="font-body-md text-body-md text-on-surface font-semibold">Guideline Range</span>
+<span class="font-data-mono text-data-mono text-secondary font-bold">51 - 63 mo.</span>
+</div>
+</div>
+<hr class="border-outline-variant border-dashed">
+<!-- Collateral -->
+<div class="flex flex-col gap-sm">
+<h4 class="font-data-mono text-data-mono text-error uppercase flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">warning</span> Collateral Consequences
+                        </h4>
+<ul class="list-none flex flex-col gap-xs font-body-md text-body-md text-on-surface-variant text-[14px]">
+<li class="flex items-start gap-xs">
+<span class="text-outline">•</span> Mandatory restitution est. $2.4M
+                            </li>
+<li class="flex items-start gap-xs">
+<span class="text-outline">•</span> Loss of professional licenses
+                            </li>
+<li class="flex items-start gap-xs">
+<span class="text-outline">•</span> Asset forfeiture (Schedule A)
+                            </li>
+</ul>
+</div>
+</div>
+</section>
+<!-- CENTER PANE: Comparative Analysis -->
+<section class="col-span-6 flex flex-col gap-base overflow-hidden">
+<!-- Current Offer Main Card (High Emphasis) -->
+<div class="bg-surface-container border border-secondary p-lg rounded flex flex-col gap-md relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-secondary opacity-5 rounded-bl-full pointer-events-none"></div>
+<div class="flex justify-between items-start">
+<h3 class="font-headline-md text-headline-md text-on-surface">Current Govt. Offer</h3>
+<span class="px-sm py-xs bg-secondary text-on-secondary font-label-caps text-label-caps rounded uppercase">Expires in 48h</span>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div class="flex flex-col gap-xs">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Custodial Recommendation</span>
+<span class="font-display-case text-display-case text-secondary">36 mo.</span>
+</div>
+<div class="flex flex-col gap-xs">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Financial Obligation</span>
+<span class="font-display-case text-display-case text-on-surface">$1.2M</span>
+</div>
+</div>
+<div class="w-full bg-surface-container-highest h-2 rounded mt-sm overflow-hidden flex">
+<div class="bg-secondary h-full w-[30%]"></div>
+<div class="bg-outline-variant h-full w-[70%]"></div>
+</div>
+<p class="font-data-mono text-data-mono text-on-surface-variant text-right">30% of Maximum Custodial Exposure</p>
+</div>
+<!-- Bento Grid for Scenarios -->
+<div class="grid grid-cols-2 gap-base flex-1">
+<!-- Max Exposure (Worst Case) -->
+<div class="bg-surface-container-low border border-error-container p-md rounded flex flex-col gap-sm relative">
+<div class="absolute top-sm right-sm">
+<span class="material-symbols-outlined text-error">gavel</span>
+</div>
+<h4 class="font-label-caps text-label-caps text-error uppercase">Max Exposure (Trial Loss)</h4>
+<div class="flex-1 flex flex-col justify-end">
+<span class="font-headline-lg text-headline-lg text-on-surface">120 mo.</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Statutory Maximum</span>
+</div>
+<ul class="mt-sm pt-sm border-t border-surface-variant font-data-mono text-data-mono text-on-surface-variant text-[12px] flex flex-col gap-xs">
+<li>+ All counts consecutively</li>
+<li>+ Aggravating role enhancement</li>
+<li>+ Full restitution $5M+</li>
+</ul>
+</div>
+<!-- Best Case (Trial Win / Downward Departure) -->
+<div class="bg-surface-container-low border border-outline-variant p-md rounded flex flex-col gap-sm relative">
+<div class="absolute top-sm right-sm">
+<span class="material-symbols-outlined text-on-surface-variant">balance</span>
+</div>
+<h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase">Best Case (Trial Win / Vari.)</h4>
+<div class="flex-1 flex flex-col justify-end">
+<span class="font-headline-lg text-headline-lg text-on-surface">0 - 12 mo.</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Probation / Home Confine.</span>
+</div>
+<ul class="mt-sm pt-sm border-t border-surface-variant font-data-mono text-data-mono text-on-surface-variant text-[12px] flex flex-col gap-xs">
+<li>+ Acquittal on main counts</li>
+<li>+ § 3553(a) downward variance</li>
+<li>+ Minimal culpability finding</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- RIGHT PANE: Strategy & Counsel -->
+<section class="col-span-3 bg-surface border border-outline-variant flex flex-col rounded">
+<div class="bg-surface-container border-b border-outline-variant px-md py-sm">
+<h3 class="font-label-caps text-label-caps text-on-surface uppercase tracking-widest">Strategy &amp; Notes</h3>
+</div>
+<div class="p-md flex-1 overflow-y-auto flex flex-col gap-lg">
+<!-- Notes Field -->
+<div class="flex flex-col gap-xs">
+<label class="font-data-mono text-data-mono text-outline uppercase">Counsel Notes</label>
+<div class="bg-surface-container-low border border-outline-variant rounded p-sm font-body-md text-body-md text-on-surface min-h-[120px] focus-within:border-secondary focus-within:ring-1 focus-within:ring-secondary transition-all">
+<textarea class="w-full h-full bg-transparent border-none outline-none resize-none p-0 focus:ring-0 text-on-surface font-body-md" placeholder="Enter tactical observations..."></textarea>
+</div>
+</div>
+<!-- Action Items / Questions -->
+<div class="flex flex-col gap-xs">
+<label class="font-data-mono text-data-mono text-outline uppercase flex items-center justify-between">
+                            Questions for Client
+                            <button class="text-secondary hover:text-secondary-fixed"><span class="material-symbols-outlined text-[16px]">add</span></button>
+</label>
+<div class="flex flex-col gap-sm">
+<label class="flex items-start gap-sm cursor-pointer group">
+<input class="mt-1 form-checkbox h-4 w-4 text-secondary bg-surface-container border-outline-variant rounded focus:ring-secondary focus:ring-offset-surface" type="checkbox">
+<span class="font-body-md text-body-md text-on-surface group-hover:text-secondary-fixed transition-colors text-[14px]">Willingness to forfeit offshore assets?</span>
+</label>
+<label class="flex items-start gap-sm cursor-pointer group">
+<input class="mt-1 form-checkbox h-4 w-4 text-secondary bg-surface-container border-outline-variant rounded focus:ring-secondary focus:ring-offset-surface" type="checkbox">
+<span class="font-body-md text-body-md text-on-surface group-hover:text-secondary-fixed transition-colors text-[14px]">Tolerance for minimum 24-mo actual time served?</span>
+</label>
+<label class="flex items-start gap-sm cursor-pointer group">
+<input class="mt-1 form-checkbox h-4 w-4 text-secondary bg-surface-container border-outline-variant rounded focus:ring-secondary focus:ring-offset-surface" type="checkbox">
+<span class="font-body-md text-body-md text-on-surface group-hover:text-secondary-fixed transition-colors text-[14px]">Confirm family status for § 3553(a) argument.</span>
+</label>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- ACTION FOOTER: User Choice (Brutalist style) -->
+<footer class="border-t-2 border-outline-variant bg-surface-container-low p-md flex items-center justify-between shrink-0">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-outline">verified_user</span>
+<span class="font-data-mono text-data-mono text-outline">Awaiting strategic direction</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="px-lg py-sm border border-outline-variant text-on-surface font-label-caps text-label-caps uppercase hover:bg-surface-variant transition-colors rounded">
+                    Reject &amp; Counter
+                </button>
+<button class="px-lg py-sm border border-outline-variant text-on-surface font-label-caps text-label-caps uppercase hover:bg-surface-variant transition-colors rounded">
+                    Prepare for Trial
+                </button>
+<button class="px-lg py-sm bg-tertiary text-on-tertiary font-label-caps text-label-caps uppercase hover:bg-tertiary-fixed border border-tertiary shadow-[2px_2px_0px_0px_rgba(207,197,190,0.3)] transition-all rounded">
+                    Accept Principles
+                </button>
+</div>
+</footer>
+</main>
+</body></html>

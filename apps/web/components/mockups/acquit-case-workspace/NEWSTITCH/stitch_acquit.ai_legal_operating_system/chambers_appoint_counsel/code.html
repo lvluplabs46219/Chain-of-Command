@@ -1,0 +1,463 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Chambers - Appoint Counsel | ACQUIT.AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400..700&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#1a1c1e",
+                        "on-tertiary-fixed": "#201b17",
+                        "surface-container-highest": "#353435",
+                        "tertiary-container": "#201b17",
+                        "secondary-fixed": "#d1e4fb",
+                        "on-tertiary": "#352f2b",
+                        "error": "#ffb4ab",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container": "#201f1f",
+                        "background": "#141313",
+                        "on-surface": "#e5e2e1",
+                        "surface-tint": "#c6c6c9",
+                        "primary-fixed-dim": "#c6c6c9",
+                        "outline-variant": "#44474a",
+                        "on-primary-container": "#838486",
+                        "on-surface-variant": "#c5c6ca",
+                        "inverse-primary": "#5d5e61",
+                        "on-background": "#e5e2e1",
+                        "primary-fixed": "#e2e2e5",
+                        "on-secondary-fixed": "#091d2e",
+                        "tertiary-fixed-dim": "#cfc5be",
+                        "tertiary-fixed": "#ebe0da",
+                        "secondary-container": "#36485b",
+                        "on-secondary-fixed-variant": "#36485b",
+                        "inverse-surface": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#4c4641",
+                        "on-primary-fixed": "#1a1c1e",
+                        "outline": "#8f9194",
+                        "tertiary": "#cfc5be",
+                        "on-primary-fixed-variant": "#454749",
+                        "surface-container-high": "#2a2a2a",
+                        "error-container": "#93000a",
+                        "surface-variant": "#353435",
+                        "secondary-fixed-dim": "#b5c8df",
+                        "on-secondary-container": "#a4b7cd",
+                        "surface-dim": "#141313",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "surface": "#141313",
+                        "on-tertiary-container": "#8b837d",
+                        "on-primary": "#2f3133",
+                        "surface-container-low": "#1c1b1b",
+                        "inverse-on-surface": "#313030",
+                        "surface-bright": "#3a3939",
+                        "secondary": "#b5c8df",
+                        "primary": "#c6c6c9",
+                        "on-secondary": "#203243"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin-safe": "32px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xl": "40px",
+                        "xs": "4px",
+                        "base": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Hanken Grotesk"],
+                        "headline-lg": ["Domine"],
+                        "label-caps": ["Hanken Grotesk"],
+                        "data-mono": ["JetBrains Mono"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-md": ["Domine"],
+                        "headline-lg-mobile": ["Domine"],
+                        "display-case": ["Domine"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-case": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #141313; /* background */
+            color: #e5e2e1; /* on-surface */
+        }
+        
+        /* Custom Scrollbar for dense lists */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #141313;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #353435;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #44474a;
+        }
+
+        /* Form Inputs - "Blanks" styling */
+        .legal-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #44474a;
+            border-radius: 0;
+            color: #e5e2e1;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 8px 0;
+            transition: all 0.2s ease;
+        }
+        .legal-input:focus {
+            outline: none;
+            box-shadow: none;
+            border-bottom: 1px solid #c6c6c9;
+            background: rgba(198, 198, 201, 0.05);
+            padding-left: 8px;
+        }
+        .legal-input::placeholder {
+            color: #838486;
+        }
+        
+        /* Sliders */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #c6c6c9;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 0 2px #141313;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #44474a;
+            border-radius: 2px;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body class="antialiased overflow-hidden selection:bg-primary selection:text-on-primary flex">
+<!-- SideNavBar (Shared Component) -->
+<nav class="w-[280px] h-screen fixed left-0 top-0 border-r border-outline-variant dark:border-outline-variant bg-background dark:bg-background flex flex-col h-full py-md z-40">
+<!-- Header -->
+<div class="px-md mb-8">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">balance</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-surface dark:text-on-surface tracking-tighter uppercase">ACQUIT.AI</h1>
+<p class="font-data-mono text-data-mono text-on-surface-variant text-[10px] uppercase">Legal OS v1.0</p>
+</div>
+</div>
+<button class="w-full mt-4 bg-primary text-on-primary font-label-caps text-label-caps py-2 px-4 rounded-sm border border-transparent hover:bg-primary-fixed transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                New Filing
+            </button>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 overflow-y-auto">
+<ul class="flex flex-col gap-1 w-full">
+<!-- Command Center -->
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Command Center</span>
+</a>
+</li>
+<!-- The Docket -->
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined">gavel</span>
+<span>The Docket</span>
+</a>
+</li>
+<!-- Chambers (ACTIVE) -->
+<li>
+<a class="flex items-center gap-3 text-primary dark:text-primary border-l-4 border-primary bg-primary-container/10 px-4 py-3 font-bold font-body-md text-body-md uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined">meeting_room</span>
+<span>Chambers</span>
+</a>
+</li>
+<!-- Law Library -->
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined">library_books</span>
+<span>Law Library</span>
+</a>
+</li>
+<!-- Record Room -->
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+<span>Record Room</span>
+</a>
+</li>
+<!-- Investigations -->
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+<span>Investigations</span>
+</a>
+</li>
+<!-- Case Timeline -->
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span>Case Timeline</span>
+</a>
+</li>
+<!-- Court Watch -->
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined">visibility</span>
+<span>Court Watch</span>
+</a>
+</li>
+<!-- Counsel Directory -->
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined">contact_page</span>
+<span>Counsel Directory</span>
+</a>
+</li>
+<!-- Motions & Tasks -->
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container dark:hover:bg-surface-container transition-colors font-body-md text-body-md uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span>Motions &amp; Tasks</span>
+</a>
+</li>
+</ul>
+</div>
+<!-- User Profile -->
+<div class="mt-auto px-md pt-4 border-t border-outline-variant">
+<div class="flex items-center gap-3">
+<img alt="Lead Counsel" class="w-8 h-8 rounded object-cover border border-outline-variant grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-nsvUc6nLSH76i_vsg30Kd2E2e1jU6fNMM8Ji__O7G1BhVsH4HnPVb1jIHwvL3QCXgabXwxm1GZjPCUiwqEbuQzqda_aehdnXsWuvD94B0AcMrCmIkUFJuvQ9iuvV8kLuH_BAuhLlC6avyIizKUq9vmuZ4ckCvQLpAmrOOxNW8zV0YJEtY7V_t_XivpLCVIO6Y2sjLJpIu24dapliUHBdoNDrL_eUGtGaCF4DbiUePsPjukNTDouc_A">
+<div class="flex-1 overflow-hidden">
+<p class="font-data-mono text-data-mono text-on-surface truncate text-xs">J. SMITH, ESQ.</p>
+<p class="font-data-mono text-[10px] text-on-surface-variant truncate">ID: 8849-B</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- TopAppBar (Shared Component) -->
+<header class="h-16 fixed top-0 right-0 left-[280px] z-50 border-b border-outline-variant dark:border-outline-variant bg-surface dark:bg-surface flex items-center justify-between px-md w-full">
+<!-- Context / Title -->
+<div class="flex items-center gap-4">
+<div class="bg-surface-container px-2 py-1 border border-outline-variant rounded-sm flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-error animate-pulse"></div>
+<span class="font-data-mono text-data-mono text-primary font-bold">2024-CV-8821</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">/ CHAMBERS / APPOINT COUNSEL</span>
+</div>
+<!-- Right Actions -->
+<div class="flex items-center gap-4 pr-[280px]"> <!-- Offset for right fixed padding -->
+<!-- Search -->
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="bg-surface-container-highest border border-outline-variant rounded-sm py-1 pl-8 pr-3 font-data-mono text-[12px] text-on-surface focus:outline-none focus:ring-1 focus:ring-primary w-64" placeholder="Query Records..." type="text">
+</div>
+<div class="flex items-center gap-2 border-l border-outline-variant pl-4">
+<button class="p-1.5 text-on-surface-variant hover:text-primary dark:hover:text-primary transition-opacity rounded hover:bg-surface-container">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary dark:hover:text-primary transition-opacity rounded hover:bg-surface-container">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary dark:hover:text-primary transition-opacity rounded hover:bg-surface-container">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area (The Canvas) -->
+<main class="ml-[280px] mt-16 flex-1 h-[calc(100vh-64px)] overflow-hidden flex bg-background relative">
+<!-- Left Panel: Configuration Form -->
+<section class="flex-1 overflow-y-auto p-lg border-r border-outline-variant">
+<header class="mb-8">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Initialize AI Counsel</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Configure parameters for specialized autonomous legal agent deployment.</p>
+</header>
+<form class="space-y-10 max-w-2xl">
+<!-- Section 1: Identity -->
+<fieldset class="space-y-6">
+<legend class="font-label-caps text-label-caps text-primary border-b border-outline-variant w-full pb-2 mb-4">I. Identity &amp; Role Matrix</legend>
+<div class="grid grid-cols-2 gap-6">
+<div class="flex flex-col gap-1">
+<label class="font-data-mono text-[11px] text-on-surface-variant uppercase">Designation (Agent Name)</label>
+<input class="legal-input" placeholder="e.g., ORACLE-7" type="text">
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-data-mono text-[11px] text-on-surface-variant uppercase">Primary Function</label>
+<select class="legal-input bg-surface-container appearance-none cursor-pointer">
+<option>Sentencing Specialist</option>
+<option>Discovery Analyst</option>
+<option>Contract Auditor</option>
+<option>Appellate Strategist</option>
+</select>
+</div>
+</div>
+</fieldset>
+<!-- Section 2: Expertise & Directives -->
+<fieldset class="space-y-6">
+<legend class="font-label-caps text-label-caps text-primary border-b border-outline-variant w-full pb-2 mb-4">II. Knowledge Parameters</legend>
+<div class="flex flex-col gap-3">
+<label class="font-data-mono text-[11px] text-on-surface-variant uppercase">Jurisdictional Focus (Select Multiple)</label>
+<div class="flex flex-wrap gap-2">
+<label class="cursor-pointer border border-outline-variant px-3 py-1 rounded-sm flex items-center gap-2 hover:border-primary has-[:checked]:bg-primary-container has-[:checked]:border-primary transition-all">
+<input class="sr-only" type="checkbox">
+<span class="font-data-mono text-xs text-on-surface">Federal (US)</span>
+</label>
+<label class="cursor-pointer border border-outline-variant px-3 py-1 rounded-sm flex items-center gap-2 hover:border-primary has-[:checked]:bg-primary-container has-[:checked]:border-primary transition-all">
+<input checked="" class="sr-only" type="checkbox">
+<span class="font-data-mono text-xs text-on-surface">State (NY)</span>
+</label>
+<label class="cursor-pointer border border-outline-variant px-3 py-1 rounded-sm flex items-center gap-2 hover:border-primary has-[:checked]:bg-primary-container has-[:checked]:border-primary transition-all">
+<input class="sr-only" type="checkbox">
+<span class="font-data-mono text-xs text-on-surface">International (EU)</span>
+</label>
+<label class="cursor-pointer border border-outline-variant px-3 py-1 rounded-sm flex items-center gap-2 hover:border-primary has-[:checked]:bg-primary-container has-[:checked]:border-primary transition-all">
+<input class="sr-only" type="checkbox">
+<span class="font-data-mono text-xs text-on-surface">Maritime Law</span>
+</label>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-data-mono text-[11px] text-on-surface-variant uppercase">Core Directive (System Prompt)</label>
+<textarea class="legal-input min-h-[100px] resize-y" placeholder="Define the agent's primary operational constraints and goals..."></textarea>
+</div>
+</fieldset>
+<!-- Section 3: Personality Tuning -->
+<fieldset class="space-y-8">
+<legend class="font-label-caps text-label-caps text-primary border-b border-outline-variant w-full pb-2 mb-4">III. Behavioral Tuning</legend>
+<div class="grid grid-cols-1 gap-8">
+<!-- Slider 1 -->
+<div>
+<div class="flex justify-between mb-2">
+<span class="font-data-mono text-[10px] text-on-surface-variant uppercase">Risk Tolerance</span>
+<span class="font-data-mono text-[10px] text-primary" id="risk-val">0.3</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-data-mono text-[10px] text-on-surface-variant">CONSERVATIVE</span>
+<input class="flex-1" max="1" min="0" oninput="document.getElementById('risk-val').textContent=this.value" step="0.1" type="range" value="0.3">
+<span class="font-data-mono text-[10px] text-on-surface-variant">AGGRESSIVE</span>
+</div>
+</div>
+<!-- Slider 2 -->
+<div>
+<div class="flex justify-between mb-2">
+<span class="font-data-mono text-[10px] text-on-surface-variant uppercase">Argumentative Posture</span>
+<span class="font-data-mono text-[10px] text-primary" id="arg-val">0.8</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-data-mono text-[10px] text-on-surface-variant">DIPLOMATIC</span>
+<input class="flex-1" max="1" min="0" oninput="document.getElementById('arg-val').textContent=this.value" step="0.1" type="range" value="0.8">
+<span class="font-data-mono text-[10px] text-on-surface-variant">ADVERSARIAL</span>
+</div>
+</div>
+</div>
+</fieldset>
+</form>
+</section>
+<!-- Right Panel: Agent Core Preview (The Inspector) -->
+<aside class="w-[400px] bg-surface flex flex-col relative z-10 border-l border-outline-variant shadow-[-4px_0_15px_rgba(0,0,0,0.5)]">
+<div class="p-4 border-b border-outline-variant bg-surface-container-highest flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-on-surface uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+                    Agent Core Visualization
+                </span>
+<span class="font-data-mono text-[10px] px-2 py-0.5 border border-primary text-primary rounded-sm uppercase">Standby</span>
+</div>
+<!-- Visualization Canvas -->
+<div class="flex-1 relative bg-black flex items-center justify-center p-4 overflow-hidden group">
+<!-- Decorative Grid Overlay -->
+<div class="absolute inset-0 bg-[linear-gradient(rgba(44,62,80,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(44,62,80,0.2)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none opacity-30"></div>
+<!-- Central Node -->
+<div class="relative w-48 h-48 rounded-full border border-primary/30 flex items-center justify-center before:absolute before:inset-0 before:rounded-full before:border before:border-primary/50 before:animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite]">
+<!-- Inner Core -->
+<div class="w-32 h-32 rounded-full border-2 border-primary bg-primary-container/20 flex items-center justify-center relative overflow-hidden backdrop-blur-sm">
+<!-- Simulated Shader effect using CSS gradients -->
+<div class="absolute inset-0 bg-[conic-gradient(from_0deg,transparent_0deg,rgba(198,198,201,0.2)_90deg,transparent_180deg)] animate-[spin_4s_linear_infinite]"></div>
+<span class="material-symbols-outlined text-primary text-4xl relative z-10">smart_toy</span>
+</div>
+<!-- Orbiting Data Points -->
+<div class="absolute w-full h-full animate-[spin_10s_linear_infinite]">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-secondary rounded-full shadow-[0_0_10px_#b5c8df]"></div>
+</div>
+</div>
+<!-- HUD Details -->
+<div class="absolute bottom-4 left-4 right-4 flex justify-between text-[10px] font-data-mono text-primary/70">
+<span>SYS_LOAD: <span class="text-on-surface">12%</span></span>
+<span>TEMP: <span class="text-on-surface">STABLE</span></span>
+</div>
+</div>
+<!-- Agent Summary Stats -->
+<div class="h-1/3 border-t border-outline-variant bg-surface p-6 flex flex-col">
+<h3 class="font-data-mono text-xs text-on-surface-variant uppercase mb-4">Initial Projection</h3>
+<div class="space-y-4 flex-1">
+<div class="flex items-center justify-between border-b border-outline-variant/50 pb-2">
+<span class="font-data-mono text-[11px] text-on-surface">Base Model</span>
+<span class="font-data-mono text-[11px] text-primary">Lex-Jurist-v4</span>
+</div>
+<div class="flex items-center justify-between border-b border-outline-variant/50 pb-2">
+<span class="font-data-mono text-[11px] text-on-surface">Context Window</span>
+<span class="font-data-mono text-[11px] text-primary">128k Tokens</span>
+</div>
+<div class="flex items-center justify-between border-b border-outline-variant/50 pb-2">
+<span class="font-data-mono text-[11px] text-on-surface">Est. Latency</span>
+<span class="font-data-mono text-[11px] text-secondary">~450ms</span>
+</div>
+</div>
+<!-- Action Bar (Footer style) -->
+<div class="mt-4 flex gap-3">
+<button class="flex-1 bg-transparent border border-outline-variant text-on-surface font-label-caps text-label-caps py-3 uppercase hover:bg-surface-container transition-colors">
+                        Cancel
+                    </button>
+<button class="flex-1 bg-primary text-on-primary font-label-caps text-label-caps py-3 uppercase border border-transparent shadow-[2px_2px_0px_#141313,3px_3px_0px_#c6c6c9] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_#141313,2px_2px_0px_#c6c6c9] transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">how_to_reg</span>
+                        Appoint Counsel
+                    </button>
+</div>
+</div>
+</aside>
+</main>
+</body></html>

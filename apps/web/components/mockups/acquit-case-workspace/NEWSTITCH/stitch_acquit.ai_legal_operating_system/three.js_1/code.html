@@ -1,0 +1,557 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width,initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+<!-- STITCH_THREEJS_START:ANIMATION_82 class="fixed inset-0 w-full h-full bg-transparent" -->
+<div class="fixed inset-0 w-full h-full bg-transparent" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_82" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_82');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  # Acquit.ai — Next.js (App Router) Implementation Blueprint
+
+This specification provides the production-ready code structure, components, and layout files for the **Acquit.ai Legal Operating System** built with **Next.js 14+ (App Router)** and **Tailwind CSS**.
+
+---
+
+## 1. `tailwind.config.ts`
+
+```typescript
+import type { Config } from 'tailwindcss';
+
+const config: Config = {
+  darkMode: 'class',
+  content: [
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        background: '#141313',
+        surface: '#141313',
+        'surface-dim': '#141313',
+        'surface-bright': '#3a3939',
+        'surface-container-lowest': '#0e0e0e',
+        'surface-container-low': '#1c1b1b',
+        'surface-container': '#232222',
+        'surface-container-high': '#2c2b2b',
+        'surface-container-highest': '#363535',
+        primary: '#e0e0e0',
+        'on-primary': '#141313',
+        secondary: '#c8a97e', // Warm gold accent for active states & highlights
+        'on-surface': '#f4f4f4',
+        'on-surface-variant': '#a0a0a0',
+        'outline-variant': '#2a2929',
+      },
+      fontFamily: {
+        serif: ['var(--font-domine)', 'serif'],
+        mono: ['var(--font-mono)', 'monospace'],
+        sans: ['system-ui', '-apple-system', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [],
+};
+export default config;
+```
+
+---
+
+## 2. Shared App Shell Layout (`app/(shell)/layout.tsx`)
+
+```tsx
+import React from 'react';
+import SideNavBar from '@/components/shell/SideNavBar';
+import TopAppBar from '@/components/shell/TopAppBar';
+
+export default function ShellLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex h-screen w-screen bg-[#141313] text-[#f4f4f4] overflow-hidden font-sans select-none">
+      {/* 1. Persistent Left Navigation Sidebar (280px) */}
+      <SideNavBar />
+
+      {/* 2. Main Execution Area with Top Bar */}
+      <div className="flex flex-col flex-1 min-w-0 h-full overflow-hidden">
+        <TopAppBar />
+        
+        {/* Dynamic Inner Module Content */}
+        <main className="flex-1 relative overflow-y-auto bg-[#141313]">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## 3. Persistent Side Navigation (`components/shell/SideNavBar.tsx`)
+
+```tsx
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import {
+  LayoutDashboard,
+  Gavel,
+  Landmark,
+  LibraryBig,
+  FolderLock,
+  SearchCode,
+  History,
+  Eye,
+  Users2,
+  ListTodo,
+  Settings,
+  HelpCircle,
+  Plus,
+  Scale
+} from 'lucide-react';
+
+interface NavItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { name: 'Command Center', href: '/', icon: LayoutDashboard },
+  { name: 'The Docket', href: '/docket', icon: Gavel },
+  { name: 'Chambers', href: '/chambers', icon: Landmark },
+  { name: 'Law Library', href: '/law-library', icon: LibraryBig },
+  { name: 'Record Room', href: '/record-room', icon: FolderLock },
+  { name: 'Investigations', href: '/investigations', icon: SearchCode },
+  { name: 'Case Timeline', href: '/timeline', icon: History },
+  { name: 'Court Watch', href: '/court-watch', icon: Eye },
+  { name: 'Counsel Directory', href: '/directory', icon: Users2 },
+  { name: 'Motions & Tasks', href: '/motions', icon: ListTodo },
+];
+
+export default function SideNavBar() {
+  const pathname = usePathname();
+
+  const isActiveRoute = (href: string) => {
+    if (href === '/') return pathname === '/';
+    return pathname.startsWith(href);
+  };
+
+  return (
+    <aside className="w-[280px] h-full flex flex-col justify-between bg-[#0e0e0e] border-r border-[#2a2929] shrink-0 z-40">
+      {/* Brand & User Profile Header */}
+      <div>
+        <div className="p-6 pb-4 border-b border-[#2a2929]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <Scale className="w-5 h-5 text-[#c8a97e]" />
+              <h1 className="font-serif text-lg font-black tracking-tight text-white uppercase">
+                ACQUIT.AI
+              </h1>
+            </div>
+            <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-[#1c1b1b] border border-[#3a3939] text-[#a0a0a0]">
+              v1.0
+            </span>
+          </div>
+          <div className="mt-4 flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-[#232222] border border-[#3a3939] flex items-center justify-center font-mono text-xs text-[#c8a97e]">
+              SC
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-white">Senior Counsel</p>
+              <p className="text-[11px] font-mono text-[#a0a0a0]">2024-CV-8821</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 10 Core OS Navigation Tabs */}
+        <nav className="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-320px)]">
+          {NAV_ITEMS.map((item) => {
+            const active = isActiveRoute(item.href);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all duration-150 ${
+                  active
+                    ? 'bg-[#1c1b1b] text-white border-l-4 border-[#c8a97e] font-semibold pl-2.5'
+                    : 'text-[#a0a0a0] hover:text-white hover:bg-[#181818]'
+                }`}
+              >
+                <Icon className={`w-4 h-4 ${active ? 'text-[#c8a97e]' : 'text-[#707070]'}`} />
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* Primary Action Button & Status Footers */}
+      <div className="p-4 border-t border-[#2a2929] space-y-3 bg-[#0e0e0e]">
+        <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[#c8a97e] hover:bg-[#d6ba92] text-black font-semibold text-xs uppercase tracking-wider transition-all duration-150 shadow-md">
+          <Plus className="w-4 h-4 stroke-[2.5]" />
+          <span>New Filing</span>
+        </button>
+
+        <div className="space-y-1">
+          <Link
+            href="/settings"
+            className="flex items-center gap-3 px-3 py-2 rounded text-xs text-[#888] hover:text-white hover:bg-[#181818] transition-colors"
+          >
+            <Settings className="w-4 h-4" />
+            <span>Settings</span>
+          </Link>
+          <Link
+            href="/support"
+            className="flex items-center gap-3 px-3 py-2 rounded text-xs text-[#888] hover:text-white hover:bg-[#181818] transition-colors"
+          >
+            <HelpCircle className="w-4 h-4" />
+            <span>Support</span>
+          </Link>
+        </div>
+
+        {/* Live Subsystem Monitors */}
+        <div className="pt-2 border-t border-[#1f1f1f] space-y-1">
+          <div className="flex items-center justify-between text-[10px] font-mono text-[#777]">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              UPL Monitor
+            </span>
+            <span className="text-emerald-500">Nominal</span>
+          </div>
+          <div className="flex items-center justify-between text-[10px] font-mono text-[#777]">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              E2E Encryption
+            </span>
+            <span>Enabled</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
+}
+```
+
+---
+
+## 4. Top App Bar (`components/shell/TopAppBar.tsx`)
+
+```tsx
+'use client';
+
+import React from 'react';
+import { Search, Bell, History, PenTool } from 'lucide-react';
+
+export default function TopAppBar() {
+  return (
+    <header className="h-14 w-full bg-[#1c1b1b] border-b border-[#2a2929] flex items-center justify-between px-6 shrink-0 z-30">
+      {/* Global Query Search */}
+      <div className="relative w-96">
+        <Search className="w-4 h-4 text-[#707070] absolute left-3 top-1/2 -translate-y-1/2" />
+        <input
+          type="text"
+          placeholder="Global Search (Files, Statutes, Agents, Dockets)..."
+          className="w-full bg-[#141313] border border-[#333] rounded-md pl-9 pr-4 py-1.5 text-xs text-white placeholder-[#666] focus:outline-none focus:border-[#c8a97e] font-mono transition-colors"
+        />
+      </div>
+
+      {/* Case Header Indicator, The Clerk & Signature Action */}
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 px-3 py-1 bg-[#141313] rounded border border-[#2a2929] text-xs font-mono">
+          <span className="text-[#a0a0a0]">Active Matter:</span>
+          <span className="text-[#c8a97e] font-semibold">2024-CV-8821 (State v. Doe)</span>
+        </div>
+
+        {/* The Clerk Notifications */}
+        <button
+          title="The Clerk"
+          className="relative p-2 rounded hover:bg-[#282727] text-[#c0c0c0] hover:text-white transition-colors"
+        >
+          <Bell className="w-4 h-4" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500"></span>
+        </button>
+
+        <button
+          title="Audit History"
+          className="p-2 rounded hover:bg-[#282727] text-[#c0c0c0] hover:text-white transition-colors"
+        >
+          <History className="w-4 h-4" />
+        </button>
+
+        {/* Affix Signature Primary Action */}
+        <button className="flex items-center gap-2 px-3.5 py-1.5 rounded bg-[#2a2929] hover:bg-[#383737] border border-[#444] text-xs font-mono uppercase tracking-wider text-white transition-all">
+          <PenTool className="w-3.5 h-3.5 text-[#c8a97e]" />
+          <span>Affix Signature</span>
+        </button>
+      </div>
+    </header>
+  );
+}
+```
+
+---
+
+## 5. Next.js Client Component: 3D Cylindrical Carousel (`components/carousel/Cylindrical3DCarousel.tsx`)
+
+```tsx
+'use client';
+
+import React, { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ChevronLeft, ChevronRight, ExternalLink, ArrowRight } from 'lucide-react';
+
+export interface ModuleNavCard {
+  id: string;
+  name: string;
+  role: string;
+  department: string;
+  avatar: string;
+  bio: string;
+  href: string;
+}
+
+const MODULES: ModuleNavCard[] = [
+  {
+    id: '1',
+    name: 'The Docket',
+    role: 'Case Management',
+    department: 'ACTIVE MATTERS',
+    avatar: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=300&h=300',
+    bio: 'Master index of all active, pending, and closed judicial proceedings.',
+    href: '/docket',
+  },
+  {
+    id: '2',
+    name: 'Chambers',
+    role: 'AI Legal Team',
+    department: 'INNER SANCTUM',
+    avatar: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=300&h=300',
+    bio: 'Collaborate with your specialized AI legal force in the conference room.',
+    href: '/chambers',
+  },
+  {
+    id: '3',
+    name: 'Law Library',
+    role: 'Legal Research',
+    department: 'THE STACKS',
+    avatar: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&q=80&w=300&h=300',
+    bio: 'Query global authorities, primary statutes, and citation webs with AI synthesis.',
+    href: '/law-library',
+  },
+  {
+    id: '4',
+    name: 'Record Room',
+    role: 'Document Control',
+    department: 'FILING CABINET',
+    avatar: 'https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&q=80&w=300&h=300',
+    bio: 'Official court filing center for charging instruments, exhibits, and motions.',
+    href: '/record-room',
+  },
+  {
+    id: '5',
+    name: 'Investigations',
+    role: 'Evidence Analysis',
+    department: 'WAR ROOM',
+    avatar: 'https://images.unsplash.com/photo-1453728013993-6d66e9c9123a?auto=format&fit=crop&q=80&w=300&h=300',
+    bio: 'Link evidence to chronological facts, inspect affidavits, and spot conflicts.',
+    href: '/investigations',
+  },
+  {
+    id: '6',
+    name: 'Case Timeline',
+    role: 'Chronology',
+    department: 'EVENT LOG',
+    avatar: 'https://images.unsplash.com/photo-1506784919141-93504332279b?auto=format&fit=crop&q=80&w=300&h=300',
+    bio: 'An immutable timeline tracking arrests, discovery handoffs, and hearings.',
+    href: '/timeline',
+  },
+  {
+    id: '7',
+    name: 'Court Watch',
+    role: 'Docket Sync',
+    department: 'THE CLERK',
+    avatar: 'https://images.unsplash.com/photo-1449156059431-789955417bb8?auto=format&fit=crop&q=80&w=300&h=300',
+    bio: 'Real-time telemetry and schedule tracking with live court filing alerts.',
+    href: '/court-watch',
+  },
+  {
+    id: '8',
+    name: 'Counsel Directory',
+    role: 'Counsel Search',
+    department: 'BAR LISTINGS',
+    avatar: 'https://images.unsplash.com/photo-1436450412740-6b988f486c6b?auto=format&fit=crop&q=80&w=300&h=300',
+    bio: 'Verify counsel credentials, detect conflicts, or explore pro bono programs.',
+    href: '/directory',
+  },
+];
+
+interface Cylindrical3DCarouselProps {
+  radius?: number;
+}
+
+export default function Cylindrical3DCarousel({ radius = 560 }: Cylindrical3DCarouselProps) {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const count = MODULES.length;
+  const angleStep = 360 / count;
+  const rotationAngle = -selectedIndex * angleStep;
+
+  const handlePrev = () => {
+    setSelectedIndex((prev) => (prev - 1 + count) % count);
+  };
+
+  const handleNext = () => {
+    setSelectedIndex((prev) => (prev + 1) % count);
+  };
+
+  return (
+    <div className="relative w-full h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center overflow-hidden bg-[#141313]">
+      {/* 3D Perspective Viewport */}
+      <div
+        className="relative w-full h-[520px] flex items-center justify-center"
+        style={{ perspective: '1200px' }}
+      >
+        <div
+          className="relative w-full h-full flex items-center justify-center transition-transform duration-700 ease-out"
+          style={{
+            transformStyle: 'preserve-3d',
+            transform: `translateZ(-${radius}px) rotateY(${rotationAngle}deg)`,
+          }}
+        >
+          {MODULES.map((item, index) => {
+            const itemAngle = index * angleStep;
+            let rawDiff = (itemAngle + rotationAngle) % 360;
+            if (rawDiff > 180) rawDiff -= 360;
+            if (rawDiff < -180) rawDiff += 360;
+            const absDiff = Math.abs(rawDiff);
+            const isCenter = absDiff < angleStep / 2;
+            const opacity = Math.max(0.12, 1 - absDiff / 130);
+            const scale = Math.max(0.65, 1 - absDiff / 360);
+
+            return (
+              <div
+                key={item.id}
+                onClick={() => setSelectedIndex(index)}
+                className="absolute w-[320px] h-[440px] cursor-pointer transition-all duration-300"
+                style={{
+                  transformStyle: 'preserve-3d',
+                  transform: `rotateY(${itemAngle}deg) translateZ(${radius}px) scale(${scale})`,
+                  opacity,
+                  filter: `blur(${absDiff / 24}px)`,
+                  zIndex: isCenter ? 60 : Math.round(100 - absDiff),
+                }}
+              >
+                <div
+                  className={`w-full h-full rounded-2xl p-6 flex flex-col justify-between border transition-all duration-300 shadow-[0_20px_50px_rgba(0,0,0,0.7)] ${
+                    isCenter
+                      ? 'bg-[#1c1b1b] border-[#c8a97e] ring-1 ring-[#c8a97e]/40'
+                      : 'bg-[#181818] border-[#3a3939]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="px-2.5 py-1 text-[10px] font-mono font-bold tracking-widest rounded bg-[#2a2929] text-[#c8a97e] uppercase">
+                      {item.department}
+                    </span>
+                    <span className="text-[10px] font-mono text-[#777]">
+                      MOD #{item.id}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col items-center text-center my-auto">
+                    <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-[#3a3939] mb-4 shadow-lg">
+                      <Image
+                        src={item.avatar}
+                        alt={item.name}
+                        fill
+                        className="object-cover grayscale hover:grayscale-0 transition-all duration-500"
+                      />
+                    </div>
+                    <h3 className="text-2xl font-serif font-bold text-white mb-1">
+                      {item.name}
+                    </h3>
+                    <p className="text-xs font-mono uppercase tracking-wider text-[#c8a97e] mb-3">
+                      {item.role}
+                    </p>
+                    <p className="text-xs text-[#a0a0a0] leading-relaxed line-clamp-3 font-serif italic">
+                      {item.bio}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-[#2a2929] flex items-center justify-between">
+                    <span className="text-[10px] font-mono text-[#666]">
+                      Acquit Core Engine
+                    </span>
+                    <Link
+                      href={item.href}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white hover:bg-[#e0e0e0] text-black text-[11px] font-bold uppercase tracking-wider transition-all shadow"
+                    >
+                      <span>Enter Module</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Navigation Controls */}
+      <div className="flex items-center gap-6 mt-4 z-20">
+        <button
+          onClick={handlePrev}
+          aria-label="Previous module"
+          className="p-3 rounded-full bg-[#1c1b1b] border border-[#3a3939] text-white hover:bg-[#282727] hover:border-[#c8a97e] transition-all"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+
+        <div className="flex items-center gap-2 font-mono text-xs text-[#a0a0a0]">
+          <span className="text-white font-bold">{selectedIndex + 1}</span>
+          <span>/</span>
+          <span>{count}</span>
+        </div>
+
+        <button
+          onClick={handleNext}
+          aria-label="Next module"
+          className="p-3 rounded-full bg-[#1c1b1b] border border-[#3a3939] text-white hover:bg-[#282727] hover:border-[#c8a97e] transition-all"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_82 -->
+
+
+</body></html>

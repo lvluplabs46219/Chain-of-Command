@@ -1,0 +1,259 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Chambers - Session Transcript</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#1a1c1e",
+                        "on-tertiary-fixed": "#201b17",
+                        "surface-container-highest": "#353435",
+                        "tertiary-container": "#201b17",
+                        "secondary-fixed": "#d1e4fb",
+                        "on-tertiary": "#352f2b",
+                        "error": "#ffb4ab",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container": "#201f1f",
+                        "background": "#141313",
+                        "on-surface": "#e5e2e1",
+                        "surface-tint": "#c6c6c9",
+                        "primary-fixed-dim": "#c6c6c9",
+                        "outline-variant": "#44474a",
+                        "on-primary-container": "#838486",
+                        "on-surface-variant": "#c5c6ca",
+                        "inverse-primary": "#5d5e61",
+                        "on-background": "#e5e2e1",
+                        "primary-fixed": "#e2e2e5",
+                        "on-secondary-fixed": "#091d2e",
+                        "tertiary-fixed-dim": "#cfc5be",
+                        "tertiary-fixed": "#ebe0da",
+                        "secondary-container": "#36485b",
+                        "on-secondary-fixed-variant": "#36485b",
+                        "inverse-surface": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#4c4641",
+                        "on-primary-fixed": "#1a1c1e",
+                        "outline": "#8f9194",
+                        "tertiary": "#cfc5be",
+                        "on-primary-fixed-variant": "#454749",
+                        "surface-container-high": "#2a2a2a",
+                        "error-container": "#93000a",
+                        "surface-variant": "#353435",
+                        "secondary-fixed-dim": "#b5c8df",
+                        "on-secondary-container": "#a4b7cd",
+                        "surface-dim": "#141313",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "surface": "#141313",
+                        "on-tertiary-container": "#8b837d",
+                        "on-primary": "#2f3133",
+                        "surface-container-low": "#1c1b1b",
+                        "inverse-on-surface": "#313030",
+                        "surface-bright": "#3a3939",
+                        "secondary": "#b5c8df",
+                        "primary": "#c6c6c9",
+                        "on-secondary": "#203243"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin-safe": "32px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xl": "40px",
+                        "xs": "4px",
+                        "base": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Hanken Grotesk"],
+                        "headline-lg": ["Domine"],
+                        "label-caps": ["Hanken Grotesk"],
+                        "data-mono": ["JetBrains Mono"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-md": ["Domine"],
+                        "headline-lg-mobile": ["Domine"],
+                        "display-case": ["Domine"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-case": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md m-0 p-0 overflow-hidden">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface h-16 fixed top-0 right-0 left-0 md:left-[280px] z-50 border-b border-outline-variant dark:border-outline-variant flex items-center justify-between px-md w-auto md:w-full">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md text-on-surface dark:text-on-surface">2024-CV-8821</span>
+</div>
+<div class="flex items-center gap-md">
+<!-- Search Bar placeholder -->
+<div class="hidden lg:flex items-center bg-surface-container rounded-full px-4 py-2 border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none text-body-md text-on-surface focus:ring-0 placeholder:text-on-surface-variant w-64" placeholder="Search Transcripts..." type="text">
+</div>
+<button aria-label="Notifications" class="p-2 text-on-surface-variant hover:text-primary transition-opacity">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button aria-label="Settings" class="p-2 text-on-surface-variant hover:text-primary transition-opacity">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button aria-label="Help" class="p-2 text-on-surface-variant hover:text-primary transition-opacity">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+<img alt="Lead Counsel" class="w-8 h-8 rounded-full border border-outline-variant object-cover ml-2" data-alt="A small, circular profile picture of a professional lawyer in a modern, dark-themed corporate setting. The lawyer is looking confident and authoritative. The lighting is dramatic and moody, fitting a high-stakes legal environment. The background is slightly blurred to emphasize the subject." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhU_lGedER9CGy5uCEmYxGSwyCxSEYw9rsClmaKZcpiKw35T4OpuAXS0SKShCe-9F0anR1AND52ewlgj_750H_4oiRCQ-lao7IqX4T5jAXmGjVVvhczOzFYEvUCQeLnMNwkkSruSB54qyRiF5kURnPE906oMNu2_VW_iuinGDbmq6pWPle6t5-gTO57-s-AGC9aLxnFj8jGP-wMRsC8Nms7FT9j39RtqY7flpPoIKTw3rozCH9IOFa2w">
+</div>
+</header>
+<!-- SideNavBar -->
+<nav class="bg-background dark:bg-background w-[280px] h-screen fixed left-0 top-0 border-r border-outline-variant dark:border-outline-variant flex-col py-md hidden md:flex z-40">
+<div class="px-md mb-xl flex flex-col">
+<span class="font-headline-md text-headline-md font-bold text-on-surface dark:text-on-surface tracking-tighter">ACQUIT.AI</span>
+<span class="font-data-mono text-data-mono text-on-surface-variant mt-1">Legal OS v1.0</span>
+</div>
+<button class="mx-md mb-lg bg-[#b59a60] text-black font-body-md font-bold py-3 px-4 rounded hover:bg-[#c9aa6a] transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="add">add</span> New Filing
+        </button>
+<ul class="flex flex-col gap-1 overflow-y-auto flex-1 font-body-md text-body-md uppercase tracking-wider">
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span> Command Center
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span> The Docket
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-primary dark:text-primary border-l-4 border-primary bg-primary-container/10 px-4 py-3 font-bold" href="#">
+<span class="material-symbols-outlined" data-icon="meeting_room">meeting_room</span> Chambers
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="library_books">library_books</span> Law Library
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span> Record Room
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span> Investigations
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span> Case Timeline
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span> Court Watch
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="contact_page">contact_page</span> Counsel Directory
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant px-4 py-3 hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span> Motions &amp; Tasks
+                </a>
+</li>
+</ul>
+</nav>
+<!-- Main Content Area -->
+<main class="md:ml-[280px] pt-16 h-screen flex overflow-hidden">
+<!-- List View -->
+<div class="w-full lg:w-1/2 xl:w-2/5 flex flex-col border-r border-outline-variant h-full bg-surface-dim">
+<div class="p-lg border-b border-outline-variant bg-surface">
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Session Transcripts</h1>
+<p class="font-data-mono text-data-mono text-on-surface-variant">Log of autonomous agent activities.</p>
+</div>
+<div class="flex-1 overflow-y-auto">
+<!-- Session Item 1 -->
+<div class="p-lg border-b border-outline-variant hover:bg-surface-container-high transition-colors cursor-pointer bg-surface-container-high border-l-2 border-[#b59a60]">
+<div class="flex justify-between items-start mb-2">
+<span class="font-data-mono text-data-mono text-[#b59a60]">2024-05-14 14:32:01</span>
+<span class="font-label-caps text-label-caps bg-secondary-container text-on-secondary-container px-2 py-1 rounded">COMPLETE</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Deposition Analysis: Dr. Aris</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">Agent extracted key contradictions in Dr. Aris's testimony regarding the timeline of events on the night of the incident.</p>
+<div class="mt-4 flex gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant border border-outline-variant px-2 py-1 rounded">AGENT: INVESTIGATOR</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant border border-outline-variant px-2 py-1 rounded">MATTER: 2024-CV-8821</span>
+</div>
+</div>
+<!-- Session Item 2 -->
+<div class="p-lg border-b border-outline-variant hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<span class="font-data-mono text-data-mono text-on-surface-variant">2024-05-13 09:15:44</span>
+<span class="font-label-caps text-label-caps bg-surface-container text-on-surface px-2 py-1 rounded border border-outline-variant">ARCHIVED</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Drafting: Motion in Limine</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">Initial generation of arguments to exclude hearsay evidence presented in plaintiff's exhibit 4B.</p>
+<div class="mt-4 flex gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant border border-outline-variant px-2 py-1 rounded">AGENT: CLERK</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant border border-outline-variant px-2 py-1 rounded">MATTER: 2024-CV-8821</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Transcript Preview (Inspector Panel) -->
+<div class="hidden lg:flex flex-col w-1/2 xl:w-3/5 bg-background h-full">
+<div class="h-12 border-b border-outline-variant bg-[#1a2433] flex items-center px-lg">
+<span class="font-label-caps text-label-caps text-on-surface tracking-widest text-[#a4b7cd]">ACTIVE SESSION: DEPOSITION ANALYSIS</span>
+</div>
+<div class="flex-1 p-xl overflow-y-auto bg-surface-container-lowest">
+<div class="max-w-3xl mx-auto space-y-6">
+<div class="border border-outline-variant rounded p-lg bg-surface">
+<div class="flex items-center gap-3 mb-4 pb-4 border-b border-outline-variant">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center border border-[#b59a60]">
+<span class="material-symbols-outlined text-[#b59a60] text-sm" data-icon="smart_toy">smart_toy</span>
+</div>
+<div>
+<div class="font-body-md font-bold text-on-surface">Agent: Investigator</div>
+<div class="font-data-mono text-xs text-on-surface-variant">14:32:01.045</div>
+</div>
+</div>
+<div class="font-body-lg text-body-lg text-on-surface space-y-4">
+<p>Analyzing transcript of Dr. Aris, Exhibit D. Cross-referencing timeline with police report PR-402.</p>
+<p class="font-data-mono text-sm bg-surface-container-high p-4 border-l-2 border-outline-variant text-on-surface-variant">
+                                Query: "Identify contradictions between Dr. Aris testimony on page 44 and the official timeline established in PR-402."
+                            </p>
+</div>
+</div>
+</div>
+</div>
+<div class="border-t border-outline-variant bg-surface p-md flex justify-end gap-md">
+<button class="font-data-mono text-data-mono px-4 py-2 border border-outline text-on-surface hover:bg-surface-container transition-colors rounded">EXPORT LOG</button>
+<button class="font-data-mono text-data-mono px-4 py-2 bg-[#b59a60] text-black hover:bg-[#c9aa6a] transition-colors rounded">ATTACH TO DOCKET</button>
+</div>
+</div>
+</main>
+</body></html>
