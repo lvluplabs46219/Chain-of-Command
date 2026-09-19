@@ -22,7 +22,7 @@ import {
   ShieldCheck, 
   ShieldAlert, 
   ShieldX, 
-  LinkBreak, 
+  Unlink, 
   Hash, 
   Clock, 
   User, 
@@ -60,6 +60,7 @@ import {
   type ChainTrackingInfo,
   type ChainTrackingEvent,
   type ChainVerificationResult,
+  type ChainResourceType,
   ChainOfCommand
 } from '@/lib/chain-of-command';
 
@@ -107,7 +108,7 @@ const STATUS_COLORS = {
     bg: 'bg-orange-950/40',
     border: 'border-orange-500/30',
     text: 'text-orange-400',
-    icon: LinkBreak,
+    icon: Unlink,
     label: 'Incomplete',
   },
 } as const;
@@ -158,7 +159,7 @@ const EVENT_ICONS: Record<ChainEventType, React.ElementType> = {
   'evidence.processed': FileText,
   'evidence.verified': CheckCircle2,
   'evidence.challenged': AlertCircle,
-  'evidence.linked': LinkBreak,
+  'evidence.linked': Unlink,
   
   // System events
   'system.backup_created': Package,
@@ -338,7 +339,9 @@ function TimelineEvent({
                             variant="ghost"
                             size="icon"
                             className="h-5 w-5 text-white/40 hover:text-[#D4AF37] hover:bg-white/5"
-                            onClick={() => navigator.clipboard.writeText(event.previousHash)}
+                            onClick={() => {
+                              if (event.previousHash) void navigator.clipboard.writeText(event.previousHash);
+                            }}
                           >
                             <Copy size={10} />
                           </Button>
@@ -433,7 +436,7 @@ function VerificationSummary({ result, className = '' }: VerificationSummaryProp
             
             {result.hasBrokenLinks && (
               <Alert className="bg-orange-950/40 border-orange-700/40 text-orange-300 p-2">
-                <LinkBreak size={14} className="shrink-0" />
+                <Unlink size={14} className="shrink-0" />
                 <AlertTitle className="font-semibold text-[10px] mb-0">Broken Links</AlertTitle>
                 <AlertDescription className="text-[10px]">
                   {result.errors.filter(e => e.type === 'broken_link').length} events have broken chain links
@@ -579,7 +582,7 @@ export function ChainTracker({
     // Create mock tracking info
     const mockTrackingInfo: ChainTrackingInfo = {
       resourceId: resourceId || 'doc-001',
-      resourceType: resourceType || 'document',
+      resourceType: (resourceType as ChainResourceType) || 'document',
       resourceName: 'Exhibit_A_Dashcam_Log.pdf',
       caseId: caseId || 'case-001',
       chainId: chainId || 'demo-chain-001',

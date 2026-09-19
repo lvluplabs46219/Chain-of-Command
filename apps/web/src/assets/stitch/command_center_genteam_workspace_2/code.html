@@ -1,0 +1,409 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Acquit.ai Communication Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;600;700&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#93000a",
+                        "secondary-fixed": "#d1e4fb",
+                        "inverse-surface": "#e5e2e1",
+                        "on-secondary": "#203243",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary": "#352f2b",
+                        "surface-container-highest": "#353435",
+                        "on-secondary-container": "#a4b7cd",
+                        "secondary": "#b5c8df",
+                        "inverse-primary": "#5d5e61",
+                        "error": "#ffb4ab",
+                        "primary-fixed": "#e2e2e5",
+                        "on-surface-variant": "#c5c6ca",
+                        "on-primary-fixed-variant": "#454749",
+                        "surface-container-high": "#2a2a2a",
+                        "primary": "#c6c6c9",
+                        "tertiary": "#cfc5be",
+                        "on-primary-container": "#838486",
+                        "inverse-on-surface": "#313030",
+                        "surface-bright": "#3a3939",
+                        "outline": "#8f9194",
+                        "primary-container": "#1a1c1e",
+                        "surface-container-low": "#1c1b1b",
+                        "primary-fixed-dim": "#c6c6c9",
+                        "surface": "#141313",
+                        "on-tertiary-fixed-variant": "#4c4641",
+                        "tertiary-container": "#201b17",
+                        "outline-variant": "#44474a",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#b5c8df",
+                        "on-secondary-fixed": "#091d2e",
+                        "surface-container": "#201f1f",
+                        "surface-variant": "#353435",
+                        "secondary-container": "#36485b",
+                        "tertiary-fixed": "#ebe0da",
+                        "tertiary-fixed-dim": "#cfc5be",
+                        "on-background": "#e5e2e1",
+                        "surface-dim": "#141313",
+                        "on-primary": "#2f3133",
+                        "on-secondary-fixed-variant": "#36485b",
+                        "background": "#141313",
+                        "on-error": "#690005",
+                        "on-tertiary-fixed": "#201b17",
+                        "surface-tint": "#c6c6c9",
+                        "on-primary-fixed": "#1a1c1e",
+                        "on-tertiary-container": "#8b837d",
+                        "surface-container-lowest": "#0e0e0e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "2xl": "1rem",
+                        "3xl": "1.5rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xl": "40px",
+                        "base": "4px",
+                        "gutter": "16px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "margin-safe": "32px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Hanken Grotesk"],
+                        "data-mono": ["JetBrains Mono"],
+                        "headline-md": ["Domine"],
+                        "label-caps": ["Hanken Grotesk"],
+                        "display-case": ["Domine"],
+                        "headline-lg": ["Domine"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Domine"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700" }],
+                        "display-case": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Scrollbar styling for density */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #44474a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8f9194;
+        }
+        
+        /* Custom scrollbar for chat area to blend in */
+        .chat-scroll::-webkit-scrollbar-track {
+            background: #141313;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md text-body-md antialiased overflow-hidden selection:bg-primary-container selection:text-primary">
+<!-- JSON SIDENAVBAR START -->
+<aside class="bg-background dark:bg-background text-primary dark:text-primary w-[280px] h-screen fixed left-0 top-0 border-r border-outline-variant flex flex-col h-full py-md z-40 hidden md:flex">
+<div class="px-lg mb-lg">
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary tracking-tighter uppercase mb-xs flex items-center gap-2">
+<span class="material-symbols-outlined fill text-[32px]">balance</span>
+                Acquit.ai
+            </h1>
+<p class="font-data-mono text-data-mono text-on-surface-variant flex items-center gap-2">
+<img alt="User Profile" class="w-6 h-6 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of an attorney in a modern, dark-themed law office, strong directional lighting, high contrast, authoritative expression, 8k resolution, cinematic grading." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4jnslda_udTNOOjSOihM7HX1fzzjDjv0_lh92MUlZfqOSD8PtTDjDlrzDg_9TiDH0lCyQIHctLkKo8u9kYbeJsFoAGYr9GKUYUHGWwZ1abvdBVJc8-uqYKHud7OmgVYELDMhVkVbJCZbXWNbyWwJAsDupqTEI3dKE6_pVy8drjZGrI3IdM-BCi85qwUfEMV9aFlhOJHaPhYJQFdy8MRlfkNAhAk-K3CdK9XL0kI4aqtd3kSCPxi-ovQ">
+                Senior Counsel
+            </p>
+</div>
+<nav class="flex-1 overflow-y-auto px-md space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#"><span class="material-symbols-outlined">dashboard</span><span class="font-label-caps text-label-caps uppercase">Command Center</span></a><a class="flex items-center gap-3 px-3 py-2 text-primary border-l-4 border-primary bg-secondary-container/30 font-bold hover:bg-surface-container-high transition-colors duration-150 transition-all duration-75" href="#">
+<span class="material-symbols-outlined">forum</span>
+<span class="font-label-caps text-label-caps uppercase">Communications</span>
+</a>
+
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-label-caps text-label-caps uppercase">The Docket</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="font-label-caps text-label-caps uppercase">Chambers</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined">library_books</span>
+<span class="font-label-caps text-label-caps uppercase">Law Library</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+<span class="font-label-caps text-label-caps uppercase">Record Room</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined">policy</span>
+<span class="font-label-caps text-label-caps uppercase">Investigations</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined">timeline</span>
+<span class="font-label-caps text-label-caps uppercase">Case Timeline</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined">visibility</span>
+<span class="font-label-caps text-label-caps uppercase">Court Watch</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-caps text-label-caps uppercase">Motions &amp; Tasks</span>
+</a>
+</nav>
+<div class="mt-auto px-md pt-md space-y-4">
+<button class="w-full bg-[#E5B55C] text-black font-data-mono text-data-mono py-2 px-4 uppercase font-bold hover:bg-[#D4A54B] transition-colors flex items-center justify-center gap-2 rounded-sm border border-[#E5B55C]">
+<span class="material-symbols-outlined">add</span>
+                NEW FILING
+            </button>
+<div class="border-t border-outline-variant pt-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps uppercase">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-caps text-label-caps uppercase">Support</span>
+</a>
+</div>
+<div class="pt-2 px-3 flex flex-col gap-1 text-[10px] font-data-mono text-outline">
+<div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span> UPL Monitor: Nominal</div>
+<div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span> E2E Encr: Enabled</div>
+<div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Guardrails: Active</div>
+</div>
+</div>
+</aside>
+<!-- JSON SIDENAVBAR END -->
+<!-- JSON TOPAPPBAR START -->
+<header class="bg-surface-container-low dark:bg-surface-container-low text-primary dark:text-primary h-16 fixed top-0 right-0 left-0 md:left-[280px] z-50 border-b border-outline-variant flex justify-between items-center px-lg">
+<div class="flex items-center gap-6 flex-1">
+<div class="relative w-64 md:w-96 hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface-container-high border-outline-variant text-on-surface font-data-mono text-data-mono py-1.5 pl-9 pr-3 focus:border-primary focus:ring-1 focus:ring-primary rounded-none transition-all placeholder:text-on-surface-variant/50" placeholder="Search Messages &amp; Files..." type="text">
+</div>
+<nav class="hidden lg:flex gap-6">
+<a class="text-primary border-b-2 border-primary pb-1 font-body-md text-body-md" href="#">Active Case: 2024-CV-8821</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex gap-2 text-on-surface-variant">
+<button class="p-2 hover:bg-surface-bright dark:hover:bg-surface-bright rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
+</button>
+</div>
+<button class="hidden sm:flex items-center gap-2 border border-outline-variant bg-surface-container hover:bg-surface-bright text-on-surface font-data-mono text-data-mono px-4 py-1.5 transition-colors rounded-sm">
+<span class="material-symbols-outlined text-[18px]">draw</span>
+                AFFIX SIGNATURE
+            </button>
+<button class="md:hidden p-2 text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</header>
+<!-- JSON TOPAPPBAR END -->
+<main class="md:pl-[280px] pt-16 h-screen flex w-full overflow-hidden bg-background">
+<!-- TELEGRAM STYLE 3-PANE LAYOUT -->
+<div class="flex flex-1 w-full h-full">
+<!-- PANE 1: CHAT LIST (LEFT BAR) -->
+<aside class="w-full md:w-[320px] lg:w-[350px] border-r border-outline-variant bg-surface-container-lowest flex flex-col h-full shrink-0 flex-col">
+<!-- Channel Header -->
+<div class="p-3 border-b border-outline-variant bg-surface-container-low flex justify-between items-center shrink-0">
+<h2 class="font-headline-md text-lg text-primary">Legal Team</h2>
+<div class="flex gap-1 relative group">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined text-[20px]">person_add</span>
+</button>
+<div class="absolute right-0 top-full mt-1 bg-surface-container-high border border-outline-variant rounded-sm shadow-lg w-48 hidden group-hover:block z-50">
+<button class="w-full text-left px-3 py-2 text-sm text-on-surface hover:bg-surface-container flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">person_add</span> Add Contact</button>
+<button class="w-full text-left px-3 py-2 text-sm text-on-surface hover:bg-surface-container flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">gavel</span> Add Counsel</button>
+<button class="w-full text-left px-3 py-2 text-sm text-on-surface hover:bg-surface-container flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">balance</span> Add Opposing</button>
+</div>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit_square</span>
+</button>
+</div>
+</div>
+<!-- Filter Tabs -->
+<div class="px-3 py-2 border-b border-outline-variant/50 flex gap-2 overflow-x-auto scrollbar-hide shrink-0">
+<button class="px-3 py-1 bg-primary-container text-primary rounded-full text-[13px] font-medium whitespace-nowrap border border-primary/20">All</button>
+<button class="px-3 py-1 bg-transparent text-on-surface-variant hover:bg-surface-container-high rounded-full text-[13px] font-medium whitespace-nowrap">Unread</button>
+<button class="px-3 py-1 bg-transparent text-on-surface-variant hover:bg-surface-container-high rounded-full text-[13px] font-medium whitespace-nowrap">Channels</button>
+<button class="px-3 py-1 bg-transparent text-on-surface-variant hover:bg-surface-container-high rounded-full text-[13px] font-medium whitespace-nowrap">DMs</button>
+</div>
+<!-- Chat List -->
+<div class="flex-1 overflow-y-auto chat-scroll p-2 space-y-1"><p class="font-label-caps text-[10px] text-outline-variant uppercase mt-2 mb-1 px-2 tracking-widest">AI Agents</p><div class="flex gap-3 p-3 rounded-lg bg-surface-container-highest cursor-pointer border border-primary/30"><div class="w-10 h-10 rounded-full bg-primary-container shrink-0 flex items-center justify-center border border-primary/20 relative"><span class="material-symbols-outlined text-primary text-[20px]">smart_toy</span><div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-surface-container-highest rounded-full"></div></div><div class="flex-1 min-w-0"><div class="flex justify-between items-baseline"><span class="font-bold text-sm text-primary truncate">Chambers AI</span><span class="text-[10px] text-green-400 font-data-mono">ACTIVE</span></div><p class="text-[12px] text-on-surface-variant truncate">Lead Strategist</p></div></div><div class="flex gap-3 max-w-[85%]"><div class="w-8 h-8 rounded-full bg-blue-500/10 shrink-0 flex items-center justify-center mt-auto border border-blue-500/20"><span class="material-symbols-outlined text-blue-400 text-[16px]">database</span></div><div class="flex flex-col gap-1"><div class="flex items-center gap-2 ml-1"><span class="text-[12px] font-bold text-blue-400">Evidence Agent</span><span class="text-[11px] text-on-surface-variant font-data-mono">10:46 AM</span></div><div class="bg-surface-container-high p-3 rounded-2xl rounded-bl-sm border border-outline-variant/20 text-on-surface text-[14px] leading-relaxed shadow-sm">@ChambersAI I've indexed the 10/12 hearing transcripts. There is a 14% variance in Witness B's timeline compared to the initial deposition. Flagging for conflict detection.</div></div></div><div class="flex gap-3 p-3 rounded-lg hover:bg-surface-container cursor-pointer"><div class="w-10 h-10 rounded-full bg-surface-container-high shrink-0 flex items-center justify-center border border-outline-variant/30 relative"><span class="material-symbols-outlined text-on-surface-variant text-[20px]">search_insights</span><div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-blue-500 border-2 border-surface-container-highest rounded-full"></div></div><div class="flex-1 min-w-0"><div class="flex justify-between items-baseline"><span class="font-semibold text-sm text-on-surface truncate">Research Clerk</span><span class="text-[10px] text-blue-400 font-data-mono">IDLE</span></div><p class="text-[12px] text-on-surface-variant truncate">Case Law Specialist</p></div></div><p class="font-label-caps text-[10px] text-outline-variant uppercase mt-4 mb-1 px-2 tracking-widest">Human Counsel</p><div class="flex gap-3 p-3 rounded-lg hover:bg-surface-container cursor-pointer"><img class="w-10 h-10 rounded-full object-cover border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4jnslda_udTNOOjSOihM7HX1fzzjDjv0_lh92MUlZfqOSD8PtTDjDlrzDg_9TiDH0lCyQIHctLkKo8u9kYbeJsFoAGYr9GKUYUHGWwZ1abvdBVJc8-uqYKHud7OmgVYELDMhVkVbJCZbXWNbyWwJAsDupqTEI3dKE6_pVy8drjZGrI3IdM-BCi85qwUfEMV9aFlhOJHaPhYJQFdy8MRlfkNAhAk-K3CdK9XL0kI4aqtd3kSCPxi-ovQ"><div class="flex-1 min-w-0"><div class="flex justify-between items-baseline"><span class="font-semibold text-sm text-on-surface truncate">Senior Counsel (You)</span></div><p class="text-[12px] text-on-surface-variant truncate">Lead Attorney</p></div></div></div>
+<div class="p-4 border-t border-outline-variant"><button class="w-full py-2.5 bg-surface-container-high border border-outline-variant hover:bg-surface-container-highest text-primary font-label-caps text-[11px] tracking-widest flex items-center justify-center gap-2 rounded transition-colors"><span class="material-symbols-outlined text-[18px]">person_add</span> ADD MEMBER / AGENT</button></div></aside>
+<!-- PANE 2: MAIN CHAT AREA (CENTER) -->
+<div class="flex-1 flex flex-col h-full bg-surface relative min-w-0">
+<!-- Chat Header -->
+<div class="h-[68px] px-4 border-b border-outline-variant bg-surface/95 backdrop-blur-sm flex justify-between items-center shrink-0 z-10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-primary text-[20px]">smart_toy</span>
+</div>
+<div>
+<h3 class="font-headline-md text-[16px] text-primary leading-tight">Legal Strategy Workspace</h3>
+<p class="text-[12px] text-on-surface-variant font-data-mono">Multi-Agent Collaboration • 2024-CV-8821</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container xl:hidden">
+<span class="material-symbols-outlined">info</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Chat Messages Area -->
+<div class="flex-1 overflow-y-auto chat-scroll p-4 space-y-6 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMTRiOGE2IiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')]">
+<!-- Date Divider -->
+<div class="flex justify-center my-4">
+<span class="bg-surface-container-high px-3 py-1 rounded-full text-[11px] font-data-mono text-on-surface-variant border border-outline-variant/30">Today</span>
+</div>
+<!-- Message from AI -->
+<div class="flex gap-3 max-w-[85%]">
+<div class="w-8 h-8 rounded-full bg-primary-container shrink-0 flex items-center justify-center mt-auto border border-primary/20">
+<span class="material-symbols-outlined text-primary text-[16px]">smart_toy</span>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2 ml-1">
+<span class="text-[12px] font-bold text-primary">Chambers AI</span>
+<span class="text-[11px] text-on-surface-variant font-data-mono">10:45 AM</span>
+</div>
+<div class="bg-surface-container-high p-3 rounded-2xl rounded-bl-sm border border-outline-variant/20 text-on-surface text-[14px] leading-relaxed shadow-sm">
+                    I've reviewed the docket for 2024-CV-8821. J. Marston (Defense) filed a Notice of Appearance earlier today. They are requesting a 48-hour extension on the MTD response.
+                </div>
+</div>
+</div><div class="flex gap-3 max-w-[85%]"><div class="w-8 h-8 rounded-full bg-blue-500/10 shrink-0 flex items-center justify-center mt-auto border border-blue-500/20"><span class="material-symbols-outlined text-blue-400 text-[16px]">database</span></div><div class="flex flex-col gap-1"><div class="flex items-center gap-2 ml-1"><span class="text-[12px] font-bold text-blue-400">Evidence Agent</span><span class="text-[11px] text-on-surface-variant font-data-mono">10:46 AM</span></div><div class="bg-surface-container-high p-3 rounded-2xl rounded-bl-sm border border-outline-variant/20 text-on-surface text-[14px] leading-relaxed shadow-sm">@ChambersAI I've indexed the 10/12 hearing transcripts. There is a 14% variance in Witness B's timeline compared to the initial deposition. Flagging for conflict detection.</div></div></div>
+<!-- User Message -->
+<div class="flex gap-3 max-w-[85%] ml-auto justify-end">
+<div class="flex flex-col gap-1 items-end">
+<div class="flex items-center gap-2 mr-1">
+<span class="text-[11px] text-on-surface-variant font-data-mono">10:48 AM</span>
+<span class="text-[12px] font-bold text-secondary">You</span>
+</div>
+<div class="bg-secondary-container/20 p-3 rounded-2xl rounded-br-sm border border-secondary/30 text-on-surface text-[14px] leading-relaxed shadow-sm">
+                    Draft a response granting the 48-hour extension but note this will be the final extension permitted for this phase.
+                </div>
+<div class="flex items-center gap-1 mr-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px] text-primary">done_all</span>
+</div>
+</div>
+<img alt="User" class="w-8 h-8 rounded-full object-cover border border-outline-variant mt-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4jnslda_udTNOOjSOihM7HX1fzzjDjv0_lh92MUlZfqOSD8PtTDjDlrzDg_9TiDH0lCyQIHctLkKo8u9kYbeJsFoAGYr9GKUYUHGWwZ1abvdBVJc8-uqYKHud7OmgVYELDMhVkVbJCZbXWNbyWwJAsDupqTEI3dKE6_pVy8drjZGrI3IdM-BCi85qwUfEMV9aFlhOJHaPhYJQFdy8MRlfkNAhAk-K3CdK9XL0kI4aqtd3kSCPxi-ovQ">
+</div>
+<!-- Message from AI with Highlight/Urgency -->
+<div class="flex gap-3 max-w-[85%]">
+<div class="w-8 h-8 rounded-full bg-primary-container shrink-0 flex items-center justify-center mt-auto border border-primary/20">
+<span class="material-symbols-outlined text-primary text-[16px]">smart_toy</span>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2 ml-1">
+<span class="text-[12px] font-bold text-primary">Chambers AI</span>
+<span class="text-[11px] text-on-surface-variant font-data-mono">10:50 AM</span>
+</div>
+<div class="bg-surface-container-high p-3 rounded-2xl rounded-bl-sm border border-error/30 text-on-surface text-[14px] leading-relaxed shadow-sm relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-error"></div>
+<div class="flex items-center gap-1.5 mb-2 text-error font-semibold text-[12px] uppercase tracking-wider">
+<span class="material-symbols-outlined text-[14px]">warning</span> Conflict Detected
+                    </div>
+                    Detected a conflict in Witness B's testimony regarding the 10/12 hearing. Recommend immediate cross-reference with Exhibit 42.
+                    
+                    <div class="mt-3 bg-surface border border-outline-variant/30 rounded p-2 flex items-center gap-3 hover:bg-surface-bright cursor-pointer transition-colors">
+<div class="w-8 h-8 bg-error-container/20 rounded flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-[13px] font-medium text-on-surface truncate">Exhibit_42_Transcript_Oct12.pdf</p>
+<p class="text-[11px] text-on-surface-variant">Page 4, Line 12</p>
+</div>
+<button class="text-primary"><span class="material-symbols-outlined text-[18px]">download</span></button>
+</div>
+</div>
+<div class="flex gap-2 ml-2 mt-1">
+<button class="bg-surface-container border border-outline-variant/50 hover:bg-surface-container-high px-3 py-1 rounded-full text-[12px] text-primary flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[14px]">check</span> Run Cross-Ref
+                    </button>
+<button class="bg-surface-container border border-outline-variant/50 hover:bg-surface-container-high px-3 py-1 rounded-full text-[12px] text-on-surface-variant flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[14px]">close</span> Dismiss
+                    </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Message Input Area -->
+<div class="p-4 bg-surface/95 backdrop-blur-sm border-t border-outline-variant shrink-0">
+<div class="flex items-end gap-2 bg-surface-container-low border border-outline-variant rounded-xl p-1 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 transition-all">
+<button class="p-2.5 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container shrink-0">
+<span class="material-symbols-outlined text-[22px]">attach_file</span>
+</button>
+<textarea class="w-full bg-transparent border-none text-on-surface font-body-md text-[15px] py-3 px-1 resize-none max-h-32 focus:ring-0 placeholder:text-on-surface-variant/50" placeholder="Message the team, @tag an agent, or type / for tools..." rows="1" style="min-height: 44px;"></textarea>
+<div class="flex gap-1 shrink-0 p-1">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined text-[22px]">mic</span>
+</button>
+<button class="p-2 bg-primary text-background hover:bg-primary-fixed transition-colors rounded-full flex items-center justify-center h-10 w-10">
+<span class="material-symbols-outlined text-[20px]">send</span>
+</button>
+</div>
+</div>
+<div class="flex justify-between items-center mt-2 px-2">
+<div class="flex gap-3 text-[11px] font-data-mono text-outline-variant">
+<span class="flex items-center gap-1 hover:text-primary cursor-pointer"><span class="material-symbols-outlined text-[14px]">bolt</span> /summarize</span>
+<span class="flex items-center gap-1 hover:text-primary cursor-pointer"><span class="material-symbols-outlined text-[14px]">search</span> /cite</span>
+</div>
+<span class="text-[10px] text-outline-variant">Enter to send, Shift+Enter for new line</span>
+</div>
+</div>
+</div>
+<!-- PANE 3: INFO & CONTEXT (RIGHT BAR) -->
+<aside class="hidden xl:flex w-[300px] border-l border-outline-variant bg-surface-container-lowest flex-col h-full shrink-0">
+<div class="p-4 border-b border-outline-variant bg-surface-container-low flex items-center justify-between shrink-0 h-[68px]">
+<h3 class="font-headline-md text-[16px] text-primary">Team Intelligence</h3>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto chat-scroll p-4 space-y-6"><div class="space-y-6"><div><h5 class="font-label-caps text-[11px] text-outline-variant uppercase tracking-widest mb-3">Agent Status</h5><div class="space-y-3"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span><span class="text-[13px] text-on-surface">Chambers AI</span></div><span class="text-[10px] font-data-mono text-on-surface-variant">THINKING...</span></div><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span><span class="text-[13px] text-on-surface">Evidence Agent</span></div><span class="text-[10px] font-data-mono text-on-surface-variant">IDLE</span></div><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-outline-variant"></span><span class="text-[13px] text-on-surface">Research Clerk</span></div><span class="text-[10px] font-data-mono text-on-surface-variant">OFFLINE</span></div></div></div><div class="pt-4 border-t border-outline-variant/30"><h5 class="font-label-caps text-[11px] text-outline-variant uppercase tracking-widest mb-3">Role Assignment</h5><div class="p-3 bg-surface-container rounded border border-outline-variant/30"><p class="text-[12px] text-primary font-medium mb-1">Current Task: MTD Response</p><p class="text-[11px] text-on-surface-variant">Chambers AI: Drafting<br>Evidence Agent: Verification<br>Senior Counsel: Review</p></div></div><div class="pt-4 border-t border-outline-variant/30"><h5 class="font-label-caps text-[11px] text-outline-variant uppercase tracking-widest mb-3">Team Composition</h5><div class="flex gap-1"><div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center border border-primary/20"><span class="material-symbols-outlined text-primary text-[16px]">smart_toy</span></div><div class="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20"><span class="material-symbols-outlined text-blue-400 text-[16px]">database</span></div><img class="w-8 h-8 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4jnslda_udTNOOjSOihM7HX1fzzjDjv0_lh92MUlZfqOSD8PtTDjDlrzDg_9TiDH0lCyQIHctLkKo8u9kYbeJsFoAGYr9GKUYUHGWwZ1abvdBVJc8-uqYKHud7OmgVYELDMhVkVbJCZbXWNbyWwJAsDupqTEI3dKE6_pVy8drjZGrI3IdM-BCi85qwUfEMV9aFlhOJHaPhYJQFdy8MRlfkNAhAk-K3CdK9XL0kI4aqtd3kSCPxi-ovQ"><div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center border border-outline-variant/30 text-on-surface-variant text-[12px] font-bold">+2</div></div></div></div></div>
+</aside>
+</div>
+</main>
+
+
+</body></html>

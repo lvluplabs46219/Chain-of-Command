@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Acquit.ai Command Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;600;700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#93000a",
+                        "secondary-fixed": "#d1e4fb",
+                        "inverse-surface": "#e5e2e1",
+                        "on-secondary": "#203243",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary": "#352f2b",
+                        "surface-container-highest": "#353435",
+                        "on-secondary-container": "#a4b7cd",
+                        "secondary": "#b5c8df",
+                        "inverse-primary": "#5d5e61",
+                        "error": "#ffb4ab",
+                        "primary-fixed": "#e2e2e5",
+                        "on-surface-variant": "#c5c6ca",
+                        "on-primary-fixed-variant": "#454749",
+                        "surface-container-high": "#2a2a2a",
+                        "primary": "#c6c6c9",
+                        "tertiary": "#cfc5be",
+                        "on-primary-container": "#838486",
+                        "inverse-on-surface": "#313030",
+                        "surface-bright": "#3a3939",
+                        "outline": "#8f9194",
+                        "primary-container": "#1a1c1e",
+                        "surface-container-low": "#1c1b1b",
+                        "primary-fixed-dim": "#c6c6c9",
+                        "surface": "#141313",
+                        "on-tertiary-fixed-variant": "#4c4641",
+                        "tertiary-container": "#201b17",
+                        "outline-variant": "#44474a",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#b5c8df",
+                        "on-secondary-fixed": "#091d2e",
+                        "surface-container": "#201f1f",
+                        "surface-variant": "#353435",
+                        "secondary-container": "#36485b",
+                        "tertiary-fixed": "#ebe0da",
+                        "tertiary-fixed-dim": "#cfc5be",
+                        "on-background": "#e5e2e1",
+                        "surface-dim": "#141313",
+                        "on-primary": "#2f3133",
+                        "on-secondary-fixed-variant": "#36485b",
+                        "background": "#141313",
+                        "on-error": "#690005",
+                        "on-tertiary-fixed": "#201b17",
+                        "surface-tint": "#c6c6c9",
+                        "on-primary-fixed": "#1a1c1e",
+                        "on-tertiary-container": "#8b837d",
+                        "surface-container-lowest": "#0e0e0e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xl": "40px",
+                        "base": "4px",
+                        "gutter": "16px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "margin-safe": "32px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "headline-md": ["Domine"],
+                        "label-caps": ["Inter"],
+                        "display-case": ["Domine"],
+                        "headline-lg": ["Domine"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Domine"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700" }],
+                        "display-case": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Scrollbar styling for density */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #141313;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #44474a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8f9194;
+        }
+
+        #sidebar {
+            transition: width 0.3s ease;
+        }
+        #sidebar.collapsed {
+            width: 64px;
+        }
+        #sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        #sidebar.collapsed .network-management, 
+        #sidebar.collapsed .status-indicators {
+            display: none;
+        }
+        #sidebar.collapsed .new-filing-btn {
+            padding: 8px 0;
+            justify-content: center;
+        }
+        #sidebar.collapsed .new-filing-btn span:last-child {
+            display: none;
+        }
+        
+        #main-content {
+            transition: margin-left 0.3s ease;
+        }
+        #header-nav {
+            transition: left 0.3s ease;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md text-body-md antialiased overflow-hidden selection:bg-primary-container selection:text-primary">
+<!-- JSON SIDENAVBAR START -->
+<aside class="bg-background dark:bg-background text-primary dark:text-primary w-[280px] h-screen fixed left-0 top-0 border-r border-outline-variant flex flex-col h-full py-md z-40 hidden md:flex" id="sidebar">
+<div class="px-lg mb-lg flex items-center justify-between">
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary tracking-tighter uppercase mb-xs flex items-center gap-2 sidebar-text">
+<span class="material-symbols-outlined fill text-[32px]">balance</span>
+                Acquit.ai
+            </h1>
+<span class="material-symbols-outlined fill text-[32px] hidden" id="sidebar-icon-only">balance</span>
+<button class="text-on-surface-variant hover:text-primary transition-colors" id="toggle-sidebar">
+<span class="material-symbols-outlined">menu_open</span>
+</button>
+</div>
+<div class="px-lg mb-lg sidebar-text">
+<p class="font-data-mono text-data-mono text-on-surface-variant flex items-center gap-2">
+<img alt="User Profile" class="w-6 h-6 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of an attorney in a modern, dark-themed law office, strong directional lighting, high contrast, authoritative expression, 8k resolution, cinematic grading." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4jnslda_udTNOOjSOihM7HX1fzzjDjv0_lh92MUlZfqOSD8PtTDjDlrzDg_9TiDH0lCyQIHctLkKo8u9kYbeJsFoAGYr9GKUYUHGWwZ1abvdBVJc8-uqYKHud7OmgVYELDMhVkVbJCZbXWNbyWwJAsDupqTEI3dKE6_pVy8drjZGrI3IdM-BCi85qwUfEMV9aFlhOJHaPhYJQFdy8MRlfkNAhAk-K3CdK9XL0kI4aqtd3kSCPxi-ovQ"/>
+                Senior Counsel
+            </p>
+</div>
+<nav class="flex-1 overflow-y-auto px-md space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-primary border-l-4 border-primary bg-secondary-container/30 font-bold hover:bg-surface-container-high transition-colors duration-150 transition-all duration-75" href="#" title="Command Center">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps uppercase sidebar-text">Command Center</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#" title="The Docket">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-label-caps text-label-caps uppercase sidebar-text">The Docket</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#" title="Chambers">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="font-label-caps text-label-caps uppercase sidebar-text">Chambers</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#" title="Law Library">
+<span class="material-symbols-outlined">library_books</span>
+<span class="font-label-caps text-label-caps uppercase sidebar-text">Law Library</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#" title="Record Room">
+<span class="material-symbols-outlined">folder_open</span>
+<span class="font-label-caps text-label-caps uppercase sidebar-text">Record Room</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#" title="Investigations">
+<span class="material-symbols-outlined">policy</span>
+<span class="font-label-caps text-label-caps uppercase sidebar-text">Investigations</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#" title="Case Timeline">
+<span class="material-symbols-outlined">timeline</span>
+<span class="font-label-caps text-label-caps uppercase sidebar-text">Case Timeline</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#" title="Court Watch">
+<span class="material-symbols-outlined">visibility</span>
+<span class="font-label-caps text-label-caps uppercase sidebar-text">Court Watch</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#" title="Counsel Directory">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-caps text-label-caps uppercase sidebar-text">Counsel Directory</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#" title="Motions &amp; Tasks">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-caps text-label-caps uppercase sidebar-text">Motions &amp; Tasks</span>
+</a>
+</nav>
+<div class="mt-auto px-md pt-md space-y-4">
+<div class="mb-4 network-management"><p class="font-label-caps text-[10px] text-outline-variant uppercase mb-2 px-3">Network Management</p><div class="grid grid-cols-1 gap-1 px-1"><button class="flex items-center gap-2 px-2 py-1.5 text-[11px] text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors rounded-sm"><span class="material-symbols-outlined text-[16px]">person_add</span> Add Contact</button><button class="flex items-center gap-2 px-2 py-1.5 text-[11px] text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors rounded-sm"><span class="material-symbols-outlined text-[16px]">gavel</span> Add Counsel</button><button class="flex items-center gap-2 px-2 py-1.5 text-[11px] text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors rounded-sm"><span class="material-symbols-outlined text-[16px]">balance</span> Add Opposing</button></div></div><button class="w-full bg-[#E5B55C] text-black font-data-mono text-data-mono py-2 px-4 uppercase font-bold hover:bg-[#D4A54B] transition-colors flex items-center justify-center gap-2 rounded-sm border border-[#E5B55C] new-filing-btn" title="New Filing">
+<span class="material-symbols-outlined">add</span>
+<span class="sidebar-text">NEW FILING</span>
+</button>
+<div class="border-t border-outline-variant pt-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#" title="Settings">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps uppercase sidebar-text">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-medium hover:text-on-surface hover:bg-surface-container-high transition-colors duration-150 border-l-4 border-transparent" href="#" title="Support">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-caps text-label-caps uppercase sidebar-text">Support</span>
+</a>
+</div>
+<div class="pt-2 px-3 flex flex-col gap-1 text-[10px] font-data-mono text-outline status-indicators">
+<div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span> UPL Monitor: Nominal</div>
+<div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span> E2E Encr: Enabled</div>
+<div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Guardrails: Active</div>
+</div>
+</div>
+</aside>
+<!-- JSON SIDENAVBAR END -->
+<!-- JSON TOPAPPBAR START -->
+<header class="bg-surface-container-low dark:bg-surface-container-low text-primary dark:text-primary h-16 fixed top-0 right-0 left-0 md:left-[280px] z-50 border-b border-outline-variant flex justify-between items-center px-lg" id="header-nav">
+<div class="flex items-center gap-6 flex-1">
+<div class="relative w-64 md:w-96 hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface-container-high border-outline-variant text-on-surface font-data-mono text-data-mono py-1.5 pl-9 pr-3 focus:border-primary focus:ring-1 focus:ring-primary rounded-none transition-all placeholder:text-on-surface-variant/50" placeholder="Global Search..." type="text"/>
+</div>
+<nav class="hidden lg:flex gap-6">
+<a class="text-primary border-b-2 border-primary pb-1 font-body-md text-body-md" href="#">Case: 2024-CV-8821</a>
+<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md pb-1 border-b-2 border-transparent" href="#">The Clerk</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex gap-2 text-on-surface-variant">
+<button class="p-2 hover:bg-surface-bright dark:hover:bg-surface-bright rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 hover:bg-surface-bright dark:hover:bg-surface-bright rounded-full transition-colors hidden sm:block">
+<span class="material-symbols-outlined">history</span>
+</button>
+<button class="p-2 hover:bg-surface-bright dark:hover:bg-surface-bright rounded-full transition-colors md:hidden">
+<span class="material-symbols-outlined">search</span>
+</button>
+</div>
+<button class="hidden sm:flex items-center gap-2 border border-outline-variant bg-surface-container hover:bg-surface-bright text-on-surface font-data-mono text-data-mono px-4 py-1.5 transition-colors rounded-sm">
+<span class="material-symbols-outlined text-[18px]">draw</span>
+                AFFIX SIGNATURE
+            </button>
+<button class="md:hidden p-2 text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</header>
+<!-- JSON TOPAPPBAR END -->
+<main class="md:pl-[280px] pt-16 h-screen flex flex-col w-full overflow-hidden" id="main-content">
+<div class="flex-1 flex flex-col items-center justify-center p-md md:p-lg relative bg-[#0e0e0e] overflow-hidden w-full h-full">
+<!-- Background Radial Gradient -->
+<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary-container/40 via-background to-background pointer-events-none z-0"></div>
+<!-- Carousel Container -->
+<div class="relative z-10 w-full h-full max-w-5xl flex items-center justify-center overflow-hidden" id="carousel-container">
+</div>
+<!-- Navigation Controls -->
+<div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-6">
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-high border border-outline-variant text-on-surface hover:text-primary hover:border-primary transition-colors" id="prev-btn">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<span class="font-data-mono text-primary text-[16px] tracking-widest font-bold" id="index-display">1 / 8</span>
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-high border border-outline-variant text-on-surface hover:text-primary hover:border-primary transition-colors" id="next-btn">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</main>
+<script>
+    // Sidebar Toggle Logic
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('main-content');
+    const headerNav = document.getElementById('header-nav');
+    const toggleBtn = document.getElementById('toggle-sidebar');
+    const sidebarIconOnly = document.getElementById('sidebar-icon-only');
+
+    let isCollapsed = false;
+
+    toggleBtn.addEventListener('click', () => {
+        isCollapsed = !isCollapsed;
+        if (isCollapsed) {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.remove('md:pl-[280px]');
+            mainContent.classList.add('md:pl-[64px]');
+            headerNav.classList.remove('md:left-[280px]');
+            headerNav.classList.add('md:left-[64px]');
+            sidebarIconOnly.classList.remove('hidden');
+            toggleBtn.innerHTML = '<span class="material-symbols-outlined">menu</span>';
+        } else {
+            sidebar.classList.remove('collapsed');
+            mainContent.classList.remove('md:pl-[64px]');
+            mainContent.classList.add('md:pl-[280px]');
+            headerNav.classList.remove('md:left-[64px]');
+            headerNav.classList.add('md:left-[280px]');
+            sidebarIconOnly.classList.add('hidden');
+            toggleBtn.innerHTML = '<span class="material-symbols-outlined">menu_open</span>';
+        }
+        
+        // Trigger resize event for Three.js
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 300); // match transition duration
+    });
+
+    // Three.js Carousel Logic
+    const container = document.getElementById('carousel-container');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const indexDisplay = document.getElementById('index-display');
+
+    const modules = [
+        { title: "THE DOCKET", icon: "gavel", color: "#e2e2e5" },
+        { title: "CHAMBERS", icon: "account_balance", color: "#a4b7cd" },
+        { title: "LAW LIBRARY", icon: "library_books", color: "#b5c8df" },
+        { title: "RECORD ROOM", icon: "folder_open", color: "#cfc5be" },
+        { title: "INVESTIGATIONS", icon: "policy", color: "#c6c6c9" },
+        { title: "CASE TIMELINE", icon: "timeline", color: "#e5e2e1" },
+        { title: "COURT WATCH", icon: "visibility", color: "#d1e4fb" },
+        { title: "DIRECTORY", icon: "groups", color: "#ebe0da" }
+    ];
+
+    const scene = new THREE.Scene();
+    
+    // Camera setup
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.z = 15;
+    camera.position.y = 0;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+
+    const pointLight = new THREE.PointLight(0xffffff, 1);
+    pointLight.position.set(0, 10, 10);
+    scene.add(pointLight);
+
+    // Carousel Group
+    const carouselGroup = new THREE.Group();
+    scene.add(carouselGroup);
+
+    const radius = 8;
+    const cards = [];
+    const totalCards = modules.length;
+    let targetRotation = 0;
+    let currentRotation = 0;
+    let currentIndex = 0;
+
+    // Create Canvas Texture for text
+    function createCardTexture(text, iconStr) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+
+        // Background
+        ctx.fillStyle = '#1c1b1b'; // surface-container-low
+        ctx.fillRect(0, 0, 512, 512);
+        
+        // Border
+        ctx.strokeStyle = '#44474a'; // outline-variant
+        ctx.lineWidth = 10;
+        ctx.strokeRect(5, 5, 502, 502);
+
+        // Text settings for icon (using a placeholder shape if material symbols don't render on canvas easily)
+        ctx.fillStyle = '#c6c6c9';
+        ctx.font = '100px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Draw pseudo-icon (circle)
+        ctx.beginPath();
+        ctx.arc(256, 180, 60, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Draw Title
+        ctx.fillStyle = '#e5e2e1'; // on-surface
+        ctx.font = 'bold 48px Arial'; // fallback for Domine
+        ctx.fillText(text, 256, 340);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        return texture;
+    }
+
+    // Build Cards
+    for (let i = 0; i < totalCards; i++) {
+        const angle = (i / totalCards) * Math.PI * 2;
+        const module = modules[i];
+
+        const geometry = new THREE.PlaneGeometry(4, 4);
+        const material = new THREE.MeshStandardMaterial({
+            map: createCardTexture(module.title, module.icon),
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.9
+        });
+
+        const card = new THREE.Mesh(geometry, material);
+        
+        card.position.x = Math.sin(angle) * radius;
+        card.position.z = Math.cos(angle) * radius;
+        
+        card.rotation.y = angle;
+
+        cards.push(card);
+        carouselGroup.add(card);
+    }
+
+    // Animation Loop
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        // Smooth rotation interpolation
+        currentRotation += (targetRotation - currentRotation) * 0.1;
+        carouselGroup.rotation.y = currentRotation;
+
+        // Update card opacities based on distance from front
+        cards.forEach((card, index) => {
+            // Calculate world position
+            const worldPos = new THREE.Vector3();
+            card.getWorldPosition(worldPos);
+            
+            // Front is positive Z
+            const zDist = worldPos.z;
+            
+            // Map z from roughly -radius to +radius into opacity 0.2 to 1.0
+            let opacity = (zDist + radius) / (radius * 2);
+            opacity = Math.max(0.2, Math.min(1.0, opacity));
+            
+            card.material.opacity = opacity;
+        });
+
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // Controls
+    function updateCarousel() {
+        targetRotation = (currentIndex * Math.PI * 2) / totalCards;
+        // Adjust index for display (1-based, inverted direction for UX)
+        let displayIdx = (totalCards - (currentIndex % totalCards)) % totalCards + 1;
+        indexDisplay.textContent = `${displayIdx} / ${totalCards}`;
+    }
+
+    prevBtn.addEventListener('click', () => {
+        currentIndex++;
+        updateCarousel();
+    });
+
+    nextBtn.addEventListener('click', () => {
+        currentIndex--;
+        updateCarousel();
+    });
+
+    // Handle Resize
+    window.addEventListener('resize', () => {
+        if (!container) return;
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        
+        renderer.setSize(width, height);
+    });
+
+</script>
+</body></html>

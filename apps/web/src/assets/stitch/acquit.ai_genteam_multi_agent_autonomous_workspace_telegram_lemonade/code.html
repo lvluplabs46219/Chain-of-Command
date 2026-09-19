@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Acquit.ai — GenTeam AI Workspace (Lemonade Server)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;600;700;900&amp;family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            surface: '#141313',
+            'surface-dim': '#100f0f',
+            'surface-container-lowest': '#0b0b0b',
+            'surface-container-low': '#181717',
+            'surface-container': '#201f1f',
+            'surface-container-high': '#292828',
+            'surface-container-highest': '#333232',
+            lemon: {
+              300: '#fef08a',
+              400: '#facc15',
+              500: '#eab308',
+              600: '#ca8a04',
+            },
+            accent: '#c8a97e',
+            'accent-gold': '#d4af37',
+            emerald: {
+              400: '#34d399',
+              500: '#10b981',
+              900: '#064e3b'
+            }
+          },
+          fontFamily: {
+            serif: ['Domine', 'serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Custom subtle scrollbars */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #141313; }
+    ::-webkit-scrollbar-thumb { background: #2f2e2e; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4a4949; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 350, 'GRAD' 0, 'opsz' 20;
+      vertical-align: middle;
+    }
+    .material-symbols-filled {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.08); }
+    }
+    .glow-effect {
+      animation: pulseGlow 4s infinite ease-in-out;
+    }
+    @keyframes subtlePulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .pulse-subtle {
+      animation: subtlePulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+</head>
+<body class="bg-[#0e0e0e] text-[#ededed] font-sans antialiased h-screen w-screen overflow-hidden flex flex-col select-none">
+<!-- TOP APP BAR: LEMONADE SERVER ORCHESTRATION & GENSPARK GENTEAM HUD -->
+<header class="h-14 border-b border-[#262525] bg-[#141313] px-4 flex items-center justify-between shrink-0 z-30">
+<!-- Brand / Server Node Status -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#facc15] via-[#ca8a04] to-[#713f12] p-[1px] shadow-sm">
+<div class="w-full h-full bg-[#181717] rounded-[7px] flex items-center justify-center">
+<span class="material-symbols-outlined text-lemon-400 text-lg">bolt</span>
+</div>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-serif font-black tracking-tight text-white text-sm">ACQUIT.AI</span>
+<span class="text-[10px] font-mono uppercase px-1.5 py-0.2 rounded bg-[#201f1f] text-lemon-400 border border-[#38362b]">LEMONADE CORE</span>
+</div>
+<p class="text-[10px] font-mono text-[#8a8888] leading-none">GenTeam Orchestration Host v2.4 • Multi-Agent Mesh</p>
+</div>
+</div>
+<div class="h-5 w-[1px] bg-[#2a2929] mx-1"></div>
+<!-- Lemonade Server Daemon Status Badge -->
+<div class="flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#181717] border border-[#2d2c2c] text-xs font-mono">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+</span>
+<span class="text-[#a8a7a7]">Lemonade RPC:</span>
+<span class="text-white font-semibold">http://localhost:8765</span>
+<span class="text-[10px] text-[#5cb85c] bg-[#142918] px-1.5 py-0.5 rounded border border-[#1f4726]">CONNECTED</span>
+</div>
+<!-- Inter-Agent Mesh Status -->
+<div class="hidden lg:flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#1a1710] border border-[#3f3517] text-[11px] font-mono text-lemon-400">
+<span class="material-symbols-outlined text-sm text-lemon-400 animate-spin" style="animation-duration: 9s;">hub</span>
+<span>Inter-Agent Autonomy:</span>
+<span class="text-white font-bold bg-[#28210f] px-1.5 py-0.2 rounded border border-[#52441c]">PEER DELEGATION ACTIVE</span>
+</div>
+<div class="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#181717] border border-[#2d2c2c] text-xs font-mono">
+<span class="material-symbols-outlined text-sm text-[#8c8a8a]">memory</span>
+<span class="text-[#a8a7a7]">Matter:</span>
+<span class="text-lemon-400 font-semibold">#2024-CR-8821 (US v. Sterling)</span>
+</div>
+</div>
+<!-- Center Mode Switcher -->
+<div class="flex items-center p-1 bg-[#1a1919] border border-[#2a2929] rounded-lg">
+<button class="flex items-center gap-1.5 px-3 py-1 rounded-md bg-[#2d2c2c] text-white text-xs font-medium shadow-sm">
+<span class="material-symbols-outlined text-sm text-lemon-400">groups</span>
+<span>GenTeam Hub</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1 rounded-md text-[#9e9d9d] hover:text-white text-xs font-medium hover:bg-[#222121] transition">
+<span class="material-symbols-outlined text-sm">tune</span>
+<span>Permission Matrix</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1 rounded-md text-[#9e9d9d] hover:text-white text-xs font-medium hover:bg-[#222121] transition">
+<span class="material-symbols-outlined text-sm">alt_route</span>
+<span>Cross-Channel Dispatch</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1 rounded-md text-[#9e9d9d] hover:text-white text-xs font-medium hover:bg-[#222121] transition">
+<span class="material-symbols-outlined text-sm text-lemon-400">dns</span>
+<span>Lemonade Topology</span>
+</button>
+</div>
+<!-- Right Quick Actions -->
+<div class="flex items-center gap-2">
+<!-- Create Custom Agent Button -->
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-lemon-500 to-amber-600 hover:from-lemon-400 hover:to-amber-500 text-black font-bold text-xs shadow-md transition transform active:scale-95">
+<span class="material-symbols-outlined text-base">person_add</span>
+<span>+ Assemble New Agent</span>
+</button>
+<button class="p-2 rounded-lg bg-[#1a1919] border border-[#2a2929] text-[#a09e9e] hover:text-white transition" title="The Clerk Notifications">
+<span class="material-symbols-outlined text-lg">notifications</span>
+</button>
+<button class="p-2 rounded-lg bg-[#1a1919] border border-[#2a2929] text-[#a09e9e] hover:text-white transition" title="Server Logs &amp; Telemetry">
+<span class="material-symbols-outlined text-lg">developer_board</span>
+</button>
+<div class="w-7 h-7 rounded-full bg-[#262525] border border-[#3b3a3a] flex items-center justify-center font-mono text-[11px] font-bold text-lemon-400">
+        SC
+      </div>
+</div>
+</header>
+<!-- MAIN GENSPARK GENTEAM 3-COLUMN WORKSPACE FRAMEWORK -->
+<div class="flex-1 flex overflow-hidden w-full h-[calc(100vh-3.5rem)]">
+<!-- TELEGRAM LEFT FOLDER / WORKSPACE ICON RAIL (72px) -->
+<nav class="w-[72px] bg-[#100f0f] border-r border-[#242323] flex flex-col items-center py-3 justify-between shrink-0 select-none z-20">
+<div class="flex flex-col items-center gap-4 w-full">
+<!-- All Chats Folder -->
+<div class="relative group flex flex-col items-center cursor-pointer">
+<div class="w-11 h-11 rounded-2xl bg-[#222121] text-lemon-400 flex items-center justify-center border border-[#38362b] shadow-sm transition hover:bg-[#2a2929]">
+<span class="material-symbols-outlined text-2xl">chat</span>
+</div>
+<span class="text-[10px] font-sans mt-1 text-white font-medium">All</span>
+<span class="absolute -top-1 right-2 px-1.5 py-0.2 bg-lemon-400 text-black text-[9px] font-bold rounded-full font-mono shadow">14</span>
+</div>
+<!-- GenTeam Active Folder (Selected) -->
+<div class="relative group flex flex-col items-center cursor-pointer">
+<div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#3a280c] to-[#705213] text-white flex items-center justify-center border border-lemon-400 shadow-md transition">
+<span class="material-symbols-outlined text-2xl text-lemon-400">groups</span>
+</div>
+<span class="text-[10px] font-sans mt-1 text-lemon-400 font-bold">GenTeam</span>
+<span class="absolute -top-1 right-2 px-1.5 py-0.2 bg-emerald-500 text-black text-[9px] font-bold rounded-full font-mono animate-pulse">5</span>
+</div>
+<!-- Inter-Bot Bridge & Cross-Channel Dispatch -->
+<div class="relative group flex flex-col items-center cursor-pointer opacity-90 hover:opacity-100 transition">
+<div class="w-11 h-11 rounded-2xl bg-[#1a1724] text-purple-300 hover:text-white flex items-center justify-center border border-[#3a2b4f] hover:bg-[#251e36]">
+<span class="material-symbols-outlined text-2xl">alt_route</span>
+</div>
+<span class="text-[10px] font-sans mt-1 text-purple-300 font-semibold">Bridge</span>
+<span class="absolute -top-1 right-2 px-1.5 py-0.2 bg-purple-500 text-white text-[9px] font-bold rounded-full font-mono">4ch</span>
+</div>
+<!-- Counsel Bot DMs Folder -->
+<div class="relative group flex flex-col items-center cursor-pointer opacity-75 hover:opacity-100 transition">
+<div class="w-11 h-11 rounded-2xl bg-[#181717] text-[#aaa] hover:text-white flex items-center justify-center border border-[#292828] hover:bg-[#222121]">
+<span class="material-symbols-outlined text-2xl">smart_toy</span>
+</div>
+<span class="text-[10px] font-sans mt-1 text-[#888]">Bots</span>
+<span class="absolute -top-1 right-2 px-1.5 py-0.2 bg-[#2d2c2c] text-[#bbb] text-[9px] font-bold rounded-full font-mono">3</span>
+</div>
+<!-- Court Exhibits & Saved Case Law -->
+<div class="relative group flex flex-col items-center cursor-pointer opacity-75 hover:opacity-100 transition">
+<div class="w-11 h-11 rounded-2xl bg-[#181717] text-[#aaa] hover:text-white flex items-center justify-center border border-[#292828] hover:bg-[#222121]">
+<span class="material-symbols-outlined text-2xl">bookmark</span>
+</div>
+<span class="text-[10px] font-sans mt-1 text-[#888]">Briefs</span>
+</div>
+<!-- Lemonade Server Daemon Topology -->
+<div class="relative group flex flex-col items-center cursor-pointer opacity-75 hover:opacity-100 transition">
+<div class="w-11 h-11 rounded-2xl bg-[#181717] text-[#aaa] hover:text-white flex items-center justify-center border border-[#292828] hover:bg-[#222121]">
+<span class="material-symbols-outlined text-2xl text-emerald-400">dns</span>
+</div>
+<span class="text-[10px] font-sans mt-1 text-[#888]">vLLM</span>
+</div>
+</div>
+<!-- Bottom Folder Settings & Profile -->
+<div class="flex flex-col items-center gap-3 w-full pb-2">
+<button class="w-10 h-10 rounded-xl bg-[#181717] text-[#888] hover:text-white flex items-center justify-center hover:bg-[#222121] border border-[#262525] transition" title="Telegram Client Settings">
+<span class="material-symbols-outlined text-xl">settings</span>
+</button>
+<div class="w-9 h-9 rounded-full bg-gradient-to-tr from-[#2d2c2c] to-[#454749] border border-lemon-400 text-lemon-400 flex items-center justify-center text-xs font-serif font-bold shadow-md cursor-pointer">
+        SC
+      </div>
+</div>
+</nav>
+<!-- TELEGRAM CHAT LIST / CHANNEL SIDEBAR (340px) -->
+<aside class="w-[340px] border-r border-[#242323] bg-[#141313] flex flex-col shrink-0 select-none">
+<!-- Search Header with Telegram Filter Pills -->
+<div class="p-3 border-b border-[#242323] bg-[#161515]">
+<div class="relative flex items-center mb-2.5">
+<span class="material-symbols-outlined absolute left-3 text-sm text-[#777]">search</span>
+<input class="w-full bg-[#100f0f] border border-[#2b2a2a] rounded-full pl-9 pr-4 py-1.5 text-xs text-white placeholder-[#636161] focus:outline-none focus:border-lemon-400 transition font-sans" placeholder="Search chats, bots, or case cites..." type="text"/>
+</div>
+<!-- Filter Pills -->
+<div class="flex items-center gap-1.5 overflow-x-auto text-[11px] font-medium scrollbar-none">
+<button class="px-2.5 py-0.5 rounded-full bg-lemon-400 text-black font-bold shadow-sm whitespace-nowrap">All</button>
+<button class="px-2.5 py-0.5 rounded-full bg-[#201f1f] text-[#bbb] hover:text-white border border-[#2d2c2c] transition whitespace-nowrap">GenTeam Channels</button>
+<button class="px-2.5 py-0.5 rounded-full bg-[#201f1f] text-[#bbb] hover:text-white border border-[#2d2c2c] transition whitespace-nowrap">Bot DMs</button>
+<button class="px-2.5 py-0.5 rounded-full bg-[#201f1f] text-[#bbb] hover:text-white border border-[#2d2c2c] transition whitespace-nowrap">Sparring</button>
+</div>
+</div>
+<!-- Cross-Channel Dispatch Quick Bar -->
+<div class="px-3 py-2 bg-[#121111] border-b border-[#242323]">
+<div class="flex items-center justify-between mb-1.5">
+<span class="text-[10px] font-mono text-[#8a8888] uppercase tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-purple-400">alt_route</span> Inter-Channel Mesh
+  </span>
+<span class="text-[9px] font-mono text-emerald-400 bg-[#162719] px-1 rounded border border-[#224426]">4 SYNCED</span>
+</div>
+<div class="grid grid-cols-2 gap-1 text-[10px] font-mono">
+<button class="px-2 py-1 rounded bg-[#201f1f] border border-lemon-400/60 text-left text-lemon-400 truncate flex items-center justify-between font-semibold">
+<span>#war-room</span>
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+</button>
+<button class="px-2 py-1 rounded bg-[#181717] hover:bg-[#201f1f] border border-[#2d2c2c] text-left text-[#aaa] hover:text-white truncate flex items-center justify-between">
+<span>#statute-research</span>
+<span class="text-[9px] text-purple-400 font-bold">2 msg</span>
+</button>
+<button class="px-2 py-1 rounded bg-[#181717] hover:bg-[#201f1f] border border-[#2d2c2c] text-left text-[#aaa] hover:text-white truncate flex items-center justify-between">
+<span>#sparring-pit</span>
+<span class="text-[9px] text-red-400">VS</span>
+</button>
+<button class="px-2 py-1 rounded bg-[#181717] hover:bg-[#201f1f] border border-[#2d2c2c] text-left text-[#aaa] hover:text-white truncate flex items-center justify-between">
+<span>#exhibits-vault</span>
+<span class="text-[9px] text-cyan-400 font-mono">sync</span>
+</button>
+</div>
+</div>
+<!-- Telegram Chat List Items -->
+<div class="flex-1 overflow-y-auto divide-y divide-[#1e1d1d]">
+<!-- 1. Active Multi-Agent Squad (Pinned GenTeam Group) -->
+<div class="p-3 bg-[#201f1f] border-l-2 border-lemon-400 cursor-pointer flex items-start gap-3 transition">
+<div class="relative shrink-0">
+<div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#3a280c] to-[#705213] border border-lemon-400 flex items-center justify-center text-lg shadow-md">
+            ⚖️
+          </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-[#201f1f] rounded-full"></span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<h4 class="text-xs font-bold text-white truncate font-serif flex items-center gap-1.5">
+<span>GenTeam Defense Squad</span>
+<span class="material-symbols-outlined text-xs text-lemon-400">push_pin</span>
+</h4>
+<span class="text-[10px] font-mono text-lemon-400">10:44 AM</span>
+</div>
+<p class="text-[11px] text-[#cfcece] truncate font-sans mt-0.5">
+<span class="text-purple-300 font-semibold">[Auto-Delegated]</span> Marcus → Lex-Archivist cross-posted...
+          </p>
+<div class="flex items-center justify-between mt-1.5">
+<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[#162729] text-cyan-300 border border-[#1e3c3f]">5 bots • Peer-Delegation ON</span>
+<span class="w-4 h-4 rounded-full bg-lemon-400 text-black text-[9px] font-mono font-bold flex items-center justify-center">4</span>
+</div>
+</div>
+</div>
+<!-- 2. Channel: #statute-research (Autonomous Bridge) -->
+<div class="p-3 hover:bg-[#181717] cursor-pointer flex items-start gap-3 transition group">
+<div class="relative shrink-0">
+<div class="w-12 h-12 rounded-2xl bg-[#1b1c2b] border border-[#303358] flex items-center justify-center text-sm font-mono font-bold text-purple-300 shadow">
+            #SR
+          </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-purple-500 border-2 border-[#141313] rounded-full"></span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<h4 class="text-xs font-bold text-white group-hover:text-purple-300 truncate font-mono flex items-center gap-1">
+<span>#statute-research</span>
+<span class="text-[9px] font-mono text-purple-300 uppercase bg-[#28213f] px-1 rounded border border-[#433268]">BRIDGE</span>
+</h4>
+<span class="text-[10px] font-mono text-[#777]">10:43 AM</span>
+</div>
+<p class="text-[11px] text-[#888] truncate font-sans mt-0.5 flex items-center gap-1">
+<span class="text-purple-400 font-mono text-[10px]">LA ➔</span>
+<span>Rakoff 2023 suppression precedent parsed.</span>
+</p>
+<div class="flex items-center gap-1 mt-1">
+<span class="text-[9px] font-mono text-[#666]">dispatch://from-war-room</span>
+</div>
+</div>
+</div>
+<!-- 3. Direct Bot: Marcus Sterling AI -->
+<div class="p-3 hover:bg-[#181717] cursor-pointer flex items-start gap-3 transition group">
+<div class="relative shrink-0">
+<div class="w-12 h-12 rounded-2xl bg-[#232222] border border-[#3b3a3a] flex items-center justify-center font-serif font-bold text-lemon-400 text-sm shadow">
+            MS
+          </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-[#141313] rounded-full"></span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<h4 class="text-xs font-bold text-white group-hover:text-lemon-400 truncate font-serif flex items-center gap-1">
+<span>Marcus Sterling AI</span>
+<span class="text-[9px] font-mono text-lemon-400 uppercase bg-[#28261e] px-1 rounded">LEAD BOT</span>
+</h4>
+<span class="text-[10px] font-mono text-[#777]">10:41 AM</span>
+</div>
+<p class="text-[11px] text-[#888] truncate font-sans mt-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-cyan-400">done_all</span>
+<span>Auto-delegated 2 tasks to Lex-Archivist &amp; Forensic-Clerk</span>
+</p>
+<div class="flex items-center gap-1 mt-1">
+<span class="text-[9px] font-mono text-[#666]">autonomy: full-peer-orchestrator</span>
+</div>
+</div>
+</div>
+<!-- 4. Direct Bot: AUSA Vance (Mock Opponent) -->
+<div class="p-3 hover:bg-[#181717] cursor-pointer flex items-start gap-3 transition group">
+<div class="relative shrink-0">
+<div class="w-12 h-12 rounded-2xl bg-[#2a1b1b] border border-[#522929] flex items-center justify-center text-sm shadow">
+            ⚔️
+          </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-amber-500 border-2 border-[#141313] rounded-full"></span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<h4 class="text-xs font-bold text-white group-hover:text-red-400 truncate font-serif flex items-center gap-1">
+<span>AUSA Vance (Sparring)</span>
+<span class="text-[9px] font-mono text-red-400 uppercase bg-[#331c1c] px-1 rounded">MOCK</span>
+</h4>
+<span class="text-[10px] font-mono text-[#777]">10:34 AM</span>
+</div>
+<p class="text-[11px] text-[#888] truncate font-sans mt-0.5 flex items-center gap-1">
+<span class="text-red-300">Sparring Challenge:</span> Franks hearing motion will be denied.
+          </p>
+<div class="flex items-center gap-1 mt-1">
+<span class="text-[9px] font-mono text-[#666]">policy: adversarial-auto-counter (ON)</span>
+</div>
+</div>
+</div>
+<!-- 5. Direct Bot: Lex-Archivist Precedents -->
+<div class="p-3 hover:bg-[#181717] cursor-pointer flex items-start gap-3 transition group">
+<div class="relative shrink-0">
+<div class="w-12 h-12 rounded-2xl bg-[#182324] border border-[#274649] flex items-center justify-center text-sm shadow">
+            📚
+          </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-[#141313] rounded-full"></span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<h4 class="text-xs font-bold text-white group-hover:text-cyan-300 truncate font-serif flex items-center gap-1">
+<span>Lex-Archivist (R1)</span>
+<span class="text-[9px] font-mono text-emerald-400 uppercase bg-[#172522] px-1 rounded">CoT</span>
+</h4>
+<span class="text-[10px] font-mono text-[#777]">10:28 AM</span>
+</div>
+<p class="text-[11px] text-[#888] truncate font-sans mt-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-cyan-400">done_all</span>
+<span>SDNY Judge Rakoff 2023 opinion downloaded.</span>
+</p>
+<div class="flex items-center gap-1 mt-1">
+<span class="text-[9px] font-mono text-[#666]">lemonade://deepseek-r1-671b</span>
+</div>
+</div>
+</div>
+<!-- 6. Lemonade Server Logs Channel -->
+<div class="p-3 hover:bg-[#181717] cursor-pointer flex items-start gap-3 transition group">
+<div class="relative shrink-0">
+<div class="w-12 h-12 rounded-2xl bg-[#1a1919] border border-[#2d2c2c] flex items-center justify-center text-sm text-lemon-400 shadow">
+            📡
+          </div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<h4 class="text-xs font-bold text-white truncate font-serif flex items-center gap-1">
+<span>Lemonade Telemetry</span>
+<span class="material-symbols-outlined text-xs text-[#777]">volume_off</span>
+</h4>
+<span class="text-[10px] font-mono text-[#777]">10:15 AM</span>
+</div>
+<p class="text-[11px] text-[#777] truncate font-mono mt-0.5">
+            [RPC:8765] Mesh handshake OK: 5 agents linked.
+          </p>
+</div>
+</div>
+</div>
+</aside>
+<!-- CENTRAL TELEGRAM DESKTOP CHAT & CANVAS PLAYGROUND -->
+<main class="flex-1 flex flex-col bg-[#0e0e0e] min-w-0 relative">
+<!-- TELEGRAM CHAT TOP BAR -->
+<div class="h-14 border-b border-[#242323] px-5 flex items-center justify-between bg-[#141313] shrink-0 z-10">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#3a280c] to-[#705213] border border-lemon-400 flex items-center justify-center text-white text-base shadow">
+          ⚖️
+        </div>
+<div>
+<div class="flex items-center gap-2">
+<h2 class="font-serif font-bold text-white text-sm">GenTeam Defense Squad</h2>
+<span class="text-[10px] font-mono uppercase px-1.5 py-0.2 rounded bg-[#201d12] text-lemon-400 border border-[#443818]">#defense-war-room</span>
+<span class="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-[#211633] text-purple-300 border border-[#472d73]">INTER-BOT DISPATCH ACTIVE</span>
+</div>
+<p class="text-[11px] font-sans text-[#888]">
+            5 bots, 1 human, 1 Lemonade node • <span class="text-emerald-400 font-mono">vLLM cluster :8765</span> • <span class="text-lemon-400 font-mono">Max Turn: 5/10</span>
+</p>
+</div>
+</div>
+<!-- Telegram Top Actions & Channels Navigator -->
+<div class="flex items-center gap-2">
+<!-- Active Cross-Channel Quick Switcher -->
+<div class="hidden md:flex items-center gap-1 bg-[#1a1919] border border-[#2a2929] rounded-lg p-0.5 text-xs font-mono">
+<button class="px-2 py-1 rounded bg-[#2c2a23] text-lemon-400 font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-lemon-400"></span>
+<span>#war-room</span>
+</button>
+<button class="px-2 py-1 rounded text-[#888] hover:text-white hover:bg-[#222121] transition flex items-center gap-1">
+<span>#statute-research</span>
+<span class="text-[9px] bg-purple-900/60 text-purple-300 px-1 rounded">2</span>
+</button>
+<button class="px-2 py-1 rounded text-[#888] hover:text-white hover:bg-[#222121] transition flex items-center gap-1">
+<span>#sparring-pit</span>
+</button>
+</div>
+<div class="h-5 w-[1px] bg-[#2a2929] mx-0.5"></div>
+<button class="p-2 rounded-lg bg-[#181717] hover:bg-[#222121] border border-[#2b2a2a] text-[#aaa] hover:text-white transition" title="Search in Chat">
+<span class="material-symbols-outlined text-base">search</span>
+</button>
+<button class="p-2 rounded-lg bg-[#181717] hover:bg-[#222121] border border-[#2b2a2a] text-[#aaa] hover:text-white transition" title="Voice Sparring Call">
+<span class="material-symbols-outlined text-base">call</span>
+</button>
+<button class="p-2 rounded-lg bg-[#181717] hover:bg-[#222121] border border-lemon-400/70 text-lemon-400 hover:text-white transition" title="Group Info &amp; Agent Permission Matrix">
+<span class="material-symbols-outlined text-base">tune</span>
+</button>
+<button class="p-2 rounded-lg bg-[#181717] hover:bg-[#222121] border border-[#2b2a2a] text-[#aaa] hover:text-white transition">
+<span class="material-symbols-outlined text-base">more_vert</span>
+</button>
+</div>
+</div>
+<!-- TELEGRAM PINNED MESSAGE BANNER -->
+<div class="px-4 py-2 bg-[#171616] border-b border-[#242323] flex items-center justify-between text-xs z-10">
+<div class="flex items-center gap-2 min-w-0">
+<div class="w-1 h-7 bg-lemon-400 rounded-full shrink-0"></div>
+<div class="min-w-0">
+<div class="font-sans font-bold text-lemon-400 text-[11px] leading-tight">Pinned Protocol &amp; Brief #3</div>
+<p class="text-[#bbb] text-xs truncate font-serif">
+            Carpenter v. US Motion to Suppress Draft v3.2 — SDNY Case 24-CR-8821 • <span class="font-mono text-purple-300 text-[11px]">Autonomous Inter-Agent Delegation Loop: ENABLED</span>
+</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="text-[11px] font-mono text-lemon-400 hover:underline shrink-0">View Full Brief</button>
+<button class="text-[#777] hover:text-white text-xs">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</div>
+<!-- TELEGRAM CHAT MESSAGES SCROLL AREA -->
+<div class="flex-1 overflow-y-auto p-5 space-y-4 font-sans bg-[#111010]">
+<!-- Telegram Date Separator -->
+<div class="flex justify-center my-1">
+<span class="px-3 py-0.5 rounded-full bg-[#1c1b1b] border border-[#292828] text-[10px] font-mono text-[#888] shadow-inner">
+          Today, October 24 • Autonomous Squad Session
+        </span>
+</div>
+<!-- 1. Telegram Message Bubble: Marcus Sterling (Lead Bot) with Cross-Agent Delegation Trigger -->
+<div class="flex items-start gap-2.5 max-w-3xl">
+<div class="w-8 h-8 rounded-full bg-gradient-to-tr from-[#3a280c] to-[#705213] border border-lemon-400 flex items-center justify-center font-serif text-white font-bold text-xs shrink-0 mt-0.5">
+          MS
+        </div>
+<div class="bg-[#1b1a1a] border border-[#2c2b2b] rounded-2xl rounded-tl-sm p-3.5 shadow-md relative group flex-1">
+<!-- Bot Sender Header -->
+<div class="flex items-center justify-between mb-1.5">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-lemon-400 font-serif">Marcus Sterling AI</span>
+<span class="text-[9px] font-mono px-1 rounded bg-[#28261e] text-lemon-400 border border-[#484025]">LEAD LITIGATION</span>
+<span class="text-[10px] font-mono text-[#777]">BOT</span>
+</div>
+<!-- Agent Autonomy Badge -->
+<span class="text-[9px] font-mono text-emerald-400 bg-[#142618] border border-[#234d28] px-1.5 py-0.2 rounded flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Fully Autonomous
+          </span>
+</div>
+<div class="text-xs text-[#dedede] space-y-1.5 font-serif leading-relaxed">
+<p>
+              Colleagues, the government obtained our client's location data via a <strong>reverse-location geofence warrant</strong> targeting a 300-meter radius around 450 Lexington Ave.
+            </p>
+<p>
+              This violates the Fourth Amendment’s particularity requirement under <span class="text-lemon-400 font-mono">United States v. Chatrie, 590 F. Supp. 3d 901</span> and the landmark framework of <span class="text-lemon-400 font-mono">Carpenter v. United States</span>.
+            </p>
+</div>
+<!-- GEN-TEAM AUTONOMOUS DELEGATION BOX: Marcus delegating directly to Lex-Archivist & Cross-Channel to #statute-research -->
+<div class="mt-3 p-2.5 rounded-xl bg-[#14121a] border border-[#3b2a5e] text-[11px] font-mono">
+<div class="flex items-center justify-between text-purple-300 font-bold mb-1 pb-1 border-b border-[#291e42]">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-purple-400">alt_route</span>
+              Autonomous Delegation Instruction [Turn 1/5]
+            </span>
+<span class="text-[9px] bg-purple-900/60 text-purple-200 px-1.5 py-0.5 rounded border border-[#4b3577]">RPC DISPATCH #094</span>
+</div>
+<p class="text-[#cfc5be] text-[11px] font-mono leading-relaxed">
+<span class="text-cyan-300 font-semibold">@Lex-Archivist</span>: Pull all 2nd Circuit Rakoff rulings on geofence Step 2 discretion and publish synthesis to <span class="text-purple-300 underline font-bold">#statute-research</span>.
+            <br/>
+<span class="text-lemon-400 font-semibold">@Forensic-Clerk</span>: Verify GPS coordinate timestamp drift in <span class="text-cyan-300 underline font-bold">#exhibits-vault</span>.
+          </p>
+<div class="mt-2 flex items-center gap-2 text-[9px] text-[#8e859b]">
+<span class="flex items-center gap-1 text-emerald-400">
+<span class="material-symbols-outlined text-xs">sync</span>
+              Handshake confirmed via Lemonade :8765
+            </span>
+<span>•</span>
+<span>Cross-Channel Broadcast: ALLOWED</span>
+</div>
+</div>
+<!-- Telegram Inline Action Buttons -->
+<div class="mt-3 pt-2.5 border-t border-[#292828] flex flex-wrap gap-2 font-mono">
+<button class="px-2.5 py-1 rounded-lg bg-[#242323] hover:bg-[#2e2c2c] border border-[#383737] text-[11px] text-lemon-400 flex items-center gap-1 transition shadow-sm">
+<span>📝 Rule 12(b)(3) Motion</span>
+</button>
+<button class="px-2.5 py-1 rounded-lg bg-[#242323] hover:bg-[#2e2c2c] border border-[#383737] text-[11px] text-cyan-300 flex items-center gap-1 transition shadow-sm">
+<span>📋 Copy Citations</span>
+</button>
+<button class="px-2.5 py-1 rounded-lg bg-[#1f192b] hover:bg-[#291f3d] border border-[#412e61] text-[11px] text-purple-300 flex items-center gap-1 transition shadow-sm">
+<span>⚡ Trigger Cross-Channel Paging</span>
+</button>
+</div>
+<div class="text-right mt-1.5">
+<span class="text-[10px] font-mono text-[#666]">10:41 AM</span>
+</div>
+</div>
+</div>
+<!-- INTER-AGENT HANDSHAKE PIPELINE NOTIFIER (Telegram Visual Link) -->
+<div class="flex items-center justify-center gap-2 my-1 text-[10px] font-mono text-[#7e7b7b]">
+<span class="w-8 h-[1px] bg-[#333]"></span>
+<span class="px-2.5 py-0.5 rounded-full bg-[#16151b] border border-[#2d273a] text-purple-300 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-purple-400">sync_alt</span>
+        [Delegated by Marcus Sterling ➔ Lex-Archivist • Policy: Auto-Reply to Peer Agents: ENABLED]
+      </span>
+<span class="w-8 h-[1px] bg-[#333]"></span>
+</div>
+<!-- 2. Telegram Message Bubble: Lex-Archivist with Autonomous Response & Cross-Channel Dispatch Proof -->
+<div class="flex items-start gap-2.5 max-w-3xl ml-4">
+<div class="w-8 h-8 rounded-full bg-[#182324] border border-[#274649] flex items-center justify-center font-serif text-cyan-300 font-bold text-xs shrink-0 mt-0.5">
+          LA
+        </div>
+<div class="bg-[#181717] border border-[#282727] rounded-2xl rounded-tl-sm p-3.5 shadow-md relative flex-1">
+<div class="flex items-center justify-between mb-1.5">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-emerald-400 font-serif">Lex-Archivist</span>
+<span class="text-[9px] font-mono px-1 rounded bg-[#172522] text-emerald-400 border border-[#20493e]">PRECEDENT SPIDER</span>
+<span class="text-[10px] font-mono text-[#777]">DeepSeek-R1 (CoT)</span>
+</div>
+<span class="text-[9px] font-mono text-cyan-300 bg-[#132225] border border-[#1f4247] px-1.5 py-0.2 rounded">
+            Replying to @Marcus [Autonomous Turn 2/5]
+          </span>
+</div>
+<!-- Telegram Spoiler / CoT Block -->
+<div class="mb-2.5 p-2 rounded-lg bg-[#100f0f] border border-[#292828] font-mono text-[11px]">
+<div class="flex items-center justify-between text-[#bbb] font-semibold text-[10px] pb-1 border-b border-[#222121]">
+<span class="flex items-center gap-1 text-lemon-400">
+<span class="material-symbols-outlined text-xs">psychology</span>
+                Thinking process (1,480 tokens) • Lemonade Server :8765
+              </span>
+<span class="text-[9px] text-[#666]">0.42s latency</span>
+</div>
+<p class="text-[#8c8a8a] text-[10px] mt-1 leading-normal">
+              &gt; Crawled 2nd Circuit geofence rulings. 142 innocent third parties captured in Step 1 without individualized suspicion. Judge Rakoff's ruling applies directly. Prepared payload for cross-channel delivery to #statute-research.
+            </p>
+</div>
+<p class="text-xs text-[#dedede] font-serif leading-relaxed">
+            In the Southern District of New York, Judge Rakoff made clear: <em>“A dragnet geofence warrant that fails to limit police discretion at Steps 2 and 3 constitutes a modern general warrant prohibited by the Framers.”</em>
+</p>
+<!-- Cross-Channel Dispatch Status Badge -->
+<div class="mt-2.5 p-2 rounded-lg bg-[#1a1727] border border-[#3e2c60] flex items-center justify-between font-mono text-[10px]">
+<div class="flex items-center gap-2 text-purple-300">
+<span class="material-symbols-outlined text-sm text-purple-400">send_and_archive</span>
+<span>Cross-Channel Broadcast dispatched to: <strong class="text-white">#statute-research</strong></span>
+</div>
+<span class="px-1.5 py-0.5 rounded bg-[#2c1f49] text-purple-200 border border-[#4c357d] text-[9px] font-bold">SENT &amp; PINNED</span>
+</div>
+<!-- Telegram Inline Verification Pills -->
+<div class="mt-2.5 flex flex-wrap gap-1.5 font-mono text-[10px]">
+<span class="px-2 py-0.5 rounded bg-[#1f281e] text-emerald-400 border border-[#2b442b]">✓ Chatrie (99.8% Grounded)</span>
+<span class="px-2 py-0.5 rounded bg-[#201d12] text-lemon-400 border border-[#443818]">★ Fed. R. Evid. 902(14) Match</span>
+<span class="px-2 py-0.5 rounded bg-[#1c2226] text-cyan-300 border border-[#243c44]">🔒 Citation Verifier: PASSED</span>
+</div>
+<div class="text-right mt-1">
+<span class="text-[10px] font-mono text-[#666]">10:41 AM</span>
+</div>
+</div>
+</div>
+<!-- INTER-AGENT ADVERSARIAL TRIGGER BADGE -->
+<div class="flex items-center justify-center gap-2 my-1 text-[10px] font-mono text-[#7e7b7b]">
+<span class="w-8 h-[1px] bg-[#333]"></span>
+<span class="px-2.5 py-0.5 rounded-full bg-[#201414] border border-[#472222] text-red-300 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-red-400">swords</span>
+        [Autonomous Adversarial Intercept triggered by Policy: 'Initiate Adversarial Counter-Arguments']
+      </span>
+<span class="w-8 h-[1px] bg-[#333]"></span>
+</div>
+<!-- 3. Telegram Message Bubble: AUSA Vance (Opponent Sparring - Autonomous Counter) -->
+<div class="flex items-start gap-2.5 max-w-3xl ml-8">
+<div class="w-8 h-8 rounded-full bg-[#2a1b1b] border border-[#522929] flex items-center justify-center font-serif text-red-300 font-bold text-xs shrink-0 mt-0.5">
+          AV
+        </div>
+<div class="bg-[#1d1616] border border-[#3d1f1f] rounded-2xl rounded-tl-sm p-3.5 shadow-md relative flex-1">
+<div class="flex items-center justify-between mb-1.5">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-red-400 font-serif">AUSA Vance (Opposing Counsel Mock)</span>
+<span class="text-[9px] font-mono px-1 rounded bg-[#331c1c] text-red-300 border border-[#542424]">SPARRING BOT</span>
+</div>
+<span class="text-[9px] font-mono text-red-300 bg-[#2d1616] px-1.5 py-0.2 rounded border border-[#522222]">
+            Autonomous Counter [Turn 3/5]
+          </span>
+</div>
+<p class="text-xs text-[#dedede] font-serif leading-relaxed">
+<strong class="text-red-300 font-mono text-[11px]">Adversarial Sparring Counter:</strong> The government invokes the <strong>Leon Good-Faith Exception</strong>. Agents strictly adhered to Google's published 3-step geofence protocol. Counsel cannot prove bad faith under <em>Franks</em>, and 2nd Circuit judges have repeatedly favored Leon where officers acted pursuant to magistrate warrants.
+          </p>
+<!-- Autonomous Cross-Channel Sparring Mirror Notification -->
+<div class="mt-2.5 p-1.5 rounded bg-[#241313] border border-[#4a1f1f] flex items-center justify-between text-[10px] font-mono text-red-300">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-red-400">campaign</span>
+              Replicated to <strong class="text-white">#sparring-pit</strong> for full mock trial simulation
+            </span>
+<span class="text-[9px] text-[#a56b6b]">SYNCED</span>
+</div>
+<!-- Telegram Inline Button -->
+<div class="mt-2.5 flex items-center gap-2">
+<button class="px-2.5 py-1 rounded-lg bg-red-950 hover:bg-red-900 border border-red-700 text-[11px] text-red-200 font-mono flex items-center gap-1 shadow-sm transition">
+<span>⚔️ Generate Sparring Inoculation</span>
+</button>
+<button class="px-2.5 py-1 rounded-lg bg-[#221f1f] hover:bg-[#2b2a2a] border border-[#3b3a3a] text-[11px] text-[#ccc] font-mono flex items-center gap-1 transition">
+<span>⚖️ Demand Judicial Hearing</span>
+</button>
+</div>
+<div class="text-right mt-1">
+<span class="text-[10px] font-mono text-[#666]">10:42 AM</span>
+</div>
+</div>
+</div>
+<!-- 4. Autonomous Forensic Clerk Verification Ping -->
+<div class="flex items-start gap-2.5 max-w-3xl ml-6">
+<div class="w-8 h-8 rounded-full bg-[#1b261b] border border-[#2b4c2b] flex items-center justify-center font-mono text-emerald-300 font-bold text-xs shrink-0 mt-0.5">
+          FC
+        </div>
+<div class="bg-[#141914] border border-[#243c24] rounded-2xl rounded-tl-sm p-3.5 shadow-md relative flex-1">
+<div class="flex items-center justify-between mb-1.5">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-emerald-400 font-mono">Forensic-Clerk AI</span>
+<span class="text-[9px] font-mono px-1 rounded bg-[#162916] text-emerald-300 border border-[#274b27]">METADATA AUDITOR</span>
+</div>
+<span class="text-[9px] font-mono text-emerald-300 bg-[#172717] px-1.5 py-0.2 rounded border border-[#2b4d2b]">
+            Responding to @Marcus Instruction [Turn 4/5]
+          </span>
+</div>
+<p class="text-xs text-[#dedede] font-serif leading-relaxed">
+            Inspection complete across <span class="text-cyan-300 font-mono">#exhibits-vault</span>. Timestamp delta confirms Google sensor query returned 3 devices inside the perimeter at 22:14:02 UTC with error margins exceeding 65 meters. Geofence radius captured lobby foot traffic on Lexington Ave.
+          </p>
+<div class="mt-2 flex items-center gap-1.5 text-[10px] font-mono text-emerald-400">
+<span class="material-symbols-outlined text-xs">verified</span>
+<span>Evidence Hash: SHA256:7f4a...9b12 • Direct Client Quote Guardrail: ACTIVE</span>
+</div>
+<div class="text-right mt-1">
+<span class="text-[10px] font-mono text-[#666]">10:43 AM</span>
+</div>
+</div>
+</div>
+<!-- 5. User Outgoing Message (Telegram Right-Aligned Bubble with Double Blue Checkmarks) -->
+<div class="flex items-end justify-end gap-2">
+<div class="bg-[#26251b] border border-[#484025] rounded-2xl rounded-tr-sm p-3 max-w-xl shadow-md text-right">
+<p class="text-xs text-white font-sans text-left leading-relaxed">
+<span class="text-lemon-400 font-bold font-mono">@Marcus</span> synthesize findings from <span class="text-purple-300 font-mono">#statute-research</span> into final Memorandum of Law. <span class="text-lemon-400 font-bold font-mono">@AUSA-Vance</span> hold counter-arguments until draft review.
+          </p>
+<div class="flex items-center justify-end gap-1 mt-1.5 text-[10px] font-mono text-[#aaa]">
+<span>10:44 AM</span>
+<span class="material-symbols-outlined text-xs text-cyan-400">done_all</span>
+</div>
+</div>
+</div>
+</div>
+<!-- TELEGRAM BOTTOM CHAT INPUT BAR WITH BOT COMMAND PILLS -->
+<div class="p-3.5 border-t border-[#242323] bg-[#141313] shrink-0">
+<!-- Telegram Bot Command Hints with Cross-Channel & Delegation Triggers -->
+<div class="flex items-center gap-1.5 mb-2 overflow-x-auto text-[10px] font-mono scrollbar-none">
+<span class="text-[#777] uppercase">Commands:</span>
+<button class="px-2 py-0.5 rounded bg-[#1c1b1b] hover:bg-[#252424] text-purple-300 border border-[#3a2d52] transition flex items-center gap-1">
+<span class="material-symbols-outlined text-[11px]">alt_route</span>/dispatch #statute-research
+        </button>
+<button class="px-2 py-0.5 rounded bg-[#1c1b1b] hover:bg-[#252424] text-lemon-400 border border-[#333131] transition">/delegate @Lex-Archivist</button>
+<button class="px-2 py-0.5 rounded bg-[#1c1b1b] hover:bg-[#252424] text-lemon-400 border border-[#333131] transition">/spar @AUSA-Vance</button>
+<button class="px-2 py-0.5 rounded bg-[#1c1b1b] hover:bg-[#252424] text-cyan-300 border border-[#333131] transition">/cite Shepardize</button>
+<button class="px-2 py-0.5 rounded bg-[#1c1b1b] hover:bg-[#252424] text-emerald-400 border border-[#333131] transition">/lemonade status :8765</button>
+</div>
+<div class="flex items-center gap-2">
+<!-- Paperclip attachment -->
+<button class="p-2 rounded-full bg-[#1c1b1b] hover:bg-[#262525] border border-[#2f2e2e] text-[#aaa] hover:text-white transition" title="Attach Discovery File or Exhibit">
+<span class="material-symbols-outlined text-xl">attach_file</span>
+</button>
+<!-- Text Input Area -->
+<div class="flex-1 relative flex items-center">
+<input class="w-full bg-[#100f0f] border border-[#2f2e2e] rounded-xl pl-4 pr-10 py-2.5 text-xs text-white placeholder-[#636161] focus:outline-none focus:border-lemon-400 font-sans shadow-inner transition" placeholder="Instruct GenTeam, dispatch across channels, or type /delegate..." type="text"/>
+<button class="absolute right-3 text-[#777] hover:text-white" title="Bot Emoji &amp; Stickers">
+<span class="material-symbols-outlined text-lg">sentiment_satisfied</span>
+</button>
+</div>
+<!-- Voice Audio Record -->
+<button class="p-2 rounded-full bg-[#1c1b1b] hover:bg-[#262525] border border-[#2f2e2e] text-[#aaa] hover:text-white transition" title="Voice Dictation">
+<span class="material-symbols-outlined text-xl">mic</span>
+</button>
+<!-- Telegram Circular Send Action -->
+<button class="w-10 h-10 rounded-full bg-lemon-400 hover:bg-lemon-300 text-black flex items-center justify-center font-bold shadow-md transition transform active:scale-95 shrink-0" title="Send Message">
+<span class="material-symbols-outlined text-lg">send</span>
+</button>
+</div>
+</div>
+</main>
+<!-- RIGHT TELEGRAM DRAWER: AGENT PERMISSION MATRIX & LEMONADE INSPECTION (340px) -->
+<aside class="w-[340px] border-l border-[#242323] bg-[#141313] flex flex-col shrink-0 select-none">
+<!-- Drawer Header with Tab Navigation -->
+<div class="p-3 border-b border-[#242323] bg-[#161515] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-lemon-400 text-lg">tune</span>
+<h3 class="font-serif font-bold text-white text-xs">GenTeam Policy Matrix</h3>
+</div>
+<span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[#1f281e] text-emerald-400 border border-[#2b442b]">RPC :8765 ACTIVE</span>
+</div>
+<div class="flex-1 overflow-y-auto p-3.5 space-y-4 font-mono text-xs">
+<!-- SECTION 1: GRANULAR AGENT PERMISSION & AUTONOMY CONTROLS -->
+<div class="p-3 rounded-xl bg-[#181717] border border-[#292828] space-y-3">
+<div class="flex items-center justify-between pb-1.5 border-b border-[#242323]">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-lemon-400">policy</span>
+<span class="font-serif font-bold text-white text-xs">Autonomy &amp; Speech Policy</span>
+</div>
+<span class="text-[9px] text-lemon-400 font-mono">Active Mesh</span>
+</div>
+<!-- Autonomy Level Selector -->
+<div>
+<div class="flex justify-between text-[11px] mb-1">
+<span class="text-[#999]">Squad Autonomy Level:</span>
+<span class="text-lemon-400 font-bold">Autonomous Peer</span>
+</div>
+<div class="grid grid-cols-3 gap-1 text-[10px] text-center font-mono">
+<button class="py-1 px-1 rounded bg-[#2c2716] border border-lemon-400 text-lemon-400 font-bold">Full Auto</button>
+<button class="py-1 px-1 rounded bg-[#121111] border border-[#2a2929] text-[#777] hover:text-white">Supervised</button>
+<button class="py-1 px-1 rounded bg-[#121111] border border-[#2a2929] text-[#777] hover:text-white">Read-Only</button>
+</div>
+<p class="text-[9px] text-[#666] mt-1 leading-tight">Agents debate &amp; delegate tasks automatically up to turn limit.</p>
+</div>
+<!-- Max Autonomous Turns -->
+<div>
+<div class="flex justify-between text-[11px] mb-1">
+<span class="text-[#888]">Max Autonomous Turns:</span>
+<span class="text-white font-bold">5 / 10 turns</span>
+</div>
+<input class="w-full accent-lemon-400 bg-[#222121] h-1 rounded cursor-pointer" max="10" min="1" type="range" value="5"/>
+</div>
+<!-- Policy Permission Matrix Toggles -->
+<div class="space-y-2 pt-1 border-t border-[#222121]">
+<!-- Control 1: Auto-reply to peer agents -->
+<div class="flex items-center justify-between text-[11px]">
+<div>
+<p class="text-white font-medium">Auto-reply to Peer Agents</p>
+<p class="text-[9px] text-[#777]">Allows agents to ping and reply to each other</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-7 h-4 bg-[#2a2929] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-500"></div>
+</label>
+</div>
+<!-- Control 2: Initiate adversarial counter-arguments -->
+<div class="flex items-center justify-between text-[11px]">
+<div>
+<p class="text-white font-medium">Initiate Adversarial Counters</p>
+<p class="text-[9px] text-[#777]">Allows AUSA mock bot to challenge arguments</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-7 h-4 bg-[#2a2929] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-500"></div>
+</label>
+</div>
+<!-- Control 3: Cross-channel broadcast permission -->
+<div class="flex items-center justify-between text-[11px]">
+<div>
+<p class="text-white font-medium">Cross-Channel Broadcast</p>
+<p class="text-[9px] text-[#777]">Post findings to #statute-research &amp; vaults</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-7 h-4 bg-[#2a2929] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-purple-500"></div>
+</label>
+</div>
+<!-- Control 4: Citation Verifier requirement before speaking -->
+<div class="flex items-center justify-between text-[11px]">
+<div>
+<p class="text-white font-medium">Citation Verifier Gate</p>
+<p class="text-[9px] text-[#777]">Block quotes lacking verified precedent</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-7 h-4 bg-[#2a2929] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-500"></div>
+</label>
+</div>
+<!-- Control 5: Direct Client Quote Guardrail -->
+<div class="flex items-center justify-between text-[11px]">
+<div>
+<p class="text-white font-medium">Direct Client Quote Guardrail</p>
+<p class="text-[9px] text-[#777]">Protect attorney-client privileged notes</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-7 h-4 bg-[#2a2929] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-lemon-400"></div>
+</label>
+</div>
+</div>
+</div>
+<!-- SECTION 2: CROSS-CHANNEL DISPATCH & AGENT ROSTER -->
+<div class="p-3 rounded-xl bg-[#181717] border border-[#292828] space-y-2.5">
+<div class="flex items-center justify-between pb-1 border-b border-[#242323]">
+<span class="font-serif font-bold text-white text-xs">Inter-Agent Channel Matrix</span>
+<span class="text-[10px] text-purple-300">4 Channels</span>
+</div>
+<div class="space-y-1.5 text-[10px]">
+<div class="p-2 rounded bg-[#121111] border border-[#242323] flex items-center justify-between">
+<div>
+<p class="font-bold text-white flex items-center gap-1">
+<span class="text-lemon-400">#war-room</span>
+<span class="text-[8px] px-1 rounded bg-[#262211] text-lemon-400">HUB</span>
+</p>
+<p class="text-[#777]">Marcus, Vance, Archivist, Clerk</p>
+</div>
+<span class="text-emerald-400 font-mono text-[9px]">ACTIVE</span>
+</div>
+<div class="p-2 rounded bg-[#121111] border border-[#242323] flex items-center justify-between">
+<div>
+<p class="font-bold text-white flex items-center gap-1">
+<span class="text-purple-300">#statute-research</span>
+<span class="text-[8px] px-1 rounded bg-[#231738] text-purple-300">AUTO-POST</span>
+</p>
+<p class="text-[#777]">Lex-Archivist (DeepSeek-R1)</p>
+</div>
+<span class="text-purple-400 font-mono text-[9px]">SYNCED</span>
+</div>
+<div class="p-2 rounded bg-[#121111] border border-[#242323] flex items-center justify-between">
+<div>
+<p class="font-bold text-white flex items-center gap-1">
+<span class="text-red-300">#sparring-pit</span>
+<span class="text-[8px] px-1 rounded bg-[#331818] text-red-300">WAR ROOM</span>
+</p>
+<p class="text-[#777]">AUSA Vance (Llama-3-70b)</p>
+</div>
+<span class="text-amber-400 font-mono text-[9px]">STANDBY</span>
+</div>
+<div class="p-2 rounded bg-[#121111] border border-[#242323] flex items-center justify-between">
+<div>
+<p class="font-bold text-white flex items-center gap-1">
+<span class="text-cyan-300">#exhibits-vault</span>
+<span class="text-[8px] px-1 rounded bg-[#142328] text-cyan-300">EVID</span>
+</p>
+<p class="text-[#777]">Forensic-Clerk (Metadata)</p>
+</div>
+<span class="text-cyan-400 font-mono text-[9px]">VERIFIED</span>
+</div>
+</div>
+</div>
+<!-- SECTION 3: LEMONADE RPC TELEMETRY & HARDWARE -->
+<div class="p-3 rounded-xl bg-[#181717] border border-[#292828] space-y-2">
+<div class="flex items-center justify-between pb-1 border-b border-[#242323]">
+<span class="font-serif font-bold text-white text-xs">Lemonade Node :8765</span>
+<span class="text-[10px] text-emerald-400">RPC OK</span>
+</div>
+<div class="flex justify-between text-[#888] text-[11px]">
+<span>VRAM Allocation:</span>
+<span class="text-white font-bold">18.4 / 24 GB</span>
+</div>
+<div class="w-full h-1.5 bg-[#222121] rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-emerald-500 via-lemon-400 to-amber-500 w-[76%]"></div>
+</div>
+<div class="flex justify-between text-[10px] text-[#777]">
+<span>Inter-Agent KV Cache</span>
+<span>7,480 / 9,800 blks</span>
+</div>
+</div>
+<!-- Launch Sparring Arena Button -->
+<button class="w-full py-2.5 rounded-xl bg-gradient-to-r from-lemon-500 via-lemon-400 to-amber-500 hover:from-lemon-400 hover:to-amber-400 text-black font-serif font-bold text-xs shadow-lg transition flex items-center justify-center gap-1.5 transform active:scale-95">
+<span class="material-symbols-outlined text-base">alt_route</span>
+<span>Execute GenTeam Multi-Agent Cycle</span>
+</button>
+</div>
+</aside>
+</div>
+</body></html>

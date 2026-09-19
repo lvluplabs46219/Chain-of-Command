@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ACQUIT.AI - Chambers: Conference Room</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;600;700&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-container": "#1a1c1e",
+                    "on-tertiary-fixed": "#201b17",
+                    "error-container": "#93000a",
+                    "inverse-primary": "#5d5e61",
+                    "on-secondary-fixed": "#091d2e",
+                    "background": "#141313",
+                    "secondary-container": "#36485b",
+                    "on-tertiary-fixed-variant": "#4c4641",
+                    "on-primary-fixed-variant": "#454749",
+                    "surface": "#141313",
+                    "tertiary-fixed": "#ebe0da",
+                    "on-background": "#e5e2e1",
+                    "on-tertiary-container": "#8b837d",
+                    "tertiary-container": "#201b17",
+                    "surface-bright": "#3a3939",
+                    "primary-fixed-dim": "#c6c6c9",
+                    "surface-variant": "#353435",
+                    "surface-container-lowest": "#0e0e0e",
+                    "tertiary": "#cfc5be",
+                    "on-surface": "#e5e2e1",
+                    "on-secondary-fixed-variant": "#36485b",
+                    "error": "#ffb4ab",
+                    "secondary": "#b5c8df",
+                    "outline": "#8f9194",
+                    "inverse-surface": "#e5e2e1",
+                    "surface-tint": "#c6c6c9",
+                    "surface-container-highest": "#353435",
+                    "on-surface-variant": "#c5c6ca",
+                    "surface-container-high": "#2a2a2a",
+                    "secondary-fixed-dim": "#b5c8df",
+                    "surface-dim": "#141313",
+                    "surface-container-low": "#1c1b1b",
+                    "on-secondary-container": "#a4b7cd",
+                    "secondary-fixed": "#d1e4fb",
+                    "on-error": "#690005",
+                    "tertiary-fixed-dim": "#cfc5be",
+                    "on-primary-container": "#838486",
+                    "on-error-container": "#ffdad6",
+                    "inverse-on-surface": "#313030",
+                    "surface-container": "#201f1f",
+                    "primary": "#c6c6c9",
+                    "on-secondary": "#203243",
+                    "outline-variant": "#44474a",
+                    "on-primary": "#2f3133",
+                    "primary-fixed": "#e2e2e5",
+                    "on-tertiary": "#352f2b",
+                    "on-primary-fixed": "#1a1c1e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "xl": "40px",
+                    "margin-safe": "32px",
+                    "sm": "8px",
+                    "xs": "4px",
+                    "gutter": "16px",
+                    "lg": "24px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Domine"],
+                    "data-mono": ["JetBrains Mono"],
+                    "label-caps": ["Hanken Grotesk"],
+                    "body-md": ["Hanken Grotesk"],
+                    "headline-lg": ["Domine"],
+                    "display-case": ["Domine"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "headline-md": ["Domine"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "display-case": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        /* Custom Scrollbar for Terminal aesthetic */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0e0e0e; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #44474a; 
+            border-radius: 0;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8f9194; 
+        }
+        .blinking-cursor {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .agent-processing {
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(181, 200, 223, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(181, 200, 223, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(181, 200, 223, 0); }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface h-screen overflow-hidden flex flex-col md:flex-row antialiased">
+<!-- SideNavBar (Hidden on Mobile, Flex on MD) -->
+<nav class="hidden md:flex flex-col h-full overflow-y-auto w-[280px] border-r border-outline-variant bg-surface-container-lowest shrink-0 z-40">
+<!-- Header -->
+<div class="px-lg py-xl border-b border-outline-variant">
+<div class="flex items-center gap-sm mb-xs">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary font-bold" data-icon="account_balance">account_balance</span>
+</div>
+<div>
+<h1 class="font-display-case text-display-case text-primary tracking-tighter leading-none">ACQUIT.AI</h1>
+</div>
+</div>
+<p class="font-data-mono text-data-mono text-on-surface-variant ml-10">Legal OS v1.0</p>
+</div>
+<!-- Main Nav Links -->
+<div class="flex-1 py-lg space-y-2">
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-on-surface uppercase opacity-70 hover:bg-surface-container-high transition-colors duration-150 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps">Command Center</span>
+</a>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-on-surface uppercase opacity-70 hover:bg-surface-container-high transition-colors duration-150 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+<span class="font-label-caps text-label-caps">The Docket</span>
+</a>
+<a class="flex items-center gap-md px-lg py-md border-l-4 border-secondary text-secondary font-bold uppercase bg-surface-container-high active:translate-x-1 duration-75" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance" data-weight="fill" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+<span class="font-label-caps text-label-caps">Chambers</span>
+</a>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-on-surface uppercase opacity-70 hover:bg-surface-container-high transition-colors duration-150 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="library_books">library_books</span>
+<span class="font-label-caps text-label-caps">Law Library</span>
+</a>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-on-surface uppercase opacity-70 hover:bg-surface-container-high transition-colors duration-150 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span class="font-label-caps text-label-caps">Record Room</span>
+</a>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-on-surface uppercase opacity-70 hover:bg-surface-container-high transition-colors duration-150 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+<span class="font-label-caps text-label-caps">Investigations</span>
+</a>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-on-surface uppercase opacity-70 hover:bg-surface-container-high transition-colors duration-150 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-label-caps text-label-caps">Case Timeline</span>
+</a>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-on-surface uppercase opacity-70 hover:bg-surface-container-high transition-colors duration-150 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+<span class="font-label-caps text-label-caps">Court Watch</span>
+</a>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-on-surface uppercase opacity-70 hover:bg-surface-container-high transition-colors duration-150 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-caps text-label-caps">Counsel Directory</span>
+</a>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:text-on-surface uppercase opacity-70 hover:bg-surface-container-high transition-colors duration-150 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="font-label-caps text-label-caps">Motions &amp; Tasks</span>
+</a>
+</div>
+<!-- Footer Nav -->
+<div class="mt-auto border-t border-outline-variant py-md space-y-2">
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant hover:text-on-surface uppercase opacity-70 hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant hover:text-on-surface uppercase opacity-70 hover:bg-surface-container-high transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+<span class="font-label-caps text-label-caps">Support</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col h-full min-w-0 bg-surface">
+<!-- TopAppBar -->
+<header class="h-16 w-full border-b border-outline-variant bg-surface-container-low flex justify-between items-center px-lg sticky top-0 z-50 shrink-0">
+<!-- Mobile Brand/Menu Trigger -->
+<div class="md:hidden flex items-center gap-sm">
+<button class="text-primary p-1">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<span class="font-headline-md text-headline-md font-bold text-primary">ACQUIT.AI</span>
+</div>
+<!-- Desktop Nav Links (Hidden Mobile) -->
+<div class="hidden md:flex items-center gap-lg">
+<div class="flex gap-lg">
+<a class="text-secondary font-bold border-b-2 border-secondary pb-1 pt-1 font-data-mono text-data-mono uppercase tracking-wider" href="#">Case: 2024-CV-8821</a>
+</div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-sm">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-all active:opacity-80 rounded hover:bg-surface-container-high flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-label-caps text-label-caps uppercase hidden md:inline">The Clerk</span>
+</button>
+<button class="bg-primary text-on-primary font-label-caps text-label-caps px-4 py-2 rounded-sm hover:opacity-90 transition-opacity uppercase tracking-widest hidden md:block mr-2">AFFIX SIGNATURE</button>
+<div class="w-8 h-8 rounded-full border border-outline-variant overflow-hidden bg-surface-container-high">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A stark, high-contrast, black and white professional headshot of a lawyer. The lighting is dramatic, casting deep shadows on one side of the face. The mood is serious and authoritative, fitting a high-stakes legal environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD24RH4jik8LHpUNjugIxAOdkuqnZB8vHObD0fDYzL2PuW-c1AjR62VwIcGqqfrE9RtS23Fr1hH_Hp_0Nghq7lzKzS-4XUXU8h63oY4HSNl6EtKbuPcryOX-v6gIVdXmv0Uia3l56utD5FJi3tiCbvHEu7-37Z3iVKYudRNpgia4MbaRNhWbn8DEMT4Nr1ZTgDFXsOtngALHggtyuydCiLk_h6YrHCiaiZJfy5tOAFgzGAPF572OaE90Q"/>
+</div>
+</div>
+</header>
+<!-- War Room Interface -->
+<main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+<!-- Chat / Terminal Area -->
+<div class="flex-1 flex flex-col min-w-0 border-r border-outline-variant relative z-10">
+<!-- Session Header -->
+<div class="px-md py-sm border-b border-outline-variant bg-surface-container flex items-center justify-between shrink-0">
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+<span class="font-data-mono text-data-mono text-error uppercase tracking-widest text-xs">Live Session: Conference Room Alpha</span>
+</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant text-xs">
+                        SYS.TIME: 14:42:09 EST
+                    </div>
+</div>
+<!-- Message Thread -->
+<div class="flex-1 overflow-y-auto p-md md:p-lg space-y-lg pb-32">
+<!-- System Prompt -->
+<div class="flex gap-md w-full max-w-4xl mx-auto">
+<div class="w-10 h-10 shrink-0 border border-outline-variant rounded bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-outline" data-icon="terminal">terminal</span>
+</div>
+<div class="flex-1 space-y-1">
+<div class="flex items-baseline gap-sm">
+<span class="font-label-caps text-label-caps text-outline uppercase">System</span>
+<span class="font-data-mono text-[10px] text-surface-tint">14:30:00</span>
+</div>
+<div class="border border-outline-variant bg-surface-container-lowest p-sm font-data-mono text-data-mono text-on-surface-variant text-sm">
+<span class="text-secondary">&gt;</span> Initializing collaborative analysis protocol for Case 2024-CR-0892.<br/>
+<span class="text-secondary">&gt;</span> Agents loaded: Lead Counsel (Strategic), Research Clerk (Precedent), Evidence Agent (Factual).<br/>
+<span class="text-secondary">&gt;</span> Awaiting directives.
+                            </div>
+</div>
+</div>
+<!-- User Input -->
+<div class="flex gap-md w-full max-w-4xl mx-auto">
+<div class="w-10 h-10 shrink-0 border border-outline-variant rounded overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A stark, high-contrast, black and white professional headshot of a lawyer. The lighting is dramatic, casting deep shadows on one side of the face. The mood is serious and authoritative, fitting a high-stakes legal environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU4jCb_ZnxAoLQEpLI8MkSxh0wqUXi4C8z-InFCnyFUbcW612FPXTstEJuMFeL5F6-unoMg3D9Xh_7zEEJRd-V6F13r_t5Xo7TsONbOC4QK0cdU0T-D2NsKswzFSe_WLvR9GqyQA9_YZs14rySIsyfOXlTmoyWHxN4R8IYiPAlOqkKXD9CAkntXt_3kcw-ZjvMYpfRo3-K_VMjDV1yBmhT8o7hF-wOrOynYktuCNMtB5Ks4zzoxmMSMQ"/>
+</div>
+<div class="flex-1 space-y-1">
+<div class="flex items-baseline gap-sm">
+<span class="font-label-caps text-label-caps text-primary uppercase">Managing Partner</span>
+<span class="font-data-mono text-[10px] text-surface-tint">14:32:15</span>
+</div>
+<div class="font-body-md text-body-md text-on-surface">
+                                Review the prosecution's timeline regarding the events of October 14th. I need inconsistencies mapped against the defendant's toll tag data and the primary witness statement.
+                            </div>
+</div>
+</div>
+<!-- Agent Response 1 -->
+<div class="flex gap-md w-full max-w-4xl mx-auto">
+<div class="w-10 h-10 shrink-0 border border-secondary rounded bg-secondary-container flex items-center justify-center relative">
+<span class="material-symbols-outlined text-secondary" data-icon="psychology">psychology</span>
+</div>
+<div class="flex-1 space-y-2">
+<div class="flex items-baseline gap-sm">
+<span class="font-label-caps text-label-caps text-secondary uppercase">Lead Counsel AI</span>
+<span class="font-data-mono text-[10px] text-surface-tint">14:32:18</span>
+</div>
+<div class="font-body-md text-body-md text-on-surface p-md border border-outline-variant bg-surface-container-low rounded-sm">
+<p class="mb-2">Analyzing timeline disparities. I've initiated sub-routines for Evidence and Research.</p>
+<p class="mb-2">Initial pass suggests a critical 14-minute vulnerability in the State's narrative between 21:00 and 21:14.</p>
+<div class="flex gap-2 mt-4">
+<span class="px-2 py-1 border border-outline-variant text-xs font-data-mono text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[14px]" data-icon="attachment">attachment</span> State_Timeline_v2.pdf</span>
+<span class="px-2 py-1 border border-outline-variant text-xs font-data-mono text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[14px]" data-icon="attachment">attachment</span> Def_Toll_Logs.csv</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Agent Response 2 (Processing) -->
+<div class="flex gap-md w-full max-w-4xl mx-auto opacity-90">
+<div class="w-10 h-10 shrink-0 border border-tertiary rounded bg-tertiary-container flex items-center justify-center agent-processing">
+<span class="material-symbols-outlined text-tertiary animate-spin" data-icon="sync">sync</span>
+</div>
+<div class="flex-1 space-y-1">
+<div class="flex items-baseline gap-sm">
+<span class="font-label-caps text-label-caps text-tertiary uppercase">Evidence Agent</span>
+<span class="font-data-mono text-[10px] text-surface-tint">14:32:20</span>
+</div>
+<div class="font-data-mono text-data-mono text-tertiary text-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="search">search</span> Cross-referencing toll timestamps with Exhibit C (Witness Statement)...
+                            </div>
+</div>
+</div>
+</div>
+<!-- Input Area (Command Line Style) -->
+<div class="absolute bottom-0 left-0 right-0 border-t border-outline-variant bg-surface-container p-md z-20">
+<div class="max-w-4xl mx-auto">
+<div class="flex items-center gap-2 mb-2">
+<button class="text-xs font-data-mono text-on-surface-variant hover:text-secondary border border-outline-variant px-2 py-1 rounded bg-surface-container-lowest">/summon Research Clerk</button>
+<button class="text-xs font-data-mono text-on-surface-variant hover:text-secondary border border-outline-variant px-2 py-1 rounded bg-surface-container-lowest">/cite precedent</button>
+<button class="text-xs font-data-mono text-on-surface-variant hover:text-secondary border border-outline-variant px-2 py-1 rounded bg-surface-container-lowest">/generate memo</button>
+</div>
+<div class="relative flex items-center">
+<div class="absolute left-3 text-secondary font-data-mono font-bold">&gt;</div>
+<input class="w-full bg-surface-container-lowest border-2 border-outline-variant text-on-surface font-data-mono text-data-mono pl-8 pr-12 py-3 focus:outline-none focus:border-secondary focus:ring-0 transition-colors placeholder:text-on-surface-variant/50" placeholder="Enter directive or query..." type="text"/>
+<button class="absolute right-3 text-on-surface-variant hover:text-secondary transition-colors">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Inspector Panel (Right Side) -->
+<div class="hidden lg:flex flex-col w-[320px] shrink-0 border-l border-outline-variant bg-surface-container-lowest z-10 overflow-y-auto">
+<div class="p-md border-b border-outline-variant bg-surface-container sticky top-0">
+<h2 class="font-label-caps text-label-caps text-on-surface uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="memory">memory</span> Active Agents
+                    </h2>
+</div>
+<div class="p-md space-y-md">
+<!-- Agent Card -->
+<div class="border border-secondary bg-surface p-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 w-16 h-16 bg-secondary opacity-5 rounded-bl-full"></div>
+<div class="flex items-center gap-sm mb-2">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="font-label-caps text-label-caps text-secondary uppercase">Lead Counsel</span>
+</div>
+<div class="font-data-mono text-[10px] text-on-surface-variant space-y-1">
+<div class="flex justify-between"><span>Status:</span> <span class="text-on-surface">Analyzing</span></div>
+<div class="flex justify-between"><span>Memory:</span> <span class="text-on-surface">Context Window 84%</span></div>
+<div class="flex justify-between"><span>Focus:</span> <span class="text-on-surface truncate ml-2">Strategic vulnerabilities</span></div>
+</div>
+</div>
+<!-- Agent Card -->
+<div class="border border-tertiary bg-surface p-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 w-16 h-16 bg-tertiary opacity-5 rounded-bl-full"></div>
+<div class="flex items-center gap-sm mb-2">
+<div class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></div>
+<span class="font-label-caps text-label-caps text-tertiary uppercase">Evidence Agent</span>
+</div>
+<div class="font-data-mono text-[10px] text-on-surface-variant space-y-1">
+<div class="flex justify-between"><span>Status:</span> <span class="text-tertiary">Processing Task</span></div>
+<div class="flex justify-between"><span>Memory:</span> <span class="text-on-surface">Context Window 42%</span></div>
+<div class="flex justify-between"><span>Focus:</span> <span class="text-on-surface truncate ml-2">Toll tag cross-ref</span></div>
+</div>
+</div>
+<!-- Agent Card (Idle) -->
+<div class="border border-outline-variant bg-surface p-sm relative overflow-hidden opacity-60">
+<div class="flex items-center gap-sm mb-2">
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<span class="font-label-caps text-label-caps text-outline uppercase">Research Clerk</span>
+</div>
+<div class="font-data-mono text-[10px] text-on-surface-variant space-y-1">
+<div class="flex justify-between"><span>Status:</span> <span class="text-on-surface">Idle</span></div>
+<div class="flex justify-between"><span>Memory:</span> <span class="text-on-surface">Context Window 12%</span></div>
+</div>
+</div>
+</div>
+<div class="p-md border-t border-outline-variant mt-auto bg-surface-container">
+<h2 class="font-label-caps text-label-caps text-on-surface uppercase tracking-widest mb-2 text-[10px]">Session Context</h2>
+<div class="font-data-mono text-[10px] text-on-surface-variant">
+                        Documents Loaded: 14<br/>
+                        Tokens Used: 124,050 / 200,000<br/>
+                        Security Level: L3 (Confidential)
+                     </div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
