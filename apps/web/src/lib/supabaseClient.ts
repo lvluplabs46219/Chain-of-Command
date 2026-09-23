@@ -11,16 +11,15 @@
 import { createClient, SupabaseClient, User, Session, RealtimeChannel } from "@supabase/supabase-js";
 
 // Canonical Public Supabase Config (Environment Variables or Local Fallback)
-// Uses NEXT_PUBLIC_* for Next.js compatibility, falls back to VITE_* for legacy support
 const SUPABASE_URL = 
-  (typeof process !== "undefined" && process.env.NEXT_PUBLIC_SUPABASE_URL) ||
-  (typeof process !== "undefined" && process.env.VITE_SUPABASE_URL) ||
-  "https://YOUR_PROJECT_REF.supabase.co";
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_SUPABASE_URL) ||
+  (typeof process !== "undefined" && (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL)) ||
+  "https://fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff.supabase.co";
 
 const SUPABASE_ANON_KEY =
-  (typeof process !== "undefined" && (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)) ||
-  (typeof process !== "undefined" && process.env.VITE_SUPABASE_ANON_KEY) ||
-  "sb_publishable_3GfWfA2a1RIjnBzXVUM6qg_8z7eh-pv";
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_SUPABASE_ANON_KEY) ||
+  (typeof process !== "undefined" && (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY)) ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjcXVpdC1wbGF0Zm9ybSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjIwMDAwMDAwMDB9.mock-anon-key-acquit-ai";
 
 let browserSupabaseInstance: SupabaseClient | null = null;
 

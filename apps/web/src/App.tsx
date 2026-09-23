@@ -43,10 +43,7 @@ const ROUTES: RouteDefinition[] = [
 ];
 
 function getBasePath(): string {
-  if (typeof window !== "undefined") {
-    return window.location.pathname;
-  }
-  return process.env.NEXT_PUBLIC_BASE_URL || "";
+  return import.meta.env.BASE_URL.replace(/\/$/, "");
 }
 
 function _resolveComponent(
