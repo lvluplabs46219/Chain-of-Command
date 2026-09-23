@@ -21,9 +21,11 @@ export class ApiError extends Error {
  * Resolves the appropriate API base URL based on host environment.
  */
 export function getApiBaseUrl(): string {
-  if (typeof window !== "undefined") {
-    const envApi = (import.meta as any).env?.VITE_API_URL;
-    if (envApi) return envApi;
+  if (typeof process !== "undefined" && process.env.API_URL) {
+    return process.env.API_URL;
+  }
+  if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
   }
   return "/api";
 }
