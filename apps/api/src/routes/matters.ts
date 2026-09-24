@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from 'express';
 import { eq } from 'drizzle-orm';
-import { db, mattersTable, timelineEventsTable, documentsTable } from '@workspace/db';
+import { db, mattersTable, timelineEventsTable, documentsTable, usersTable } from '@workspace/db';
+import { AuthenticatedRequest } from '../middleware/verifySession';
 
 export const mattersRouter = Router();
 
