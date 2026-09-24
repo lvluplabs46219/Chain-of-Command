@@ -1,9 +1,243 @@
 {
   "mcpServers": {
-    "cloudflare": { "url": "https://mcp.cloudflare.com/mcp" },
-    "cloudflare-docs": { "url": "https://docs.mcp.cloudflare.com/mcp" },
-    "cloudflare-bindings": { "url": "https://bindings.mcp.cloudflare.com/mcp" },
-    "cloudflare-builds": { "url": "https://builds.mcp.cloudflare.com/mcp" },
-    "cloudflare-observability": { "url": "https://observability.mcp.cloudflare.com/mcp" }
+    "cloudflare": {
+      "url": "https://mcp.cloudflare.com/mcp"
+    },
+    "cloudflare-docs": {
+      "url": "https://docs.mcp.cloudflare.com/mcp"
+    },
+    "cloudflare-bindings": {
+      "url": "https://bindings.mcp.cloudflare.com/mcp"
+    },
+    "cloudflare-builds": {
+      "url": "https://builds.mcp.cloudflare.com/mcp"
+    },
+    "cloudflare-observability": {
+      "url": "https://observability.mcp.cloudflare.com/mcp"
+    },
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=YOUR_PROJECT_REF&features=docs,account,database,debugging,development,functions,branching"
+    },
+    "MCP_DOCKER": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "mcp/gateway:latest"
+      ],
+      "type": "stdio"
+    },
+    "io.github.github/github-mcp-server": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "gallery": "https://api.mcp.github.com",
+      "version": "1.6.0"
+    },
+    "io.github.wonderwhy-er/desktop-commander": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "--registry",
+        "https://registry.npmjs.org",
+        "@wonderwhy-er/desktop-commander@0.2.44"
+      ],
+      "gallery": "https://api.mcp.github.com",
+      "version": "0.2.44"
+    },
+    "io.github.ChromeDevTools/chrome-devtools-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "--registry",
+        "https://registry.npmjs.org",
+        "chrome-devtools-mcp@1.6.0"
+      ],
+      "gallery": "https://api.mcp.github.com",
+      "version": "1.6.0"
+    },
+    "microsoft/playwright-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ],
+      "gallery": "https://api.mcp.github.com",
+      "version": "0.0.1-seed"
+    },
+    "io.github.vybenetwork/vybe-solana-api": {
+      "type": "http",
+      "url": "https://docs.vybenetwork.com/mcp",
+      "headers": {
+        "X-API-KEY": "${input:X-API-KEY}"
+      },
+      "gallery": "https://api.mcp.github.com",
+      "version": "1.0.9"
+    },
+    "io.github.vercel/next-devtools-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "next-devtools-mcp@0.3.6"
+      ],
+      "gallery": "https://api.mcp.github.com",
+      "version": "0.3.6"
+    },
+    "huggingface/hf-mcp-server": {
+      "type": "http",
+      "url": "https://huggingface.co/mcp?login",
+      "gallery": "https://api.mcp.github.com",
+      "version": "1.0.0"
+    },
+    "datacloud_bigquery_remote": {
+      "type": "http",
+      "url": "https://bigquery.googleapis.com/mcp",
+      "authProviderType": "google_credentials",
+      "headers": {
+        "User-Agent": "datacloud.vscode"
+      },
+      "oauth": {
+        "scopes": [
+          "https://www.googleapis.com/auth/bigquery",
+          "https://www.googleapis.com/auth/cloud-platform"
+        ]
+      }
+    },
+    "datacloud_spanner_remote": {
+      "type": "http",
+      "url": "https://spanner.googleapis.com/mcp",
+      "authProviderType": "google_credentials",
+      "headers": {
+        "User-Agent": "datacloud.vscode"
+      },
+      "oauth": {
+        "scopes": [
+          "https://www.googleapis.com/auth/spanner.admin",
+          "https://www.googleapis.com/auth/spanner.data"
+        ]
+      }
+    },
+    "datacloud_alloydb_remote": {
+      "type": "http",
+      "url": "https://alloydb.us-central1.rep.googleapis.com/mcp",
+      "authProviderType": "google_credentials",
+      "headers": {
+        "User-Agent": "datacloud.vscode"
+      },
+      "oauth": {
+        "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+        ]
+      }
+    },
+    "datacloud_cloud-sql_remote": {
+      "type": "http",
+      "url": "https://sqladmin.googleapis.com/mcp",
+      "authProviderType": "google_credentials",
+      "headers": {
+        "User-Agent": "datacloud.vscode"
+      },
+      "oauth": {
+        "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+        ]
+      }
+    },
+    "datacloud_knowledge_catalog_remote": {
+      "type": "http",
+      "url": "https://dataplex.googleapis.com/mcp",
+      "authProviderType": "google_credentials",
+      "headers": {
+        "User-Agent": "datacloud.vscode"
+      },
+      "oauth": {
+        "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+        ]
+      }
+    },
+    "datacloud_dataproc_remote": {
+      "type": "http",
+      "url": "https://dataproc-us-central1.googleapis.com/mcp",
+      "authProviderType": "google_credentials",
+      "headers": {
+        "User-Agent": "datacloud.vscode"
+      },
+      "oauth": {
+        "scopes": [
+          "https://www.googleapis.com/auth/dataproc"
+        ]
+      }
+    },
+    "metasploit/metasploit-mcp-server": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/home/andrew/Downloads/metasploit-mcp-server-main/src/index.js"
+      ],
+      "version": "1.0.0"
+    },
+    "com.supabase/mcp": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp",
+      "gallery": "https://api.mcp.github.com",
+      "version": "0.11.0"
+    },
+    "com.postman/postman-mcp-server": {
+      "type": "http",
+      "url": "https://mcp.postman.com/mcp",
+      "headers": {
+        "Authorization": "${input:Authorization}"
+      },
+      "gallery": "https://api.mcp.github.com",
+      "version": "2.12.0"
+    },
+    "com.vercel/vercel-mcp": {
+      "type": "http",
+      "url": "https://mcp.vercel.com",
+      "gallery": "https://api.mcp.github.com",
+      "version": "0.0.3"
+    },
+    "hf-mcp-server": {
+      "url": "https://huggingface.co/mcp?login",
+      "type": "http"
+    },
+    "everything": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-everything"
+      ],
+      "type": "stdio"
+    },
+    "debugai": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@debugai/mcp"
+      ]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-filesystem"
+      ],
+      "type": "stdio"
+    },
+    "docker": {
+      "command": "npx",
+      "args": [
+        "mcp-server-docker"
+      ],
+      "type": "stdio"
+    },
+    "memory": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-memory"
+      ],
+      "type": "stdio"
+    }
   }
 }
