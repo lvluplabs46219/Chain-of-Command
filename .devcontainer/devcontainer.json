@@ -1435,14 +1435,6 @@
 		"ghcr.io/nolanjx/devcontainer-features/pi-coding-agent:1": {},
 		"registry.gitlab.com/pravorskyi/devcontainer-features/claude-code:1": {},
 		"ghcr.io/beepboop2025/liquilens-devcontainer-features/liquilens-evidence:1": {}
-	},
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"RooVeterinaryInc.roo-cline",
-				"saoudrizwan.claude-dev"
-			]
-		}
 	}
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
