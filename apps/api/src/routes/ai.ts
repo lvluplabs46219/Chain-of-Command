@@ -1,9 +1,10 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { z } from "zod";
-import { acquitAgentRuntime, LEGAL_DISCLAIMER, type AgentEvent, type AgentPolicy, type AgentSource } from "../ai/runtime";
+import { acquitAgentRuntime, LEGAL_DISCLAIMER, type AgentEvent, type AgentPolicy, type AgentSource, detectPromptInjection } from "../ai/runtime";
 import type { ModelProvider } from "../ai/model-gateway";
 import { Redis } from "@upstash/redis";
 import crypto from "crypto";
+import { AuthenticatedRequest } from "../middleware/verifySession";
 
 export const SPECIALIST_AGENTS: Record<string, { name: string; roleDescription: string; policy: AgentPolicy }> = {
   "lead-counsel": {
@@ -106,7 +107,6 @@ export const SPECIALIST_AGENTS: Record<string, { name: string; roleDescription: 
   },
 };
 
-
 const AgentSourceSchema = z.object({
   id: z.string(),
   content: z.string(),
@@ -140,12 +140,13 @@ interface RunRecord {
   listeners: Set<(event: AgentEvent) => void>;
   request: z.infer<typeof AiRunRequest>;
   createdAt: number;
+  ownerUserId: string; // CRITICAL: Track owner for authorization
 }
 
 // In-memory active stream listeners map
 const memoryRuns = new Map<string, RunRecord>();
 
-// Upstash Redis instance with 60-min TTL (HIGH-1 resolution)
+// Upstash Redis instance with 60-min TTL
 let redisClient: Redis | null = null;
 if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
   redisClient = new Redis({
@@ -154,7 +155,7 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
   });
 }
 
-// Helper to save run events with 60 min TTL (3600s)
+// Helper to save run events with 60 min TTL
 async function persistRunState(runId: string, record: RunRecord): Promise<void> {
   if (!redisClient) return;
   try {
@@ -164,13 +165,13 @@ async function persistRunState(runId: string, record: RunRecord): Promise<void> 
       done: record.done,
       request: record.request,
       createdAt: record.createdAt,
+      ownerUserId: record.ownerUserId, // CRITICAL: Persist owner
     };
     await redisClient.set(`agent_run:${runId}`, JSON.stringify(payload), { ex: 3600 });
   } catch (err) {
     console.warn("Redis run state persistence warning:", err);
   }
 }
-
 
 function writeEvent(res: Response, event: AgentEvent): void {
   res.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
@@ -180,6 +181,19 @@ async function executeRun(runId: string, record: RunRecord): Promise<void> {
   const agent = SPECIALIST_AGENTS[record.request.agentId];
   const provider = (record.request.provider ?? "demo") as ModelProvider;
   const sources = (record.request.sources ?? []) as unknown as AgentSource[];
+
+  // Check for prompt injection in the input
+  if (detectPromptInjection(record.request.input)) {
+    record.events.push({
+      type: 'error',
+      timestamp: Date.now(),
+      payload: { error: 'Prompt injection detected - request aborted' },
+    });
+    record.done = true;
+    await persistRunState(runId, record);
+    for (const listener of record.listeners) listener(record.events[record.events.length - 1]);
+    return;
+  }
 
   try {
     for await (const event of acquitAgentRuntime.execute({
@@ -200,7 +214,7 @@ async function executeRun(runId: string, record: RunRecord): Promise<void> {
     void persistRunState(runId, record);
     for (const listener of record.listeners) record.listeners.delete(listener);
     setTimeout(() => {
-        memoryRuns.delete(runId);
+      memoryRuns.delete(runId);
     }, 5 * 60 * 1000);
   }
 }
@@ -217,8 +231,14 @@ router.get("/ai/agents", (_req: Request, res: Response) => {
   return res.json({ agents: list });
 });
 
-// Launch an AI agent run
-router.post("/ai/agents/:agentId/runs", (req: Request, res: Response) => {
+// Launch an AI agent run - requires authentication
+router.post("/ai/agents/:agentId/runs", (req: AuthenticatedRequest, res: Response) => {
+  const user = req.user;
+  
+  if (!user || !user.id) {
+    return res.status(401).json({ message: "Unauthorized: User not authenticated" });
+  }
+  
   const parsed = AiRunRequest.safeParse({
     ...req.body,
     agentId: req.params.agentId,
@@ -228,6 +248,12 @@ router.post("/ai/agents/:agentId/runs", (req: Request, res: Response) => {
     return res.status(400).json({ message: "Invalid AI run request.", issues: parsed.error.issues });
   }
 
+  // Check for prompt injection before creating the run
+  if (detectPromptInjection(parsed.data.input)) {
+    console.warn(`Prompt injection detected in AI run request from user ${user.id}`);
+    return res.status(400).json({ message: "Invalid input - request rejected" });
+  }
+
   const runId = crypto.randomUUID();
   const record: RunRecord = {
     events: [],
@@ -235,6 +261,7 @@ router.post("/ai/agents/:agentId/runs", (req: Request, res: Response) => {
     listeners: new Set(),
     request: parsed.data,
     createdAt: Date.now(),
+    ownerUserId: user.id, // CRITICAL: Store the authenticated user's ID
   };
 
   memoryRuns.set(runId, record);
@@ -255,8 +282,16 @@ router.post("/ai/agents/:agentId/runs", (req: Request, res: Response) => {
 });
 
 // Stream real-time agent output with SSE
-router.get("/ai/runs/:runId/stream", async (req: Request, res: Response): Promise<void> => {
+// CRITICAL: Verify that the requesting user matches the owner
+router.get("/ai/runs/:runId/stream", async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  const user = req.user;
   const runId = String(req.params.runId);
+  
+  if (!user || !user.id) {
+    res.status(401).json({ message: "Unauthorized: User not authenticated" });
+    return;
+  }
+  
   let record = memoryRuns.get(runId);
 
   // If not in local memory, check Redis store for completed run
@@ -271,6 +306,7 @@ router.get("/ai/runs/:runId/stream", async (req: Request, res: Response): Promis
           listeners: new Set(),
           request: parsed.request,
           createdAt: parsed.createdAt || Date.now(),
+          ownerUserId: parsed.ownerUserId || '',
         };
       }
     } catch (err) {
@@ -280,6 +316,13 @@ router.get("/ai/runs/:runId/stream", async (req: Request, res: Response): Promis
 
   if (!record) {
     res.status(404).json({ message: "AI run not found or expired." });
+    return;
+  }
+
+  // CRITICAL SECURITY CHECK: Verify that the authenticated user matches the owner
+  if (record.ownerUserId !== user.id) {
+    console.warn(`User ${user.id} attempted to access run ${runId} owned by ${record.ownerUserId}`);
+    res.status(403).json({ message: "Unauthorized: This AI run belongs to another user" });
     return;
   }
 

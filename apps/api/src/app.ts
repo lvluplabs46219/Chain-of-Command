@@ -52,18 +52,24 @@ const parseAllowedOrigins = (): (string | RegExp)[] => {
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
+    // CRITICAL: Do NOT allow requests with no Origin when credentials are enabled
+    if (!origin) {
+      return callback(new Error('No origin header - access denied'), false);
+    }
+    
     const allowed = parseAllowedOrigins();
     const isExplicitlyAllowed = allowed.some(pattern => {
       if (typeof pattern === "string") return pattern === origin;
       if (pattern instanceof RegExp) return pattern.test(origin);
       return false;
     });
-    if (isExplicitlyAllowed || origin.includes("vercel.app") || origin.includes("pages.dev") || origin.includes("localhost")) {
+    
+    // Only allow explicitly permitted origins - do NOT fallback to allowing all
+    if (isExplicitlyAllowed) {
       return callback(null, true);
     }
-    // Allow client requests gracefully
-    return callback(null, true);
+    
+    return callback(new Error('Origin not in allowlist'), false);
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -71,10 +77,22 @@ app.use(cors({
 }));
 
 app.use(helmet({
-  frameguard: false,
-  crossOriginOpenerPolicy: false,
-  crossOriginResourcePolicy: false,
-  contentSecurityPolicy: false,
+  // Enable security headers for a legal/PII application
+  frameguard: { action: 'deny' },
+  crossOriginOpenerPolicy: { policy: 'same-origin' },
+  crossOriginResourcePolicy: { policy: 'same-origin' },
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      frameSrc: ["'none'"],
+    },
+  },
 }));
 
 app.use(express.json({ limit: "10kb" }));

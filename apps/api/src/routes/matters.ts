@@ -1,153 +1,97 @@
 import { Router, type Request, type Response } from 'express';
 import { eq } from 'drizzle-orm';
 import { db, mattersTable, timelineEventsTable, documentsTable } from '@workspace/db';
+import { AuthenticatedRequest } from '../middleware/verifySession';
+import { verifySession } from '../middleware/verifySession';
 
 export const mattersRouter = Router();
 
-export interface MatterDetail {
-  id: string;
-  caseNumber: string;
-  title: string;
-  jurisdiction: string;
-  courtName: string;
-  status: 'active' | 'pending' | 'closed';
-  judge: string;
-  prosecutor: string;
-  nextAction: {
-    title: string;
-    description: string;
-    deadline: string;
-    daysRemaining: number;
-    urgency: 'critical' | 'normal' | 'low';
-    statutoryRef: string;
-  };
-  parties: Array<{
-    role: 'Litigant' | 'Prosecutor' | 'Judge' | 'Investigator';
-    name: string;
-    title: string;
-    contact?: string;
-  }>;
-  issues: Array<{
-    id: string;
-    title: string;
-    type: 'defense' | 'procedural' | 'evidentiary';
-    status: 'In Review' | 'Draft Prepared' | 'Filed';
-    statutoryRef: string;
-    elements: string[];
-  }>;
-  deadlines: Array<{
-    id: string;
-    title: string;
-    dueDate: string;
-    type: 'court_filing' | 'appearance' | 'discovery';
-    completed: boolean;
-  }>;
-  createdAt: string;
-  updatedAt: string;
-}
+// Apply authentication middleware to all matter routes
+mattersRouter.use(verifySession);
 
-const fallbackMatter: MatterDetail = {
-  id: 'matter-001',
-  caseNumber: 'IN-MAR-24-0187',
-  title: 'State of Indiana v. Alex Thompson',
-  jurisdiction: 'Indiana',
-  courtName: 'Marion County Superior Court, Criminal Division 3',
-  status: 'active',
-  judge: 'Hon. Marcus Vance',
-  prosecutor: 'Deputy DA Rachel Sterling (Bar #IN-88912)',
-  nextAction: {
-    title: 'File Formal Request for Complete Discovery Packet',
-    description: 'Statutory deadline to compel production of body-cam footage and witness audio before Omnibus hearing.',
-    deadline: '2026-08-24T17:00:00.000Z',
-    daysRemaining: 5,
-    urgency: 'critical',
-    statutoryRef: 'Ind. R. Crim. P. 2.5 & Ind. Code § 35-36-8-1',
-  },
-  parties: [
-    { role: 'Litigant', name: 'Alex Thompson', title: 'Self-Represented Litigant (Pro Se)' },
-    { role: 'Prosecutor', name: 'Deputy DA Rachel Sterling', title: 'Marion County Prosecutor’s Office', contact: 'rsterling@marioncounty.in.gov' },
-    { role: 'Judge', name: 'Hon. Marcus Vance', title: 'Superior Court Judge, Div 3', contact: 'Courtroom 4B' },
-    { role: 'Investigator', name: 'Officer J. Martinez #402', title: 'IMPD Investigating Officer' },
-  ],
-  issues: [
-    {
-      id: 'iss-1',
-      title: 'Fourth Amendment Search & Seizure Suppression',
-      type: 'evidentiary',
-      status: 'Draft Prepared',
-      statutoryRef: 'U.S. Const. amend. IV & Ind. Const. art. 1, § 11',
-      elements: ['Warrantless vehicle search', 'Lack of probable cause', 'Tainted fruit doctrine'],
-    },
-    {
-      id: 'iss-2',
-      title: 'Lack of Requisite Culpable Mental State (Mens Rea)',
-      type: 'defense',
-      status: 'In Review',
-      statutoryRef: 'Ind. Code § 35-41-2-2',
-      elements: ['Absence of knowingly/intentionally taking', 'Mistake of fact defense'],
-    },
-    {
-      id: 'iss-3',
-      title: 'Failure to Disclose Brady Exculpatory Surveillance',
-      type: 'procedural',
-      status: 'In Review',
-      statutoryRef: 'Brady v. Maryland, 373 U.S. 83 (1963)',
-      elements: ['Store CCTV store angle 2 withheld', 'Materiality to defense identification'],
-    },
-  ],
-  deadlines: [
-    { id: 'dl-1', title: 'Omnibus Hearing Motion Deadline', dueDate: '2026-08-24T17:00:00Z', type: 'court_filing', completed: false },
-    { id: 'dl-2', title: 'Initial Pre-Trial Conference Appearance', dueDate: '2026-09-02T09:00:00Z', type: 'appearance', completed: false },
-    { id: 'dl-3', title: 'Witness List & Alibi Notice Filing', dueDate: '2026-09-15T17:00:00Z', type: 'discovery', completed: false },
-  ],
-  createdAt: '2026-08-10T14:30:00.000Z',
-  updatedAt: new Date().toISOString(),
-};
-
-mattersRouter.get('/matters', async (_req: Request, res: Response) => {
+mattersRouter.get('/matters', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const dbMatters = await db.select().from(mattersTable);
+    const user = req.user;
+    if (!user || !user.id) {
+      return res.status(401).json({ success: false, error: 'Unauthorized: User not authenticated' });
+    }
+
+    // CRITICAL: Scope query to authenticated user's matters only
+    const dbMatters = await db
+      .select()
+      .from(mattersTable)
+      .where(eq(mattersTable.userId, user.id));
+    
     if (Array.isArray(dbMatters) && dbMatters.length > 0) {
       const mapped = dbMatters.map((m) => ({
-        ...fallbackMatter,
         id: m.id,
-        caseNumber: m.caseNumber || fallbackMatter.caseNumber,
-        title: m.title || fallbackMatter.title,
-        courtName: m.courtName || fallbackMatter.courtName,
-        jurisdiction: m.jurisdiction || fallbackMatter.jurisdiction,
+        caseNumber: m.caseNumber || '',
+        title: m.title || '',
+        courtName: m.courtName || '',
+        jurisdiction: m.jurisdiction || '',
         status: m.status || 'active',
+        createdAt: m.createdAt || new Date().toISOString(),
+        updatedAt: m.updatedAt || new Date().toISOString(),
       }));
       return res.json({ success: true, matters: mapped });
     }
-    return res.json({ success: true, matters: [fallbackMatter] });
+    
+    // Return empty array for users with no matters - do NOT return shared fallback with PII
+    return res.json({ success: true, matters: [] });
   } catch (err: any) {
     console.error('Fetch matters error:', err);
-    return res.json({ success: true, matters: [fallbackMatter] });
+    return res.status(500).json({ success: false, error: 'Failed to fetch matters' });
   }
 });
 
-mattersRouter.get('/matters/:matterId', async (req: Request, res: Response) => {
+mattersRouter.get('/matters/:matterId', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { matterId } = req.params;
-    const [dbMatter] = await db.select().from(mattersTable).where(eq(mattersTable.id, matterId));
-    if (dbMatter) {
-      return res.json({
-        success: true,
-        matter: {
-          ...fallbackMatter,
-          id: dbMatter.id,
-          caseNumber: dbMatter.caseNumber || fallbackMatter.caseNumber,
-          title: dbMatter.title || fallbackMatter.title,
-          courtName: dbMatter.courtName || fallbackMatter.courtName,
-          jurisdiction: dbMatter.jurisdiction || fallbackMatter.jurisdiction,
-          status: dbMatter.status || 'active',
-        },
-      });
+    const user = req.user;
+    if (!user || !user.id) {
+      return res.status(401).json({ success: false, error: 'Unauthorized: User not authenticated' });
     }
-    return res.json({ success: true, matter: fallbackMatter });
+
+    const { matterId } = req.params;
+    
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(matterId)) {
+      return res.status(400).json({ success: false, error: 'Invalid matter ID format' });
+    }
+    
+    // CRITICAL: Verify the matter belongs to the authenticated user
+    const [dbMatter] = await db
+      .select()
+      .from(mattersTable)
+      .where(eq(mattersTable.id, matterId));
+    
+    if (!dbMatter) {
+      return res.status(404).json({ success: false, error: 'Matter not found' });
+    }
+    
+    // Verify ownership - matter's userId must match authenticated user's ID
+    if (dbMatter.userId !== user.id) {
+      console.warn(`User ${user.id} attempted to access matter ${matterId} owned by ${dbMatter.userId}`);
+      return res.status(403).json({ success: false, error: 'Forbidden: Matter does not belong to authenticated user' });
+    }
+    
+    return res.json({
+      success: true,
+      matter: {
+        id: dbMatter.id,
+        caseNumber: dbMatter.caseNumber || '',
+        title: dbMatter.title || '',
+        courtName: dbMatter.courtName || '',
+        jurisdiction: dbMatter.jurisdiction || '',
+        status: dbMatter.status || 'active',
+        description: dbMatter.description || '',
+        createdAt: dbMatter.createdAt || new Date().toISOString(),
+        updatedAt: dbMatter.updatedAt || new Date().toISOString(),
+      },
+    });
   } catch (err: any) {
     console.error('Fetch matter error:', err);
-    return res.json({ success: true, matter: fallbackMatter });
+    return res.status(500).json({ success: false, error: 'Failed to fetch matter' });
   }
 });
 

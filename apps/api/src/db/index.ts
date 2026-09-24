@@ -11,13 +11,17 @@ import * as schema from '../../../../packages/database/schema/sic-audit';
 import * as chainSchema from '../../../../packages/database/schema/chain-of-command';
 
 // Get database connection string from environment
-const DATABASE_URL = process.env.DATABASE_URL || 
-  'postgresql://postgres:postgres@localhost:5432/postgres';
+// FAIL FAST: Require DATABASE_URL to be explicitly configured
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  throw new Error('DATABASE_URL environment variable is required - refusing to start with default credentials');
+}
 
-// Create connection pool
+// Create connection pool with proper TLS verification
 const pool = new Pool({
   connectionString: DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  // In production, properly verify TLS certificates to prevent MITM attacks
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: true } : false,
 });
 
 // Create Drizzle instance with all schemas

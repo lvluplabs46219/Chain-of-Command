@@ -131,7 +131,7 @@ const pool = new Pool({{
 const files = {file_list_json};
 const fileMap = {file_map_json};
 const force = {'true' if force else 'false'};
-const dryRun = {'true' if dryRun else 'false'};
+const dryRun = {'true' if dry_run else 'false'};
 
 async function run() {{
   const client = await pool.connect();

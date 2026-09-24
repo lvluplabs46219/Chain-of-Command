@@ -17,33 +17,33 @@ jobs:
           access_token: ${{ secrets.BW_ACCESS_TOKEN }}
           base_url: https://vault.bitwarden.com
           secrets: |
-            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > NEXT_PUBLIC_SUPABASE_URL
-            bdbb16bc-0b9b-472e-99fa-af4101309076 > SUPABASE_SERVICE_ROLE_KEY
-            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > SUPABASE_URL
-            bdbb16bc-0b9b-472e-99fa-af4101309076 > NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > NEXT_PUBLIC_SUPABASE_ANON_KEY
-            bdbb16bc-0b9b-472e-99fa-af4101309076 > SUPABASE_PUBLISHABLE_KEY
-            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > SUPABASE_ANON_KEY
-            bdbb16bc-0b9b-472e-99fa-af4101309076 > SUPABASE_SECRET_KEY
-            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > DATABASE_URL
-            bdbb16bc-0b9b-472e-99fa-af4101309076 > POSTGRES_URL
-            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > SUPABASE_JWKS_URL
-            bdbb16bc-0b9b-472e-99fa-af4101309076 > DB_HOST
-            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > DB_PORT
-            bdbb16bc-0b9b-472e-99fa-af4101309076 > DB_NAME
-            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > DB_USER
-            bdbb16bc-0b9b-472e-99fa-af4101309076 > DB_PASSWORD
-            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > GEMINI_API_KEY
-            bdbb16bc-0b9b-472e-99fa-af4101309076 > GCP_SERVICE_ACCOUNT_EMAIL
-            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > OLLAMA_BASE_URL
-            bdbb16bc-0b9b-472e-99fa-af4101309076 > WEBSCRAPER_API_KEY
-            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > BOT_TOKEN
-            bdbb16bc-0b9b-472e-99fa-af4101309076 > ANTHROPIC_API_KEY
-            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > GH_TOKEN
-            bdbb16bc-0b9b-472e-99fa-af4101309076 > GITHUB_TOKEN_AUDIT
-            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > ALLOWED_ORIGINS
-            bdbb16bc-0b9b-472e-99fa-af4101309076 > TAILSCALE_BOUND_DOMAINS
-            fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff > POSTMAN
+            ${{ secrets.BW_ITEM_ID_SUPABASE_URL }} > NEXT_PUBLIC_SUPABASE_URL
+            ${{ secrets.BW_ITEM_ID_SUPABASE_SERVICE_ROLE_KEY }} > SUPABASE_SERVICE_ROLE_KEY
+            ${{ secrets.BW_ITEM_ID_SUPABASE_URL }} > SUPABASE_URL
+            ${{ secrets.BW_ITEM_ID_SUPABASE_PUBLISHABLE_KEY }} > NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+            ${{ secrets.BW_ITEM_ID_SUPABASE_ANON_KEY }} > NEXT_PUBLIC_SUPABASE_ANON_KEY
+            ${{ secrets.BW_ITEM_ID_SUPABASE_PUBLISHABLE_KEY }} > SUPABASE_PUBLISHABLE_KEY
+            ${{ secrets.BW_ITEM_ID_SUPABASE_ANON_KEY }} > SUPABASE_ANON_KEY
+            ${{ secrets.BW_ITEM_ID_SUPABASE_SERVICE_ROLE_KEY }} > SUPABASE_SECRET_KEY
+            ${{ secrets.BW_ITEM_ID_DATABASE_URL }} > DATABASE_URL
+            ${{ secrets.BW_ITEM_ID_POSTGRES_URL }} > POSTGRES_URL
+            ${{ secrets.BW_ITEM_ID_SUPABASE_JWKS_URL }} > SUPABASE_JWKS_URL
+            ${{ secrets.BW_ITEM_ID_DB_HOST }} > DB_HOST
+            ${{ secrets.BW_ITEM_ID_DB_PORT }} > DB_PORT
+            ${{ secrets.BW_ITEM_ID_DB_NAME }} > DB_NAME
+            ${{ secrets.BW_ITEM_ID_DB_USER }} > DB_USER
+            ${{ secrets.BW_ITEM_ID_DB_PASSWORD }} > DB_PASSWORD
+            ${{ secrets.BW_ITEM_ID_GEMINI_API_KEY }} > GEMINI_API_KEY
+            ${{ secrets.BW_ITEM_ID_GCP_SERVICE_ACCOUNT_EMAIL }} > GCP_SERVICE_ACCOUNT_EMAIL
+            ${{ secrets.BW_ITEM_ID_OLLAMA_BASE_URL }} > OLLAMA_BASE_URL
+            ${{ secrets.BW_ITEM_ID_WEBSCRAPER_API_KEY }} > WEBSCRAPER_API_KEY
+            ${{ secrets.BW_ITEM_ID_BOT_TOKEN }} > BOT_TOKEN
+            ${{ secrets.BW_ITEM_ID_ANTHROPIC_API_KEY }} > ANTHROPIC_API_KEY
+            ${{ secrets.BW_ITEM_ID_GH_TOKEN }} > GH_TOKEN
+            ${{ secrets.BW_ITEM_ID_GITHUB_TOKEN_AUDIT }} > GITHUB_TOKEN_AUDIT
+            ${{ secrets.BW_ITEM_ID_ALLOWED_ORIGINS }} > ALLOWED_ORIGINS
+            ${{ secrets.BW_ITEM_ID_TAILSCALE_BOUND_DOMAINS }} > TAILSCALE_BOUND_DOMAINS
+            ${{ secrets.BW_ITEM_ID_POSTMAN }} > POSTMAN
 
       - name: Verify Environment
         run: echo "Secrets loaded successfully"

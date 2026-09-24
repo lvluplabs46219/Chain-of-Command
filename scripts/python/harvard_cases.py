@@ -119,7 +119,8 @@ def ingest_to_postgres(limit=10, jurisdiction=None):
     check_dependencies(needs_db=True)
     
     if not DATABASE_URL:
-        print("[-] DATABASE_URL is not set. Please set it in your environment or .env file.")
+        print("[-]SUPABASE_URL
+is not set. Please set it in your environment or .env file.")
         sys.exit(1)
 
     print("=" * 70)

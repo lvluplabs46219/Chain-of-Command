@@ -5,7 +5,7 @@ import directoryRouter from "./directory";
 import courtlistenerRouter from "./courtlistener";
 import { webhooksRouter } from "./webhooks";
 import { documentsRouter } from "./documents";
-import { mattersRouter } from "./matters";
+import mattersRouter from "./matters";
 import { geminiRouter } from "./gemini";
 import { filingRouter } from "./filing";
 import auditRouter from "./audit";
