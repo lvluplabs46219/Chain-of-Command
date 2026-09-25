@@ -1,7 +1,7 @@
+import StitchPage from "@/lib/stitch/StitchPage";
+
 export const dynamic = "force-dynamic";
 
-import AcquitClientApp from "@/components/AcquitClientApp";
-
 export default function HomePage() {
-  return <AcquitClientApp />;
+  return <StitchPage folder="command_center_home" />;
 }
