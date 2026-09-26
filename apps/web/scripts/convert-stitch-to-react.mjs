@@ -4,27 +4,55 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const webRoot = path.resolve(__dirname, "..");
+
 const SOURCE = path.join(
-  webRoot, "components", "mockups", "acquit-case-workspace",
-  "NEWSTITCH", "stitch_acquit.ai_legal_operating_system"
+  webRoot,
+  "components",
+  "mockups",
+  "acquit-case-workspace",
+  "NEWSTITCH",
+  "stitch_acquit.ai_legal_operating_system"
 );
+
 const OUT_DIR = path.join(webRoot, "src", "components", "stitch", "pages");
 const REGISTRY = path.join(webRoot, "src", "components", "stitch", "registry.ts");
 const TOKENS = path.join(webRoot, "src", "components", "stitch", "tokens.css");
 
 const VOID_ELEMENTS = new Set([
-  "area","base","br","col","embed","hr","img","input","link","meta",
-  "param","source","track","wbr",
+  "area",
+  "base",
+  "br",
+  "col",
+  "embed",
+  "hr",
+  "img",
+  "input",
+  "link",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr",
 ]);
 
 const ATTR_MAP = {
-  "class": "className", "for": "htmlFor", "tabindex": "tabIndex",
-  "autocomplete": "autoComplete", "autofocus": "autoFocus",
-  "colspan": "colSpan", "rowspan": "rowSpan", "readonly": "readOnly",
-  "maxlength": "maxLength", "minlength": "minLength",
-  "novalidate": "noValidate", "srcset": "srcSet", "crossorigin": "crossOrigin",
-  "datetime": "dateTime", "contenteditable": "contentEditable",
-  "spellcheck": "spellCheck", "playsinline": "playsInline",
+  "class": "className",
+  "for": "htmlFor",
+  "tabindex": "tabIndex",
+  "autocomplete": "autoComplete",
+  "autofocus": "autoFocus",
+  "colspan": "colSpan",
+  "rowspan": "rowSpan",
+  "readonly": "readOnly",
+  "maxlength": "maxLength",
+  "minlength": "minLength",
+  "novalidate": "noValidate",
+  "srcset": "srcSet",
+  "crossorigin": "crossOrigin",
+  "datetime": "dateTime",
+  "contenteditable": "contentEditable",
+  "spellcheck": "spellCheck",
+  "playsinline": "playsInline",
 };
 
 function camelAttr(name) {
@@ -51,7 +79,10 @@ function inlineStyleToObject(raw) {
 }
 
 function pascal(name) {
-  const parts = name.split(/[^a-zA-Z0-9]+/).filter(Boolean).map((p) => p.charAt(0).toUpperCase() + p.slice(1));
+  const parts = name
+    .split(/[^a-zA-Z0-9]+/)
+    .filter(Boolean)
+    .map((p) => p.charAt(0).toUpperCase() + p.slice(1));
   let out = parts.join("");
   if (/^[0-9]/.test(out)) out = "Page" + out;
   return out || "Page";
@@ -122,33 +153,84 @@ function extractStyles(doc) {
   return styles.join("\n\n");
 }
 
-function parseTailwindConfig(doc) {
-  const m = doc.match(/<script id="tailwind-config">([\s\S]*?)<\/script>/);
-  if (!m) {
-    // Some designs use a plain <script> for tailwind.config
-    const m2 = doc.match(/<script>\s*tailwind\.config\s*=\s*\{([\s\S]*?)\}\s*<\/script>/);
-    if (!m2) return null;
-    try { return (new Function("return ({ " + m2[1] + " })"))(); } catch { return null; }
+// ---- Tailwind config parsing (v4) ----
+// Extracts the tailwind.config object from ANY <script> tag (with or without
+// id="tailwind-config") using a balanced-brace scan that respects strings and
+// comments. Tolerates trailing commas, stray statements after the object, and
+// malformed trailing braces.
+
+function extractBalancedObject(text, startIdx) {
+  let depth = 0;
+  let i = startIdx;
+  const n = text.length;
+  let inStr = null; // '"', "'", or '`'
+  while (i < n) {
+    const ch = text[i];
+    if (inStr) {
+      if (ch === "\\") { i += 2; continue; }
+      if (ch === inStr) inStr = null;
+      i++;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === "`") { inStr = ch; i++; continue; }
+    if (ch === "/" && text[i + 1] === "/") {
+      while (i < n && text[i] !== "\n") i++;
+      continue;
+    }
+    if (ch === "/" && text[i + 1] === "*") {
+      i += 2;
+      while (i < n && !(text[i] === "*" && text[i + 1] === "/")) i++;
+      i += 2;
+      continue;
+    }
+    if (ch === "{") depth++;
+    else if (ch === "}") {
+      depth--;
+      if (depth === 0) return text.slice(startIdx, i + 1);
+    }
+    i++;
   }
-  let text = m[1].trim();
-  const eq = text.indexOf("=");
-  if (eq !== -1) text = text.slice(eq + 1).trim();
-  // Strip trailing commas and stray content before parsing (some designs have malformed trailing braces)
-  text = text.replace(/,(\s*[}\]])/g, "$1");
-  // Remove trailing junk: extra closing braces after the config object
-  text = text.replace(/\}\s*,?\s*\}\s*,?\s*\}\s*$/g, "}}");
+  return null; // unbalanced
+}
+
+function tryEvalObject(obj) {
   try {
-    return (new Function("return (" + text + ")"))();
+    return { cfg: new Function("return (" + obj + ")")() };
   } catch (e) {
-    // Second chance: aggressive cleanup of trailing braces
+    // Retry with trailing commas stripped (JS objects tolerate them, but be safe)
     try {
-      const cleaned = text.replace(/\}[\s\S]*$/, "}");
-      return (new Function("return (" + cleaned + ")"))();
+      const cleaned = obj.replace(/,(\s*[}\]])/g, "$1");
+      return { cfg: new Function("return (" + cleaned + ")")() };
     } catch (e2) {
-      console.warn("[stitch:convert] Could not parse tailwind config: " + e2.message);
-      return null;
+      return { err: e2.message };
     }
   }
+}
+
+function parseTailwindConfig(doc) {
+  const scripts = [];
+  const re = /<script([^>]*)>([\s\S]*?)<\/script>/gi;
+  let m;
+  while ((m = re.exec(doc))) scripts.push(m[2]);
+  // Prefer the id="tailwind-config" script if present
+  const idMatch = doc.match(/<script id="tailwind-config"[^>]*>([\s\S]*?)<\/script>/i);
+  if (idMatch) scripts.unshift(idMatch[1]);
+
+  let lastErr = null;
+  for (const s of scripts) {
+    const idx = s.search(/tailwind\.config\s*=/);
+    if (idx === -1) continue;
+    const brace = s.indexOf("{", idx);
+    if (brace === -1) continue;
+    const obj = extractBalancedObject(s, brace);
+    if (!obj) { lastErr = "unbalanced braces"; continue; }
+    const res = tryEvalObject(obj);
+    if (res.cfg) return res.cfg;
+    lastErr = res.err;
+    console.warn("[stitch:convert] Config eval failed, trying fallback parse: " + lastErr);
+  }
+  if (lastErr) console.warn("[stitch:convert] Could not parse tailwind config: " + lastErr);
+  return null;
 }
 
 function themeOf(cfg) {
@@ -243,14 +325,20 @@ function main() {
   // Pass 1: parse everything
   const parsed = [];
   const skipped = [];
+  let parseFailures = 0;
   for (const folder of folders) {
     const htmlPath = path.join(SOURCE, folder, "code.html");
-    if (!fs.existsSync(htmlPath)) { skipped.push(folder + " (no code.html)"); continue; }
+    if (!fs.existsSync(htmlPath)) {
+      skipped.push(folder + " (no code.html)");
+      continue;
+    }
     const doc = fs.readFileSync(htmlPath, "utf-8");
+    const cfg = parseTailwindConfig(doc);
+    if (!cfg) parseFailures += 1;
     parsed.push({
       folder,
       doc,
-      tokens: themeTokens(themeOf(parseTailwindConfig(doc))),
+      tokens: themeTokens(themeOf(cfg)),
       bodyClasses: extractBodyClasses(doc),
     });
   }
@@ -278,6 +366,7 @@ function main() {
       modLines.push("  " + u.cssVar + "--letter-spacing: 0em;");
     }
   }
+
   const tokensCss = [
     "/* AUTO-GENERATED by scripts/convert-stitch-to-react.mjs -- do not edit.",
     "   Registers every Stitch design token with Tailwind v4 (flattened, incl.",
@@ -304,6 +393,7 @@ function main() {
     "}",
     "",
   ].join("\n");
+
   fs.writeFileSync(TOKENS, tokensCss);
 
   // Pass 4: emit components
@@ -327,7 +417,6 @@ function main() {
         }
       }
     }
-
     const scopedVars = varLines.length
       ? '[data-page="' + safeFile + '"] {\n' + varLines.join("\n") + "\n}\n\n"
       : "";
@@ -356,6 +445,7 @@ function main() {
       path.join(OUT_DIR, cssFile),
       "/* AUTO-GENERATED page styles (" + folder + ") */\n" + scopedVars + css + "\n"
     );
+
     registry.set(folder, { componentName, safeFile });
     converted += 1;
   }
@@ -381,10 +471,14 @@ function main() {
     "}",
     "",
   ].join("\n");
+
   fs.writeFileSync(REGISTRY, registrySrc);
 
   console.log("[stitch:convert] Converted " + converted + " pages into React components.");
   console.log("[stitch:convert] Registered " + themeLines.length + " global design tokens.");
+  if (parseFailures) {
+    console.log("[stitch:convert] " + parseFailures + " pages had unparsable tailwind configs (tokens skipped).");
+  }
   if (skipped.length) {
     console.log("[stitch:convert] Skipped " + skipped.length + ":");
     for (const s of skipped) console.log("  - " + s);
