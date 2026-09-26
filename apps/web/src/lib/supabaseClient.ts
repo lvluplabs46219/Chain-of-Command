@@ -1,27 +1,17 @@
 /**
  * Acquit.ai Client-Side Supabase Client & Realtime Engine
- * 
+ *
  * Configured for direct browser execution in embeds, Canva custom HTML blocks,
  * and Cloudflare Pages / Next.js deployments.
- * 
+ *
  * Interacts directly with public Supabase REST & Realtime websocket endpoints
  * using the public Anon Key. All operations respect Row Level Security (RLS).
  */
 
 import { createClient, SupabaseClient, User, Session, RealtimeChannel } from "@supabase/supabase-js";
 
-declare global {
-  interface ImportMetaEnv {
-    readonly VITE_SUPABASE_URL?: string;
-    readonly VITE_SUPABASE_ANON_KEY?: string;
-  }
-  interface ImportMeta {
-    readonly env?: ImportMetaEnv;
-  }
-}
-
 // Canonical Public Supabase Config (Environment Variables or Local Fallback)
-const SUPABASE_URL = 
+const SUPABASE_URL =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_SUPABASE_URL) ||
   (typeof process !== "undefined" && (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL)) ||
   "https://fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff.supabase.co";
@@ -54,8 +44,7 @@ export function getSupabaseClient(): SupabaseClient {
       },
     });
 
-    // Make available on wind
-ow for custom client scripts
+    // Make available on window for custom client scripts
     if (typeof window !== "undefined") {
       (window as any).acquitSupabase = browserSupabaseInstance;
     }
@@ -139,8 +128,7 @@ export const clientCaseData = {
   /**
    * Fetch active matters for currently authenticated litigant
    */
-  async fet
-chUserMatters(userId?: string) {
+  async fetchUserMatters(userId?: string) {
     const client = getSupabaseClient();
     let query = client.from("matters").select("*").order("created_at", { ascending: false });
     if (userId) {
@@ -201,7 +189,7 @@ chUserMatters(userId?: string) {
   ): RealtimeChannel {
     const client = getSupabaseClient();
     const channelName = `realtime-matter-${matterId}`;
-    
+
     return client
       .channel(channelName)
       .on(
@@ -210,8 +198,7 @@ chUserMatters(userId?: string) {
           event: "*",
           schema: "public",
           table: "matters",
- 
-         filter: `id=eq.${matterId}`,
+          filter: `id=eq.${matterId}`,
         },
         (payload) => {
           console.log("[Supabase Realtime] Matter change received:", payload);
