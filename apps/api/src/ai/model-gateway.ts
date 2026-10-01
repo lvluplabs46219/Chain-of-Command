@@ -108,7 +108,7 @@ export class DemoModelAdapter implements ModelAdapter {
   provider = "demo" as const;
 
   async listModels(): Promise<string[]> {
-    return ["acquit-demo-1"];
+    return ["chain-of-command-demo-1", "acquit-demo-1"];
   }
 
   async complete(request: ModelRequest): Promise<ModelResponse> {
