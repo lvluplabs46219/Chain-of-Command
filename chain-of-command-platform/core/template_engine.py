@@ -37,7 +37,7 @@ class TemplateEngine:
             'time': lambda: time.strftime("%H:%M:%S"),
             'uuid': lambda: str(uuid.uuid4()),
             'task_id': lambda: str(uuid.uuid4()),
-            'platform': "Acquit.ai",
+            'platform': "Chain of Command",
             'user_id': os.getenv('USER', 'pro_se_litigant')
         }
 

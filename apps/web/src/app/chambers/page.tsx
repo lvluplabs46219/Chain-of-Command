@@ -3,7 +3,7 @@ import StitchPage from "@/lib/stitch/StitchPage";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Chambers - AI Legal Team | Acquit.ai",
+  title: "Chambers - AI Legal Team | Chain of Command",
   description: "Multi-agent legal workspace with specialized AI counselors",
 };
 

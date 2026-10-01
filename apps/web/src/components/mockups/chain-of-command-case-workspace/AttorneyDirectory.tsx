@@ -7,7 +7,7 @@ export function AttorneyDirectory() {
 
 <header className="bg-surface-container-low dark:bg-surface-container-low text-primary dark:text-primary docked full-width top-0 border-b border-outline-variant flat no shadows flex justify-between items-center w-full px-gutter h-16 sticky z-50">
 <div className="flex items-center gap-6">
-<h1 className="text-headline-md font-headline-md font-bold text-on-surface dark:text-on-surface">Acquit.ai</h1>
+<h1 className="text-headline-md font-headline-md font-bold text-on-surface dark:text-on-surface">Chain of Command</h1>
 
 <nav className="hidden md:flex items-center gap-4">
 <a className="text-on-surface-variant text-body-md font-body-md hover:bg-surface-variant hover:text-on-surface px-3 py-2 rounded-DEFAULT transition-all" href="#">File</a>
@@ -145,7 +145,7 @@ export function AttorneyDirectory() {
 <span className="material-symbols-outlined text-on-surface-variant mt-1">info</span>
 <div>
 <h4 className="text-data-mono font-data-mono text-on-surface font-bold uppercase mb-1">Directory Notice</h4>
-<p className="text-body-md font-body-md text-on-surface-variant text-sm">This index is provided as a raw directory for informational purposes only. It does not constitute an endorsement, recommendation, or referral by Acquit.ai. Users must independently verify credentials.</p>
+<p className="text-body-md font-body-md text-on-surface-variant text-sm">This index is provided as a raw directory for informational purposes only. It does not constitute an endorsement, recommendation, or referral by Chain of Command. Users must independently verify credentials.</p>
 </div>
 </div>
 

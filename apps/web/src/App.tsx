@@ -212,7 +212,7 @@ function HomePage() {
   return (
     <div className="min-h-[calc(100vh-45px)] bg-[#0A0A0A] flex flex-col items-center justify-center p-8 text-white font-sans">
       <div className="max-w-4xl text-center space-y-8">
-        <h1 className="text-4xl md:text-5xl font-serif text-[#D4AF37] mb-4">Acquit.ai Platform</h1>
+        <h1 className="text-4xl md:text-5xl font-serif text-[#D4AF37] mb-4">Chain of Command Platform</h1>
         <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
           The legal operating system for self-represented litigants. Access the full suite of AI tools, research modules, and legal workspaces.
         </p>

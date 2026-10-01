@@ -1,6 +1,6 @@
 /**
- * Acquit.ai Production API Service Layer
- * Centralized client for communicating with the Acquit.ai backend API.
+ * Chain of Command Production API Service Layer
+ * Centralized client for communicating with the Chain of Command backend API.
  * Automatically injects authentication tokens, manages environment URLs,
  * and standardizes error handling.
  */

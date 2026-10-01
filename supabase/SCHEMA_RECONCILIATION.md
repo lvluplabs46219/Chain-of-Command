@@ -1,4 +1,4 @@
-# Acquit.ai Supabase Schema Reconciliation
+# Chain of Command Supabase Schema Reconciliation
 
 ## Status
 

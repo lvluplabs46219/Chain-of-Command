@@ -119,7 +119,7 @@ export function AILab() {
       id: "msg-1",
       sender: "agent",
       agentName: "Lead Counsel Coordinator",
-      text: "Welcome to the Acquit.ai intelligence workspace. I am coordinating your legal team. We have ingested Marion County Docket #18 and 7 evidence artifacts. How would you like to proceed?",
+      text: "Welcome to the Chain of Command intelligence workspace. I am coordinating your legal team. We have ingested Marion County Docket #18 and 7 evidence artifacts. How would you like to proceed?",
       timestamp: "10:14 AM",
       citations: [
         { title: "Ind. R. Crim. P. 2.5", cite: "Mandatory Prosecution Discovery" }

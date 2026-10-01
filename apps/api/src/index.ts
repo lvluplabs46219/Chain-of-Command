@@ -4,7 +4,7 @@ import { logger } from "./lib/logger";
 const PORT = parseInt(process.env.PORT || "3001", 10);
 
 const server = app.listen(PORT, () => {
-  logger.info(`Acquit.ai API Server listening on port ${PORT} [${process.env.NODE_ENV ?? "development"}]`);
+  logger.info(`Chain of Command API Server listening on port ${PORT} [${process.env.NODE_ENV ?? "development"}]`);
 });
 
 const gracefulShutdown = (signal: string) => {

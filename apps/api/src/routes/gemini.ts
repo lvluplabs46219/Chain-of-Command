@@ -159,7 +159,7 @@ const handleLawyerChat = async (req: Request, res: Response) => {
     const sanitizedContext = context ? (typeof context === 'string' ? sanitizeUserInput(context) : JSON.stringify(context)) : 'Pro Se Matter';
     const sanitizedAgentRole = sanitizeUserInput(String(agentRole));
 
-    const lawyerPrompt = `Role: Acquit.ai Legal Team Assistant (${sanitizedAgentRole})
+    const lawyerPrompt = `Role: Chain of Command Legal Team Assistant (${sanitizedAgentRole})
 Mission: Assist self-represented (pro se) litigant with legal education, procedural rules, and factual organization.
 Jurisdiction: ${sanitizedJurisdiction}
 Case Context: ${sanitizedContext}
@@ -257,7 +257,7 @@ geminiRouter.post('/gemini/clerk-chat', async (req: Request, res: Response) => {
     const sanitizedContext = context ? JSON.stringify(context) : 'General Criminal / Procedural Inquiry';
     const sanitizedJurisdiction = sanitizeUserInput(String(jurisdiction));
 
-    const clerkPrompt = `You are "The Clerk", an AI court procedural guide and legal education assistant for pro se (self-represented) litigants on Acquit.ai.
+    const clerkPrompt = `You are "The Clerk", an AI court procedural guide and legal education assistant for pro se (self-represented) litigants on Chain of Command.
 Jurisdiction: ${sanitizedJurisdiction}
 Case Context: ${sanitizedContext}
 
@@ -404,7 +404,7 @@ geminiRouter.post('/gemini/plea-assistant', async (req: Request, res: Response) 
     const sanitizedTrialRisks = sanitizeUserInput(String(trialRisks || 'General'));
     const sanitizedCollateralConsequences = sanitizeUserInput(String(collateralConsequences || 'General'));
 
-    const prompt = `Act as the neutral Plea Decision Assistant for Acquit.ai.
+    const prompt = `Act as the neutral Plea Decision Assistant for Chain of Command.
 CRITICAL MANDATE: You MUST NOT tell the user to take or reject the plea.
 
 Input Data:

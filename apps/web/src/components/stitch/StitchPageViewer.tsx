@@ -98,7 +98,7 @@ export function StitchPageViewer({
                 for (var key in routeMap) {
                   if (text.indexOf(key) !== -1) {
                     e.preventDefault();
-                    window.parent.postMessage({ type: 'ACQUIT_NAVIGATE', path: routeMap[key] }, '*');
+                    window.parent.postMessage({ type: 'CHAIN_OF_COMMAND_NAVIGATE', path: routeMap[key] }, '*');
                     return;
                   }
                 }
@@ -135,7 +135,7 @@ export function StitchPageViewer({
   // Listen for navigation messages from within the iframe
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
-      if (event.data && event.data.type === "ACQUIT_NAVIGATE" && event.data.path) {
+      if (event.data && event.data.type === "CHAIN_OF_COMMAND_NAVIGATE" && event.data.path) {
         navigate(event.data.path);
       }
     }

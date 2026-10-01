@@ -1,5 +1,5 @@
 /**
- * Acquit.ai — Cloudflare API Proxy Worker
+ * Chain of Command — Cloudflare API Proxy Worker
  * Secure reverse proxy with CORS enforcement, security headers,
  * and request forwarding to the Acquit backend API.
  */

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Acquit.ai - Harvard LIL Caselaw Access Project Ingestion Forwarder
+Chain of Command - Harvard LIL Caselaw Access Project Ingestion Forwarder
 Redirects to scripts/python/harvard_cases.py
 """
 import os

@@ -43,7 +43,7 @@ export async function sendOnboardingEmail(user: UserAccount): Promise<{ sent: bo
 }
 
 /**
- * Acquit.ai User Signup Durable Workflow
+ * Chain of Command User Signup Durable Workflow
  */
 export async function handleUserSignup(email: string) {
   "use workflow";

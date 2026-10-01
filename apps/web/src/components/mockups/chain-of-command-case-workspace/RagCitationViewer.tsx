@@ -264,7 +264,7 @@ export function RagCitationViewer({
       {/* Main Message Content */}
       <div className="mt-4 text-xs sm:text-sm text-[#f3ede8] leading-relaxed whitespace-pre-line font-sans">
         {activeContent || (isStreaming && (
-          <span className="text-[#8e857e] animate-pulse">Streaming response from Acquit.ai Model Gateway...</span>
+          <span className="text-[#8e857e] animate-pulse">Streaming response from Chain of Command Model Gateway...</span>
         ))}
         {isStreaming && (
           <span className="inline-block w-2 h-4 ml-1 bg-[#d4af37] animate-pulse align-middle"></span>

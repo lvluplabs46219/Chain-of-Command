@@ -11,7 +11,7 @@ function corsHeaders(origin, allowed) {
   return {
     "Access-Control-Allow-Origin": ok ? origin : list[0] || "",
     "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Request-Id, X-Acquit-Token",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Request-Id, X-ChainOfCommand-Token",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
   };
@@ -56,7 +56,7 @@ export default {
     }
 
     if (env.WORKER_AUTH_TOKEN) {
-      const token = request.headers.get("X-Acquit-Token");
+      const token = request.headers.get("X-ChainOfCommand-Token");
       if (token !== env.WORKER_AUTH_TOKEN && !url.pathname.startsWith("/api/public")) {
         return json({ error: "unauthorized" }, 401, cors);
       }

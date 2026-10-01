@@ -1,5 +1,5 @@
 /**
- * Canonical route resolution for the Acquit.ai Stitch application pages.
+ * Canonical route resolution for the Chain of Command Stitch application pages.
  * Every Stitch design IS an actual app page; routes are derived deterministically.
  */
 

@@ -55,7 +55,7 @@ def build_system():
 
     # 2. Template & Prompt Security
     template_engine = TemplateEngine(
-        context={"platform": "Acquit.ai", "user_role": "pro_se_litigant"}
+        context={"platform": "Chain of Command", "user_role": "pro_se_litigant"}
     )
 
     # 3. Model Routing

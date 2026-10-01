@@ -1,5 +1,5 @@
 /**
- * Acquit.ai User Authentication & Workspace Security Context
+ * Chain of Command User Authentication & Workspace Security Context
  * Provides secure session state, token management, role-based controls,
  * and workspace route protection for self-represented litigants.
  */

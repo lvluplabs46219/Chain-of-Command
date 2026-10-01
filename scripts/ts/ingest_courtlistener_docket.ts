@@ -14,7 +14,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 function getHeaders(): Record<string, string> {
   const headers: Record<string, string> = {
-    "User-Agent": "Acquit.ai CourtListener Ingestion Pipeline/1.0 (contact@acquit.ai)",
+    "User-Agent": "Chain of Command CourtListener Ingestion Pipeline/1.0 (contact@acquit.ai)",
     "Accept": "application/json"
   };
   if (COURTLISTENER_TOKEN && COURTLISTENER_TOKEN.trim() !== "") {

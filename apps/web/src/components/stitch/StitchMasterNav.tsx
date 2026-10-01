@@ -46,7 +46,7 @@ export function StitchMasterNav() {
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
                 <span className="font-serif text-lg font-bold tracking-tight text-white group-hover:text-[#b5c8df] transition-colors">
-                  Acquit.ai
+                  Chain of Command
                 </span>
                 <span className="rounded bg-[#36485b]/60 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[#b5c8df] border border-[#b5c8df]/30">
                   LEGAL OS

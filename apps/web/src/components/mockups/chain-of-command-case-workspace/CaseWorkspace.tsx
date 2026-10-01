@@ -8,7 +8,7 @@ export function CaseWorkspace() {
 <header className="bg-surface-container-low dark:bg-surface-container-low border-b border-outline-variant w-full shrink-0 z-50">
 <div className="flex justify-between items-center w-full px-gutter h-16">
 <div className="flex items-center gap-lg">
-<div className="text-headline-md font-headline-md font-bold text-on-surface dark:text-on-surface tracking-tight">Acquit.ai</div>
+<div className="text-headline-md font-headline-md font-bold text-on-surface dark:text-on-surface tracking-tight">Chain of Command</div>
 <nav className="hidden md:flex gap-sm">
 <button className="text-on-surface-variant px-sm py-xs hover:bg-surface-variant hover:text-on-surface rounded text-data-mono font-data-mono transition-colors">File</button>
 <button className="text-on-surface-variant px-sm py-xs hover:bg-surface-variant hover:text-on-surface rounded text-data-mono font-data-mono transition-colors">Edit</button>

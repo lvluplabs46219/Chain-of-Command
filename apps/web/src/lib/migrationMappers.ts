@@ -1,5 +1,5 @@
 /**
- * Acquit.ai Migration Mappers
+ * Chain of Command Migration Mappers
  * Utility functions to map between frontend mock/state types and backend API response contracts.
  * Simplifies transitioning from offline mock views to production backend endpoints.
  */

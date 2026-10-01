@@ -70,7 +70,7 @@ WHEREFORE, the Defendant respectfully requests that this Court set this matter f
             <span className="cursor-pointer hover:text-white">Help</span>
           </div>
         </div>
-        <div className="text-center font-medium">Acquit.ai - Case Workspace</div>
+        <div className="text-center font-medium">Chain of Command - Case Workspace</div>
         <div className="flex gap-3">
           <span className="h-3 w-3 rounded-full bg-yellow-500"></span>
           <span className="h-3 w-3 rounded-full bg-green-500"></span>
@@ -215,7 +215,7 @@ WHEREFORE, the Defendant respectfully requests that this Court set this matter f
             ) : (
               <div className="flex h-full flex-col items-center justify-center text-gray-500">
                 <img src="https://www.gstatic.com/mobilesdk/250721_mobilesdk/mono_firebase_dark.svg" alt="logo" className="mb-4 h-24 w-24 opacity-20 grayscale" />
-                <h2 className="text-xl">Acquit.ai Workspace</h2>
+                <h2 className="text-xl">Chain of Command Workspace</h2>
                 <p className="mt-2 text-sm">Select a file from the explorer to begin.</p>
               </div>
             )}

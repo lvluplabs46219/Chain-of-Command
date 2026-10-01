@@ -19,7 +19,7 @@ Features:
 - Comprehensive error handling and rate limiting
 
 Usage:
-    from acquit_platform import initialize_system
+    from chain_of_command_platform import initialize_system
     
     # Initialize the complete system
     system = initialize_system()

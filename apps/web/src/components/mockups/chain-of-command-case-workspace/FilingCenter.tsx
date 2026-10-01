@@ -243,7 +243,7 @@ export function FilingCenter() {
                     />
                     <span className="text-[12px] text-white/80 font-sans leading-relaxed group-hover:text-white transition-colors">
                       <strong className="text-white block font-mono text-[11px] mb-0.5">2. Self-Represented Status</strong>
-                      I am acting Pro Se on my own behalf. I acknowledge Acquit.ai is a legal software tool and does not provide legal representation.
+                      I am acting Pro Se on my own behalf. I acknowledge Chain of Command is a legal software tool and does not provide legal representation.
                     </span>
                   </label>
 

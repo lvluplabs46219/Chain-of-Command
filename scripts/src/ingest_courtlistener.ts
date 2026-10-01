@@ -153,7 +153,7 @@ function generateDeterministicVector(text: string, dim = 1536): number[] {
 
 async function fetchLiveOpinion(opinionId: string) {
   const url = `https://www.courtlistener.com/api/rest/v4/opinions/${opinionId}/`;
-  const headers: Record<string, string> = { "User-Agent": "Acquit.ai Ingestion Bot/1.0" };
+  const headers: Record<string, string> = { "User-Agent": "Chain of Command Ingestion Bot/1.0" };
   if (process.env.COURTLISTENER_API_TOKEN && process.env.COURTLISTENER_API_TOKEN.trim() !== '') {
     headers["Authorization"] = `Token ${process.env.COURTLISTENER_API_TOKEN}`;
   }

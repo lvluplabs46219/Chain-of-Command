@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Acquit.ai - Database Migration Engine
+Chain of Command - Database Migration Engine
 Applies all Supabase/PostgreSQL migrations in chronological order.
 Tracks applied migrations in public._migrations table to prevent duplicate execution.
 Supports both psycopg2 (native python) and node pg fallback if python DB driver is absent.
@@ -203,7 +203,7 @@ run().catch(err => {{
     return result.returncode == 0
 
 def main():
-    parser = argparse.ArgumentParser(description="Acquit.ai Supabase Migration Runner")
+    parser = argparse.ArgumentParser(description="Chain of Command Supabase Migration Runner")
     parser.add_argument("--force", action="store_true", help="Re-apply all migrations even if previously applied")
     parser.add_argument("--dry-run", action="store_true", help="List pending migrations without executing them")
     parser.add_argument("--list", action="store_true", help="List all available migration files")

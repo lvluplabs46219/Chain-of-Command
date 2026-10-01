@@ -1,5 +1,5 @@
 /**
- * Acquit.ai Client-Side Supabase Client & Realtime Engine
+ * Chain of Command Client-Side Supabase Client & Realtime Engine
  * 
  * Configured for direct browser execution in embeds, Canva custom HTML blocks,
  * and Cloudflare Pages / Next.js deployments.

@@ -15,7 +15,7 @@ export default function AcquitClientApp() {
       <div className="min-h-screen bg-[#111214] flex items-center justify-center text-[#d4af37]">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-mono tracking-wider uppercase text-[#c5c6ca]">Initializing Acquit Legal OS...</span>
+          <span className="text-xs font-mono tracking-wider uppercase text-[#c5c6ca]">Initializing Chain of Command...</span>
         </div>
       </div>
     );
