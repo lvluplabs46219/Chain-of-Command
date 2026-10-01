@@ -1,5 +1,5 @@
 """
-Acquit Platform - Multi-agent Orchestration, LLM Routing, and Variable Substitution
+Chain of Command Platform - Multi-agent Orchestration, LLM Routing, and Variable Substitution
 
 This is a hierarchical multi-agent system with a central Orchestrator, specialized Agents,
 a Task Bot for repetitive operations, and a Main LLM as the reasoning core.
@@ -1195,7 +1195,7 @@ def example_bot_to_all_llms():
 
 
 if __name__ == "__main__":
-    print("Acquit Platform - Agentic System Architecture")
+    print("Chain of Command Platform - Agentic System Architecture")
     print("=" * 60)
     example_basic_usage()
     example_variable_substitution()
