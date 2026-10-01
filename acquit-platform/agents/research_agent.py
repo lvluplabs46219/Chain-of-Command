@@ -24,24 +24,39 @@ class ResearchAgent(BaseAgent):
         query = params.get("query") or params.get("topic") or context.get("case_number", "unknown_case")
         depth = params.get("depth", "comprehensive")
 
-        # In a full deployment, this calls vector RAG / court API or delegated LLM
+        # Delegate the research prompt directly to the LLM router for live output
+        prompt = (
+            f"Perform {depth} legal research for case '{query}'. "
+            f"Identify controlling statutes, precedent, and court rules relevant to the query, "
+            f"and provide a concise summary of findings."
+        )
+
+        llm_result: Optional[Dict[str, Any]] = None
         if self.llm_router:
-            self.llm_router.delegate(
-                task={"description": f"Perform legal research for {query}"},
+            llm_result = self.llm_router.delegate(
+                task={"prompt": prompt},
                 sensitivity=sensitivity,
                 agent_id=self.name
             )
 
-        mock_authorities = [
-            {"citation": "State v. Anderson, 142 N.E.3d 891", "type": "Precedent", "relevance": 0.94},
-            {"citation": "Ind. Code § 35-36-8-1 (Omnibus Date)", "type": "Statute", "relevance": 0.98},
-            {"citation": "Local Criminal Rule 4 (Filing Deadlines)", "type": "Court Rule", "relevance": 0.91},
-        ]
+        if llm_result and llm_result.get("status") == "success":
+            return {
+                "query": query,
+                "depth": depth,
+                "provider": llm_result.get("provider"),
+                "model": llm_result.get("model"),
+                "authorities": llm_result.get("content"),
+                "summary": llm_result.get("content"),
+                "tokens_used": llm_result.get("tokens_used"),
+                "cost": llm_result.get("cost"),
+                "task_id": llm_result.get("task_id")
+            }
 
+        # No router or delegation failed - surface the error instead of mock data
+        error = llm_result.get("error") if llm_result else "No LLM router configured"
         return {
             "query": query,
             "depth": depth,
-            "found_items": len(mock_authorities),
-            "authorities": mock_authorities,
-            "summary": f"Identified {len(mock_authorities)} authoritative sources grounded for case {query}."
+            "status": "error",
+            "error": f"LLM delegation failed: {error}"
         }

@@ -24,21 +24,39 @@ class CodeAgent(BaseAgent):
         requirements = params.get("requirements", "Create a function to redact sensitive information...")
         language = params.get("language", "python")
 
-        code_snippet = f"""# Generated code for: {requirements}
-import re
+        # Delegate the code-generation prompt directly to the LLM router for live output
+        prompt = (
+            f"Generate production-quality {language} code for the following legal-tech requirement: "
+            f"{requirements}. Return only the complete, runnable code with docstrings and no explanation."
+        )
 
-def redact_sensitive_pii(text: str) -> str:
-    \"\"\"Redacts SSN, phone numbers, and identifying court case minors.\"\"\"
-    # Redact Social Security Numbers (XXX-XX-XXXX)
-    text = re.sub(r'\\b\\d{{3}}-\\d{{2}}-\\d{{4}}\\b', '[REDACTED-SSN]', text)
-    # Redact Standard Phone Numbers
-    text = re.sub(r'\\b\\(?\\d{{3}}\\)?[-.\\s]?\\d{{3}}[-.\\s]?\\d{{4}}\\b', '[REDACTED-PHONE]', text)
-    return text
-"""
+        llm_result: Optional[Dict[str, Any]] = None
+        if self.llm_router:
+            llm_result = self.llm_router.delegate(
+                task={"prompt": prompt},
+                sensitivity=sensitivity,
+                agent_id=self.name
+            )
 
+        if llm_result and llm_result.get("status") == "success":
+            code = llm_result.get("content", "")
+            return {
+                "language": language,
+                "requirements": requirements,
+                "provider": llm_result.get("provider"),
+                "model": llm_result.get("model"),
+                "code": code,
+                "lines": len(code.strip().splitlines()) if code.strip() else 0,
+                "tokens_used": llm_result.get("tokens_used"),
+                "cost": llm_result.get("cost"),
+                "task_id": llm_result.get("task_id")
+            }
+
+        # No router or delegation failed - surface the error instead of mock data
+        error = llm_result.get("error") if llm_result else "No LLM router configured"
         return {
             "language": language,
             "requirements": requirements,
-            "code": code_snippet,
-            "lines": len(code_snippet.strip().splitlines())
+            "status": "error",
+            "error": f"LLM delegation failed: {error}"
         }
