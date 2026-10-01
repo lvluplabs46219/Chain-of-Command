@@ -115,7 +115,7 @@ export function FilingCenter() {
                   Motion for Discovery & Inspection
                 </h2>
                 <p className="text-[13px] text-white/60 mt-1">
-                  Drafted by Acquit AI based on Marion County Docket Entry #18
+                  Drafted by Chain of Command AI based on Marion County Docket Entry #18
                 </p>
               </div>
               <div className="h-10 w-10 rounded-xl bg-[#174E48]/30 flex items-center justify-center border border-[#174E48] text-[#D4AF37] shrink-0">

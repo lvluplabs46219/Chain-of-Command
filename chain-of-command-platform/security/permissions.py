@@ -1,5 +1,5 @@
 """
-Acquit Platform - Security & Permission Subsystem
+Chain of Command Platform - Security & Permission Subsystem
 Enforces role-based agent permissions and data sensitivity levels.
 """
 

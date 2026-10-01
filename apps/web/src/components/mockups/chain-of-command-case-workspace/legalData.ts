@@ -265,7 +265,7 @@ export const INITIAL_TIMELINE_EVENTS: TimelineEvent[] = [
     description: "Deadline under Marion Sup. Ct. LR49-CR00-4.1 to serve all defense discovery requests and suppression motions 14 days prior to omnibus date.",
     keyTakeaways: [
       "Must file Motion to Exclude Unproduced Video Evidence if State delays",
-      "Draft already initiated in Acquit Filing Center (85% complete)"
+      "Draft already initiated in Chain of Command Filing Center (85% complete)"
     ],
     actionRequired: "Review and electronically sign Motion in Filing Center"
   },

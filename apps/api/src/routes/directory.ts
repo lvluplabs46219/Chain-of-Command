@@ -219,9 +219,9 @@ router.get("/directory/lawyers", (req: Request, res: Response) => {
   return res.json({
     policy: {
       enforced: true,
-      name: "ACQUIT ATTORNEY DIRECTORY POLICY",
+      name: "CHAIN OF COMMAND ATTORNEY DIRECTORY POLICY",
       aiRecommendationUsed: false,
-      disclaimer: "Acquit displays attorney directory listings matching user-selected criteria. Acquit does not endorse, select, or evaluate the competence of any individual attorney or law firm.",
+      disclaimer: "Chain of Command displays attorney directory listings matching user-selected criteria. Chain of Command does not endorse, select, or evaluate the competence of any individual attorney or law firm.",
     },
     totalMatches: results.length,
     attorneys: results,

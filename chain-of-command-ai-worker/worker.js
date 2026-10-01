@@ -1,7 +1,7 @@
 /**
  * Chain of Command — Cloudflare API Proxy Worker
  * Secure reverse proxy with CORS enforcement, security headers,
- * and request forwarding to the Acquit backend API.
+ * and request forwarding to the Chain of Command backend API.
  */
 
 export default {
@@ -15,7 +15,7 @@ export default {
         headers: {
           "Access-Control-Allow-Origin": request.headers.get("Origin") || "*",
           "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, X-Acquit-Case-Id",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, X-ChainOfCommand-Case-Id",
           "Access-Control-Allow-Credentials": "true",
           "Access-Control-Max-Age": "86400",
         },
@@ -27,7 +27,7 @@ export default {
       return new Response(
         JSON.stringify({
           status: "healthy",
-          service: "acquit-ai-api-proxy",
+          service: "chain-of-command-ai-api-proxy",
           timestamp: new Date().toISOString(),
           region: request.cf?.colo || "global",
         }),
@@ -49,7 +49,7 @@ export default {
     const newHeaders = new Headers(request.headers);
     newHeaders.set("X-Forwarded-Host", url.host);
     newHeaders.set("X-Forwarded-Proto", url.protocol.replace(":", ""));
-    newHeaders.set("X-Acquit-Proxy", "cloudflare-worker");
+    newHeaders.set("X-ChainOfCommand-Proxy", "cloudflare-worker");
 
     try {
       const response = await fetch(targetUrl.toString(), {

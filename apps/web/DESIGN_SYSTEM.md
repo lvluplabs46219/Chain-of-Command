@@ -105,10 +105,10 @@ active carousel slide, selected agent, selected nav item.
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │ SIDEBAR (280px, fixed, collapsible on mobile)                       │
-│  ── Brand mark (gold glow "A" mark + ACQUIT.AI / SOVEREIGN OS)      │
+│  ── Brand mark (gold glow "A" mark + CHAIN OF COMMAND / SOVEREIGN OS)      │
 │  ── WORKSPACE                                                       │
 │      Case overview · AI Lab · Google Workspace · Find an attorney   │
-│      Timeline · Documents · Filing center · Acquit Academy          │
+│      Timeline · Documents · Filing center · Chain of Command Academy          │
 │  ── INTELLIGENCE                                                     │
 │      AI legal team · Law library                                    │
 │  ── Enclave Secured trust panel (glass, gold shield icon)            │
@@ -133,7 +133,7 @@ active carousel slide, selected agent, selected nav item.
 │   • Filing center    → FilingCenter (motion drafts, human-approval)  │
 │   • Find an attorney → AttorneyDirectory (filterable card grid)      │
 │   • Law library      → LawLibraryExplorer + RagCitationViewer        │
-│   • Acquit Academy   → AcquitAcademy (course carousel)               │
+│   • Chain of Command Academy   → ChainOfCommandAcademy (course carousel)               │
 │   • Google Workspace → GoogleWorkspaceIntegration                    │
 │                                                                       │
 │  Footer notice: disclaimer + "Plain English" toggle                  │
@@ -148,7 +148,7 @@ active carousel slide, selected agent, selected nav item.
 | Document vault | `SovereignCylinder.tsx` | 3D rotating cylinder of filings, drag-to-rotate, IPFS-style CID chips |
 | Case progression | inside `AILab.tsx` | 4-up static strip (arrest → hearing → discovery → trial), gold ring on active |
 | Attorney cards | `AttorneyDirectory.tsx` | Filterable grid, could upgrade to `Carousel` primitive for mobile swipe |
-| Academy courses | `AcquitAcademy.tsx` | Course card carousel |
+| Academy courses | `ChainOfCommandAcademy.tsx` | Course card carousel |
 | Law authorities | `LawLibraryExplorer.tsx` | Statute/case card carousel with cite-to-case action |
 
 Base primitive: `src/components/ui/carousel.tsx` (shadcn wrapper over
@@ -168,7 +168,7 @@ ls).
 
 ## 7. Open Gaps / Next Steps
 
-1. `AttorneyDirectory` and `AcquitAcademy` use flex/grid card lists, not the
+1. `AttorneyDirectory` and `ChainOfCommandAcademy` use flex/grid card lists, not the
    shared `Carousel` primitive — consider migrating to `ui/carousel.tsx` +
    `CarouselItem` for consistent swipe/keyboard nav + built-in prev/next glow
    buttons instead of bespoke scroll containers.

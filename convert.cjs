@@ -60,7 +60,7 @@ export default function AttorneyDirectory() {
 }
 `;
 
-fs.writeFileSync('apps/web/src/components/mockups/acquit-case-workspace/CaseWorkspace.tsx', ccJsx);
-fs.writeFileSync('apps/web/src/components/mockups/acquit-case-workspace/AttorneyDirectory.tsx', cdJsx);
+fs.writeFileSync('apps/web/src/components/mockups/chain-of-command-case-workspace/CaseWorkspace.tsx', ccJsx);
+fs.writeFileSync('apps/web/src/components/mockups/chain-of-command-case-workspace/AttorneyDirectory.tsx', cdJsx);
 
 console.log("Converted.");

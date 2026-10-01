@@ -191,7 +191,7 @@
   --spacing: 0.25rem;
 
   /* ---------------------------------------------------------------- */
-  /* SOVEREIGN (Black & Gold) — Acquit.ai brand tokens                */
+  /* SOVEREIGN (Black & Gold) — Chain of Command brand tokens                */
   /* Use these instead of hardcoding hex values in new components.    */
   /* e.g. text-[color:var(--sov-gold)] or bg-[color:var(--sov-void)]  */
   /* ---------------------------------------------------------------- */
@@ -293,7 +293,7 @@
 
 @layer utilities {
   /* ---------------------------------------------------------------- */
-  /* SOVEREIGN UI utilities — shared building blocks for Acquit.ai    */
+  /* SOVEREIGN UI utilities — shared building blocks for Chain of Command    */
   /* screens. Prefer these over re-typing the same class strings.     */
   /* ---------------------------------------------------------------- */
 

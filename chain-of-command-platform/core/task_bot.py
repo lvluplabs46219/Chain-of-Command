@@ -1,5 +1,5 @@
 """
-Acquit Platform - TaskBot Automation Layer
+Chain of Command Platform - TaskBot Automation Layer
 Handles repetitive tasks, data formatting, and multi-LLM broadcast operations with security guards.
 """
 

@@ -1,5 +1,5 @@
 {
-  "name": "@acquit/database",
+  "name": "@chain-of-command/database",
   "version": "1.0.0",
   "private": true,
   "main": "index.ts",

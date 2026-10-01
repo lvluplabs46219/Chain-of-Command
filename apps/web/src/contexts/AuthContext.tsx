@@ -34,7 +34,7 @@ export interface AuthContextType {
 const DEFAULT_LITIGANT_USER: AuthUser = {
   id: "usr_pro_se_litigant",
   name: "Arthur Marlowe",
-  email: "litigant@acquit.ai",
+  email: "litigant@chainofcommand.ai",
   role: "pro_se",
   jurisdiction: "Arizona / Marion County",
   activeMatterId: "matter-001",
@@ -44,7 +44,7 @@ const DEFAULT_LITIGANT_USER: AuthUser = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const USER_STORAGE_KEY = "acquit_auth_user";
+const USER_STORAGE_KEY = "chain_of_command_auth_user";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } else {
         // Auto-provision standard pro se demo session for instant usability
-        const defaultToken = "acquit-pro-se-token";
+        const defaultToken = "chain-of-command-pro-se-token";
         setAuthToken(defaultToken);
         setTokenState(defaultToken);
         setUser(DEFAULT_LITIGANT_USER);
@@ -94,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(supaUser));
         }
       }).catch((err) => {
-        console.warn("[Acquit Auth] Supabase session check notice:", err);
+        console.warn("[Chain of Command Auth] Supabase session check notice:", err);
       });
 
       const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -127,9 +127,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const loginAsLitigant = async (name = "Arthur Marlowe", email = "litigant@acquit.ai") => {
+  const loginAsLitigant = async (name = "Arthur Marlowe", email = "litigant@chainofcommand.ai") => {
     setIsLoading(true);
-    const newToken = "acquit-pro-se-token";
+    const newToken = "chain-of-command-pro-se-token";
     const newUser: AuthUser = {
       ...DEFAULT_LITIGANT_USER,
       name,

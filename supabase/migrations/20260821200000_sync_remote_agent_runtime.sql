@@ -1,4 +1,4 @@
--- Acquit.ai remote-state synchronization
+-- Chain of Command remote-state synchronization
 -- Captures the agent runtime tables already applied to Supabase project othxichdhzdxgtatautb.
 -- This file is intentionally idempotent so a fresh environment can recreate the runtime schema.
 

@@ -37,7 +37,7 @@ export function StitchGallery() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="font-mono text-xs tracking-widest text-[#b5c8df] uppercase">
-              ACQUIT.AI / STITCH OS SPECIFICATION
+              CHAIN OF COMMAND / STITCH OS SPECIFICATION
             </span>
             <span className="rounded bg-[#36485b]/60 px-2 py-0.5 font-mono text-[10px] text-[#b5c8df]">
               46 DESIGN SCREENS
@@ -47,7 +47,7 @@ export function StitchGallery() {
             Stitch OS Pages & Screen Matrix
           </h1>
           <p className="mt-1 text-sm text-[#8f9194] max-w-2xl">
-            Complete high-fidelity layouts created for the Acquit legal operating system. Click any card to launch the interactive live layout or inspect its visual spec.
+            Complete high-fidelity layouts created for the Chain of Command legal operating system. Click any card to launch the interactive live layout or inspect its visual spec.
           </p>
         </div>
 

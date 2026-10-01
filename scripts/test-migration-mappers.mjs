@@ -10,7 +10,7 @@ import {
   mapBackendRunToAiChatMessage
 } from "../apps/web/src/lib/migrationMappers.ts";
 
-console.log("=== Testing Acquit.ai Migration Mappers ===");
+console.log("=== Testing Chain of Command Migration Mappers ===");
 
 // 1. Test Authority mapping
 const sampleBackendAuth = {

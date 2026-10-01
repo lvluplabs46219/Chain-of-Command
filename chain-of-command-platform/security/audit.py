@@ -1,5 +1,5 @@
 """
-Acquit Platform - Immutable Audit Logging
+Chain of Command Platform - Immutable Audit Logging
 Maintains append-only execution records for compliance, explainability, and observability.
 """
 

@@ -2,7 +2,7 @@ import './globals.css';
 import type { Metadata } from 'react';
 
 export const metadata: Metadata = {
-  title: 'Acquit Legal Operating System',
+  title: 'Chain of Command Legal Operating System',
   description: 'AI-Powered Legal Workspace & Multi-Agent Platform',
 };
 

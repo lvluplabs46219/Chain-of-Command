@@ -1,4 +1,4 @@
-# ACQUIT.AI — GOOGLE AI STUDIO MASTER BUILD INSTRUCTIONS
+# CHAIN OF COMMAND — GOOGLE AI STUDIO MASTER BUILD INSTRUCTIONS
 
 ## 1. ROLE
 You are the principal software architect, AI systems engineer, legal-tech product architect, UX architect, security engineer, database architect, and senior full-stack developer responsible for building Chain of Command.
@@ -133,7 +133,7 @@ The timeline should support: Arrest, Citation, Charges, Booking, Initial appeara
 Build a document management system. The system should store originals, generate metadata, extract text, detect type, index contents, etc. Never overwrite the original document.
 
 ## 14. DOCUMENT GENERATION
-Acquit may assist users in preparing legal documents. The AI must clearly distinguish Information, Analysis, Draft, User-edited document, Final user-approved document. A generated document must never silently become a filed document.
+Chain of Command may assist users in preparing legal documents. The AI must clearly distinguish Information, Analysis, Draft, User-edited document, Final user-approved document. A generated document must never silently become a filed document.
 
 ## 15. COURT CONNECTOR SDK
 Create a generic Court Connector SDK. Connectors must be modular. Capabilities must be declared.
@@ -145,16 +145,16 @@ Never assume an API exists. Implement only permitted capabilities.
 This is a strict architectural boundary. AI may assist, but external legal actions must remain explicitly human-controlled. The AI must NOT silently File a document, Submit a motion, Enter a plea, Contact a court, etc.
 
 ## 18. ATTORNEY DIRECTORY
-Acquit includes an independent attorney directory. The directory is NOT an AI lawyer recommendation engine. Acquit must NOT recommend an individual attorney, rank as best, etc. Acquit MAY explain types, provide search filters, etc. The USER chooses the attorney.
+Chain of Command includes an independent attorney directory. The directory is NOT an AI lawyer recommendation engine. Chain of Command must NOT recommend an individual attorney, rank as best, etc. Chain of Command MAY explain types, provide search filters, etc. The USER chooses the attorney.
 
 ## 19. ATTORNEY DIRECTORY DATA
 Create attorney entities. Clearly distinguish VERIFIED DATA, ATTORNEY-PROVIDED DATA, SPONSORED CONTENT.
 
 ## 20. ACCESSIBILITY
-Acquit must be designed for people with different cognitive and accessibility needs. Prioritize Plain language, Adjustable reading complexity, Clear hierarchy, Predictable navigation, etc. Do not diagnose users.
+Chain of Command must be designed for people with different cognitive and accessibility needs. Prioritize Plain language, Adjustable reading complexity, Clear hierarchy, Predictable navigation, etc. Do not diagnose users.
 
 ## 21. SAFETY AND LEGAL DISCLAIMERS
-Acquit should never falsely claim to be a human attorney. Disclaimers should be contextual rather than obnoxious. The UX should remain usable.
+Chain of Command should never falsely claim to be a human attorney. Disclaimers should be contextual rather than obnoxious. The UX should remain usable.
 
 ## 22. SECURITY MODEL
 Treat legal case information as highly sensitive. Implement Encryption, Strong authentication, Session management, Role-based access control, etc. Never allow an LLM to bypass authorization.

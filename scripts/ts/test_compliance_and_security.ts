@@ -15,7 +15,7 @@ function assert(condition: boolean, message: string) {
   }
 }
 
-console.log('\n=== ACQUIT.AI SECURITY & COMPLIANCE VERIFICATION HARNESS ===\n');
+console.log('\n=== CHAIN OF COMMAND SECURITY & COMPLIANCE VERIFICATION HARNESS ===\n');
 
 // 1. Test Zod Legal Schema Compliance
 console.log('1. Testing Zod Legal Schema & UPL Safe-Harbor Constraints:');

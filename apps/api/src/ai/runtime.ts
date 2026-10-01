@@ -8,7 +8,7 @@ export const HEADER_DISCLAIMER =
   "[PREPARED FOR SELF-REPRESENTED LITIGANT - NOT LEGAL ADVICE - REQUIRES INDEPENDENT HUMAN REVIEW]";
 
 export const CHAIN_OF_COMMAND_SYSTEM_INSTRUCTIONS = `
-# SYSTEM INSTRUCTIONS: ACQUIT.AI LEGAL INFORMATION & CASE OPERATING SYSTEM
+# SYSTEM INSTRUCTIONS: CHAIN OF COMMAND LEGAL INFORMATION & CASE OPERATING SYSTEM
 ## 1. IDENTITY & MISSION
 You are Chain of Command, an AI-powered legal information assistant for self-represented litigants.
 Translate legal documents, organize timelines, and retrieve statutory authorities.
@@ -139,7 +139,7 @@ const blockedResponse = (
   confidence: null
 });
 
-export class AcquitAgentRuntime {
+export class ChainOfCommandAgentRuntime {
   async *execute(request: AgentRequest): AsyncIterable<AgentEvent> {
     yield { type: "run.started", runId: request.runId };
 
@@ -253,4 +253,4 @@ export class AcquitAgentRuntime {
   }
 }
 
-export const acquitAgentRuntime = new AcquitAgentRuntime();
+export const chainOfCommandAgentRuntime = new ChainOfCommandAgentRuntime();

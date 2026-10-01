@@ -246,7 +246,7 @@ async function ingestPrecedent(p: LegalPrecedentSeed) {
 
 async function main() {
   console.log("============================================================");
-  console.log("             ACQUIT.AI LEGAL INGESTION PIPELINE             ");
+  console.log("             CHAIN OF COMMAND LEGAL INGESTION PIPELINE             ");
   console.log("============================================================");
 
   let successCount = 0;

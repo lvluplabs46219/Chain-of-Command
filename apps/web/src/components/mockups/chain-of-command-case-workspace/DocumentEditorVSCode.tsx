@@ -187,7 +187,7 @@ WHEREFORE, the Defendant respectfully requests that this Court set this matter f
 
           {/* Breadcrumbs */}
           <div className="flex h-6 items-center gap-1 px-4 text-xs text-gray-400 border-b border-white/10">
-            <span>acquit-workspace</span>
+            <span>chain-of-command-workspace</span>
             <ChevronRight size={12} />
             <span>CASE FILES</span>
             <ChevronRight size={12} />

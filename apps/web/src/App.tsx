@@ -4,15 +4,15 @@ import { modules as discoveredModules } from "./.generated/mockup-components";
 import { StitchMasterNav } from "./components/stitch/StitchMasterNav";
 import { StitchCategoryPage } from "./components/stitch/StitchCategoryPage";
 import { StitchMockupDirectPage } from "./components/stitch/StitchMockupDirectPage";
-import { StitchGallery } from "./components/mockups/acquit-case-workspace/StitchGallery";
-import { AcquitAcademy } from "./components/mockups/acquit-case-workspace/AcquitAcademy";
-import { DocumentEditorVSCode } from "./components/mockups/acquit-case-workspace/DocumentEditorVSCode";
-import { SovereignCylinder } from "./components/mockups/acquit-case-workspace/SovereignCylinder";
-import { GoogleWorkspaceIntegration } from "./components/mockups/acquit-case-workspace/GoogleWorkspaceIntegration";
-import { RagCitationViewer } from "./components/mockups/acquit-case-workspace/RagCitationViewer";
-import { FeaturedAttorneysCarousel } from "./components/mockups/acquit-case-workspace/FeaturedAttorneysCarousel";
-import { FeaturedCoursesCarousel } from "./components/mockups/acquit-case-workspace/FeaturedCoursesCarousel";
-import { MOCK_RAG_MESSAGES } from "./components/mockups/acquit-case-workspace/legalData";
+import { StitchGallery } from "./components/mockups/chain-of-command-case-workspace/StitchGallery";
+import { ChainOfCommandAcademy } from "./components/mockups/chain-of-command-case-workspace/ChainOfCommandAcademy";
+import { DocumentEditorVSCode } from "./components/mockups/chain-of-command-case-workspace/DocumentEditorVSCode";
+import { SovereignCylinder } from "./components/mockups/chain-of-command-case-workspace/SovereignCylinder";
+import { GoogleWorkspaceIntegration } from "./components/mockups/chain-of-command-case-workspace/GoogleWorkspaceIntegration";
+import { RagCitationViewer } from "./components/mockups/chain-of-command-case-workspace/RagCitationViewer";
+import { FeaturedAttorneysCarousel } from "./components/mockups/chain-of-command-case-workspace/FeaturedAttorneysCarousel";
+import { FeaturedCoursesCarousel } from "./components/mockups/chain-of-command-case-workspace/FeaturedCoursesCarousel";
+import { MOCK_RAG_MESSAGES } from "./components/mockups/chain-of-command-case-workspace/legalData";
 import { ChainOfCommandWorkspace } from "./components/mockups/chain-of-command/ChainOfCommandWorkspace";
 import { AuthProvider, WorkspaceGuard } from "./contexts/AuthContext";
 
@@ -25,21 +25,21 @@ type RouteDefinition = {
 };
 
 const ROUTES: RouteDefinition[] = [
-  { path: "/case-workspace", label: "Case Workspace", componentPath: "acquit-case-workspace/CaseWorkspace" },
-  { path: "/ai-lab", label: "AI Lab", componentPath: "acquit-case-workspace/AILab" },
-  { path: "/timeline", label: "Timeline", componentPath: "acquit-case-workspace/CaseTimeline" },
-  { path: "/law-library", label: "Law Library", componentPath: "acquit-case-workspace/LawLibraryExplorer" },
-  { path: "/filing-center", label: "Filing Center", componentPath: "acquit-case-workspace/FilingCenter" },
-  { path: "/attorney-directory", label: "Attorney Directory", componentPath: "acquit-case-workspace/AttorneyDirectory" },
-  { path: "/academy", label: "Acquit Academy", componentPath: "acquit-case-workspace/AcquitAcademy" },
-  { path: "/document-vault", label: "Document Vault", componentPath: "acquit-case-workspace/SovereignCylinder" },
-  { path: "/document-editor", label: "Document Editor", componentPath: "acquit-case-workspace/DocumentEditorVSCode" },
-  { path: "/evidence", label: "Evidence", componentPath: "acquit-case-workspace/EvidenceCarousel" },
-  { path: "/featured-attorneys", label: "Featured Attorneys", componentPath: "acquit-case-workspace/FeaturedAttorneysCarousel" },
-  { path: "/featured-courses", label: "Featured Courses", componentPath: "acquit-case-workspace/FeaturedCoursesCarousel" },
-  { path: "/google-workspace", label: "Google Workspace", componentPath: "acquit-case-workspace/GoogleWorkspaceIntegration" },
-  { path: "/rag-citations", label: "RAG Citations", componentPath: "acquit-case-workspace/RagCitationViewer" },
-  { path: "/gallery", label: "Mockup Gallery", componentPath: "acquit-case-workspace/StitchGallery" },
+  { path: "/case-workspace", label: "Case Workspace", componentPath: "chain-of-command-case-workspace/CaseWorkspace" },
+  { path: "/ai-lab", label: "AI Lab", componentPath: "chain-of-command-case-workspace/AILab" },
+  { path: "/timeline", label: "Timeline", componentPath: "chain-of-command-case-workspace/CaseTimeline" },
+  { path: "/law-library", label: "Law Library", componentPath: "chain-of-command-case-workspace/LawLibraryExplorer" },
+  { path: "/filing-center", label: "Filing Center", componentPath: "chain-of-command-case-workspace/FilingCenter" },
+  { path: "/attorney-directory", label: "Attorney Directory", componentPath: "chain-of-command-case-workspace/AttorneyDirectory" },
+  { path: "/academy", label: "Chain of Command Academy", componentPath: "chain-of-command-case-workspace/ChainOfCommandAcademy" },
+  { path: "/document-vault", label: "Document Vault", componentPath: "chain-of-command-case-workspace/SovereignCylinder" },
+  { path: "/document-editor", label: "Document Editor", componentPath: "chain-of-command-case-workspace/DocumentEditorVSCode" },
+  { path: "/evidence", label: "Evidence", componentPath: "chain-of-command-case-workspace/EvidenceCarousel" },
+  { path: "/featured-attorneys", label: "Featured Attorneys", componentPath: "chain-of-command-case-workspace/FeaturedAttorneysCarousel" },
+  { path: "/featured-courses", label: "Featured Courses", componentPath: "chain-of-command-case-workspace/FeaturedCoursesCarousel" },
+  { path: "/google-workspace", label: "Google Workspace", componentPath: "chain-of-command-case-workspace/GoogleWorkspaceIntegration" },
+  { path: "/rag-citations", label: "RAG Citations", componentPath: "chain-of-command-case-workspace/RagCitationViewer" },
+  { path: "/gallery", label: "Mockup Gallery", componentPath: "chain-of-command-case-workspace/StitchGallery" },
 ];
 
 function getBasePath(): string {
@@ -135,7 +135,7 @@ function PreviewRenderer({
       <main className="flex min-h-screen items-center justify-center bg-[#0A0A0A]">
         <div className="text-center">
           <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-[#174E48] border-t-[#D4AF37]" />
-          <p className="font-mono text-sm tracking-widest text-[#D4AF37]">LOADING ACQUIT...</p>
+          <p className="font-mono text-sm tracking-widest text-[#D4AF37]">LOADING CHAIN OF COMMAND...</p>
         </div>
       </main>
     );
@@ -149,7 +149,7 @@ function MockupNavigation({ activePath }: { activePath: string }) {
 
   return (
     <nav
-      aria-label="Acquit mockup navigation"
+      aria-label="Chain of Command mockup navigation"
       className="fixed inset-x-0 bottom-0 z-[9999] border-t border-[#D4AF37]/20 bg-[#0A0A0A]/95 px-3 py-2 shadow-2xl backdrop-blur"
     >
       <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto">
@@ -179,7 +179,7 @@ function Gallery() {
     <main className="min-h-screen bg-[#0A0A0A] p-6 pb-24 text-white md:p-10 md:pb-24">
       <div className="mx-auto max-w-6xl">
         <header className="mb-8">
-          <p className="mb-2 font-mono text-xs tracking-[0.25em] text-[#D4AF37]">ACQUIT.AI / MOCKUP ROUTER</p>
+          <p className="mb-2 font-mono text-xs tracking-[0.25em] text-[#D4AF37]">CHAIN OF COMMAND / MOCKUP ROUTER</p>
           <h1 className="text-3xl font-semibold">Platform Screen Map</h1>
           <p className="mt-2 max-w-2xl text-white/60">
             All mockup surfaces are now addressable through stable routes. This is the visual integration layer; it does not imply AI filing or court-system automation.
@@ -236,7 +236,7 @@ function HomePage() {
             <span className="text-[#34D399] font-medium group-hover:text-[#34D399] transition-colors">Chain of Command</span>
           </button>
           <button onClick={() => navigate('/academy')} className="p-8 rounded-xl border border-[#1A1A1A] bg-[#0E0E0E] hover:bg-[#111214] hover:border-[#174E48] transition-all group flex flex-col items-center justify-center gap-3">
-            <span className="text-[#D4AF37] font-medium group-hover:text-[#34D399] transition-colors">Acquit Academy</span>
+            <span className="text-[#D4AF37] font-medium group-hover:text-[#34D399] transition-colors">Chain of Command Academy</span>
           </button>
         </div>
       </div>
@@ -364,7 +364,7 @@ function MainApp() {
               </WorkspaceGuard>
             }
           />
-          <Route path="/academy" element={<AcquitAcademy />} />
+          <Route path="/academy" element={<ChainOfCommandAcademy />} />
           <Route
             path="/google-workspace"
             element={

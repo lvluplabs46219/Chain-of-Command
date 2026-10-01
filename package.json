@@ -24,7 +24,7 @@
     "start": "tsx apps/api/src/index.ts",
     "prepare": "is-ci || husky",
     "test": "tsx scripts/test_compliance_and_security.ts",
-    "patcher": "tsx scripts/acquit-patcher.ts"
+    "patcher": "tsx scripts/chain-of-command-patcher.ts"
   },
   "dependencies": {
     "@google/genai": "^2.18.0",

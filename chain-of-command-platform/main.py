@@ -1,5 +1,5 @@
 """
-Acquit Platform — Agentic System Architecture
+Chain of Command Platform — Agentic System Architecture
 Main entry point and execution demonstration of core multi-agent workflows,
 security guards, and compliance audit logging.
 """
@@ -111,7 +111,7 @@ def build_system():
 
 def main():
     print("=" * 80)
-    print("Acquit Platform — Agentic System Architecture")
+    print("Chain of Command Platform — Agentic System Architecture")
     print("=" * 80)
     print()
     print("Initializing components...")

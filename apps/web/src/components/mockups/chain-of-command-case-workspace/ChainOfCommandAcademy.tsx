@@ -18,7 +18,7 @@ import {
   Sparkles
 } from "lucide-react";
 
-export function AcquitAcademy() {
+export function ChainOfCommandAcademy() {
   const [activeCourse, setActiveCourse] = useState<string | null>(null);
 
   const courses = [
@@ -190,7 +190,7 @@ export function AcquitAcademy() {
               <GraduationCap size={14} /> Self-Representation Education
             </div>
             <h2 className="mt-1 font-['Fraunces'] text-2xl font-semibold text-white/70">
-              Acquit Academy
+              Chain of Command Academy
             </h2>
             <p className="mt-1 text-xs text-white/70 max-w-2xl">
               Learn how to represent yourself effectively. Understand court rules, courtroom behavior, ethics, and procedures. Interactive lessons designed to help you prepare for court.
@@ -245,7 +245,7 @@ export function AcquitAcademy() {
       
       <div className="mt-8 rounded-xl border border-white/10 bg-[rgba(255,255,255,0.03)] p-4 text-center">
          <p className="text-[11px] text-white/70 max-w-4xl mx-auto leading-relaxed">
-            Acquit Academy provides legal information and education for self-represented people. It is not a law school, does not grant degrees, and does not create an attorney-client relationship. Laws and rules change - always verify with official sources.
+            Chain of Command Academy provides legal information and education for self-represented people. It is not a law school, does not grant degrees, and does not create an attorney-client relationship. Laws and rules change - always verify with official sources.
          </p>
       </div>
     </div>

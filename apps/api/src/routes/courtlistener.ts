@@ -58,7 +58,7 @@ courtlistenerRouter.get("/courtlistener/search", async (req: Request, res: Expre
 
     const response = await fetch(url.toString(), {
       headers: {
-        "User-Agent": "AcquitLegalAI/1.0 (https://acquit.ai; contact@acquit.ai)",
+        "User-Agent": "ChainOfCommandLegalAI/1.0 (https://chainofcommand.ai; contact@chainofcommand.ai)",
         ...(process.env.COURTLISTENER_API_TOKEN ? { Authorization: `Token ${process.env.COURTLISTENER_API_TOKEN}` } : {}),
       },
     });
@@ -78,7 +78,7 @@ courtlistenerRouter.get("/courtlistener/search", async (req: Request, res: Expre
   }
 });
 
-// Ingest/Migrate an authority from CourtListener to Acquit Law DB
+// Ingest/Migrate an authority from CourtListener to Chain of Command Law DB
 courtlistenerRouter.post("/courtlistener/migrate", async (req: AuthenticatedRequest, res: ExpressResponse) => {
   const userId = req.user?.id;
   if (!userId) {
@@ -125,7 +125,7 @@ courtlistenerRouter.post("/courtlistener/migrate", async (req: AuthenticatedRequ
 
     return res.json({
       success: true,
-      message: `Successfully migrated "${caseName}" from CourtListener to Acquit DB.`,
+      message: `Successfully migrated "${caseName}" from CourtListener to Chain of Command DB.`,
       authority: {
         ...authority,
         ipfsCid,

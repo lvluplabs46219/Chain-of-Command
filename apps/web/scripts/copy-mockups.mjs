@@ -9,9 +9,9 @@ const SOURCE = path.join(
   webRoot,
   "components",
   "mockups",
-  "acquit-case-workspace",
+  "chain-of-command-case-workspace",
   "NEWSTITCH",
-  "stitch_acquit.ai_legal_operating_system"
+  "stitch_chainofcommand.ai_legal_operating_system"
 );
 
 /**

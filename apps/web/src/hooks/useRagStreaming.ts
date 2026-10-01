@@ -6,7 +6,7 @@
  */
 
 import { useState, useRef, useCallback } from "react";
-import { type AiChatMessage, type RagSourceClaim } from "../components/mockups/acquit-case-workspace/legalData";
+import { type AiChatMessage, type RagSourceClaim } from "../components/mockups/chain-of-command-case-workspace/legalData";
 import { getApiBaseUrl, getAuthToken } from "../lib/api";
 
 export type StreamStatus = "idle" | "connecting" | "retrieving" | "streaming" | "completed" | "error";

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import App from "../App";
 
-export default function AcquitClientApp() {
+export default function ChainOfCommandClientApp() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {

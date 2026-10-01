@@ -9,7 +9,7 @@ import type {
   RagSourceClaim,
   TimelineEvent,
   AiChatMessage,
-} from "../components/mockups/acquit-case-workspace/legalData";
+} from "../components/mockups/chain-of-command-case-workspace/legalData";
 
 // ============================================================================
 // 1. Legal Authority Mappers

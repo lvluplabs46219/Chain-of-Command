@@ -35,7 +35,7 @@ export function getSupabaseClient(): SupabaseClient {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        storageKey: "acquit_supabase_auth_token",
+        storageKey: "chain_of_command_supabase_auth_token",
       },
       realtime: {
         params: {
@@ -46,7 +46,7 @@ export function getSupabaseClient(): SupabaseClient {
 
     // Make available on window for custom client scripts
     if (typeof window !== "undefined") {
-      (window as any).acquitSupabase = browserSupabaseInstance;
+      (window as any).chainOfCommandSupabase = browserSupabaseInstance;
     }
   }
 

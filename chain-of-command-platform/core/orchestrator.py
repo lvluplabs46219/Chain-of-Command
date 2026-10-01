@@ -1,5 +1,5 @@
 """
-Acquit Platform - Workflow Orchestrator
+Chain of Command Platform - Workflow Orchestrator
 Coordinates multi-agent workflows, performs task decomposition, enforces security guards,
 and aggregates structured results.
 """

@@ -1,5 +1,5 @@
 -- ====================================================================
--- Acquit.ai Supabase Security & Hardening Script
+-- Chain of Command Supabase Security & Hardening Script
 -- Resolves linter warnings: vector schema, security definer, RLS policies
 -- ====================================================================
 

@@ -118,7 +118,7 @@ export function GoogleWorkspaceIntegration({
         ...prev,
         lastSyncedAt: new Date().toISOString(),
       }));
-      setSyncNotice("Google Workspace synchronized with Acquit Case Vault (Drive, Docs & Calendar up to date).");
+      setSyncNotice("Google Workspace synchronized with Chain of Command Case Vault (Drive, Docs & Calendar up to date).");
       setTimeout(() => setSyncNotice(null), 5000);
     }, 1200);
   };

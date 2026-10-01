@@ -1,5 +1,5 @@
 """
-Acquit Platform - Multi-Provider LLM Router
+Chain of Command Platform - Multi-Provider LLM Router
 Supports OpenAI, Anthropic, Mistral, and Local Ollama with intelligent routing,
 fallback handling, sensitivity guards, and compliance audit logging.
 """

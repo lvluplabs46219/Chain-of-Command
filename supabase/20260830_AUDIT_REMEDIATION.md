@@ -1,8 +1,8 @@
-# Acquit Platform - Security Audit Remediation
+# Chain of Command Platform - Security Audit Remediation
 
 ## Overview
 
-This document describes the critical security issues identified in the August 30, 2026 audit of the Acquit Platform's Supabase database and the migrations created to address them.
+This document describes the critical security issues identified in the August 30, 2026 audit of the Chain of Command Platform's Supabase database and the migrations created to address them.
 
 **Audit Source**: Live Supabase database audit (project: othxichdhzdxgtatautb)
 **Audit Date**: August 30, 2026
@@ -548,7 +548,7 @@ DROP POLICY IF EXISTS "Service role only for cold_cases_ingestion" ON public.col
 
 ## Contact and Support
 
-**Primary Contact**: Andrew (andrew@acquit.ai)
+**Primary Contact**: Andrew (andrew@chainofcommand.ai)
 **Backup Contact**: Platform Team
 
 **Escalation Path**:
@@ -578,4 +578,4 @@ DROP POLICY IF EXISTS "Service role only for cold_cases_ingestion" ON public.col
 
 ---
 
-*This document is maintained as part of the Acquit Platform's security and compliance program.*
+*This document is maintained as part of the Chain of Command Platform's security and compliance program.*

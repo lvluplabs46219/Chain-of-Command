@@ -50,7 +50,7 @@ documentsRouter.post('/documents/signed-upload-url', async (req: AuthenticatedRe
 
     const safeFilename = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
     const objectKey = `matters/${matterId}/${Date.now()}-${safeFilename}`;
-    const uploadUrl = `https://storage.acquit.ai/upload/${objectKey}?signature=${crypto.randomBytes(16).toString('hex')}&expires=${Date.now() + 900000}`;
+    const uploadUrl = `https://storage.chainofcommand.ai/upload/${objectKey}?signature=${crypto.randomBytes(16).toString('hex')}&expires=${Date.now() + 900000}`;
 
     return res.json({
       uploadUrl,

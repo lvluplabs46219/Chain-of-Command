@@ -1,5 +1,5 @@
 const fs = require('fs');
-const path = 'artifacts/mockup-sandbox/src/components/mockups/acquit-case-workspace/GoogleWorkspaceIntegration.tsx';
+const path = 'artifacts/mockup-sandbox/src/components/mockups/chain-of-command-case-workspace/GoogleWorkspaceIntegration.tsx';
 let content = fs.readFileSync(path, 'utf8');
 
 const lucideImports = `

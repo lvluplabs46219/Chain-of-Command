@@ -5,7 +5,7 @@
 | **EvidenceCarousel** | Has custom scroll math carousel | YES WANTS | Refactor to Embla | Evidence photos, CCTV, and documents are visual and human. They deserve to glide, creating an editorial feel rather than a rigid list. |
 | **CaseWorkspace** | No carousel inside | YES WANTS | Include EvidenceCarousel | Without it, the case feels like a dry folder. With a sweeping "Evidence Wall", it feels like a premium command center. |
 | **AttorneyDirectory** | Vertical list/grid | YES WANTS | Add Featured Carousel | Attorney headshots are visual. A featured carousel at the top adds a premium, "recommended" feel before falling back to the utilitarian grid. |
-| **AcquitAcademy** | CSS Grid list of courses | YES WANTS | Add Masterclass Carousel | Educational videos feel much more premium and engaging (like Netflix/Masterclass) when they glide in a carousel. |
+| **ChainOfCommandAcademy** | CSS Grid list of courses | YES WANTS | Add Masterclass Carousel | Educational videos feel much more premium and engaging (like Netflix/Masterclass) when they glide in a carousel. |
 | **LawLibraryExplorer** | List/Grid | NO | Leave as List | Library results are work, not show. A list provides the necessary dense, scannable data for legal research. |
 | **CaseTimeline** | Vertical steps | NO | Leave as Timeline | Timeline is vertical storytelling. A carousel destroys chronological flow. |
 | **FilingCenter** | List/Grid | NO | Leave as Grid | Filing deadlines are utilitarian. Users need to search and work, not browse. |

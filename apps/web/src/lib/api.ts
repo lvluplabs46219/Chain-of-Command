@@ -35,10 +35,10 @@ export function getApiBaseUrl(): string {
  */
 export function getAuthToken(): string {
   if (typeof window !== "undefined") {
-    const stored = localStorage.getItem("acquit_auth_token");
+    const stored = localStorage.getItem("chain_of_command_auth_token");
     if (stored) return stored;
   }
-  return "acquit-pro-se-token";
+  return "chain-of-command-pro-se-token";
 }
 
 /**
@@ -47,9 +47,9 @@ export function getAuthToken(): string {
 export function setAuthToken(token: string | null): void {
   if (typeof window !== "undefined") {
     if (token) {
-      localStorage.setItem("acquit_auth_token", token);
+      localStorage.setItem("chain_of_command_auth_token", token);
     } else {
-      localStorage.removeItem("acquit_auth_token");
+      localStorage.removeItem("chain_of_command_auth_token");
     }
   }
 }

@@ -61,7 +61,7 @@ export default function StitchMockup({ mockupName }: { mockupName: string }) {
         // Extract title from head for the page title
         const titleMatch = fullHtml.match(/<title>([\s\S]*?)<\/title>/i);
         const title = titleMatch ? titleMatch[1] : formatName(mockupName);
-        document.title = `Acquit - ${title}`;
+        document.title = `Chain of Command - ${title}`;
         
         setHtmlContent(fullHtml);
         setLoading(false);

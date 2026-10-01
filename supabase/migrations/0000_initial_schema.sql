@@ -1,4 +1,4 @@
--- Acquit.ai Phase 0 & Phase 1 Initial Schema
+-- Chain of Command Phase 0 & Phase 1 Initial Schema
 -- This schema establishes the foundational entities for the Legal OS.
 
 -- Enable pgvector for document embeddings (Phase 3+ prep)

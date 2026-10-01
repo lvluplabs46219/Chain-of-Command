@@ -1,5 +1,5 @@
 """
-Acquit Platform - Base Agent Class
+Chain of Command Platform - Base Agent Class
 Abstract foundation for all specialized legal AI agents with permission and variable capabilities.
 """
 

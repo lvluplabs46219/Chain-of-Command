@@ -185,7 +185,7 @@ export function StitchMasterNav() {
                   onClick={() => setToolsOpen(false)}
                   className="flex flex-col rounded px-2.5 py-1.5 hover:bg-[#36485b] transition"
                 >
-                  <span className="text-xs font-semibold text-white">Acquit Academy</span>
+                  <span className="text-xs font-semibold text-white">Chain of Command Academy</span>
                   <span className="text-[11px] text-[#8f9194]">Pro se procedural training</span>
                 </Link>
                 <Link

@@ -1,5 +1,5 @@
 """
-Acquit Platform - Secure Template Engine
+Chain of Command Platform - Secure Template Engine
 Provides dual-path variable substitution:
 1. Trusted Path (render_trusted / substitute): Resolves structured variables.
 2. Untrusted Path (render_untrusted): Neutralizes prompt injection by escaping template syntax.

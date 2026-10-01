@@ -1,5 +1,5 @@
 import { Router } from 'express';
-// import { sicAuditEvents, documentCustodyChain } from '@acquit/database';
+// import { sicAuditEvents, documentCustodyChain } from '@chain-of-command/database';
 // import { db } from '../lib/db';
 // import { eq, desc } from 'drizzle-orm';
 

@@ -1,6 +1,6 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { z } from "zod";
-import { acquitAgentRuntime, LEGAL_DISCLAIMER, type AgentEvent, type AgentPolicy, type AgentSource, detectPromptInjection } from "../ai/runtime";
+import { chainOfCommandAgentRuntime, LEGAL_DISCLAIMER, type AgentEvent, type AgentPolicy, type AgentSource, detectPromptInjection } from "../ai/runtime";
 import type { ModelProvider } from "../ai/model-gateway";
 import { Redis } from "@upstash/redis";
 import crypto from "crypto";
@@ -196,7 +196,7 @@ async function executeRun(runId: string, record: RunRecord): Promise<void> {
   }
 
   try {
-    for await (const event of acquitAgentRuntime.execute({
+    for await (const event of chainOfCommandAgentRuntime.execute({
       runId,
       agentId: record.request.agentId,
       agentName: agent.name,
@@ -204,7 +204,7 @@ async function executeRun(runId: string, record: RunRecord): Promise<void> {
       input: record.request.input,
       sources,
       provider,
-      model: record.request.model ?? (provider === "ollama" ? "llama3.2" : "acquit-demo-1"),
+      model: record.request.model ?? (provider === "ollama" ? "llama3.2" : "chain-of-command-demo-1"),
     })) {
       record.events.push(event);
       for (const listener of record.listeners) listener(event);

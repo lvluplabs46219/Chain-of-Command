@@ -1,5 +1,5 @@
 """
-Acquit Platform - Research Agent
+Chain of Command Platform - Research Agent
 Performs statutory analysis, precedent queries, and case document research.
 """
 

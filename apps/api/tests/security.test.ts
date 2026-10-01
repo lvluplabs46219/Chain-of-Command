@@ -57,9 +57,9 @@ async function runTests() {
   // SEC-6 & SEC-7 CORS & CSP
   res = await fetch(`http://localhost:${port}/api/health`, {
     method: 'OPTIONS',
-    headers: { 'Origin': 'https://acquit.ai', 'Access-Control-Request-Method': 'GET' }
+    headers: { 'Origin': 'https://chainofcommand.ai', 'Access-Control-Request-Method': 'GET' }
   });
-  assert(res.headers.get('access-control-allow-origin') === 'https://acquit.ai', 'CORS should allow acquit.ai');
+  assert(res.headers.get('access-control-allow-origin') === 'https://chainofcommand.ai', 'CORS should allow chainofcommand.ai');
 
   res = await fetch(`http://localhost:${port}/api/health`, {
     method: 'OPTIONS',

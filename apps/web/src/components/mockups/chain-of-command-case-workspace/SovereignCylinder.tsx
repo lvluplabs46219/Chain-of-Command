@@ -272,7 +272,7 @@ export function SovereignCylinder() {
       <header className="relative z-20 w-full px-4 sm:px-8 pt-4 sm:pt-6">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-[16px] font-serif text-white/70">ACQUIT.AI</span>
+            <span className="text-[16px] font-serif text-white/70">CHAIN OF COMMAND</span>
           </div>
           <div className="flex items-center gap-2">
             <button className="grid h-9 w-9 place-items-center rounded-full bg-[rgba(255,255,255,0.08)] ring-1 ring-white/10 text-[14px]">…</button>
@@ -297,7 +297,7 @@ export function SovereignCylinder() {
           </div>
           <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-[10px] bg-[rgba(255,255,255,0.03)] text-black grid place-items-center font-black text-[14px] shadow-[0_0_20px_rgba(212,175,55,0.35)]">A</div>
-            <span className="text-[11px] sm:text-[12px] tracking-[0.18em] text-white/50">ACQUIT.AI — SOVEREIGN</span>
+            <span className="text-[11px] sm:text-[12px] tracking-[0.18em] text-white/50">CHAIN OF COMMAND — SOVEREIGN</span>
             <div className="h-px w-6 bg-white/5/10 hidden sm:block" />
             <div className="flex flex-wrap items-baseline gap-2 text-[18px] sm:text-[22px] leading-none tracking-[-0.02em]" style={{ fontFamily: "'Instrument Serif','Playfair Display', Georgia, serif" }}>
               <span className="text-white/70 font-[500]">EVIDENCE LAB</span>
@@ -533,7 +533,7 @@ export function SovereignCylinder() {
         </div>
         
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4 text-[10px] tracking-widest text-white/25">
-          <span>© 2026 ACQUIT.AI • SOVEREIGN LAB • BUILT FOR LUXP LABS AESTHETIC</span>
+          <span>© 2026 CHAIN OF COMMAND • SOVEREIGN LAB • BUILT FOR LUXP LABS AESTHETIC</span>
           <span className="text-white/70/60">12 CARDS • {mode} MODE • GPU ACCELERATED</span>
         </div>
       </section>

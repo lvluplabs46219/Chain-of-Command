@@ -1,4 +1,4 @@
-# Acquit.ai Dockerfile
+# Chain of Command Dockerfile
 
 FROM node:20.15.1-bookworm-slim AS base
 ENV DEBIAN_FRONTEND=noninteractive

@@ -1,5 +1,5 @@
 """
-Acquit Platform - Code Agent
+Chain of Command Platform - Code Agent
 Specializes in generating legal-tech automation scripts, redaction tools, and schema validators.
 """
 

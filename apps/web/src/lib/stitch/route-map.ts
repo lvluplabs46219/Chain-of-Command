@@ -3,12 +3,12 @@
  * Every Stitch design IS an actual app page; routes are derived deterministically.
  */
 
-/** All 85 Stitch design folders under components/mockups/acquit-case-workspace/NEWSTITCH/. */
+/** All 85 Stitch design folders under components/mockups/chain-of-command-case-workspace/NEWSTITCH/. */
 export const STITCH_FOLDERS: readonly string[] = [
   "accessibility_settings",
-  "acquit.ai_genteam_ai_workspace_lemonade_server",
-  "acquit.ai_genteam_multi_agent_autonomous_workspace_telegram_lemonade",
-  "acquit.ai_telegram_genteam_ai_workspace_lemonade_server",
+  "chainofcommand.ai_genteam_ai_workspace_lemonade_server",
+  "chainofcommand.ai_genteam_multi_agent_autonomous_workspace_telegram_lemonade",
+  "chainofcommand.ai_telegram_genteam_ai_workspace_lemonade_server",
   "ai_engine_models_agent_personas_playground_studio",
   "ai_engine_settings",
   "alexandria",
@@ -92,7 +92,7 @@ export const STITCH_FOLDERS: readonly string[] = [
   "workspace_security",
 ];
 
-/** kebabCase("acquit.ai_genteam_...") -> "acquit-ai-genteam-..." */
+/** kebabCase("chainofcommand.ai_genteam_...") -> "acquit-ai-genteam-..." */
 function kebab(name: string): string {
   return name
     .toLowerCase()

@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { z } from '../artifacts/api-server/node_modules/zod/index.js';
 
-console.log('--- STARTING ACQUIT COMPLIANCE & SECURITY TEST SUITE ---');
+console.log('--- STARTING CHAIN OF COMMAND COMPLIANCE & SECURITY TEST SUITE ---');
 
 // TEST 1: HMAC Human Filing Gate Validation
 console.log('\n[TEST 1] Testing Cryptographic Human Gate Token Verification...');
