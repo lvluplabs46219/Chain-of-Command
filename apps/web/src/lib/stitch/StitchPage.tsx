@@ -50,20 +50,26 @@ const navigationScript = `
 `;
 
 export async function loadStitchHtml(folder: string): Promise<string> {
-  const filePath = path.join(
-    process.cwd(),
-    "public",
-    "assets",
-    "stitch",
-    folder,
-    "code.html"
-  );
-  try {
-    return await fs.readFile(filePath, "utf-8");
-  } catch (error) {
-    console.error(`[stitch] Error reading design ${folder}:`, error);
-    return "";
+  const candidatePaths = [
+    path.join(process.cwd(), "public", "assets", "stitch", folder, "code.html"),
+    path.join(process.cwd(), "apps", "web", "public", "assets", "stitch", folder, "code.html"),
+    path.join(process.cwd(), "apps", "web", "src", "assets", "stitch", folder, "code.html"),
+    path.join(process.cwd(), "src", "assets", "stitch", folder, "code.html"),
+    path.join(process.cwd(), "apps", "web", "components", "mockups", "acquit-case-workspace", "NEWSTITCH", "stitch_acquit.ai_legal_operating_system", folder, "code.html"),
+    path.join(process.cwd(), "components", "mockups", "acquit-case-workspace", "NEWSTITCH", "stitch_acquit.ai_legal_operating_system", folder, "code.html"),
+  ];
+
+  for (const filePath of candidatePaths) {
+    try {
+      const content = await fs.readFile(filePath, "utf-8");
+      if (content) return content;
+    } catch {
+      // Continue to next candidate
+    }
   }
+
+  console.error(`[stitch] Error reading design ${folder}: not found in any candidate path`);
+  return "";
 }
 
 function injectNavigationScript(html: string): string {
