@@ -1,0 +1,208 @@
+/**
+ * Alexandria — High-End Editorial
+ * North Star: "The Digital Curator"
+ *
+ * Scholarly, premium reading. Dense information made effortless through
+ * serif authority and generous whitespace.
+ *
+ * Scope: Law Library, authorities, RAG citation reader, scholarly long-form.
+ * Command Center / Chambers remain Sovereign (black & gold).
+ */
+
+:root,
+[data-theme="alexandria"] {
+  /* Brand */
+  --alex-primary: #094cb2;
+  --alex-primary-container: #3b6fd4;
+  --alex-on-primary: #ffffff;
+
+  /* Archival gold (tertiary) */
+  --alex-tertiary: #6d5e00;
+  --alex-tertiary-container: #f5e6a3;
+  --alex-on-tertiary: #ffffff;
+
+  /* Surface ladder — hierarchy via bg shift, not borders */
+  --alex-surface-dim: #e8e6e1;
+  --alex-surface: #f4f2ed;
+  --alex-surface-container-low: #f7f5f0;
+  --alex-surface-container: #faf8f4;
+  --alex-surface-container-high: #fcfbf8;
+  --alex-surface-container-highest: #ffffff;
+  --alex-surface-container-lowest: #ffffff;
+
+  --alex-on-surface: #1c1b19;
+  --alex-on-surface-variant: #4a4844;
+  --alex-outline-variant: #c4c0b8;
+
+  /* Ghost border = outline_variant @ 15% */
+  --alex-ghost-border: color-mix(in srgb, var(--alex-outline-variant) 15%, transparent);
+
+  /* Glass menus */
+  --alex-glass-bg: color-mix(in srgb, var(--alex-surface-container-highest) 80%, transparent);
+  --alex-glass-blur: 20px;
+
+  /* Typography stacks */
+  --alex-font-headline: "Noto Serif", "Georgia", "Times New Roman", serif;
+  --alex-font-body: "Inter", system-ui, sans-serif;
+  --alex-font-label: "Public Sans", "Inter", system-ui, sans-serif;
+
+  /* Radius — never sharp; min sm */
+  --alex-radius-sm: 0.375rem;
+  --alex-radius-md: 0.5rem;
+  --alex-radius-lg: 0.75rem;
+  --alex-radius-xl: 1rem;
+
+  /* Modal shadow — diffused, low opacity, tinted on_surface */
+  --alex-shadow-modal: 0 24px 40px color-mix(in srgb, var(--alex-on-surface) 5%, transparent),
+    0 8px 16px color-mix(in srgb, var(--alex-on-surface) 4%, transparent);
+}
+
+/* Utility layer — import after base CSS */
+@layer utilities {
+  .alex-shell {
+    background: var(--alex-surface);
+    color: var(--alex-on-surface);
+    font-family: var(--alex-font-body);
+  }
+
+  .alex-headline {
+    font-family: var(--alex-font-headline);
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    color: var(--alex-on-surface);
+  }
+
+  .alex-body {
+    font-family: var(--alex-font-body);
+    line-height: 1.65;
+    color: var(--alex-on-surface-variant);
+  }
+
+  .alex-label {
+    font-family: var(--alex-font-label);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--alex-on-surface-variant);
+  }
+
+  .alex-card {
+    background: var(--alex-surface-container-lowest);
+    border-radius: var(--alex-radius-lg);
+    /* No-line rule: no 1px border */
+    padding: 1.25rem 1.5rem;
+  }
+
+  .alex-card-alt {
+    background: var(--alex-surface-container-low);
+    border-radius: var(--alex-radius-lg);
+    padding: 1.25rem 1.5rem;
+  }
+
+  .alex-ghost {
+    outline: 1px solid var(--alex-ghost-border);
+  }
+
+  .alex-glass {
+    background: var(--alex-glass-bg);
+    backdrop-filter: blur(var(--alex-glass-blur));
+    -webkit-backdrop-filter: blur(var(--alex-glass-blur));
+    border-radius: var(--alex-radius-md);
+  }
+
+  .alex-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--alex-radius-sm);
+    padding: 0.625rem 1.25rem;
+    font-family: var(--alex-font-body);
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--alex-on-primary);
+    background: linear-gradient(135deg, var(--alex-primary), var(--alex-primary-container));
+    border: none;
+    cursor: pointer;
+  }
+
+  .alex-btn-primary:hover {
+    filter: brightness(1.05);
+  }
+
+  .alex-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--alex-radius-sm);
+    padding: 0.625rem 1.25rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--alex-primary);
+    background: var(--alex-surface-container-high);
+    border: none;
+    cursor: pointer;
+  }
+
+  .alex-btn-tertiary {
+    background: transparent;
+    border: none;
+    color: var(--alex-primary);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: 0.5rem 0;
+  }
+
+  .alex-btn-tertiary:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .alex-input {
+    width: 100%;
+    border-radius: var(--alex-radius-sm);
+    background: var(--alex-surface-container-lowest);
+    outline: 1px solid var(--alex-ghost-border);
+    border: none;
+    padding: 0.625rem 0.875rem;
+    font-family: var(--alex-font-body);
+    color: var(--alex-on-surface);
+  }
+
+  .alex-input:focus {
+    outline: 2px solid var(--alex-primary);
+    outline-offset: 0;
+  }
+
+  .alex-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--alex-radius-sm);
+    padding: 0.2rem 0.5rem;
+    font-family: var(--alex-font-label);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--alex-tertiary-container);
+    color: var(--alex-tertiary);
+  }
+
+  .alex-link {
+    color: var(--alex-primary);
+    text-decoration: none;
+  }
+
+  .alex-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .alex-modal {
+    background: var(--alex-surface-container-lowest);
+    border-radius: var(--alex-radius-xl);
+    box-shadow: var(--alex-shadow-modal);
+  }
+}
