@@ -1,4 +1,4 @@
-# Acquit.ai Dockerfile
+# Chain of Command Dockerfile
 
 FROM node:20.15.1-bookworm-slim AS base
 ENV DEBIAN_FRONTEND=noninteractive
@@ -42,8 +42,8 @@ COPY --from=builder /app/artifacts/mockup-sandbox/dist ./artifacts/mockup-sandbo
 COPY --from=builder /app/artifacts/api-server/dist ./artifacts/api-server/dist
 COPY --from=builder /app/artifacts/api-server/package.json ./artifacts/api-server/package.json
 
-RUN useradd -m aquit && chown -R aquit:aquit /app
-USER aquit
+RUN useradd -m chainofcommand && chown -R chainofcommand:chainofcommand /app
+USER chainofcommand
 
 EXPOSE 3000
 ENV PORT=3000
