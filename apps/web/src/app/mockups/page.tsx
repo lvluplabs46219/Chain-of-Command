@@ -7,17 +7,30 @@ function formatName(name: string) {
 }
 
 function listMockups(): string[] {
-  try {
-    const mockupsDir = path.join(process.cwd(), "public", "mockups");
-    if (!fs.existsSync(mockupsDir)) return [];
-    return fs
-      .readdirSync(mockupsDir, { withFileTypes: true })
-      .filter((e) => e.isDirectory())
-      .map((e) => e.name)
-      .sort();
-  } catch {
-    return [];
+  const candidateDirs = [
+    path.join(process.cwd(), "public", "mockups"),
+    path.join(process.cwd(), "apps", "web", "public", "mockups"),
+    path.join(process.cwd(), "components", "mockups", "acquit-case-workspace", "NEWSTITCH", "stitch_acquit.ai_legal_operating_system"),
+    path.join(process.cwd(), "apps", "web", "components", "mockups", "acquit-case-workspace", "NEWSTITCH", "stitch_acquit.ai_legal_operating_system"),
+  ];
+
+  for (const mockupsDir of candidateDirs) {
+    try {
+      if (fs.existsSync(mockupsDir)) {
+        const entries = fs
+          .readdirSync(mockupsDir, { withFileTypes: true })
+          .filter((e) => e.isDirectory())
+          .map((e) => e.name)
+          .sort();
+        if (entries.length > 0) {
+          return entries;
+        }
+      }
+    } catch {
+      // Continue to next candidate
+    }
   }
+  return [];
 }
 
 export default function MockupsGalleryPage() {

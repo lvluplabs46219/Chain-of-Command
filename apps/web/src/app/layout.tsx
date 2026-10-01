@@ -2,17 +2,17 @@ import type { Metadata } from "next";
 import "../index.css";
 
 export const metadata: Metadata = {
-  title: "Chain of Command — Legal OS & Pro Se Workspace",
-  description: "AI-Powered Legal Workspace for Self-Represented Litigants and Legal Counsel",
+  title: "Acquit.ai — Legal Self-Representation Workspace",
+  description: "AI-powered legal self-representation workspace and case intelligence platform.",
   openGraph: {
-    title: "Chain of Command — Legal OS & Pro Se Workspace",
-    description: "AI-Powered Legal Workspace for Self-Represented Litigants and Legal Counsel",
+    title: "Acquit.ai — Legal Self-Representation Workspace",
+    description: "AI-powered legal self-representation workspace and case intelligence platform.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Chain of Command — Legal OS & Pro Se Workspace",
-    description: "AI-Powered Legal Workspace for Self-Represented Litigants and Legal Counsel",
+    title: "Acquit.ai — Legal Self-Representation Workspace",
+    description: "AI-powered legal self-representation workspace and case intelligence platform.",
   },
 };
 
