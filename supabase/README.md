@@ -1,6 +1,6 @@
 # Supabase schema workflow
 
-This repository tracks Acquit.ai database changes in `supabase/migrations/`.
+This repository tracks Chain of Command database changes in `supabase/migrations/`.
 
 The Supabase project previously received direct remote changes. The migration files in this directory are the Git source of truth going forward.
 

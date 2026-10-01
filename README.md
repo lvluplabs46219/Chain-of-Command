@@ -1,11 +1,11 @@
-# Acquit.ai — Legal AI Case Workspace
+# Chain of Command — Legal AI Case Workspace
 
-Acquit.ai is an AI-powered legal self-representation and legal-access platform designed for pro se litigants. This monorepo contains the core platform, including the frontend workspace, API server, RAG engine, court connectors, and security models.
+Chain of Command is an AI-powered legal self-representation and legal-access platform designed for pro se litigants. This monorepo contains the core platform, including the frontend workspace, API server, RAG engine, court connectors, and security models.
 
 ## Repository Structure
 
 ```
-acquit-platform/
+chain-of-command-platform/
 ├── apps/
 │   ├── web/           # Next.js / Vite React frontend (Case Workspace)
 │   └── api/           # Express backend services
@@ -31,7 +31,7 @@ acquit-platform/
 ```bash
 # Clone the repository
 git clone <repo-url>
-cd acquit-platform
+cd chain-of-command-platform
 
 # Install dependencies across all workspaces
 npm install
@@ -61,7 +61,8 @@ npm run dev
 ```
 
 ## Scripts & Tools
-- `npm run typecheck`: Run TypeScript compilation check across all packages.
+- `npm run typecheck`: Run TypeScript compilation check across all pac
+kages.
 - `npm run lint`: Lint the codebase.
 - `npm run ingest`: Run the CourtListener docket ingestion script.
 

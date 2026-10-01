@@ -1,5 +1,5 @@
 {
-  "name": "acquit-ai-api-proxy",
+  "name": "chain-of-command-ai-api-proxy",
   "main": "worker.js",
   "compatibility_date": "2026-09-19",
   "observability": {

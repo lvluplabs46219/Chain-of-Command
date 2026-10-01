@@ -1,6 +1,6 @@
-# Acquit.ai — Private Development Access with Tailscale
+# Chain of Command — Private Development Access with Tailscale
 
-This is the recommended development path for viewing the local Acquit web app from another trusted device without publishing the dev server to the public internet.
+This is the recommended development path for viewing the local Chain of Command web app from another trusted device without publishing the dev server to the public internet.
 
 ## 1. Start the web app locally
 
@@ -51,10 +51,10 @@ This removes the Serve configuration from the workstation.
 
 - Keep development endpoints tailnet-only.
 - Never put Supabase service-role keys, database passwords, or other secrets into Vite client environment variables.
-- Do not use Funnel for Acquit development unless a public endpoint is explicitly required and separately reviewed.
+- Do not use Funnel for Chain of Command development unless a public endpoint is explicitly required and separately reviewed.
 - Treat case data and uploaded legal documents as sensitive; use test fixtures when exposing a development UI to another device.
-- Tailscale provides network access; application authentication and authorization remain required inside Acquit.
+- Tailscale provides network access; application authentication and authorization remain required inside Chain of Command.
 
 ## Current integration boundary
 
-Tailscale is being used as a **private developer access layer**, not as a replacement for Acquit authentication, Supabase RLS, or application-level authorization.
+Tailscale is being used as a **private developer access layer**, not as a replacement for Chain of Command authentication, Supabase RLS, or application-level authorization.

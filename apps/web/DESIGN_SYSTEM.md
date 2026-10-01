@@ -1,8 +1,8 @@
-# Acquit.ai — "Sovereign" Design System (Black & Gold)
+# Chain of Command — "Sovereign" Design System (Black & Gold)
 
-This is the canonical layout + color spec for the Acquit.ai case workspace.
+This is the canonical layout + color spec for the Chain of Command case workspace.
 It documents what's **already implemented** in
-`src/components/mockups/acquit-case-workspace/` and fills in the pieces
+`src/components/mockups/chain-of-command-case-workspace/` and fills in the pieces
 needed to make it a consistent, production-grade Web3-style system.
 
 Tokens live in `src/index.css` under `:root` (prefixed `--sov-*`) and as
@@ -43,7 +43,8 @@ not mixed into the primary experience.
 | Raised surface | `--sov-ink` | `#0E0E0E` | Modals, popovers |
 | Alt surface | `--sov-ink-2` | `#111214` | Nested cards |
 | **Primary / Brand** | `--sov-gold` | `#D4AF37` | CTAs, active nav, glow, accents |
-| Gold soft | `--sov-gold-soft` | `#EFE6D0` | Text on light/white buttons |
+| Gold soft | `--sov-gold-so
+ft` | `#EFE6D0` | Text on light/white buttons |
 | Gold muted | `--sov-gold-muted` | `#c49f27` | Pressed state |
 | **Secondary** | `--sov-emerald` | `#174E48` | Secondary buttons, agent chat bubbles |
 | Emerald bright | `--sov-emerald-bright` | `#1f665e` | Emerald hover |
@@ -89,7 +90,8 @@ backdrop-filter: blur(24px);
 
 **Buttons** (3 tiers, all pill-shaped `rounded-full`, glow on hover):
 - `.sov-btn-gold` — primary action (solid gold, black text)
-- `.sov-btn-emerald` — secondary action (emerald fill, gold text)
+- `.sov-btn-eme
+rald` — secondary action (emerald fill, gold text)
 - `.sov-btn-outline` — tertiary / ghost (white/5 fill, white/20 border)
 
 **Selection state** (`.sov-selected`) — gold ring + soft glow, used for
@@ -122,7 +124,8 @@ active carousel slide, selected agent, selected nav item.
 │  ROUTES (rendered by activeNav / activeTab state):                  │
 │   • Case overview  → deadline hero card + AI assessment +            │
 │                       legal team panel + evidence summary            │
-│   • AI Lab          → 7-agent selector strip (horizontal scroll) +   │
+│   • AI Lab          → 7-agent selector strip (horizontal scroll
+) +   │
 │                       EvidenceCarousel + timeline strip +            │
 │                       Simulation / Team Chat tabs                    │
 │   • Timeline         → CaseTimeline (vertical/branching)             │
@@ -152,7 +155,8 @@ Base primitive: `src/components/ui/carousel.tsx` (shadcn wrapper over
 `embla-carousel-react`). `EvidenceCarousel` bypasses it and calls
 `useEmblaCarousel` + `embla-carousel-autoplay` directly for more control
 over per-slide styling — that's the right pattern to copy for new carousels
-that need custom slide chrome (glow rings, status badges, thumbnails).
+that need custom slide chrome (glow rings, status badges, thumbnai
+ls).
 
 ## 6. Motion / Glow Rules
 
