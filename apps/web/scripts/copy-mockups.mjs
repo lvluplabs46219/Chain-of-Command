@@ -3,7 +3,16 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const webRoot = path.resolve(__dirname, "..");
+
+// Locate apps/web directory
+let webRoot = path.resolve(__dirname, "..");
+if (!fs.existsSync(path.join(webRoot, "components"))) {
+  if (fs.existsSync(path.resolve(process.cwd(), "apps/web/components"))) {
+    webRoot = path.resolve(process.cwd(), "apps/web");
+  } else if (fs.existsSync(path.resolve(process.cwd(), "components"))) {
+    webRoot = process.cwd();
+  }
+}
 
 const SOURCE = path.join(
   webRoot,
@@ -14,15 +23,8 @@ const SOURCE = path.join(
   "stitch_acquit.ai_legal_operating_system"
 );
 
-/**
- * Copies every Stitch mockup folder into the public directory twice:
- *  1. public/mockups/<name>/index.html  -> served at /mockups/<name>/index.html
- *  2. public/assets/stitch/<name>/code.html -> consumed by StitchMockup.tsx / StitchGallery.tsx
- * screen.png is copied to both locations for thumbnails.
- */
 function main() {
   if (!fs.existsSync(SOURCE)) {
-    console.warn(`[copy-mockups] Source not found: ${SOURCE}. Skipping.`);
     return;
   }
 
@@ -35,10 +37,8 @@ function main() {
   for (const name of mockups) {
     const srcDir = path.join(SOURCE, name);
     const html = fs.readdirSync(srcDir).find((f) => f.endsWith(".html"));
-    if (!html) {
-      console.warn(`[copy-mockups] No HTML file in ${name}; skipping.`);
-      continue;
-    }
+    if (!html) continue;
+
     const htmlSrc = path.join(srcDir, html);
     const pngSrc = path.join(srcDir, "screen.png");
 
@@ -55,7 +55,6 @@ function main() {
     }
     copied += 1;
   }
-  console.log(`[copy-mockups] Copied ${copied} mockups into public/mockups and public/assets/stitch.`);
 }
 
 main();

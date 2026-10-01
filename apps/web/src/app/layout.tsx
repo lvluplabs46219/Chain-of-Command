@@ -4,6 +4,16 @@ import "../index.css";
 export const metadata: Metadata = {
   title: "Chain of Command — Legal OS & Pro Se Workspace",
   description: "AI-Powered Legal Workspace for Self-Represented Litigants and Legal Counsel",
+  openGraph: {
+    title: "Chain of Command — Legal OS & Pro Se Workspace",
+    description: "AI-Powered Legal Workspace for Self-Represented Litigants and Legal Counsel",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Chain of Command — Legal OS & Pro Se Workspace",
+    description: "AI-Powered Legal Workspace for Self-Represented Litigants and Legal Counsel",
+  },
 };
 
 export default function RootLayout({
