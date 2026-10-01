@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "../index.css";
 
 export const metadata: Metadata = {
-  title: "Acquit.ai — Legal OS & Pro Se Workspace",
+  title: "Chain of Command — Legal OS & Pro Se Workspace",
   description: "AI-Powered Legal Workspace for Self-Represented Litigants and Legal Counsel",
 };
 
