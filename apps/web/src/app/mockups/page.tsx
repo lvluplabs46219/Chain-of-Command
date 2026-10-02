@@ -13,28 +13,21 @@ function formatName(name: string) {
 }
 
 function listMockups(): string[] {
-  const candidateDirs = [
-    path.join(process.cwd(), "public", "mockups"),
-    path.join(process.cwd(), "apps", "web", "public", "mockups"),
-    path.join(process.cwd(), "components", "mockups", "acquit-case-workspace", "NEWSTITCH", "stitch_acquit.ai_legal_operating_system"),
-    path.join(process.cwd(), "apps", "web", "components", "mockups", "acquit-case-workspace", "NEWSTITCH", "stitch_acquit.ai_legal_operating_system"),
-  ];
+  // Statically scoped to public/mockups so Turbopack does not trace the whole project.
+  // Run `node scripts/copy-mockups.mjs` from apps/web to populate this directory.
+  const mockupsDir = path.join(process.cwd(), "public", "mockups");
 
-  for (const mockupsDir of candidateDirs) {
-    try {
-      if (fs.existsSync(mockupsDir)) {
-        const entries = fs
-          .readdirSync(mockupsDir, { withFileTypes: true })
-          .filter((e) => e.isDirectory())
-          .map((e) => e.name)
-          .sort();
-        if (entries.length > 0) {
-          return entries;
-        }
-      }
-    } catch {
-      // Continue to next candidate
+  try {
+    if (fs.existsSync(/* turbopackIgnore: true */ mockupsDir)) {
+      const entries = fs
+        .readdirSync(/* turbopackIgnore: true */ mockupsDir, { withFileTypes: true })
+        .filter((e) => e.isDirectory())
+        .map((e) => e.name)
+        .sort();
+      return entries;
     }
+  } catch {
+    // Directory missing or unreadable
   }
   return [];
 }
