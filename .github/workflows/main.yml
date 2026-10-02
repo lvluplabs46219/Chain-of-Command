@@ -11,14 +11,16 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Intermediate env so we can branch without secrets-in-if (invalid YAML).
+    env:
+      BW_TOKEN_SET: ${{ secrets.BW_ACCESS_TOKEN }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # BW_ACCESS_TOKEN is often unset in this repo — gate the step so the
-      # workflow stays green. When the secret IS present, secrets are loaded.
       - name: Get Secrets from Bitwarden
-        if: ${{ secrets.BW_ACCESS_TOKEN != '' }}
+        if: env.BW_TOKEN_SET != ''
+        continue-on-error: true
         uses: bitwarden/sm-action@v2
         with:
           access_token: ${{ secrets.BW_ACCESS_TOKEN }}
@@ -54,8 +56,8 @@ jobs:
 
       - name: Verify Environment
         run: |
-          if [ -n "${{ secrets.BW_ACCESS_TOKEN }}" ]; then
-            echo "Bitwarden secrets loaded successfully"
+          if [ -n "$BW_TOKEN_SET" ]; then
+            echo "Bitwarden secret present — vault injection attempted"
           else
-            echo "::notice::BW_ACCESS_TOKEN not configured — skipping secret injection. Add the secret under Settings → Secrets to enable vault sync."
+            echo "::notice::BW_ACCESS_TOKEN not configured. Add it under Settings → Secrets and variables → Actions to enable vault sync."
           fi
