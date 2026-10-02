@@ -1,5 +1,3 @@
-import { sleep } from "workflow";
-
 export interface UserAccount {
   id: string;
   email: string;
@@ -42,6 +40,8 @@ export async function sendOnboardingEmail(user: UserAccount): Promise<{ sent: bo
   };
 }
 
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /**
  * Acquit.ai User Signup Durable Workflow
  */
@@ -51,7 +51,7 @@ export async function handleUserSignup(email: string) {
   const user = await createUser(email);
   await sendWelcomeEmail(user);
 
-  await sleep(5000);
+  await delay(1000);
 
   await sendOnboardingEmail(user);
   return { userId: user.id, status: "onboarded" };

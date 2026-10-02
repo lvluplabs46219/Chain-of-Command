@@ -1,5 +1,5 @@
-import { LegalInfoResponseSchema } from '../artifacts/api-server/src/types/legalResponse';
-import { STATE_COURT_MAPPINGS } from '../lib/connectors/src/courtlistener-client';
+import { LegalInfoResponseSchema } from '../../apps/api/src/types/legalResponse';
+import { STATE_COURT_MAPPINGS } from '../../packages/connectors/src/courtlistener-client';
 import crypto from 'crypto';
 
 let passed = 0;
@@ -99,7 +99,7 @@ assert(allFound, `All priority state court identifiers mapped (Total mapped: ${O
 
 // 4. Test Multi-Agent UPL Policy Boundaries
 console.log('\n4. Testing Multi-Agent UPL & Autonomous Action Boundaries:');
-import { SPECIALIST_AGENTS } from '../artifacts/api-server/src/routes/ai';
+import { SPECIALIST_AGENTS } from '../../apps/api/src/routes/ai';
 
 const agentKeys = Object.keys(SPECIALIST_AGENTS);
 assert(agentKeys.length >= 7, `All 7 specialized AI legal agents defined (Found: ${agentKeys.length})`);

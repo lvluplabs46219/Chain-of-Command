@@ -8,6 +8,7 @@ import { documentsRouter } from "./documents";
 import mattersRouter from "./matters";
 import { geminiRouter } from "./gemini";
 import { filingRouter } from "./filing";
+import { workflowRouter } from "./workflow";
 import auditRouter from "./audit";
 import chainOfCommandRouter from "./chain-of-command";
 import { verifySession } from "../middleware/verifySession";
@@ -16,6 +17,7 @@ const router: IRouter = Router();
 
 router.use(healthRouter);
 router.use(webhooksRouter); // public via HMAC
+router.use(workflowRouter); // workflow inspection and durable workflows
 
 router.use(verifySession as any);
 router.use(aiRouter);

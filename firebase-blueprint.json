@@ -1,0 +1,102 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile representation in Firestore",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "format": "email", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "role": { "type": "string", "enum": ["litigant", "attorney", "paralegal", "admin"], "maxLength": 32 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Matter": {
+      "title": "Case Matter",
+      "description": "Legal case or matter opened by a pro se litigant or attorney",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "jurisdiction": { "type": "string", "maxLength": 100 },
+        "courtName": { "type": "string", "maxLength": 200 },
+        "caseNumber": { "type": "string", "maxLength": 100 },
+        "status": { "type": "string", "enum": ["open", "active", "pending", "closed", "archived"], "maxLength": 32 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "userId", "status"]
+    },
+    "TimelineEvent": {
+      "title": "Timeline Event",
+      "description": "Chronological factual event in a case timeline",
+      "type": "object",
+      "properties": {
+        "matterId": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "eventDate": { "type": "string", "format": "date-time" },
+        "eventType": { "type": "string", "enum": ["hearing", "filing_deadline", "discovery_deadline", "arrest", "general", "appearance", "motion", "order", "plea"], "maxLength": 64 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["matterId", "userId", "title", "eventType"]
+    },
+    "CaseDocument": {
+      "title": "Case Document",
+      "description": "Metadata for filed or drafted case document",
+      "type": "object",
+      "properties": {
+        "matterId": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "type": { "type": "string", "enum": ["filing", "evidence", "order", "correspondence", "transcript", "motion", "brief", "memo"], "maxLength": 64 },
+        "status": { "type": "string", "enum": ["draft", "review", "approved", "filed", "archived"], "maxLength": 32 },
+        "extractedText": { "type": "string", "maxLength": 50000 },
+        "aiSummary": { "type": "string", "maxLength": 5000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["matterId", "userId", "title", "type", "status"]
+    },
+    "EvidenceItem": {
+      "title": "Evidence Item",
+      "description": "Organized exhibit or evidence piece mapped to issues",
+      "type": "object",
+      "properties": {
+        "matterId": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "dateAcquired": { "type": "string", "format": "date-time" },
+        "relevanceScore": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["matterId", "userId", "title"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Individual pro se litigant or attorney user profile"
+    },
+    "/matters/{matterId}": {
+      "schema": "Matter",
+      "description": "Legal case matters owned by the user"
+    },
+    "/matters/{matterId}/timeline_events/{eventId}": {
+      "schema": "TimelineEvent",
+      "description": "Chronological events belonging to a case matter"
+    },
+    "/matters/{matterId}/documents/{documentId}": {
+      "schema": "CaseDocument",
+      "description": "Legal documents and pleadings associated with a case"
+    },
+    "/matters/{matterId}/evidence/{evidenceId}": {
+      "schema": "EvidenceItem",
+      "description": "Evidence exhibits associated with a case"
+    }
+  }
+}

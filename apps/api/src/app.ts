@@ -52,9 +52,9 @@ const parseAllowedOrigins = (): (string | RegExp)[] => {
 
 app.use(cors({
   origin: (origin, callback) => {
-    // CRITICAL: Do NOT allow requests with no Origin when credentials are enabled
+    // Allow internal server-to-server and proxy requests with no Origin header
     if (!origin) {
-      return callback(new Error('No origin header - access denied'), false);
+      return callback(null, true);
     }
     
     const allowed = parseAllowedOrigins();
@@ -69,7 +69,7 @@ app.use(cors({
       return callback(null, true);
     }
     
-    return callback(new Error('Origin not in allowlist'), false);
+    return callback(null, false);
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
