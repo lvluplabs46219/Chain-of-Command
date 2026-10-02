@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { BotIdClient } from "botid/client";
 import "../index.css";
 
@@ -84,6 +85,7 @@ export default function RootLayout({
       <body className="bg-[#111214] text-[#e1e2e5] antialiased min-h-screen">
         {children}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
