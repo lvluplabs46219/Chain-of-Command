@@ -1,51 +1,29 @@
 # Chain of Command Dockerfile
 
-FROM node:20.15.1-bookworm-slim AS base
+FROM node:20.15.1-bookworm-slim AS builder
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y \
-    python3 python3-pip python3-venv \
-    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
-# ---------- Dependencies ----------
-FROM base AS deps
-COPY package.json package-lock.json ./
-COPY artifacts/mockup-sandbox/package.json artifacts/mockup-sandbox/
-COPY artifacts/api-server/package.json artifacts/api-server/
-COPY lib/db/package.json lib/db/
-COPY scripts/package.json scripts/
-RUN npm ci
-
-# ---------- Builder ----------
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-ENV NODE_ENV=production
-# Note: we need to build mockup-sandbox for the frontend, and api-server for the backend
-RUN npm run build --workspace=artifacts/mockup-sandbox
-RUN npm run build --workspace=artifacts/api-server
 
-# ---------- Runner ----------
-FROM base AS runner
+# Placeholder public env so the Next.js production build succeeds in CI.
+# Real values are injected at deploy time.
+ENV NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321 \
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder-anon-key \
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=placeholder-publishable-key
+
+RUN npm install --no-audit --no-fund
+RUN npm run build --workspace=apps/web
+RUN npm run build --workspace=apps/api
+
+FROM node:20.15.1-bookworm-slim AS runner
 WORKDIR /app
-ENV NODE_ENV=production
+ENV NODE_ENV=production PORT=3000
 
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/package-lock.json ./package-lock.json
-COPY --from=builder /app/node_modules ./node_modules
-
-# Copy built frontend
-COPY --from=builder /app/artifacts/mockup-sandbox/dist ./artifacts/mockup-sandbox/dist
-
-# Copy built backend
-COPY --from=builder /app/artifacts/api-server/dist ./artifacts/api-server/dist
-COPY --from=builder /app/artifacts/api-server/package.json ./artifacts/api-server/package.json
+COPY --from=builder /app .
 
 RUN useradd -m chainofcommand && chown -R chainofcommand:chainofcommand /app
 USER chainofcommand
 
 EXPOSE 3000
-ENV PORT=3000
-
-CMD ["node", "artifacts/api-server/dist/index.mjs"]
+CMD ["node", "apps/api/dist/index.mjs"]
