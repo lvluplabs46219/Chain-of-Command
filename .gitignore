@@ -85,6 +85,10 @@ web_modules/
 
 # Next.js build output
 .next
+**/.next
+apps/web/.next
+apps/web/public/assets/stitch
+apps/web/public/mockups
 out
 
 # Nuxt.js build / generate output
