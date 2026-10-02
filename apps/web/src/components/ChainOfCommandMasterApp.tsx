@@ -205,7 +205,9 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
           />
         )}
 
-        {activeTab === "library" && <LibraryView />}
+        {activeTab === "library" && (
+          <LibraryView evidence={evidence} matter={activeMatter} />
+        )}
 
         {activeTab === "investigations" && (
           <InvestigationsView
