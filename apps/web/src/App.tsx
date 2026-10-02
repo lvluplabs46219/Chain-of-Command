@@ -135,7 +135,7 @@ function PreviewRenderer({
       <main className="flex min-h-screen items-center justify-center bg-[#0A0A0A]">
         <div className="text-center">
           <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-[#174E48] border-t-[#D4AF37]" />
-          <p className="font-mono text-sm tracking-widest text-[#D4AF37]">LOADING ACQUIT...</p>
+          <p className="font-mono text-sm tracking-widest text-[#D4AF37]">LOADING CHAIN OF COMMAND...</p>
         </div>
       </main>
     );
@@ -149,7 +149,7 @@ function MockupNavigation({ activePath }: { activePath: string }) {
 
   return (
     <nav
-      aria-label="Acquit mockup navigation"
+      aria-label="Chain of Command mockup navigation"
       className="fixed inset-x-0 bottom-0 z-[9999] border-t border-[#D4AF37]/20 bg-[#0A0A0A]/95 px-3 py-2 shadow-2xl backdrop-blur"
     >
       <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto">
@@ -179,7 +179,7 @@ function Gallery() {
     <main className="min-h-screen bg-[#0A0A0A] p-6 pb-24 text-white md:p-10 md:pb-24">
       <div className="mx-auto max-w-6xl">
         <header className="mb-8">
-          <p className="mb-2 font-mono text-xs tracking-[0.25em] text-[#D4AF37]">ACQUIT.AI / MOCKUP ROUTER</p>
+          <p className="mb-2 font-mono text-xs tracking-[0.25em] text-[#D4AF37]">CHAIN OF COMMAND / MOCKUP ROUTER</p>
           <h1 className="text-3xl font-semibold">Platform Screen Map</h1>
           <p className="mt-2 max-w-2xl text-white/60">
             All mockup surfaces are now addressable through stable routes. This is the visual integration layer; it does not imply AI filing or court-system automation.
@@ -212,7 +212,7 @@ function HomePage() {
   return (
     <div className="min-h-[calc(100vh-45px)] bg-[#0A0A0A] flex flex-col items-center justify-center p-8 text-white font-sans">
       <div className="max-w-4xl text-center space-y-8">
-        <h1 className="text-4xl md:text-5xl font-serif text-[#D4AF37] mb-4">Acquit.ai Platform</h1>
+        <h1 className="text-4xl md:text-5xl font-serif text-[#D4AF37] mb-4">Chain of Command Platform</h1>
         <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
           The legal operating system for self-represented litigants. Access the full suite of AI tools, research modules, and legal workspaces.
         </p>

@@ -49,6 +49,26 @@ const navigationScript = `
   </script>
 `;
 
+const SUPPRESS_TAILWIND_WARN = `<script>(function(){var w=console.warn;console.warn=function(){if(arguments[0]&&typeof arguments[0]==="string"&&(arguments[0].indexOf("cdn.tailwindcss.com")!==-1||arguments[0].indexOf("Tailwind CSS in production")!==-1))return;w.apply(console,arguments);};})();</script>\n`;
+
+function transformStitchHtml(raw: string): string {
+  let content = raw
+    .replace(/ACQUIT\.AI/g, "CHAIN OF COMMAND")
+    .replace(/Acquit\.ai/g, "Chain of Command")
+    .replace(/acquit\.ai/g, "chainofcommand.law")
+    .replace(/Acquit Platform/g, "Chain of Command Platform")
+    .replace(/Acquit Legal OS/g, "Chain of Command Legal OS")
+    .replace(/Acquit/g, "Chain of Command");
+
+  if (content.includes("cdn.tailwindcss.com") && !content.includes("arguments[0].indexOf(\"cdn.tailwindcss.com\")")) {
+    content = content.replace(
+      /<script src="https:\/\/cdn\.tailwindcss\.com/g,
+      SUPPRESS_TAILWIND_WARN + '<script src="https://cdn.tailwindcss.com'
+    );
+  }
+  return content;
+}
+
 export async function loadStitchHtml(folder: string): Promise<string> {
   const candidatePaths = [
     path.join(process.cwd(), "public", "assets", "stitch", folder, "code.html"),
@@ -62,7 +82,7 @@ export async function loadStitchHtml(folder: string): Promise<string> {
   for (const filePath of candidatePaths) {
     try {
       const content = await fs.readFile(filePath, "utf-8");
-      if (content) return content;
+      if (content) return transformStitchHtml(content);
     } catch {
       // Continue to next candidate
     }

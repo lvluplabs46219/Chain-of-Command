@@ -23,6 +23,26 @@ const SOURCE = path.join(
   "stitch_acquit.ai_legal_operating_system"
 );
 
+const SUPPRESS_TAILWIND_WARN = `<script>(function(){var w=console.warn;console.warn=function(){if(arguments[0]&&typeof arguments[0]==="string"&&(arguments[0].indexOf("cdn.tailwindcss.com")!==-1||arguments[0].indexOf("Tailwind CSS in production")!==-1))return;w.apply(console,arguments);};})();</script>\n`;
+
+function transformHtml(raw) {
+  let content = raw
+    .replace(/ACQUIT\.AI/g, "CHAIN OF COMMAND")
+    .replace(/Acquit\.ai/g, "Chain of Command")
+    .replace(/acquit\.ai/g, "chainofcommand.law")
+    .replace(/Acquit Platform/g, "Chain of Command Platform")
+    .replace(/Acquit Legal OS/g, "Chain of Command Legal OS")
+    .replace(/Acquit/g, "Chain of Command");
+
+  if (content.includes("cdn.tailwindcss.com") && !content.includes("arguments[0].indexOf(\"cdn.tailwindcss.com\")")) {
+    content = content.replace(
+      /<script src="https:\/\/cdn\.tailwindcss\.com/g,
+      SUPPRESS_TAILWIND_WARN + '<script src="https://cdn.tailwindcss.com'
+    );
+  }
+  return content;
+}
+
 function main() {
   if (!fs.existsSync(SOURCE)) {
     return;
@@ -47,8 +67,11 @@ function main() {
     fs.mkdirSync(mockupDir, { recursive: true });
     fs.mkdirSync(stitchDir, { recursive: true });
 
-    fs.copyFileSync(htmlSrc, path.join(mockupDir, "index.html"));
-    fs.copyFileSync(htmlSrc, path.join(stitchDir, "code.html"));
+    const rawHtml = fs.readFileSync(htmlSrc, "utf-8");
+    const cleanHtml = transformHtml(rawHtml);
+
+    fs.writeFileSync(path.join(mockupDir, "index.html"), cleanHtml, "utf-8");
+    fs.writeFileSync(path.join(stitchDir, "code.html"), cleanHtml, "utf-8");
     if (fs.existsSync(pngSrc)) {
       fs.copyFileSync(pngSrc, path.join(mockupDir, "screen.png"));
       fs.copyFileSync(pngSrc, path.join(stitchDir, "screen.png"));

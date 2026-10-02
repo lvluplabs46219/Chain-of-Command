@@ -1,5 +1,5 @@
 /**
- * Acquit.ai Client-side Signup Workflow Helper
+ * Chain of Command Client-side Signup Workflow Helper
  */
 
 export interface SignupWorkflowResult {

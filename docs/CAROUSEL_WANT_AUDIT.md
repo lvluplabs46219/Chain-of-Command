@@ -11,7 +11,7 @@ Moved from repository root (hygiene). Implementation status 2026-09-24:
 | **EvidenceCarousel** | Embla | YES | Keep | Evidence photos, CCTV, and documents are visual and human. |
 | **CaseWorkspace** | Should include EvidenceCarousel | YES | Include | Evidence Wall premium command center. |
 | **AttorneyDirectory** | Vertical list + featured strip | YES | Featured carousel at top | Premium recommended feel. |
-| **AcquitAcademy** | Grid + FeaturedCoursesCarousel | YES | Masterclass carousel | Netflix/Masterclass glide. |
+| **Chain of CommandAcademy** | Grid + FeaturedCoursesCarousel | YES | Masterclass carousel | Netflix/Masterclass glide. |
 | **LawLibraryExplorer** | List/Grid | NO | Leave as List | Dense scannable research. |
 | **CaseTimeline** | Vertical steps | NO | Leave as Timeline | Chronological flow. |
 | **FilingCenter** | List/Grid | NO | Leave as Grid | Utilitarian deadlines. |

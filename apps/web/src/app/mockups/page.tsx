@@ -3,7 +3,13 @@ import path from "path";
 import Link from "next/link";
 
 function formatName(name: string) {
-  return name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return name
+    .replace(/acquit\.ai_/gi, "Chain of Command ")
+    .replace(/acquit_/gi, "Chain of Command ")
+    .replace(/_acquit\.ai_/gi, " Chain of Command ")
+    .replace(/acquit/gi, "Chain of Command")
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function listMockups(): string[] {
