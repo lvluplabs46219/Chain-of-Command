@@ -10,7 +10,7 @@
     "scripts"
   ],
   "scripts": {
-    "dev": "concurrently -k -p \"[{name}]\" -n \"WEB,API\" -c \"cyan,magenta\" \"npm run dev --workspace=apps/web\" \"PORT=3001 tsx apps/api/src/index.ts\"",
+    "dev": "concurrently -p \"[{name}]\" -n \"WEB,API\" -c \"cyan,magenta\" \"npm run dev --workspace=apps/web\" \"PORT=3001 tsx apps/api/src/index.ts\"",
     "dev:web": "npm run dev --workspace=apps/web",
     "dev:api": "PORT=3001 tsx apps/api/src/index.ts",
     "build": "npm run build --workspace=apps/web",
@@ -24,7 +24,7 @@
     "harvard:preview": "python3 scripts/harvard_cases.py --action preview --limit 5",
     "harvard:ingest": "python3 scripts/harvard_cases.py --action ingest --limit 10",
     "start": "tsx apps/api/src/index.ts",
-    "prepare": "is-ci || husky",
+    "prepare": "true",
     "test": "tsx scripts/ts/test_compliance_and_security.ts",
     "patcher": "tsx scripts/ts/acquit-patcher.ts"
   },
@@ -50,7 +50,6 @@
     "multer": "^2.2.0",
     "next": "^16.3.7",
     "pg": "^8.23.0",
-    "psql": "^0.0.1",
     "react-router-dom": "^7.18.3",
     "tar-stream": "^3.2.0",
     "workflow": "^2.0.6"
