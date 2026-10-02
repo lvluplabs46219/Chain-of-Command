@@ -4,7 +4,7 @@
   "private": true,
   "main": "index.ts",
   "dependencies": {
-    "uuid": "^10.0.0"
+    "uuid": "^14.0.2"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
