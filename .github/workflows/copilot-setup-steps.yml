@@ -1,18 +1,27 @@
 # Custom setup steps for the GitHub Copilot coding agent.
-# NOTE: 'on: workflow_dispatch' prevents GitHub from treating this file as a
-# push-triggered workflow (it has no 'jobs' section, so push runs always failed
-# with an invalid-workflow startup error). Copilot reads the 'setup' key by
-# filename, so this remains fully functional for the agent environment.
+# Uses the job-based format required by GitHub Actions (a workflow file
+# without a jobs section fails validation on every push) while remaining
+# readable by Copilot for its environment setup. workflow_dispatch-only,
+# so it never produces visible runs on push.
+name: Copilot Setup Steps
 on: workflow_dispatch
 
-version: 1
-setup:
-  - name: Install Dependencies
-    command: npm install --no-audit --no-fund
-  - name: Setup Local Environment
-    command: cp -n .env.example .env.local || true
-  - name: Type Check & Verify Setup
-    # There is no root tsconfig.json, so 'tsc --build' alone fails (TS5058).
-    # Build the real workspace projects instead; keep setup non-blocking so a
-    # type error cannot break the agent environment entirely.
-    command: npx tsc --build apps/web apps/api packages/db packages/rag-engine scripts || echo "warning: typecheck reported errors (non-blocking)"
+permissions:
+  contents: read
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Dependencies
+        # Non-blocking: if install breaks, Copilot can still start and fix it
+        continue-on-error: true
+        run: npm install --no-audit --no-fund
+      - name: Setup Local Environment
+        continue-on-error: true
+        run: cp -n .env.example .env.local || true
+      - name: Type Check & Verify Setup
+        # No root tsconfig.json, so build the real workspace projects.
+        # Non-blocking so a type error cannot kill the agent environment.
+        continue-on-error: true
+        run: npx tsc --build apps/web apps/api packages/db packages/rag-engine scripts || echo "warning: typecheck reported errors (non-blocking)"
