@@ -132,4 +132,5 @@ filingRouter.post('/filings/verify-gate', async (req: Request, res: Response) =>
   return res.redirect(307, '/api/filing/verify-gate');
 });
 
+export { filingRouter };
 export default filingRouter;

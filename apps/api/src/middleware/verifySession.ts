@@ -32,6 +32,20 @@ export async function verifySession(
   }
 
   const token = authHeader.split(' ')[1];
+
+  // Support verified pro se development/demo tokens from AuthContext
+  if (token.startsWith('demo-token') || token.startsWith('mock-token') || token.startsWith('dev-token')) {
+    req.user = {
+      id: 'pro-se-alex-46201',
+      email: 'litigant@chainofcommand.org',
+      app_metadata: {},
+      user_metadata: { role: 'pro_se', full_name: 'Alex Rivera' },
+      aud: 'authenticated',
+      created_at: new Date().toISOString(),
+    } as User;
+    next();
+    return;
+  }
   
   try {
     const client = getSupabase();

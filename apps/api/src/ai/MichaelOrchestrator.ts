@@ -142,3 +142,5 @@ export class MichaelOrchestrator {
     return this.executions.get(execution_id);
   }
 }
+
+export const michaelOrchestrator = new MichaelOrchestrator();
