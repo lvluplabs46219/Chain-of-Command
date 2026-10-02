@@ -1,3 +1,5 @@
+import { withBotId } from 'botid/next/config';
+
 /** @type {import('next').NextConfig} */
 function getApiDestination() {
   const rawUrl = process.env.API_URL?.trim();
@@ -34,5 +36,6 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBotId(nextConfig);
+
 
