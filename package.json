@@ -1,71 +1,20 @@
 {
-  "name": "workspace",
-  "version": "0.0.0",
-  "license": "MIT",
+  "name": "chain-of-command",
+  "version": "1.0.0",
   "private": true,
-  "type": "module",
   "workspaces": [
     "apps/*",
     "packages/*",
-    "scripts"
+    "agent/*"
   ],
   "scripts": {
-    "dev": "concurrently -p \"[{name}]\" -n \"WEB,API\" -c \"cyan,magenta\" \"npm run dev --workspace=apps/web\" \"PORT=3001 tsx apps/api/src/index.ts\"",
-    "dev:web": "npm run dev --workspace=apps/web",
-    "dev:api": "PORT=3001 tsx apps/api/src/index.ts",
+    "dev": "npm run dev --workspace=apps/web",
     "build": "npm run build --workspace=apps/web",
-    "typecheck:libs": "tsc --build",
-    "typecheck": "tsc --build",
-    "lint": "tsc --build",
-    "db:migrate": "python3 scripts/apply_all_migrations.py",
-    "db:push": "npm run push --workspace=packages/db",
-    "ingest": "tsx scripts/src/ingest_courtlistener.ts",
-    "ingest:docket": "tsx scripts/ingest_courtlistener_docket.ts",
-    "harvard:preview": "python3 scripts/harvard_cases.py --action preview --limit 5",
-    "harvard:ingest": "python3 scripts/harvard_cases.py --action ingest --limit 10",
-    "start": "tsx apps/api/src/index.ts",
-    "prepare": "true",
-    "test": "tsx scripts/ts/test_compliance_and_security.ts",
-    "patcher": "tsx scripts/ts/acquit-patcher.ts"
-  },
-  "dependencies": {
-    "@google/genai": "^2.18.0",
-    "@replit/connectors-sdk": "^0.4.2",
-    "@sentry/node": "^10.70.0",
-    "@sentry/profiling-node": "^10.70.0",
-    "@supabase/ssr": "^0.12.7",
-    "@supabase/supabase-js": "^2.116.0",
-    "@upstash/ratelimit": "^2.0.8",
-    "@upstash/redis": "^1.38.0",
-    "@vercel/analytics": "^2.0.1",
-    "cors": "^2.8.5",
-    "dotenv": "^17.4.2",
-    "embla-carousel-autoplay": "^8.6.0",
-    "embla-carousel-react": "^8.6.0",
-    "express": "^4.19.2",
-    "express-rate-limit": "^7.3.1",
-    "firebase": "^12.19.0",
-    "firebase-admin": "14.3.0",
-    "googleapis": "^176.0.0",
-    "helmet": "^7.1.0",
-    "multer": "^2.2.0",
-    "next": "^16.3.7",
-    "pg": "^8.23.0",
-    "react-router-dom": "^7.18.3",
-    "tar-stream": "^3.2.0",
-    "workflow": "^2.0.6"
+    "start": "npm run start --workspace=apps/web",
+    "lint": "npm run lint --workspace=apps/web"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
-    "@types/cors": "^2.8.19",
-    "@types/multer": "^2.2.0",
-    "concurrently": "^10.0.4",
-    "husky": "^9.1.7",
-    "is-ci": "^3.0.1",
-    "lint-staged": "^17.3.0",
-    "prettier": "^3.9.6",
-    "supabase": "^2.115.0",
-    "tsx": "^4.23.12",
-    "typescript": "~5.9.3"
+    "typescript": "^7.0.2"
   }
 }
