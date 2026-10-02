@@ -174,7 +174,7 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
       <WorkspaceNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Main Content Area */}
-      <main className="flex-1">
+      <section aria-label="Active Case Workspace" className="flex-1">
         {activeTab === "dashboard" && (
           <DashboardView
             matter={activeMatter}
@@ -236,7 +236,7 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
         {activeTab === "audit" && <TasksDeadlinesView matter={activeMatter} />}
 
         {activeTab === "archive" && <DesignArchiveView />}
-      </main>
+      </section>
 
       {/* Universal Mandatory Legal Footer Disclaimer (GEMINI.md Rule 5.B) */}
       <footer className="border-t border-[#1F2026] bg-[#0A0B0E] py-4 px-6 text-center text-xs text-neutral-500 font-sans mt-auto">
