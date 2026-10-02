@@ -11,6 +11,9 @@ export interface GatewayDecision {
 
 /** Heuristic: heavy/consensus work goes external; everything else stays local. */
 export function decide(prompt: string): GatewayDecision {
+  if (process.env.SERAPHIM_ENABLED !== "true") {
+    return { tier: "yhwh", reason: "seraphim disabled (SERAPHIM_ENABLED != true); local only" };
+  }
   const heavy = /(consensus|deep|review|architect|multi-model|analyze the entire)/i.test(prompt);
   return heavy
     ? { tier: "seraphim", reason: "complexity heuristic matched heavy reasoning" }
