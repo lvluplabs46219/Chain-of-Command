@@ -3,7 +3,7 @@
 import React from "react";
 import {
   LayoutDashboard,
-  FolderGavel,
+  Gavel,
   Users,
   BookOpen,
   Search,
@@ -37,7 +37,7 @@ interface WorkspaceNavigationProps {
 
 const TABS: { id: WorkspaceTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: "dashboard", label: "Command Center", icon: LayoutDashboard },
-  { id: "docket", label: "The Docket", icon: FolderGavel },
+  { id: "docket", label: "The Docket", icon: Gavel },
   { id: "chambers", label: "Chambers (AI Team)", icon: Users },
   { id: "library", label: "Legal Library", icon: BookOpen },
   { id: "investigations", label: "Investigations", icon: Search },
@@ -61,7 +61,8 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className={`flex items-center gap-2 py-3 px-3.5 text-xs font-medium border-b-2 transition-all shrink-0 ${
-              isActive
+            
+  isActive
                 ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/5 font-semibold"
                 : "border-transparent text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40"
             }`}
