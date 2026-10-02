@@ -1,0 +1,1583 @@
+#!/usr/bin/env python3
+"""Skill-level regression tests (stdlib only, no pytest needed).
+
+Run after editing tune_template.py / cue_api.py / validate_template.py to
+catch drift against the Cue public API contract. Covers codex
+review findings:
+
+1. +tune prompt 不能再含 `introduction`(后端契约改造已落地)
+2. cue_api 接受 legacy `task_configs` payload 转换为 `schedules`
+3. search_plan 某个维度缺三件套 → error(block-level)
+4. report_format 某节缺执行蓝图 → error(block-level)
+5. search_tool_company / crawl_tool_site 在工具名 lint 被拦
+
+Usage:
+    python3 scripts/test_skill_regression.py
+
+Exit 0 = all passed; non-zero = at least one failed (with detail).
+"""
+
+from __future__ import annotations
+
+import os
+import re
+import sys
+import unittest
+from pathlib import Path
+from unittest import mock
+
+_HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(_HERE))
+
+# Loaded lazily inside each test so import errors point to the right file.
+
+
+class Case1_TunePromptUsesCanonicalName(unittest.TestCase):
+    """codex !450 r3 #1 — tune prompt must use input_form_spec, not introduction."""
+
+    def test_build_user_requirement_omits_introduction(self) -> None:
+        from tune_template import build_user_requirement
+
+        current = {
+            "title": "示例",
+            "primary_category": "投研",
+            "secondary_category": "财报点评",
+            "input_form_spec": "需提供: [目标_点评_公司]",
+            "goal": "测试目标",
+            "search_plan": "测试",
+            "report_format": "## 1. 测试",
+        }
+        prompt = build_user_requirement(current, "略")
+        # Prompt 必须用 canonical 名字,不应再提 introduction
+        self.assertNotIn("introduction", prompt, "+tune prompt 仍含 'introduction'")
+        self.assertIn("input_form_spec", prompt, "+tune prompt 缺 'input_form_spec'")
+
+
+class Case2_LegacyTaskConfigsNormalizedToSchedules(unittest.TestCase):
+    """codex !450 r3 #2 — cue_api 把 legacy task_configs 自动转 schedules,
+    并 strip server-internal keys。"""
+
+    def test_task_configs_to_schedules(self) -> None:
+        from cue_api import _normalize_template_payload
+
+        payload = {
+            "title": "X",
+            "task_input": "宁德时代",
+            "task_cron_expressions": ["0 9 * * *", "0 9 * * 1"],
+            "task_configs": [
+                {
+                    "type": "daily",
+                    "time": "09:00",
+                    "date_param": None,
+                    "dates": None,
+                    "name": "should-be-dropped",
+                },
+                {
+                    "type": "weekly",
+                    "time": "09:00",
+                    "date_param": "1",
+                    "dates": None,
+                    "name": "weekly",
+                },
+            ],
+        }
+        out = _normalize_template_payload(payload)
+        # task_cron_expressions / task_configs 必须从 outbound 抹除
+        self.assertNotIn("task_cron_expressions", out)
+        self.assertNotIn("task_configs", out)
+        # schedules 必须从 task_configs 派生,带正确 4 字段且无 name
+        self.assertIn("schedules", out)
+        self.assertEqual(len(out["schedules"]), 2)
+        for s in out["schedules"]:
+            self.assertEqual(set(s.keys()), {"type", "time", "date_param", "dates"})
+        self.assertEqual(out["schedules"][0]["type"], "daily")
+        self.assertEqual(out["schedules"][1]["date_param"], "1")
+
+    def test_schedules_present_wins_over_task_configs(self) -> None:
+        """如果 caller 已传 schedules,不被 task_configs 覆盖。"""
+        from cue_api import _normalize_template_payload
+
+        payload = {
+            "schedules": [
+                {"type": "daily", "time": "10:00", "date_param": None, "dates": None}
+            ],
+            "task_configs": [
+                {"type": "weekly", "time": "11:00", "date_param": "2", "dates": None}
+            ],
+        }
+        out = _normalize_template_payload(payload)
+        self.assertEqual(out["schedules"][0]["time"], "10:00")
+        self.assertNotIn("task_configs", out)
+
+
+class Case3_SearchPlanMissingTripletInOneDimension(unittest.TestCase):
+    """codex !450 r3 #3 — block-level check finds per-dimension misses
+    that global count would mask."""
+
+    def test_dimension_missing_validation_strategy(self) -> None:
+        from validate_template import validate
+
+        # 3 维度,前 2 个完整,第 3 缺验证策略。全局 count=2/3/2 都 ≥ 2,
+        # 旧 lint 全过;block-level 必须抓出第 3 维度缺。
+        sp = (
+            "**[[主体核验] 公开身份信息]**\n"
+            "- **数据路由**: 工商 / 上市公告\n"
+            "- **执行动作**: 法定代表人 / 注册资本\n"
+            "- **验证策略**: 不一致时以披露为准\n\n"
+            "**[[财务实证] 三年财务]**\n"
+            "- **数据路由**: 年报\n"
+            "- **执行动作**: 营收 / 净利润\n"
+            "- **验证策略**: 评级最新\n\n"
+            "**[[行业景气] 行业]**\n"
+            "- **数据路由**: 协会数据\n"
+            "- **执行动作**: 行业增长\n"
+            # 故意缺 **验证策略**
+        )
+        payload = {
+            "title": "x",
+            "primary_category": "x",
+            "secondary_category": "x",
+            # 三段式变量必须中文(R1);用合规 `[目标_授信_企业]` 避免 fixture 污染
+            # (codex !450 r3 review: 旧 `[目标_X_主体]` 含英文 X 会污染 errors)
+            "input_form_spec": "需提供: [目标_授信_企业](示例: 比亚迪)，可提供: [关注_风险_主题] (默认: 通用)",
+            "goal": "作为银行客户经理的预尽调助手，识别风险信号",
+            "search_plan": sp,
+            "report_format": (
+                "> **关键配置**\n> - **目标对象**: [目标_授信_企业]\n\n"
+                "# [目标_授信_企业] 测试\n\n"
+                "## 1. A\n> **[执行蓝图]**\n> - **研究目标**: x\n"
+                "> - **逻辑链条**: x\n> - **信息需求**: x\n> - **输出形式**: 段落\n"
+                "## 2. B\n> **[执行蓝图]**\n> - **研究目标**: x\n"
+                "> - **逻辑链条**: x\n> - **信息需求**: x\n> - **输出形式**: 段落\n"
+                "## 3. C\n> **[执行蓝图]**\n> - **研究目标**: x\n"
+                "> - **逻辑链条**: x\n> - **信息需求**: x\n> - **输出形式**: 段落\n"
+                "本报告基于公开信息编制\n"
+            ),
+        }
+        findings = validate(payload)
+        errors = [f for f in findings if f.severity == "error"]
+        # 必须有一条 error 指向 search_plan 第 3 维度 + 验证策略 缺失
+        relevant = [
+            f
+            for f in errors
+            if f.field == "search_plan" and "验证策略" in f.message and "行业" in f.message
+        ]
+        self.assertTrue(
+            relevant,
+            f"block-level lint 没抓到第 3 维度缺验证策略;all errors: {[str(f) for f in errors]}",
+        )
+        # 且其他字段不应被该 fixture 污染产生 errors (codex !450 r3 NICE)
+        unrelated = [f for f in errors if f.field != "search_plan"]
+        self.assertEqual(
+            unrelated, [], f"fixture 污染:非 search_plan field 也报 errors: {[str(f) for f in unrelated]}"
+        )
+
+
+class Case4_ReportSectionMissingBlueprint(unittest.TestCase):
+    """codex !450 r3 #4 — 某节缺执行蓝图引用块时,error 必须按章节定位。"""
+
+    def test_section_missing_blueprint_block_is_error(self) -> None:
+        from validate_template import validate
+
+        # 第 2 节有蓝图,第 1/3 节缺
+        rf = (
+            "> **关键配置**\n> - **目标对象**: [目标_X_主体]\n\n"
+            "# [目标_X_主体] 测试报告\n\n"
+            "## 1. 第一节\n内容(无蓝图)\n\n"
+            "## 2. 第二节\n> **[执行蓝图]**\n"
+            "> - **研究目标**: x\n> - **逻辑链条**: x\n"
+            "> - **信息需求**: x\n> - **输出形式**: 段落\n\n"
+            "## 3. 第三节\n内容(也无蓝图)\n\n"
+            "本报告基于公开信息编制\n"
+        )
+        payload = {
+            "title": "x",
+            "primary_category": "x",
+            "secondary_category": "x",
+            # 合规三段式 + 合规维度 label (codex !450 r3 fixture cleanup)
+            "input_form_spec": "需提供: [目标_授信_企业](示例: 比亚迪)，可提供: [关注_风险_主题] (默认: 通用)",
+            "goal": "作为银行客户经理的预尽调助手，识别风险信号",
+            "search_plan": (
+                "**[[主体核验] 公开身份]**\n- **数据路由**: 工商\n"
+                "- **执行动作**: 法人\n- **验证策略**: 以披露为准\n\n"
+                "**[[财务实证] 三年财务]**\n- **数据路由**: 年报\n"
+                "- **执行动作**: 营收\n- **验证策略**: 评级最新\n"
+            ),
+            "report_format": rf,
+        }
+        findings = validate(payload)
+        errors = [f for f in findings if f.severity == "error"]
+        # 必须有两条 error 指向第 1 / 第 3 节缺蓝图
+        sec1 = [
+            f
+            for f in errors
+            if "执行蓝图" in f.message and ("第 1 节" in f.message or "「第一节」" in f.message)
+        ]
+        sec3 = [
+            f
+            for f in errors
+            if "执行蓝图" in f.message and ("第 3 节" in f.message or "「第三节」" in f.message)
+        ]
+        self.assertTrue(sec1, f"未抓到第 1 节缺蓝图;errors: {[str(f) for f in errors]}")
+        self.assertTrue(sec3, f"未抓到第 3 节缺蓝图;errors: {[str(f) for f in errors]}")
+        # 非 report_format 字段不应被 fixture 污染 (codex !450 r3 NICE)
+        unrelated = [f for f in errors if f.field != "report_format"]
+        self.assertEqual(
+            unrelated, [], f"fixture 污染:非 report_format 报 errors: {[str(f) for f in unrelated]}"
+        )
+
+
+class Case5_ToolNameLeakRegexCoversAllFamilies(unittest.TestCase):
+    """codex !450 r3 #5 — search_tool* / crawl_tool* 必须被工具名 lint 拦。"""
+
+    def test_search_tool_company_caught(self) -> None:
+        from validate_template import TOOL_NAME_LEAK_RE
+
+        for sample in (
+            "调用 search_tool_company 拉公司",
+            "用 search_tool 检索",
+            "执行 search_tool_disclosure 获取披露",
+            "走 crawl_tool_site 抓页",
+            "通过 crawl_tool 爬取",
+            "用 get_disclosure 拉公告",  # 原有 family,保持工作
+            "调 list_companies",
+            "find_recent_news",
+            # CJK-glued, no spaces — \b 不 fire,旧 regex 漏抓(Pz0sT5 上线泄漏)
+            "使用get_cninfo_disclosure_search工具",
+            "根据关键词搜索公告：使用get_cninfo_disclosure_search工具。",
+            "优先list_companies再深挖",
+            "调用search_tool_company查",
+        ):
+            with self.subTest(sample=sample):
+                self.assertRegex(sample, TOOL_NAME_LEAK_RE, f"未抓 {sample!r}")
+
+    def test_legitimate_text_not_falsely_flagged(self) -> None:
+        """合规中文文本(无下划线工具名)不应被 leak regex 命中。
+
+        Codex !450 r3 confirmation: `search_tools` 复数形式也属于工具名引用
+        (meta 描述里写工具集合也是 R5 leak),应被命中 — 故不在"不应被抓"列表。
+        """
+        from validate_template import TOOL_NAME_LEAK_RE
+
+        for sample in (
+            "通过监管披露与行业数据交叉验证",
+            "数据路由: 上市公司公告",
+            "司法 / 舆情 / 监管处罚",
+            "穿透 [目标_授信_企业] 的公开监管披露",
+        ):
+            with self.subTest(sample=sample):
+                self.assertNotRegex(sample, TOOL_NAME_LEAK_RE, f"误报: {sample!r}")
+
+
+# Bonus: cue_api task_input client-side lint regression
+class Case6_TaskInputClientSideFastFail(unittest.TestCase):
+    """codex !450 r3 #2 mirror — `cue_api._normalize_template_payload`
+    在 send 前本地拦截违 R9 task_input。"""
+
+    def test_placeholder_text_raises(self) -> None:
+        from cue_api import _normalize_template_payload
+
+        with self.assertRaises(ValueError) as cm:
+            _normalize_template_payload(
+                {"task_input": "请输入企业名称或统一社会信用代码。可选补充..."}
+            )
+        self.assertIn("R9", str(cm.exception))
+
+    def test_placeholder_variable_raises(self) -> None:
+        from cue_api import _normalize_template_payload
+
+        with self.assertRaises(ValueError) as cm:
+            _normalize_template_payload({"task_input": "[目标_授信_企业]"})
+        self.assertIn("占位", str(cm.exception))
+
+    def test_internal_orchestration_raises(self) -> None:
+        from cue_api import _normalize_template_payload
+
+        for value in (
+            "Researcher先检索再交Reporter",
+            "调用file_retrieval",
+            "至少8次读取材料",
+        ):
+            with self.subTest(value=value), self.assertRaises(ValueError) as cm:
+                _normalize_template_payload({"task_input": value})
+            self.assertIn("R9", str(cm.exception))
+
+    def test_concrete_subject_passes(self) -> None:
+        from cue_api import _normalize_template_payload
+
+        for value in ("宁德时代", "今日盘后分析", "欧盟医疗器械准入"):
+            with self.subTest(value=value):
+                out = _normalize_template_payload({"task_input": value})
+                self.assertEqual(out["task_input"], value)
+
+
+class Case6b_TaskInputValidatorRejectsInternalOrchestration(unittest.TestCase):
+    """R9 validator mirrors the API client fast-fail for direct validation."""
+
+    def test_internal_terms_and_call_counts_are_errors(self) -> None:
+        from validate_template import _check_task_input
+
+        for value in (
+            "coordinator分配任务",
+            "先content_digest再汇总",
+            "读取至少8次材料",
+        ):
+            with self.subTest(value=value):
+                findings = []
+                _check_task_input({"task_input": value}, findings)
+                errors = [f for f in findings if f.severity == "error"]
+                self.assertTrue(errors, f"internal orchestration leaked: {value!r}")
+                self.assertTrue(
+                    any("内部编排" in f.message for f in errors),
+                    f"wrong error for {value!r}: {[str(f) for f in errors]}",
+                )
+
+    def test_natural_inputs_still_pass(self) -> None:
+        from validate_template import _check_task_input
+
+        for value in ("宁德时代", "今日盘后分析", "欧盟医疗器械准入"):
+            with self.subTest(value=value):
+                findings = []
+                _check_task_input({"task_input": value}, findings)
+                self.assertEqual(findings, [])
+
+
+class Case7_DimRegexCoversNonChineseLabels(unittest.TestCase):
+    """codex !450 r3 #2 — search_plan dim regex must accept English/digit/
+    dash labels like `[[ESG-2026]]`, `[[A股]]`, `[[2026]]`."""
+
+    def test_english_dash_digit_labels_match(self) -> None:
+        from validate_template import _SEARCH_PLAN_DIM_RE
+
+        for sample in (
+            "**[[ESG-2026] ESG事项]**",
+            "**[[A股] 披露]**",
+            "**[[2026] 年度趋势]**",
+            "**[[主体核验] 公开身份信息]**",  # 中文 label 不退化
+        ):
+            with self.subTest(sample=sample):
+                self.assertRegex(sample, _SEARCH_PLAN_DIM_RE)
+
+
+class Case8_RecommendedTaskHelperRequiresSchedules(unittest.TestCase):
+    """codex !450 r3 #1 — update_template_recommended_task 必须本地 raise
+    若 schedules 缺失/为空,而不是发到后端拿 422。"""
+
+    def test_missing_schedules_raises(self) -> None:
+        from cue_api import update_template_recommended_task
+
+        with self.assertRaises(ValueError) as cm:
+            # 注意: 不能真发 HTTP, 但 schedules 校验在 _request 之前
+            update_template_recommended_task("tpl_x", schedules=[])
+        self.assertIn("schedules", str(cm.exception))
+
+    def test_non_list_schedules_raises(self) -> None:
+        from cue_api import update_template_recommended_task
+
+        with self.assertRaises(ValueError):
+            update_template_recommended_task("tpl_x", schedules=None)  # type: ignore[arg-type]
+
+
+class Case9_CronExpressionsTypoRejected(unittest.TestCase):
+    """codex !450 r3 #4 — `cron_expressions` (no `task_` prefix) typo 必须
+    本地 raise; 否则后端 extra='ignore' 会静默吞掉。"""
+
+    def test_typo_field_raises(self) -> None:
+        from cue_api import _normalize_template_payload
+
+        with self.assertRaises(ValueError) as cm:
+            _normalize_template_payload(
+                {"title": "x", "cron_expressions": ["0 9 * * *"]}
+            )
+        self.assertIn("cron_expressions", str(cm.exception))
+
+    def test_task_configs_missing_type_raises(self) -> None:
+        """codex !450 r3 #3 — task_configs item 缺 type/time 应本地 raise."""
+        from cue_api import _normalize_template_payload
+
+        with self.assertRaises(ValueError) as cm:
+            _normalize_template_payload(
+                {
+                    "task_configs": [
+                        {"time": "09:00", "date_param": None, "dates": None}
+                    ]
+                }
+            )
+        self.assertIn("type", str(cm.exception))
+
+
+class Case10_TestTemplateDiagnosis(unittest.TestCase):
+    """codex r4 finding — test_template.py _diagnose_empty_report 分类正确性.
+
+    +test SSE 长流断连场景的诊断函数,决定要不要走 replay fallback。
+    """
+
+    def test_stream_cut_before_reporter(self) -> None:
+        """events 只有 coordinator/researcher,reporter 还没 start 就断流。"""
+        import json
+
+        from test_template import _diagnose_empty_report
+
+        events = [
+            ("start_of_agent", json.dumps({"data": {"agent_name": "coordinator"}})),
+            ("message", json.dumps({"data": {"delta": {"content": "x"}}})),
+            ("end_of_agent", json.dumps({"data": {"agent_name": "coordinator"}})),
+            ("start_of_agent", json.dumps({"data": {"agent_name": "researcher"}})),
+            ("message", json.dumps({"data": {"delta": {"content": "y"}}})),
+        ]
+        d = _diagnose_empty_report(events, elapsed=372.9, timeout=300.0)
+        self.assertEqual(d["kind"], "stream_cut_before_reporter")
+        self.assertEqual(d["last_agent"], "researcher")
+        self.assertFalse(d["reporter_started"])
+        self.assertTrue(d["hit_timeout"])
+
+    def test_top_level_agent_name_events_are_supported(self) -> None:
+        """Replay SSE uses top-level agent_name; extractor must support it."""
+        import json
+
+        from test_template import _diagnose_empty_report, _extract_reporter_content
+
+        events = [
+            ("start_of_agent", json.dumps({"agent_name": "reporter"})),
+            (
+                "message",
+                json.dumps(
+                    {
+                        "agent_name": "reporter",
+                        "delta": {"content": "# 淡水泉 尽调报告\n"},
+                    }
+                ),
+            ),
+            ("end_of_agent", json.dumps({"agent_name": "reporter"})),
+        ]
+        report = _extract_reporter_content(events)
+        self.assertIn("淡水泉", report)
+
+        d = _diagnose_empty_report(events, elapsed=1.0, timeout=300.0)
+        self.assertTrue(d["reporter_started"])
+        self.assertTrue(d["reporter_ended"])
+
+    def test_no_agent_events(self) -> None:
+        """events 完全无 agent — auth/template_id 错或后端没响应。"""
+        import json
+
+        from test_template import _diagnose_empty_report
+
+        events = [
+            ("message", json.dumps({"data": {"delta": {"content": "noise"}}})),
+        ]
+        d = _diagnose_empty_report(events, elapsed=2.0, timeout=300.0)
+        self.assertEqual(d["kind"], "no_agent_events")
+        self.assertIsNone(d["last_agent"])
+        self.assertFalse(d["hit_timeout"])
+
+    def test_reporter_started_no_text(self) -> None:
+        """reporter start 看到了但没 message text — 罕见 server-side fail。"""
+        import json
+
+        from test_template import _diagnose_empty_report
+
+        events = [
+            ("start_of_agent", json.dumps({"data": {"agent_name": "reporter"}})),
+            # 没 message events,直接 end
+            ("end_of_agent", json.dumps({"data": {"agent_name": "reporter"}})),
+        ]
+        d = _diagnose_empty_report(events, elapsed=10.0, timeout=300.0)
+        self.assertEqual(d["kind"], "reporter_started_no_text")
+        self.assertTrue(d["reporter_started"])
+        self.assertTrue(d["reporter_ended"])
+
+    def test_extractor_works_without_end_marker(self) -> None:
+        """codex r4 关键纠错:end_of_agent 缺失**不会**让 extractor 空 —
+        in_reporter 保持 True 直到流结束,后续 message 仍累加。"""
+        import json
+
+        from test_template import _extract_reporter_content
+
+        events = [
+            ("start_of_agent", json.dumps({"data": {"agent_name": "reporter"}})),
+            (
+                "message",
+                json.dumps({"data": {"delta": {"content": "## 1. 业绩\n"}}}),
+            ),
+            (
+                "message",
+                json.dumps({"data": {"delta": {"content": "营收增长 20%\n"}}}),
+            ),
+            # 没 end_of_agent — 流断在 reporter 中间
+        ]
+        report = _extract_reporter_content(events)
+        # ✓ 即使 end 没到,extractor 仍累加,report 非空
+        self.assertIn("业绩", report)
+        self.assertIn("营收增长 20%", report)
+
+
+class Case11_TestTemplateChecks(unittest.TestCase):
+    """+test report checks should accept legal-name expansion."""
+
+    def test_title_check_accepts_short_name_expanded_to_legal_name(self) -> None:
+        from test_template import _check_title_contains_entity
+
+        report = "# 淡水泉（北京）投资管理有限公司 私募管理人公开尽调底稿\n"
+        result = _check_title_contains_entity(report, "淡水泉投资")
+        self.assertTrue(result.ok, result.detail)
+
+
+class Case12_R10ReportTimeFieldValidator(unittest.TestCase):
+    """R10 validate_template check: 报告时间 field name + format + placeholder.
+
+    Frontend renders by exact key `报告时间`; wrong variants like 报告生成时间 break
+    the FE display. Self-created placeholders like `<由 LLM 填充>` can leak literal
+    text into the published report if the reporter LLM ignores them."""
+
+    def _payload_with_rf(self, rf_body: str) -> dict:
+        """Build a minimally-valid template payload with a custom report_format."""
+        return {
+            "title": "T",
+            "primary_category": "金融",
+            "secondary_category": "预尽调",
+            "input_form_spec": "需提供: [目标_测试_企业] (默认: 通用)。",
+            "goal": "穿透目标企业的公开监管披露,识别影响首批授信批复的偿债、合规与经营风险。",
+            "search_plan": (
+                "**[[主体] 公开身份]**\n"
+                "- **数据路由**: A\n- **执行动作**: B\n- **验证策略**: C\n\n"
+                "**[[财务] 三年财务]**\n"
+                "- **数据路由**: A\n- **执行动作**: B\n- **验证策略**: C\n"
+            ),
+            "report_format": rf_body,
+        }
+
+    def _rf_with_time_line(self, time_line: str = "报告时间: YYYY年MM月DD日") -> str:
+        return (
+            "> **关键配置**\n"
+            "> - **目标对象**: [目标_测试_企业]\n"
+            "> - **报告类型**: 测试\n"
+            "> - **基调设定**: 客观\n"
+            "> - **核心命题**: 测试\n\n"
+            "# [目标_测试_企业] 测试底稿\n"
+            f"{time_line}\n\n"
+            "## 1. 节\n\n"
+            "> **[执行蓝图]**\n"
+            "> - **研究目标**: T\n"
+            "> - **逻辑链条**: T\n"
+            "> - **信息需求**: T\n"
+            "> - **输出形式**: T\n\n"
+            "## 2. 节\n\n"
+            "> **[执行蓝图]**\n"
+            "> - **研究目标**: T\n"
+            "> - **逻辑链条**: T\n"
+            "> - **信息需求**: T\n"
+            "> - **输出形式**: T\n\n"
+            "## 3. 节\n\n"
+            "> **[执行蓝图]**\n"
+            "> - **研究目标**: T\n"
+            "> - **逻辑链条**: T\n"
+            "> - **信息需求**: T\n"
+            "> - **输出形式**: T\n"
+        )
+
+    def test_correct_field_passes(self) -> None:
+        from validate_template import validate
+
+        payload = self._payload_with_rf(self._rf_with_time_line())
+        r10 = [f for f in validate(payload) if "R10" in f.message]
+        self.assertEqual(r10, [], f"unexpected R10 findings: {r10}")
+
+    def test_wrong_name_报告生成时间_errors(self) -> None:
+        from validate_template import validate
+
+        payload = self._payload_with_rf(
+            self._rf_with_time_line("报告生成时间: YYYY年MM月DD日")
+        )
+        errs = [f for f in validate(payload)
+                if f.severity == "error" and "R10" in f.message]
+        self.assertTrue(errs, "should error on 报告生成时间")
+        self.assertTrue(any("报告生成时间" in f.message for f in errs))
+
+    def test_wrong_name_生成日期_errors(self) -> None:
+        from validate_template import validate
+
+        payload = self._payload_with_rf(
+            self._rf_with_time_line("生成日期: YYYY年MM月DD日")
+        )
+        errs = [f for f in validate(payload)
+                if f.severity == "error" and "R10" in f.message]
+        self.assertTrue(errs, "should error on 生成日期")
+
+    def test_self_created_placeholder_errors(self) -> None:
+        from validate_template import validate
+
+        payload = self._payload_with_rf(
+            self._rf_with_time_line("报告时间: <由 LLM 填充>")
+        )
+        errs = [f for f in validate(payload)
+                if f.severity == "error" and "R10" in f.message]
+        self.assertTrue(errs, "should error on <由 LLM 填充> placeholder")
+
+    def test_curly_brace_placeholder_errors(self) -> None:
+        from validate_template import validate
+
+        payload = self._payload_with_rf(
+            self._rf_with_time_line("报告时间: {CURRENT_DATE}")
+        )
+        errs = [f for f in validate(payload)
+                if f.severity == "error" and "R10" in f.message]
+        self.assertTrue(errs, "should error on {CURRENT_DATE} placeholder")
+
+    def test_missing_time_field_warns_not_errors(self) -> None:
+        from validate_template import validate
+
+        rf_no_time = self._rf_with_time_line("").replace("\n\n\n", "\n\n")
+        # strip the empty time_line above
+        payload = self._payload_with_rf(rf_no_time)
+        r10 = [f for f in validate(payload) if "R10" in f.message]
+        self.assertEqual(len(r10), 1, f"expected exactly 1 R10 warning: {r10}")
+        self.assertEqual(r10[0].severity, "warning")
+
+
+class Case13_R10ReportTimeRuntimeCheck(unittest.TestCase):
+    """+test runtime guard: produced report must have a filled 报告时间 line
+    when the template requires one, and must not leak placeholder literals."""
+
+    def test_correct_report_passes(self) -> None:
+        from test_template import _check_report_time_filled
+
+        rf = "# X\n报告时间: YYYY年MM月DD日\n\n## 1. ...\n"
+        report = "# X\n报告时间: 2026年05月28日\n\n## 1. ...\n"
+        result = _check_report_time_filled(rf, report)
+        self.assertTrue(result.ok, result.detail)
+
+    def test_placeholder_leak_fails(self) -> None:
+        from test_template import _check_report_time_filled
+
+        rf = "# X\n报告时间: YYYY年MM月DD日\n\n"
+        report = "# X\n报告时间: <由 LLM 填充>\n\n"
+        result = _check_report_time_filled(rf, report)
+        self.assertFalse(result.ok, "must catch <由 LLM 填充> literal in report")
+
+    def test_missing_line_when_required_fails(self) -> None:
+        from test_template import _check_report_time_filled
+
+        rf = "# X\n报告时间: YYYY年MM月DD日\n\n"
+        report = "# X\n\n## 1. ...\n(no report-time line at all)\n"
+        result = _check_report_time_filled(rf, report)
+        self.assertFalse(result.ok)
+
+    def test_template_no_time_field_skips(self) -> None:
+        from test_template import _check_report_time_filled
+
+        rf = "# X\n\n## 1. ...\n"  # no 报告时间 requirement
+        report = "# X\n\n## 1. ...\n"
+        result = _check_report_time_filled(rf, report)
+        self.assertTrue(result.ok, "must pass when template requires no time field")
+
+
+class Case14_UpgradeSkillHelpers(unittest.TestCase):
+    """+upgrade verb helpers (update_skill.py): pure-function unit tests.
+
+    Network and git/subprocess paths are excluded — those are exercised
+    end-to-end at agent time, not in stdlib regression. We test the
+    pieces that matter: frontmatter parsing, install-mode detection,
+    skill-arg resolution, cooldown gating, and silent-check orchestration
+    with an injected fetch_fn (no network)."""
+
+    def test_parse_version_from_md_extracts_quoted_version(self) -> None:
+        from update_skill import parse_version_from_md
+        md = '---\nname: x\nmetadata:\n  version: "0.3.1"\n---\n# body\n'
+        self.assertEqual(parse_version_from_md(md), "0.3.1")
+
+    def test_parse_version_from_md_extracts_unquoted_version(self) -> None:
+        from update_skill import parse_version_from_md
+        md = "---\nname: x\nmetadata:\n  version: 1.2.3\n---\n"
+        self.assertEqual(parse_version_from_md(md), "1.2.3")
+
+    def test_parse_version_from_md_missing_returns_none(self) -> None:
+        from update_skill import parse_version_from_md
+        md = "---\nname: x\n---\n# body\n"
+        self.assertIsNone(parse_version_from_md(md))
+
+    def test_parse_version_from_md_no_frontmatter_returns_none(self) -> None:
+        from update_skill import parse_version_from_md
+        self.assertIsNone(parse_version_from_md("# just a body\nfoo\n"))
+
+    def test_load_cooldown_merges_legacy_taking_max(self) -> None:
+        """A CUE_HOME relocate must not reset the 24h timer. When the primary
+        (relocated) file has a stale expired timestamp and the legacy ~/.cue
+        file has a newer still-cooling one, _load_cooldown must take the MAX
+        (newer) - not primary-wins via setdefault - so the skill stays gated.
+        (codex round-2 finding: setdefault kept the expired primary value.)"""
+        import json
+        import tempfile
+        from unittest import mock
+        from update_skill import _load_cooldown, _cooldown_expired
+        with tempfile.TemporaryDirectory() as d:
+            primary = Path(d) / "last-update-check.json"
+            legacy = Path(d) / "legacy.json"
+            primary.write_text(json.dumps({"cue-buddy": 1000}), encoding="utf-8")   # expired
+            legacy.write_text(json.dumps({"cue-buddy": 90000}), encoding="utf-8")   # still cooling
+            with mock.patch("update_skill._LEGACY_COOLDOWN_PATH", legacy):
+                data = _load_cooldown(primary)
+                # max wins: 90000, not the primary's stale 1000
+                self.assertEqual(data.get("cue-buddy"), 90000)
+                # now=91000 -> 91000-90000=1000s < 86400s -> still cooling
+                self.assertFalse(_cooldown_expired("cue-buddy", 91000, path=primary))
+
+    def test_detect_install_mode_git_when_dotgit_in_ancestor(self) -> None:
+        import tempfile
+        from update_skill import detect_install_mode
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_p = Path(tmp)
+            (tmp_p / ".git").mkdir()
+            skill_dir = tmp_p / "cue-buddy"
+            skill_dir.mkdir()
+            mode, root = detect_install_mode(skill_dir)
+            self.assertEqual(mode, "git")
+            self.assertEqual(root, tmp_p)
+
+    def test_detect_install_mode_copy_when_no_dotgit(self) -> None:
+        import tempfile
+        from unittest.mock import patch
+        from update_skill import detect_install_mode
+        # TMPDIR may itself sit inside a git worktree (e.g. /fast/tmp has a
+        # stray .git, or a dev sets TMPDIR into a project dir). Since
+        # detect_install_mode walks ancestors looking for .git, a stray
+        # ancestor .git would make this return "git" and break the
+        # "no .git anywhere → copy" assertion. Force .git ancestor checks
+        # to miss so the test is robust regardless of where TMPDIR lives.
+        real_exists = Path.exists
+
+        def fake_exists(self):
+            if self.name == ".git":
+                return False
+            return real_exists(self)
+
+        with tempfile.TemporaryDirectory() as tmp, \
+             patch.object(Path, "exists", fake_exists):
+            skill_dir = Path(tmp) / "cue-buddy"
+            skill_dir.mkdir()
+            mode, root = detect_install_mode(skill_dir)
+            self.assertEqual(mode, "copy")
+            self.assertIsNone(root)
+
+    def test_resolve_skill_dir_rejects_unknown(self) -> None:
+        from update_skill import _resolve_skill_dir
+        with self.assertRaises(ValueError):
+            _resolve_skill_dir("bogus-skill")
+
+    def test_resolve_skill_dir_accepts_known(self) -> None:
+        from update_skill import _resolve_skill_dir
+        # Should not raise for both known skills.
+        for s in ("cue-buddy", "cue-research"):
+            d = _resolve_skill_dir(s)
+            self.assertTrue(d.name == s)
+
+    def test_cooldown_expired_when_no_record(self) -> None:
+        import tempfile
+        from update_skill import _cooldown_expired
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp) / "cooldown.json"
+            with mock.patch("update_skill._LEGACY_COOLDOWN_PATH", Path(tmp) / "no-legacy.json"):
+                self.assertTrue(_cooldown_expired("cue-buddy", now=1000.0,
+                                                  cooldown_s=86400, path=p))
+
+    def test_cooldown_not_expired_when_recent(self) -> None:
+        import json as _json
+        import tempfile
+        from update_skill import _cooldown_expired
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp) / "cooldown.json"
+            p.write_text(_json.dumps({"cue-buddy": 1000.0}))
+            # 1 hour later, 24h cooldown → still cooling down.
+            with mock.patch("update_skill._LEGACY_COOLDOWN_PATH", Path(tmp) / "no-legacy.json"):
+                self.assertFalse(_cooldown_expired("cue-buddy", now=1000.0 + 3600,
+                                                    cooldown_s=86400, path=p))
+
+    def test_cooldown_expired_when_old(self) -> None:
+        import json as _json
+        import tempfile
+        from update_skill import _cooldown_expired
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp) / "cooldown.json"
+            p.write_text(_json.dumps({"cue-buddy": 1000.0}))
+            # 25h later → expired.
+            with mock.patch("update_skill._LEGACY_COOLDOWN_PATH", Path(tmp) / "no-legacy.json"):
+                self.assertTrue(_cooldown_expired("cue-buddy", now=1000.0 + 25 * 3600,
+                                                   cooldown_s=86400, path=p))
+
+    def test_silent_check_skips_when_cooldown_fresh(self) -> None:
+        """Cooldown gate short-circuits before any network attempt."""
+        import json as _json
+        import tempfile
+        from update_skill import silent_check_for_update
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp) / "cooldown.json"
+            p.write_text(_json.dumps({"cue-buddy": 1000.0}))
+            calls = []
+            def boom_fetch(skill):
+                calls.append(skill)
+                return "9.9.9"
+            with mock.patch("update_skill._LEGACY_COOLDOWN_PATH", Path(tmp) / "no-legacy.json"):
+                rc = silent_check_for_update(
+                    skill="cue-buddy", now=1000.0 + 60,
+                    cooldown_path=p, fetch_fn=boom_fetch,
+                )
+            self.assertEqual(rc, 0)
+            self.assertEqual(calls, [], "fetch_fn must NOT be called when cooldown is fresh")
+
+    def test_silent_check_writes_cooldown_after_successful_fetch(self) -> None:
+        """After a successful version fetch the cooldown timestamp persists."""
+        import json as _json
+        import tempfile
+        from update_skill import silent_check_for_update
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp) / "cooldown.json"
+            # Inject a fetch that returns the same version as local — so no
+            # nudge, but the timestamp should still get written.
+            local_md = (Path(__file__).resolve().parents[1] / "SKILL.md")
+            from update_skill import parse_version_from_md
+            local_v = parse_version_from_md(local_md.read_text(encoding="utf-8"))
+            with mock.patch("update_skill._LEGACY_COOLDOWN_PATH", Path(tmp) / "no-legacy.json"):
+                rc = silent_check_for_update(
+                    skill="cue-buddy", now=2000.0,
+                    cooldown_path=p, fetch_fn=lambda s: local_v,
+                )
+            self.assertEqual(rc, 0)
+            data = _json.loads(p.read_text())
+            self.assertEqual(data.get("cue-buddy"), 2000.0)
+
+    def test_silent_check_does_not_write_cooldown_on_network_failure(self) -> None:
+        """If fetch returns None (network down), cooldown stays untouched so
+        the next session retries instead of going silent for 24h."""
+        import tempfile
+        from update_skill import silent_check_for_update
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp) / "cooldown.json"
+            with mock.patch("update_skill._LEGACY_COOLDOWN_PATH", Path(tmp) / "no-legacy.json"):
+                rc = silent_check_for_update(
+                    skill="cue-buddy", now=3000.0,
+                    cooldown_path=p, fetch_fn=lambda s: None,
+                )
+            self.assertEqual(rc, 0)
+            self.assertFalse(p.exists(), "cooldown file must not be written on net failure")
+
+    def test_is_local_behind_strict_semver(self) -> None:
+        """Comparator must only fire when local < remote (semver tuple).
+        Local-ahead developer cases must NOT trigger nudge."""
+        from update_skill import is_local_behind
+        # local strictly older → behind
+        self.assertTrue(is_local_behind("0.1.0", "0.2.0"))
+        self.assertTrue(is_local_behind("0.1.0", "0.1.1"))
+        self.assertTrue(is_local_behind("0.1.0", "1.0.0"))
+        # same → not behind
+        self.assertFalse(is_local_behind("0.2.0", "0.2.0"))
+        # local ahead (developer WIP) → must NOT be considered behind
+        self.assertFalse(is_local_behind("0.2.0", "0.1.0"))
+        self.assertFalse(is_local_behind("1.0.0", "0.99.0"))
+        # missing values → False (don't nudge on unknowns)
+        self.assertFalse(is_local_behind(None, "0.2.0"))
+        self.assertFalse(is_local_behind("0.1.0", None))
+        self.assertFalse(is_local_behind(None, None))
+
+    def test_is_local_behind_non_semver_fallback(self) -> None:
+        """Non-semver strings can't be tuple-compared; fall back to inequality."""
+        from update_skill import is_local_behind
+        # both non-semver, differ → conservative: behind
+        self.assertTrue(is_local_behind("v1-beta", "v1-rc"))
+        # same non-semver → not behind
+        self.assertFalse(is_local_behind("v1-beta", "v1-beta"))
+
+
+class Case14b_UpgradeOriginVersion(unittest.TestCase):
+    """+upgrade's "is there a newer version" must follow what the pull would
+    actually bring. A git install pulls origin, so the reference is
+    origin/<branch> — not a hardcoded GitHub raw URL, which is wrong for a
+    Gitee checkout and for a fork. Copy installs have no remote, so they
+    read the published SKILL.md, GitHub first and the Gitee mirror after.
+    """
+
+    def test_failed_fetch_is_an_error_even_with_empty_stderr(self) -> None:
+        from update_skill import fetch_origin_version
+        with mock.patch("update_skill.git_fetch", return_value=(False, "")):
+            version, err = fetch_origin_version(Path("."), Path("."), "main")
+        self.assertIsNone(version)
+        self.assertTrue(err)
+
+    def test_origin_version_is_read_from_the_fetched_remote(self) -> None:
+        import subprocess
+        import tempfile
+        from update_skill import fetch_origin_version
+
+        def init(path: Path, version: str) -> None:
+            env = {
+                "GIT_AUTHOR_NAME": "T", "GIT_AUTHOR_EMAIL": "t@t",
+                "GIT_COMMITTER_NAME": "T", "GIT_COMMITTER_EMAIL": "t@t",
+                "PATH": os.environ.get("PATH", ""),
+            }
+            subprocess.run(["git", "init", "-q", "-b", "main", str(path)],
+                           check=True, env=env)
+            skill = path / "cue-buddy"
+            skill.mkdir()
+            (skill / "SKILL.md").write_text(
+                f'---\nmetadata:\n  version: "{version}"\n---\n',
+                encoding="utf-8",
+            )
+            subprocess.run(["git", "-C", str(path), "add", "."], check=True, env=env)
+            subprocess.run(["git", "-C", str(path), "commit", "-q", "-m", "init"],
+                           check=True, env=env)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_p = Path(tmp)
+            origin = tmp_p / "origin"
+            clone = tmp_p / "clone"
+            init(origin, "0.3.8")
+            init(clone, "0.3.7")
+            subprocess.run(
+                ["git", "-C", str(clone), "remote", "add", "origin", str(origin)],
+                check=True,
+            )
+            version, err = fetch_origin_version(clone, clone / "cue-buddy", "main")
+        self.assertEqual(err, "")
+        self.assertEqual(version, "0.3.8")
+
+    def test_published_fetch_falls_back_to_the_gitee_mirror(self) -> None:
+        import io
+        from update_skill import _GITEE_RAW_SKILL_URL, fetch_remote_version
+
+        seen = []
+
+        def urlopen(req, timeout):
+            seen.append(req.full_url)
+            if "githubusercontent" in req.full_url:
+                raise OSError("github unreachable")
+            self.assertIn("gitee.com", req.full_url)
+            return io.BytesIO(b'---\nmetadata:\n  version: "0.3.7"\n---\n')
+
+        with mock.patch("update_skill.urllib.request.urlopen", urlopen):
+            version = fetch_remote_version("cue-buddy", "main", timeout=1)
+        self.assertEqual(version, "0.3.7")
+        self.assertEqual(len(seen), 2)
+        self.assertTrue(seen[1].startswith(_GITEE_RAW_SKILL_URL.format(
+            branch="main", skill="cue-buddy")))
+
+    def test_published_fetch_skips_a_github_page_with_no_version(self) -> None:
+        import io
+        from update_skill import fetch_remote_version
+
+        seen = []
+
+        def urlopen(req, timeout):
+            seen.append(req.full_url)
+            if "githubusercontent" in req.full_url:
+                return io.BytesIO(b"<html>not a skill</html>")
+            return io.BytesIO(b'---\nmetadata:\n  version: "0.3.8"\n---\n')
+
+        with mock.patch("update_skill.urllib.request.urlopen", urlopen):
+            version = fetch_remote_version("cue-buddy", "main", timeout=1)
+        self.assertEqual(version, "0.3.8")
+        self.assertEqual(len(seen), 2)
+
+    def test_published_fetch_stops_when_github_has_a_version(self) -> None:
+        import io
+        from update_skill import fetch_remote_version
+
+        seen = []
+
+        def urlopen(req, timeout):
+            seen.append(req.full_url)
+            return io.BytesIO(b'---\nmetadata:\n  version: "0.3.7"\n---\n')
+
+        with mock.patch("update_skill.urllib.request.urlopen", urlopen):
+            version = fetch_remote_version("cue-buddy", "main", timeout=1)
+        self.assertEqual(version, "0.3.7")
+        self.assertEqual(len(seen), 1)
+
+    def _copy_mode_text(self) -> str:
+        import io
+        from update_skill import run_upgrade
+        out = io.StringIO()
+        with mock.patch("update_skill.detect_install_mode", return_value=("copy", None)), \
+             mock.patch("update_skill.fetch_remote_version", return_value="9.9.9"), \
+             mock.patch("sys.stdout", out):
+            code = run_upgrade(skill="cue-buddy")
+        self.assertEqual(code, 1)
+        return out.getvalue()
+
+    def _run_method_a(self, prelude: str):
+        import subprocess
+        text = self._copy_mode_text()
+        start = text.index("# 方式 A")
+        block = text[start:text.index("# 方式 B")]
+        return subprocess.run(
+            ["bash", "-c", prelude + "\n" + block],
+            capture_output=True, text=True,
+            env={"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": "/tmp"},
+        )
+
+    def test_mktemp_failure_does_not_delete_root(self) -> None:
+        # An empty tmp makes "$tmp/cue-skills" into /cue-skills, and the diff
+        # redirect becomes /cue-buddy.local-diff. The printed commands must
+        # exit before any rm/diff/cp in that case.
+        leaked = Path("/cue-buddy.local-diff")
+        # A file already at that path belongs to whoever put it there. The
+        # snippet's `>` would truncate it before finally runs, so refuse to
+        # start, and never unlink a file this test did not create.
+        if leaked.exists():
+            self.skipTest(
+                "/cue-buddy.local-diff already exists; refusing to touch it"
+            )
+        proc = self._run_method_a(
+            "mktemp() { return 1; }\n"
+            "git() { printf 'GIT %s\\n' \"$*\"; return 1; }\n"
+            "rm() { printf 'RM %s\\n' \"$*\"; return 0; }\n"
+            "diff() { printf 'DIFF %s\\n' \"$*\" >&2; return 0; }\n"
+            "cp() { printf 'CP %s\\n' \"$*\"; return 0; }\n"
+            "export -f mktemp git rm diff cp\n"
+        )
+        seen = proc.stdout + proc.stderr
+        try:
+            self.assertNotEqual(proc.returncode, 0, seen)
+            self.assertNotIn("RM ", seen)
+            self.assertNotIn("DIFF ", seen)
+            self.assertNotIn("CP ", seen)
+            self.assertNotIn("/cue-skills", seen)
+            self.assertFalse(leaked.exists())
+        finally:
+            if leaked.exists():
+                leaked.unlink()
+
+    def test_both_clones_failing_does_not_copy(self) -> None:
+        import tempfile
+        with tempfile.TemporaryDirectory() as sandbox:
+            proc = self._run_method_a(
+                "mktemp() { mkdir -p \"$1\"; printf '%s\\n' \"$1\"; }\n".replace(
+                    "$1", sandbox + "/t") +
+                "git() { printf 'GIT %s\\n' \"$*\"; return 1; }\n"
+                "rm() { printf 'RM %s\\n' \"$*\"; return 0; }\n"
+                "diff() { printf 'DIFF %s\\n' \"$*\" >&2; return 0; }\n"
+                "cp() { printf 'CP %s\\n' \"$*\"; return 0; }\n"
+                "export -f mktemp git rm diff cp\n"
+            )
+        seen = proc.stdout + proc.stderr
+        self.assertNotEqual(proc.returncode, 0, seen)
+        self.assertNotIn("DIFF ", seen)
+        self.assertNotIn("CP ", seen)
+        self.assertIn("RM ", proc.stdout)
+        for line in proc.stdout.splitlines():
+            if line.startswith("RM "):
+                self.assertTrue(line.split(" ", 2)[-1].startswith(sandbox), line)
+                self.assertNotEqual(line.split(" ", 2)[-1], "/cue-skills")
+
+    def test_gitee_clone_success_still_reaches_the_copy(self) -> None:
+        import tempfile
+        with tempfile.TemporaryDirectory() as sandbox:
+            proc = self._run_method_a(
+                'mktemp() { mkdir -p "' + sandbox + '/t"; printf "%s\\n" "' + sandbox + '/t"; }\n'
+                'git() { printf "GIT %s\\n" "$*"; case "$*" in *gitee.com*) return 0;; *) return 1;; esac; }\n'
+                'rm() { printf "RM %s\\n" "$*"; return 0; }\n'
+                'diff() { printf "DIFF %s\\n" "$*" >&2; return 0; }\n'
+                'cp() { printf "CP %s\\n" "$*"; return 0; }\n'
+                "export -f mktemp git rm diff cp\n"
+            )
+        seen = proc.stdout + proc.stderr
+        self.assertEqual(proc.returncode, 0, seen)
+        self.assertIn("DIFF ", proc.stderr)
+        self.assertIn("CP ", proc.stdout)
+        # The repo URL contains "cue-skills"; the hazard is a root path.
+        self.assertIsNone(re.search(r"(?:^|\s)/cue-skills(?:\s|/|$)", seen))
+
+    def test_copy_mode_instructions_offer_github_and_gitee(self) -> None:
+        import io
+        from update_skill import run_upgrade
+        out = io.StringIO()
+        with mock.patch("update_skill.detect_install_mode", return_value=("copy", None)), \
+             mock.patch("update_skill.fetch_remote_version", return_value="9.9.9"), \
+             mock.patch("sys.stdout", out):
+            code = run_upgrade(skill="cue-buddy")
+        text = out.getvalue()
+        self.assertEqual(code, 1)
+        self.assertIn("https://github.com/sensedeal/cue-skills", text)
+        self.assertIn("https://gitee.com/sensedeal/cue-skills", text)
+        self.assertIn("raw.githubusercontent.com", text)
+        self.assertIn("gitee.com/sensedeal/cue-skills/raw/", text)
+        self.assertNotIn("remote version (origin/", text)
+
+    def test_git_mode_version_comes_from_origin_not_raw(self) -> None:
+        import io
+        from update_skill import run_upgrade
+
+        def raw_must_not_be_called(*args, **kwargs):
+            raise AssertionError("git install must not read the published raw URL")
+
+        out = io.StringIO()
+        with mock.patch("update_skill.fetch_origin_version", return_value=("9.9.9", "")), \
+             mock.patch("update_skill.fetch_remote_version", raw_must_not_be_called), \
+             mock.patch("sys.stdout", out):
+            code = run_upgrade(skill="cue-buddy", check_only=True)
+        self.assertEqual(code, 0)
+        self.assertIn("remote version (origin/main): 9.9.9", out.getvalue())
+
+    def test_silent_check_asks_the_installs_own_remote(self) -> None:
+        import tempfile
+        from update_skill import silent_check_for_update
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "cooldown.json"
+            with mock.patch("update_skill.remote_version", return_value="0.3.7") as remote, \
+                 mock.patch("update_skill._LEGACY_COOLDOWN_PATH", Path(tmp) / "absent.json"):
+                silent_check_for_update(
+                    skill="cue-buddy", cooldown_path=path, now=1_000_000.0,
+                )
+        remote.assert_called_once()
+
+    def test_the_two_skills_ship_the_same_update_script(self) -> None:
+        here = Path(__file__).resolve().parent
+        research = here.parent.parent / "cue-research" / "scripts" / "update_skill.py"
+        self.assertEqual(research.read_bytes(), (here / "update_skill.py").read_bytes())
+
+
+class Case14c_ZhEnVersionParity(unittest.TestCase):
+    """A version bump that touches only the English files is how the zh-CN
+    copies drifted to 0.3.6 while SKILL.md said 0.3.7. The Chinese copy's
+    frontmatter and the "current version" lines must track SKILL.md.
+    """
+
+    @staticmethod
+    def _version(path: Path) -> str | None:
+        from update_skill import parse_version_from_md
+        return parse_version_from_md(path.read_text(encoding="utf-8"))
+
+    def test_skill_frontmatter_versions_match(self) -> None:
+        root = Path(__file__).resolve().parents[2]
+        for skill in ("cue-buddy", "cue-research"):
+            en = self._version(root / skill / "SKILL.md")
+            zh = self._version(root / skill / "SKILL.zh-CN.md")
+            self.assertIsNotNone(en, skill)
+            self.assertEqual(en, zh, skill)
+
+    def test_readme_current_version_tracks_skill_md(self) -> None:
+        root = Path(__file__).resolve().parents[2]
+
+        def cell(readme: Path) -> dict[str, str]:
+            found = {}
+            for line in readme.read_text(encoding="utf-8").splitlines():
+                slug = re.search(r"\*\*([^*]+)\*\*", line)
+                ver = re.search(r"\|\s*(v[0-9.]+)\s*\|\s*$", line)
+                if line.startswith("|") and slug and ver:
+                    found[slug.group(1)] = ver.group(1)
+            return found
+
+        en_cells = cell(root / "README.md")
+        zh_cells = cell(root / "README.zh-CN.md")
+        self.assertEqual(en_cells, zh_cells)
+        # English==Chinese is not enough: both tables can stay stale together.
+        # Each versioned row has to match that skill's own SKILL.md.
+        for skill, shown in en_cells.items():
+            skill_md = root / skill / "SKILL.md"
+            self.assertTrue(skill_md.is_file(), skill)
+            self.assertEqual(shown, f"v{self._version(skill_md)}", skill)
+
+        for skill, zh_marker, en_marker in (
+            ("cue-buddy", "**v{v}** — 当前版本", "**v{v}** — current"),
+            ("cue-research", "状态：v{v}", "Status: v{v}"),
+        ):
+            version = self._version(root / skill / "SKILL.md")
+            zh = (root / skill / "README.zh-CN.md").read_text(encoding="utf-8")
+            en = (root / skill / "README.md").read_text(encoding="utf-8")
+            self.assertIn(zh_marker.format(v=version), zh, skill)
+            self.assertIn(en_marker.format(v=version), en, skill)
+
+
+class Case15_UpgradeGitBranchGuard(unittest.TestCase):
+    """+upgrade git mode must refuse to run unless the user is on the target
+    branch and not in detached HEAD. Wrong-branch pull semantics would either
+    silently no-op or fail ff-only on diverged history (codex review Block C).
+    """
+
+    def _init_repo(self, tmp: Path) -> None:
+        """Initialize a tiny git repo with one commit on `main`."""
+        import subprocess
+        env = {"GIT_AUTHOR_NAME": "T", "GIT_AUTHOR_EMAIL": "t@t",
+               "GIT_COMMITTER_NAME": "T", "GIT_COMMITTER_EMAIL": "t@t",
+               "PATH": os.environ.get("PATH", "")}
+        subprocess.run(["git", "init", "-q", "-b", "main", str(tmp)],
+                       check=True, env=env)
+        (tmp / "file.txt").write_text("hi")
+        subprocess.run(["git", "-C", str(tmp), "add", "."],
+                       check=True, env=env)
+        subprocess.run(["git", "-C", str(tmp), "commit", "-q", "-m", "init"],
+                       check=True, env=env)
+
+    def test_current_branch_returns_main_after_init(self) -> None:
+        import tempfile
+        from update_skill import git_current_branch
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_p = Path(tmp)
+            self._init_repo(tmp_p)
+            self.assertEqual(git_current_branch(tmp_p), "main")
+
+    def test_current_branch_returns_none_on_detached_head(self) -> None:
+        import tempfile
+        import subprocess
+        from update_skill import git_current_branch
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_p = Path(tmp)
+            self._init_repo(tmp_p)
+            # Detach by checking out the commit SHA directly.
+            sha = subprocess.run(
+                ["git", "-C", str(tmp_p), "rev-parse", "HEAD"],
+                capture_output=True, text=True, check=True,
+            ).stdout.strip()
+            subprocess.run(
+                ["git", "-C", str(tmp_p), "checkout", "-q", sha],
+                check=True,
+                env={**os.environ, "GIT_AUTHOR_NAME": "T", "GIT_AUTHOR_EMAIL": "t@t"},
+            )
+            self.assertIsNone(git_current_branch(tmp_p))
+
+    def test_current_branch_returns_feature_when_on_feature(self) -> None:
+        import tempfile
+        import subprocess
+        from update_skill import git_current_branch
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_p = Path(tmp)
+            self._init_repo(tmp_p)
+            subprocess.run(
+                ["git", "-C", str(tmp_p), "checkout", "-q", "-b", "feature/x"],
+                check=True,
+            )
+            self.assertEqual(git_current_branch(tmp_p), "feature/x")
+
+
+class Case16_NormalizeTemplateId(unittest.TestCase):
+    """A bare `<id>` (prefix dropped while copying from chat/notes) must
+    still resolve — both humans and agents hit the backend 404 "模板不存
+    在" this way. normalize_template_id is called at every template_id
+    entry point in cue_api (get/update/frequent/recommended-task) so
+    callers never need to pre-normalize. PR#29 only covered research_run's
+    CLI; this codifies the cue_api layer coverage."""
+
+    def _fn(self):
+        from cue_api import normalize_template_id
+        return normalize_template_id
+
+    def test_bare_suffix_gets_prefixed(self):
+        self.assertEqual(self._fn()("8qNgr5"), "template_8qNgr5")
+
+    def test_already_prefixed_is_untouched(self):
+        self.assertEqual(self._fn()("template_8qNgr5"), "template_8qNgr5")
+
+    def test_none_passes_through(self):
+        self.assertIsNone(self._fn()(None))
+
+    def test_double_underscore_id_not_mangled(self):
+        # `template__xWp8N` = prefix `template_` + suffix `_xWp8N` (double
+        # underscore) — already starts with template_, must stay as-is.
+        self.assertEqual(self._fn()("template__xWp8N"), "template__xWp8N")
+
+    def test_bare_double_underscore_suffix_gets_one_prefix(self):
+        # Bare `_xWp8N` → `template__xWp8N` (correct: one prefix prepended).
+        self.assertEqual(self._fn()("_xWp8N"), "template__xWp8N")
+
+    def test_long_slug_bare_form_gets_prefixed(self):
+        self.assertEqual(
+            self._fn()("corporate_credit_pre_due_diligence"),
+            "template_corporate_credit_pre_due_diligence",
+        )
+
+    def test_get_template_normalizes_bare_id_in_url(self):
+        from unittest.mock import patch
+        import cue_api
+        with patch.object(cue_api, "_request", return_value={}) as m:
+            cue_api.get_template("8qNgr5")
+        m.assert_called_once_with("GET", "/templates/template_8qNgr5")
+
+    def test_update_template_normalizes_bare_id_in_url(self):
+        from unittest.mock import patch
+        import cue_api
+        with patch.object(cue_api, "_request", return_value={"data": {}}) as m:
+            cue_api.update_template("fnig0i", {"title": "x"})
+        self.assertEqual(m.call_args.args[0], "PUT")
+        self.assertEqual(m.call_args.args[1], "/templates/template_fnig0i")
+
+    def test_set_template_frequent_normalizes_bare_id_in_body(self):
+        from unittest.mock import patch
+        import cue_api
+        # frequent endpoint URL has no id; the canonical id rides in body.
+        with patch.object(cue_api, "_request", return_value={"data": {}}) as m:
+            cue_api.set_template_frequent("Pz0sT5", True)
+        self.assertEqual(m.call_args.args[1], "/templates/frequent")
+        self.assertEqual(
+            m.call_args.kwargs["body"]["template_id"], "template_Pz0sT5"
+        )
+
+    def test_update_recommended_task_normalizes_bare_id_in_url(self):
+        from unittest.mock import patch
+        import cue_api
+        with patch.object(cue_api, "_request", return_value={"data": {}}) as m:
+            cue_api.update_template_recommended_task(
+                "7qiAwz", schedules=[{"type": "daily", "time": "09:00"}]
+            )
+        self.assertEqual(
+            m.call_args.args[1],
+            "/templates/template_7qiAwz/recommended-task",
+        )
+
+
+class Case17_ValidateTemplateId(unittest.TestCase):
+    """validate_template_id catches a pure-digit suffix (e.g. `142` →
+    `template_142`) — the agent grabbed the buddy's numeric DB `id` or a list
+    index, not the template_id string. Cue suffixes are base62 (verified
+    0/159 buddies have a pure-digit suffix), so this is a guaranteed 404;
+    fail fast instead of burning credits. normalize prepends the prefix,
+    validate checks the suffix."""
+
+    def _fn(self):
+        from cue_api import validate_template_id
+        return validate_template_id
+
+    def test_pure_digit_suffix_rejected(self):
+        # `142` → normalize → `template_142` → validate rejects.
+        self.assertIsNotNone(self._fn()("template_142"))
+
+    def test_bare_pure_digit_rejected(self):
+        # bare `142` (pre-normalize) also rejected — suffix is still pure-digit.
+        self.assertIsNotNone(self._fn()("142"))
+
+    def test_canonical_id_accepted(self):
+        self.assertIsNone(self._fn()("template_fnig0i"))
+
+    def test_double_underscore_id_accepted(self):
+        # `template__xWp8N` suffix `_xWp8N` has letters — not pure-digit.
+        self.assertIsNone(self._fn()("template__xWp8N"))
+
+    def test_long_slug_accepted(self):
+        self.assertIsNone(self._fn()("template_corporate_credit_pre_due_diligence"))
+
+    def test_none_accepted(self):
+        self.assertIsNone(self._fn()(None))
+
+    def test_error_message_names_the_id_and_hints_source(self):
+        msg = self._fn()("template_142")
+        self.assertIn("template_142", msg)
+        self.assertIn("template_id", msg)  # hints: use the template_id field
+
+
+class Case18_ExtractSources(unittest.TestCase):
+    """extract_sources pulls citation sources from tool_chunk events, aligning
+    with the cubemanus product: entry = {type, data, chunks}. search_snippet/
+    url class (search_tool, crawl) sources at data.{url,title,description};
+    scan-class output.rows[M] kept as compat for company+pdf+page precision."""
+
+    def _fn(self):
+        from sse_report import extract_sources
+        return extract_sources
+
+    def _chunk(self, idx, name, title, inp, out):
+        import json
+        return "tool_chunk", json.dumps({"chunk": {str(idx): {
+            "type": "mcp", "data": {"tool_name": name, "tool_title": title,
+                                     "input": inp, "output": out}}}})
+
+    def _chunk_snippet(self, idx, name, title, url, desc="", chunks=None):
+        import json
+        return "tool_chunk", json.dumps({"chunk": {str(idx): {
+            "type": "search_snippet",
+            "data": {"tool_name": name, "tool_title": title, "title": title,
+                     "url": url, "description": desc, "question": ""},
+            "chunks": chunks or ["正文切片"]}}})
+
+    def test_extracts_search_snippet_url_title_description(self):
+        # search_tool 走 crawl.py: 来源在 data.{url,title,description}, output=null
+        ev = [self._chunk_snippet(0, "search_tool", "网页搜索",
+                                  "http://a.pdf", "来源摘要", ["切片0"])]
+        s = self._fn()(ev)
+        self.assertEqual(len(s), 1)
+        self.assertEqual(s[0]["url"], "http://a.pdf")
+        self.assertEqual(s[0]["title"], "网页搜索")
+        self.assertEqual(s[0]["description"], "来源摘要")
+        self.assertEqual(s[0]["chunks"], ["切片0"])
+        self.assertEqual(s[0]["output_preview"], "")  # output null
+
+    def test_extracts_mcp_output_rows(self):
+        # scan 类: output.rows[M] = {company, title, summary, source.pdf_url, page_range}
+        import json
+        out = json.dumps({"rows": [
+            {"company": "002385", "title": "商誉减值", "summary": "大北农...",
+             "source": {"pdf_url": "http://a.pdf"}, "page_range": [10, 20]},
+            {"company": "600089", "title": "存货跌价", "summary": "特变电工...",
+             "source": {"pdf_url": "http://b.pdf"}, "page_range": [30, 40]},
+        ]})
+        ev = [self._chunk(0, "scan_x", "财报检索", {"query": "资产减值"}, out)]
+        s = self._fn()(ev)
+        self.assertEqual(len(s[0]["rows"]), 2)
+        r0 = s[0]["rows"][0]
+        self.assertEqual(r0["m"], 0)
+        self.assertEqual(r0["company"], "002385")
+        self.assertEqual(r0["pdf_url"], "http://a.pdf")
+        self.assertEqual(r0["page_range"], [10, 20])
+        self.assertIn("大北农", r0["summary"])
+
+    def test_sorted_by_index_with_gaps(self):
+        ev = [self._chunk(5, "t5", "", {}, ""), self._chunk(0, "t0", "", {}, "")]
+        out = self._fn()(ev)
+        self.assertEqual([s["index"] for s in out], [0, 5])
+
+    def test_non_tool_chunk_events_ignored(self):
+        ev = [("start_of_agent", '{"agent_name":"reporter"}'),
+              ("message", '{"delta":{"content":"x"}}')]
+        self.assertEqual(self._fn()(ev), [])
+
+    def test_empty_or_malformed_ignored(self):
+        ev = [("tool_chunk", ""), ("tool_chunk", "{not json"),
+              ("tool_chunk", '{"chunk":"not-a-dict"}'),
+              ("tool_chunk", '{"chunk":{"not-digit":{}}}')]
+        self.assertEqual(self._fn()(ev), [])
+
+    def test_nested_live_shape(self):
+        # live chat_stream wraps payload in {"data":{...}}; _event_data must unwrap.
+        import json
+        ev = [("tool_chunk", json.dumps({"data": {"chunk": {"0": {
+            "type": "search_snippet",
+            "data": {"tool_name": "t", "tool_title": "", "title": "x",
+                     "url": "http://a.pdf", "description": ""}}}}}))]
+        out = self._fn()(ev)
+        self.assertEqual(len(out), 1, "nested live shape must resolve via _event_data")
+        self.assertEqual(out[0]["url"], "http://a.pdf")
+
+    def test_rows_empty_for_truncated_output(self):
+        ev = [self._chunk(0, "get_section", "", {},
+                          '{"stock_code":"002385","summary":"...[已截断]')]
+        s = self._fn()(ev)
+        self.assertEqual(s[0]["rows"], [])
+
+    def test_rows_empty_for_no_rows_output(self):
+        ev = [self._chunk(0, "yearly_income", "", {}, "No valid data loaded")]
+        s = self._fn()(ev)
+        self.assertEqual(s[0]["rows"], [])
+
+
+class Case19_VersionConsistent(unittest.TestCase):
+    """cue-buddy and cue-research share a unified version number. Assert all
+    5 surfaces match so drift / forget-to-bump is caught at CI time:
+    cue-buddy SKILL.md, cue-research SKILL.md, cue-research/README.md Status,
+    README.md cue-buddy row, README.md cue-research row."""
+
+    def _all_versions(self) -> dict:
+        import re
+        repo = _HERE.parent.parent  # cue-buddy/scripts → cue-skills repo root
+        cb_md = (repo / "cue-buddy" / "SKILL.md").read_text(encoding="utf-8")
+        cr_md = (repo / "cue-research" / "SKILL.md").read_text(encoding="utf-8")
+        cr_readme = (repo / "cue-research" / "README.md").read_text(encoding="utf-8")
+        root_readme = (repo / "README.md").read_text(encoding="utf-8")
+        cb_skill = re.search(r'^\s*version:\s*"([^"]+)"', cb_md, re.M).group(1)
+        cr_skill = re.search(r'^\s*version:\s*"([^"]+)"', cr_md, re.M).group(1)
+        cr_status = re.search(r'Status:\s*v(\S+)', cr_readme).group(1)
+        cb_row = re.search(r'cue-buddy.*?\| v(\d+\.\d+\.\d+) \|', root_readme).group(1)
+        cr_row = re.search(r'cue-research.*?\| v(\d+\.\d+\.\d+) \|', root_readme).group(1)
+        return {
+            "cue-buddy/SKILL.md": cb_skill,
+            "cue-research/SKILL.md": cr_skill,
+            "cue-research/README.md Status": cr_status,
+            "README cue-buddy row": cb_row,
+            "README cue-research row": cr_row,
+        }
+
+    def test_all_five_surfaces_match(self):
+        vs = self._all_versions()
+        unique = set(vs.values())
+        self.assertEqual(len(unique), 1,
+                         f"version drift across surfaces: {vs}")
+
+
+
+class Case20_InputFormSpecFormEra(unittest.TestCase):
+    """表单时代 input_form_spec 规则（配套前端 BuddyInputForm 表单化）:
+    R-form-1 需提供段变量必须带 (示例: X)；R-form-2 示例值禁词
+    默认/缺省/需提供/可提供（后端 _template_default_params 只认「默认/缺省」
+    触发词，示例值含它们会被误提为默认值）；R-form-3 带默认值变量必须放
+    可提供段（默认值 = 选填预填）；零参数简报类可只含可提供段。"""
+
+    def _spec_errors(self, spec: str) -> list:
+        from validate_template import _check_input_form_spec
+        out = []
+        _check_input_form_spec(spec, out)
+        return out
+
+    def test_good_spec_passes(self):
+        errs = self._spec_errors(
+            "需提供: [目标_靶点_模态](示例: TROP2 ADC)，"
+            "可提供: [关注_交易_阶段] (默认: License-Out 与股权融资)。"
+        )
+        self.assertEqual(errs, [])
+
+    def test_optional_only_spec_passes(self):
+        # 零参数简报类：只有可提供段
+        errs = self._spec_errors("可提供: [目标_简报_日期] (默认: 今日)。")
+        self.assertEqual(errs, [])
+
+    def test_required_without_example_is_error(self):
+        errs = self._spec_errors("需提供: [目标_靶点_模态]。")
+        self.assertTrue(any("示例" in e.message for e in errs), errs)
+
+    def test_example_with_forbidden_word_is_error(self):
+        errs = self._spec_errors("需提供: [目标_报告_日期](示例: 默认今日)。")
+        self.assertTrue(any("禁词" in e.message for e in errs), errs)
+
+    def test_defaulted_var_in_required_section_is_error(self):
+        errs = self._spec_errors(
+            "需提供: [目标_报告_日期](示例: 2026-09-21) (默认: 今日)。"
+        )
+        self.assertTrue(any("可提供段" in e.message for e in errs), errs)
+
+
+
+class Case21_DocTypeVarWarning(unittest.TestCase):
+    """文档型输入警告（2026-09-28 prod badcase: 法律文书审校把「待审校的合同全文」
+    设为需提供变量 → 前端必填框挡发送,而用户实际通过「上传素材」提供文档）。
+    R-form-4: 变量名或示例值含文档信号（文书/文档/全文/合同/判决书/起诉状/
+    答辩状/招股书/年报全文 + .pdf/.docx 等扩展名）→ warning 级（不拦 error,
+    存量不 brick）,提示文档类输入走素材上传通道。"""
+
+    def _findings(self, spec: str) -> list:
+        from validate_template import _check_input_form_spec
+        out = []
+        _check_input_form_spec(spec, out)
+        return out
+
+    def test_doc_var_name_in_required_warns(self):
+        fs = self._findings("需提供: [目标_审校_文书](示例: 待审校的合同全文)。")
+        self.assertTrue(any(e.severity == "warning" and "素材" in e.message for e in fs), fs)
+
+    def test_doc_var_name_in_optional_warns(self):
+        fs = self._findings("可提供: [待审_合同_文档] (默认: 无)。")
+        self.assertTrue(any(e.severity == "warning" and "素材" in e.message for e in fs), fs)
+
+    def test_filename_example_warns(self):
+        fs = self._findings("需提供: [待核查_金融研报_文档](示例: 待核查研报.pdf)。")
+        self.assertTrue(any(e.severity == "warning" for e in fs), fs)
+
+    def test_fulltext_example_warns(self):
+        fs = self._findings("需提供: [目标_审校_文本](示例: 待审校的合同全文)。")
+        self.assertTrue(any(e.severity == "warning" for e in fs), fs)
+
+    def test_plain_vars_no_warning(self):
+        fs = self._findings(
+            "需提供: [上诉人_名称_企业](示例: 某某建设工程有限公司)，"
+            "[被上诉人_名称_企业](示例: 某某置业集团有限公司)，"
+            "可提供: [案件性质_类型_纠纷] (默认: 建设工程施工合同纠纷)。"
+        )
+        self.assertEqual(fs, [])
+
+    def test_keyboard_typed_content_var_no_warning(self):
+        # 粘贴短文本型（事实陈述原文）不属文档信号——原文是可粘贴的短陈述
+        fs = self._findings("需提供: [待核查_通用_内容](示例: 需要核查的事实陈述原文)。")
+        self.assertEqual(fs, [])
+
+    def test_topic_style_fulltext_no_warning(self):
+        # 主题描述型（法案全文解读 = 研究主题）不触发
+        fs = self._findings("需提供: [目标_研究_文章](示例: 欧盟《人工智能法案》全文解读)。")
+        self.assertEqual(fs, [])
+
+
+if __name__ == "__main__":
+    # Unbuffered + verbose for skill author workflow.
+    unittest.main(verbosity=2)
