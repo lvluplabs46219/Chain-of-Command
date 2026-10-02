@@ -1,6 +1,26 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { BotIdClient } from "botid/client";
 import "../index.css";
+
+const protectedRoutes = [
+  {
+    path: "/api/checkout",
+    method: "POST" as const,
+  },
+  {
+    path: "/api/sensitive/*",
+    method: "POST" as const,
+  },
+  {
+    path: "/api/user/*",
+    method: "POST" as const,
+  },
+  {
+    path: "/api/v1/*",
+    method: "POST" as const,
+  },
+];
 
 export const metadata: Metadata = {
   title: "Chain of Command",
@@ -25,6 +45,33 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
+        <script
+          id="window-fetch-guard"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){
+              try {
+                if (typeof window !== 'undefined') {
+                  var proto = window.Window ? window.Window.prototype : Object.getPrototypeOf(window);
+                  var desc = Object.getOwnPropertyDescriptor(window, 'fetch') ||
+                             (proto && Object.getOwnPropertyDescriptor(proto, 'fetch'));
+                  if (!desc || !desc.set || !desc.writable) {
+                    var _origFetch = window.fetch ? window.fetch.bind(window) : null;
+                    var _currentFetch = _origFetch;
+                    Object.defineProperty(window, 'fetch', {
+                      configurable: true,
+                      enumerable: true,
+                      get: function() { return _currentFetch; },
+                      set: function(fn) { _currentFetch = fn; }
+                    });
+                  }
+                }
+              } catch (e) {
+                console.warn('[FetchGuard] Warning:', e);
+              }
+            })();`,
+          }}
+        />
+        <BotIdClient protect={protectedRoutes} />
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
