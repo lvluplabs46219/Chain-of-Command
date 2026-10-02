@@ -6,9 +6,10 @@ export type SenderName = Exclude<AgentName, "external">;
 
 export type TaskKind =
   | "llm.reason"          // YHWH / Metatron
-  | "file.scaffold"       // Raphael
-  | "db.migrate"          // Raphael
-  | "workspace.maintain"  // Raphael
+  | "file.scaffold"       // Raphael: write a file (payload: {path, content})
+  | "shell.exec"          // Raphael: run a shell command (payload: {cmd, cwd, timeoutMs})
+  | "db.migrate"          // Raphael: run a DB migration command
+  | "workspace.maintain"  // Raphael: lint/format/build maintenance
   | "notify"              // Gabriel
   | "deliver_payload";    // Gabriel
 
