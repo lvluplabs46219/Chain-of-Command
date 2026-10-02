@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { Matter, Charge } from "@/lib/workspace-data";
 import {
-  FolderGavel,
   Plus,
   Scale,
   Calendar,
@@ -210,7 +209,7 @@ export function DocketView({
       {/* Add Count Modal */}
       {showAddChargeModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#141519] border border-[#2A2B35] rounded-xl max-w-md w-full p-6 text-neutral-200 shadow-2xl">
+          <div className="bg-[#141519] border border-[#2B2B35] rounded-xl max-w-md w-full p-6 text-neutral-200 shadow-2xl">
             <h3 className="text-base font-semibold text-white mb-1">Add Formal Charge / Count</h3>
             <p className="text-xs text-neutral-400 mb-4">Enter statutory information from the charging information or indictment.</p>
 
