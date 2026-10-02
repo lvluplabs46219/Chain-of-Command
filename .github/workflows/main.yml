@@ -7,57 +7,38 @@ on:
 
 permissions:
   contents: read
+  # Uncomment id-token: write if you switch method to "oidc" later
+  # id-token: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Intermediate env so we can branch without secrets-in-if (invalid YAML).
     env:
-      BW_TOKEN_SET: ${{ secrets.BW_ACCESS_TOKEN }}
+      # Intermediate so we can gate steps without secrets-in-if (invalid)
+      INFISICAL_CID: ${{ secrets.INFISICAL_CLIENT_ID }}
+      INFISICAL_CSEC: ${{ secrets.INFISICAL_CLIENT_SECRET }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Get Secrets from Bitwarden
-        if: env.BW_TOKEN_SET != ''
+      - name: Fetch Secrets from Infisical
+        if: env.INFISICAL_CID != '' && env.INFISICAL_CSEC != ''
         continue-on-error: true
-        uses: bitwarden/sm-action@v2
+        uses: Infisical/secrets-action@v1.0.18
         with:
-          access_token: ${{ secrets.BW_ACCESS_TOKEN }}
-          base_url: https://vault.bitwarden.com
-          secrets: |
-            ${{ secrets.BW_ITEM_ID_SUPABASE_URL }} > NEXT_PUBLIC_SUPABASE_URL
-            ${{ secrets.BW_ITEM_ID_SUPABASE_SERVICE_ROLE_KEY }} > SUPABASE_SERVICE_ROLE_KEY
-            ${{ secrets.BW_ITEM_ID_SUPABASE_URL }} > SUPABASE_URL
-            ${{ secrets.BW_ITEM_ID_SUPABASE_PUBLISHABLE_KEY }} > NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-            ${{ secrets.BW_ITEM_ID_SUPABASE_ANON_KEY }} > NEXT_PUBLIC_SUPABASE_ANON_KEY
-            ${{ secrets.BW_ITEM_ID_SUPABASE_PUBLISHABLE_KEY }} > SUPABASE_PUBLISHABLE_KEY
-            ${{ secrets.BW_ITEM_ID_SUPABASE_ANON_KEY }} > SUPABASE_ANON_KEY
-            ${{ secrets.BW_ITEM_ID_SUPABASE_SERVICE_ROLE_KEY }} > SUPABASE_SECRET_KEY
-            ${{ secrets.BW_ITEM_ID_DATABASE_URL }} > DATABASE_URL
-            ${{ secrets.BW_ITEM_ID_POSTGRES_URL }} > POSTGRES_URL
-            ${{ secrets.BW_ITEM_ID_SUPABASE_JWKS_URL }} > SUPABASE_JWKS_URL
-            ${{ secrets.BW_ITEM_ID_DB_HOST }} > DB_HOST
-            ${{ secrets.BW_ITEM_ID_DB_PORT }} > DB_PORT
-            ${{ secrets.BW_ITEM_ID_DB_NAME }} > DB_NAME
-            ${{ secrets.BW_ITEM_ID_DB_USER }} > DB_USER
-            ${{ secrets.BW_ITEM_ID_DB_PASSWORD }} > DB_PASSWORD
-            ${{ secrets.BW_ITEM_ID_GEMINI_API_KEY }} > GEMINI_API_KEY
-            ${{ secrets.BW_ITEM_ID_GCP_SERVICE_ACCOUNT_EMAIL }} > GCP_SERVICE_ACCOUNT_EMAIL
-            ${{ secrets.BW_ITEM_ID_OLLAMA_BASE_URL }} > OLLAMA_BASE_URL
-            ${{ secrets.BW_ITEM_ID_WEBSCRAPER_API_KEY }} > WEBSCRAPER_API_KEY
-            ${{ secrets.BW_ITEM_ID_BOT_TOKEN }} > BOT_TOKEN
-            ${{ secrets.BW_ITEM_ID_ANTHROPIC_API_KEY }} > ANTHROPIC_API_KEY
-            ${{ secrets.BW_ITEM_ID_GH_TOKEN }} > GH_TOKEN
-            ${{ secrets.BW_ITEM_ID_GITHUB_TOKEN_AUDIT }} > GITHUB_TOKEN_AUDIT
-            ${{ secrets.BW_ITEM_ID_ALLOWED_ORIGINS }} > ALLOWED_ORIGINS
-            ${{ secrets.BW_ITEM_ID_TAILSCALE_BOUND_DOMAINS }} > TAILSCALE_BOUND_DOMAINS
-            ${{ secrets.BW_ITEM_ID_POSTMAN }} > POSTMAN
+          method: universal
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-slug: ${{ secrets.INFISICAL_PROJECT_SLUG }}
+          env-slug: ${{ secrets.INFISICAL_ENV_SLUG }}
+          domain: https://app.infisical.com
 
       - name: Verify Environment
         run: |
-          if [ -n "$BW_TOKEN_SET" ]; then
-            echo "Bitwarden secret present — vault injection attempted"
+          if [ -n "$INFISICAL_CID" ] && [ -n "$INFISICAL_CSEC" ]; then
+            echo "Infisical credentials present — secret injection attempted (domain: app.infisical.com)"
           else
-            echo "::notice::BW_ACCESS_TOKEN not configured. Add it under Settings → Secrets and variables → Actions to enable vault sync."
+            echo "::notice::INFISICAL_CLIENT_ID / INFISICAL_CLIENT_SECRET not set."
+            echo "::notice::Add them under Settings → Secrets and variables → Actions."
+            echo "::notice::See docs/SECRETS_MANAGEMENT.md for Machine Identity setup."
           fi
