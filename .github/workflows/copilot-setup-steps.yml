@@ -1,8 +1,8 @@
 version: 1
 setup:
   - name: Install Dependencies
-    command: npm ci
+    command: npm ci || npm install --no-audit --no-fund
   - name: Setup Local Environment
     command: cp -n .env.example .env.local || true
   - name: Type Check & Verify Setup
-    command: npx tsc --noEmit
+    command: npm run typecheck
