@@ -1,8 +1,17 @@
 // Shared wire contract for all agents (YHWH, Michael, Gabriel, Raphael, Metatron, Seraphim)
 // "external" is a valid envelope recipient for deliveries that leave the
 // agent mesh (e.g. Gabriel webhook fanout); it is never a valid sender.
-export type AgentName = "yhwh" | "michael" | "gabriel" | "raphael" | "metatron" | "seraphim" | "external";
-export type SenderName = Exclude<AgentName, "external">;
+// "watcher" is the GitHub Actions poller (cli/watch-github) — log-only identity.
+export type AgentName =
+  | "yhwh"
+  | "michael"
+  | "gabriel"
+  | "raphael"
+  | "metatron"
+  | "seraphim"
+  | "external"
+  | "watcher";
+export type SenderName = Exclude<AgentName, "external" | "watcher">;
 
 export type TaskKind =
   | "llm.reason"          // YHWH / Metatron
