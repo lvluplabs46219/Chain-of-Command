@@ -59,11 +59,18 @@ function main() {
     const html = fs.readdirSync(srcDir).find((f) => f.endsWith(".html"));
     if (!html) continue;
 
+    const mockupDir = path.join(webRoot, "public", "mockups", name);
+    const stitchDir = path.join(webRoot, "public", "assets", "stitch", name);
+    const targetHtml = path.join(stitchDir, "code.html");
+
+    // Fast-path: Skip if already extracted to avoid disk churn on dev startup
+    if (fs.existsSync(targetHtml) && !process.env.FORCE_COPY_MOCKUPS) {
+      continue;
+    }
+
     const htmlSrc = path.join(srcDir, html);
     const pngSrc = path.join(srcDir, "screen.png");
 
-    const mockupDir = path.join(webRoot, "public", "mockups", name);
-    const stitchDir = path.join(webRoot, "public", "assets", "stitch", name);
     fs.mkdirSync(mockupDir, { recursive: true });
     fs.mkdirSync(stitchDir, { recursive: true });
 
