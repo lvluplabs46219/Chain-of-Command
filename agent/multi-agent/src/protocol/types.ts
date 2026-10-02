@@ -1,5 +1,8 @@
 // Shared wire contract for all agents (YHWH, Michael, Gabriel, Raphael, Metatron, Seraphim)
-export type AgentName = "yhwh" | "michael" | "gabriel" | "raphael" | "metatron" | "seraphim";
+// "external" is a valid envelope recipient for deliveries that leave the
+// agent mesh (e.g. Gabriel webhook fanout); it is never a valid sender.
+export type AgentName = "yhwh" | "michael" | "gabriel" | "raphael" | "metatron" | "seraphim" | "external";
+export type SenderName = Exclude<AgentName, "external">;
 
 export type TaskKind =
   | "llm.reason"          // YHWH / Metatron
