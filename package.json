@@ -10,23 +10,23 @@
   "scripts": {
     "dev": "npm run dev --workspace=apps/web",
     "build": "npm run build --workspace=apps/web",
-<<<<<<< HEAD
-    "start": "npm run start --workspace=apps/web",
-    "lint": "npm run lint --workspace=apps/web"
-=======
+    "start": "tsx apps/api/src/index.ts",
+    "lint": "npm run lint --workspace=apps/web",
     "typecheck:libs": "tsc --build",
     "typecheck": "tsc --build",
-    "lint": "tsc --build",
     "db:migrate": "python3 scripts/apply_all_migrations.py",
     "db:push": "npm run push --workspace=packages/db",
     "ingest": "tsx scripts/src/ingest_courtlistener.ts",
     "ingest:docket": "tsx scripts/ingest_courtlistener_docket.ts",
     "harvard:preview": "python3 scripts/harvard_cases.py --action preview --limit 5",
     "harvard:ingest": "python3 scripts/harvard_cases.py --action ingest --limit 10",
-    "start": "tsx apps/api/src/index.ts",
     "prepare": "true",
     "test": "tsx scripts/ts/test_compliance_and_security.ts",
     "patcher": "tsx scripts/ts/acquit-patcher.ts"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "typescript": "^7.0.2"
   },
   "dependencies": {
     "@google/genai": "^2.18.0",
@@ -55,13 +55,5 @@
     "react-router-dom": "^7.18.3",
     "tar-stream": "^3.2.0",
     "workflow": "^2.0.6"
->>>>>>> a7f555abf (pipeline)
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.3",
-    "typescript": "^7.0.2"
-  },
-  "dependencies": {
-    "botid": "^1.5.11"
   }
 }
