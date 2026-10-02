@@ -246,6 +246,20 @@ export const api = {
       const baseUrl = getApiBaseUrl();
       return `${baseUrl}/ai/runs/${runId}/stream`;
     },
+
+    ragEvidenceSearch: (payload: { query: string; evidence: any[]; matterTitle?: string; jurisdiction?: string }) =>
+      request<{
+        success: boolean;
+        query: string;
+        answer: string;
+        modelUsed: string;
+        citedExhibits: string[];
+        timestamp: string;
+        disclaimer: string;
+      }>("/gemini/rag-evidence", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }),
   },
 
   // Case & Matters

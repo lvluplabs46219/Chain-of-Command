@@ -613,4 +613,103 @@ MANDATE: Never say "In my legal opinion". Prepend with SRL header and end with e
 geminiRouter.post('/gemini/score-evidence', handleScoreEvidence);
 geminiRouter.post('/ai/score-evidence', handleScoreEvidence);
 
+/**
+ * RAG Evidence & Document Library Search
+ * Searches across user's stored evidence, retrieves relevant exhibits,
+ * and synthesizes an evidence-grounded procedural answer with exact citations.
+ */
+const handleRagEvidenceSearch = async (req: Request, res: Response) => {
+  try {
+    const { query, evidence = [], matterTitle, jurisdiction = 'State & Federal' } = req.body;
+
+    if (!query || String(query).trim().length === 0) {
+      return res.status(400).json({ error: 'Search query is required.' });
+    }
+
+    const client = getAI();
+    const sanitizedQuery = sanitizeUserInput(String(query));
+    const sanitizedMatter = matterTitle ? sanitizeUserInput(String(matterTitle)) : 'Active Legal Matter';
+    const sanitizedJurisdiction = sanitizeUserInput(String(jurisdiction));
+
+    // Format stored evidence as structured RAG context
+    const evidenceContext = Array.isArray(evidence) && evidence.length > 0
+      ? evidence.map((item: any, idx: number) => {
+          return `--- EXHIBIT ${item.exhibitNumber || `Exhibit ${idx + 1}`}: ${item.title || 'Untitled'} ---
+Type: ${item.type || 'Document'}
+Date Acquired: ${item.dateAcquired || 'Unknown'}
+Custodian: ${item.custodian || 'Unknown'}
+Chain of Custody Status: ${item.chainOfCustodyStatus || 'Not specified'}
+Relevant Charge / Element: ${item.relevantCharge || 'General'}
+Summary / Content:
+${item.summary || item.description || ''}
+Storage Hash: ${item.storageHash || 'Verified'}`;
+        }).join('\n\n')
+      : 'No stored evidence exhibits available in case locker.';
+
+    const prompt = `You are the Chain of Command RAG Document Retrieval and Evidence Synthesis Engine for a self-represented (pro se) litigant.
+Case Matter: ${sanitizedMatter}
+Jurisdiction: ${sanitizedJurisdiction}
+
+USER INQUIRY:
+"${sanitizedQuery}"
+
+STORED CASE EVIDENCE & DOCUMENT LIBRARY:
+${evidenceContext}
+
+TASK:
+1. Conduct a deep RAG analysis matching the user's query directly against the stored evidence exhibits above.
+2. In the answer, cite the specific Exhibit Numbers (e.g. Exhibit A, Exhibit B, Exhibit C) and provenance details (timestamps, dates, custodians) that answer the question or substantiate/refute the claim.
+3. If the stored evidence contains contradictions (e.g., between an incident report and video surveillance or store receipts), highlight them explicitly.
+4. If the stored evidence does not contain sufficient facts to answer the question, explicitly state: "[Information Not Found in Stored Evidence - Request Supplemental Discovery or Subpoena Records]".
+5. Provide actionable procedural next steps for a self-represented litigant (e.g., filing a motion to compel, subpoenaing records, or introducing the exhibit at hearing).
+
+STRICT MANDATES:
+- NEVER use the phrase "In my legal opinion".
+- Prepend output with:
+[PREPARED FOR SELF-REPRESENTED LITIGANT - NOT LEGAL ADVICE - REQUIRES INDEPENDENT HUMAN REVIEW]
+- Append the mandatory educational disclaimer.`;
+
+    const { response, modelUsed } = await generateContentWithFallback(client, 'gemini-3.8-flash', {
+      contents: [createUserMessage(prompt)],
+      config: {
+        systemInstruction: UPL_SYSTEM_PROMPT,
+        temperature: 0.2,
+      },
+    });
+
+    const rawText = response.text || '';
+
+    // Extract mentioned exhibits from the text
+    const mentionedExhibits: string[] = [];
+    if (Array.isArray(evidence)) {
+      for (const item of evidence) {
+        if (item.exhibitNumber && rawText.includes(item.exhibitNumber)) {
+          mentionedExhibits.push(item.exhibitNumber);
+        }
+      }
+    }
+
+    return res.json({
+      success: true,
+      query: sanitizedQuery,
+      answer: rawText,
+      modelUsed,
+      citedExhibits: mentionedExhibits,
+      timestamp: new Date().toISOString(),
+      disclaimer: "This information is provided for educational and procedural purposes only and does not constitute legal advice."
+    });
+  } catch (err: any) {
+    if (err.message && err.message.includes('prompt injection detected')) {
+      console.warn('RAG Evidence Search: Prompt injection attempt blocked');
+      return res.status(400).json({ error: 'Invalid input - request rejected' });
+    }
+    console.error('RAG Evidence Search Error:', err);
+    return res.status(500).json({ error: GENERIC_ERROR_MESSAGE });
+  }
+};
+
+geminiRouter.post('/gemini/rag-evidence', handleRagEvidenceSearch);
+geminiRouter.post('/ai/rag-evidence', handleRagEvidenceSearch);
+geminiRouter.post('/rag/search', handleRagEvidenceSearch);
+
 export default geminiRouter;
