@@ -1,0 +1,12 @@
+{
+  "test_name": "test_app.py::test_reverse_list_basic",
+  "outcome": "failed",
+  "traceback": "test_app.py:14: in test_reverse_list_basic\n    assert reverse_list([1, 2, 3]) == [3, 2, 1]\nE   assert [3, 2] == [3, 2, 1]\nE     \nE     Right contains one more item: 1\nE     \nE     Full diff:\nE       [\nE           3,\nE           2,\nE     -     1,\nE       ]",
+  "duration": null,
+  "stage": "call",
+  "failing_inputs": {},
+  "environment": {
+    "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+    "cwd": "/home/andrew/Development/Repos/Aquit-Platform/gabriel_seraphim_prototype/prototype/sample_app"
+  }
+}
