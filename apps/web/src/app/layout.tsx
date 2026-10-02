@@ -1,8 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { BotIdClient } from "botid/client";
 import "../index.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: "#0A0B0E",
+};
 
 const protectedRoutes = [
   {
@@ -24,16 +32,16 @@ const protectedRoutes = [
 ];
 
 export const metadata: Metadata = {
-  title: "Chain of Command",
+  title: "Chain of Command — Legal OS & Pro Se Case Workspace",
   description: "AI-powered legal self-representation workspace and case intelligence platform.",
   openGraph: {
-    title: "Chain of Command",
+    title: "Chain of Command — Legal OS & Pro Se Case Workspace",
     description: "AI-powered legal self-representation workspace and case intelligence platform.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Chain of Command",
+    title: "Chain of Command — Legal OS & Pro Se Case Workspace",
     description: "AI-powered legal self-representation workspace and case intelligence platform.",
   },
 };
@@ -45,7 +53,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <head>
+      <body className="bg-[#111214] text-[#e1e2e5] antialiased min-h-screen">
         <script
           id="window-fetch-guard"
           dangerouslySetInnerHTML={{
@@ -73,17 +81,16 @@ export default function RootLayout({
           }}
         />
         <BotIdClient protect={protectedRoutes} />
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="bg-[#111214] text-[#e1e2e5] antialiased min-h-screen">
-        {children}
+        {/* WCAG Accessible Skip Link */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#D4AF37] focus:text-black focus:font-semibold focus:rounded focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
+        >
+          Skip to main content
+        </a>
+        <main id="main-content" role="main" tabIndex={-1} className="min-h-screen flex flex-col focus:outline-none">
+          {children}
+        </main>
         <Analytics />
         <SpeedInsights />
       </body>

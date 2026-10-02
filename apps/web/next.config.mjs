@@ -20,7 +20,7 @@ function getApiDestination() {
 }
 
 const nextConfig = {
-  output: 'standalone',
+  output: process.env.VERCEL ? undefined : 'standalone',
   reactStrictMode: true,
   allowedDevOrigins: ['*.run.app', '*.us-east1.run.app', '*.cloudrun.app', 'localhost:3000', '127.0.0.1:3000'],
   typescript: {
@@ -31,6 +31,28 @@ const nextConfig = {
       {
         source: '/api/:path*',
         destination: getApiDestination(),
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*\\.(js|mjs)',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'text/javascript; charset=utf-8',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
       },
     ];
   },
