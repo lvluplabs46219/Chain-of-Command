@@ -41,7 +41,8 @@ export type TaskState =
   | "running"
   | "succeeded"
   | "failed"
-  | "fallback";
+  | "fallback"
+  | "skipped";
 
 export interface Envelope<T = unknown> {
   id: string;

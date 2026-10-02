@@ -3,6 +3,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
 import { log } from "../protocol/types.js";
 
 const dbPath = (): string => {
@@ -38,7 +41,7 @@ export class StateStore {
   constructor() {
     try {
       // Dynamic import to allow optional sqlite3 if installed
-      const Database = (require as any)("better-sqlite3");
+      const Database = require("better-sqlite3");
       this.sqliteDb = new Database(dbPath());
       this.sqliteDb.pragma("journal_mode = WAL");
       this.sqliteDb.exec(`
@@ -59,8 +62,9 @@ export class StateStore {
           created_at TEXT NOT NULL
         );
       `);
-    } catch {
+    } catch (err) {
       // Memory fallback if native sqlite addon is not present
+      log("warn", "michael", "sqlite_unavailable_memory_only", { error: String(err) });
       this.sqliteDb = null;
     }
   }

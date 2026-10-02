@@ -7,23 +7,28 @@ export class Gabriel {
   constructor(private store: StateStore) {}
 
   /** Record + fan out an event. */
-  async emit(event: Event): Promise<{ topic: string; delivered: number }> {
+  async emit(event: Event): Promise<{ topic: string; delivered: number; configured: number }> {
     this.store.appendEvent(event.topic, event.data);
     const hooks = (process.env.GABRIEL_WEBHOOKS ?? "").split(",").map((h) => h.trim()).filter(Boolean);
-    const settled = await Promise.allSettled(
+    const ok = await Promise.all(
       hooks.map(async (hook) => {
         try {
-          await fetch(hook, {
+          const res = await fetch(hook, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(envelope("event", "gabriel", "external", event)),
+            signal: AbortSignal.timeout(10_000),
           });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return true;
         } catch (e) {
           log("warn", "gabriel", "webhook_failed", { hook, error: String(e) });
+          return false;
         }
-      })
+      }),
     );
-    return { topic: event.topic, delivered: settled.filter((s) => s.status === "fulfilled").length };
+    // delivered = webhooks that actually returned 2xx; configured = how many exist (0 => set GABRIEL_WEBHOOKS).
+    return { topic: event.topic, delivered: ok.filter(Boolean).length, configured: hooks.length };
   }
 
   /** Deliver an execution-context payload to a named target. */

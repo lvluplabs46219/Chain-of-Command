@@ -21,6 +21,18 @@ function within(rel: string): string {
   return target;
 }
 
+/** within() + existence check. A missing cwd makes spawn fail with a misleading "spawn <shell> ENOENT". */
+async function safeCwd(rel?: string): Promise<string> {
+  const dir = within(rel ?? ".");
+  let st;
+  try { st = await fsp.stat(dir); }
+  catch { throw new Error(`cwd does not exist: ${dir} (workspace root: ${path.resolve(WORKSPACE)})`); }
+  if (!st.isDirectory()) throw new Error(`cwd is not a directory: ${dir}`);
+  return dir;
+}
+
+const MAX_CAPTURE = 1_000_000; // bytes of stdout/stderr kept per command
+
 /** Pick a real shell binary that exists on this machine. */
 function resolveShell(): { bin: string; args: string[] } {
   const candidates = [
@@ -64,11 +76,14 @@ async function shell(cmd: string, cwd: string, timeoutMs: number): Promise<unkno
       child.kill("SIGKILL");
       reject(new Error(`command timed out after ${timeoutMs}ms: ${cmd}`));
     }, timeoutMs);
-    child.stdout?.on("data", (d) => (out += d));
-    child.stderr?.on("data", (d) => (err += d));
+    child.stdout?.on("data", (d) => { if (out.length < MAX_CAPTURE) out += d; });
+    child.stderr?.on("data", (d) => { if (err.length < MAX_CAPTURE) err += d; });
     child.on("error", (e) => {
       clearTimeout(timer);
-      reject(e);
+      const code = (e as NodeJS.ErrnoException).code;
+      reject(new Error(code === "ENOENT"
+        ? `spawn failed (ENOENT): shell=${SHELL.bin} cwd=${cwd} — check the shell binary and that cwd exists`
+        : String(e)));
     });
     child.on("close", (code) => {
       clearTimeout(timer);
@@ -108,7 +123,7 @@ export class Raphael {
 
     this.register("shell.exec", async (p) => {
       if (!p?.cmd) throw new Error("shell.exec requires payload.cmd");
-      const cwd = within(p?.cwd ?? ".");
+      const cwd = await safeCwd(p?.cwd);
       log("info", "raphael", "shell_exec", { cmd: p.cmd, cwd, shell: SHELL.bin });
       return shell(p.cmd, cwd, Number(p?.timeoutMs ?? DEFAULT_TIMEOUT_MS));
     });
@@ -116,13 +131,13 @@ export class Raphael {
     this.register("db.migrate", async (p) => {
       const cmd = p?.cmd ?? "npx drizzle-kit migrate";
       log("info", "raphael", "db_migrate", { cmd });
-      return shell(cmd, within(p?.cwd ?? "."), Number(p?.timeoutMs ?? DEFAULT_TIMEOUT_MS));
+      return shell(cmd, await safeCwd(p?.cwd), Number(p?.timeoutMs ?? DEFAULT_TIMEOUT_MS));
     });
 
     this.register("workspace.maintain", async (p) => {
       const cmd = p?.cmd ?? "npm run lint -- --fix";
       log("info", "raphael", "workspace_maintain", { cmd });
-      return shell(cmd, within(p?.cwd ?? "."), Number(p?.timeoutMs ?? DEFAULT_TIMEOUT_MS));
+      return shell(cmd, await safeCwd(p?.cwd), Number(p?.timeoutMs ?? DEFAULT_TIMEOUT_MS));
     });
 
     this.register("notify", async (p) => ({ forwarded: "gabriel", payload: p }));

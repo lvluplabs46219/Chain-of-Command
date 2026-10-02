@@ -6,13 +6,18 @@ const ollamaUrl = (): string => process.env.OLLAMA_URL ?? "http://127.0.0.1:1143
 const model = (): string => process.env.YHWH_MODEL ?? "qwen2.5:7b";
 
 /** Raw completion against the local provider. */
-export async function complete(prompt: string, system?: string): Promise<string> {
+export async function complete(
+  prompt: string,
+  system?: string,
+  opts: { json?: boolean; timeoutMs?: number } = {},
+): Promise<string> {
   const res = await fetch(`${ollamaUrl()}/api/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model: model(), prompt, system, stream: false }),
+    body: JSON.stringify({ model: model(), prompt, system, stream: false, ...(opts.json ? { format: "json" } : {}) }),
+    signal: AbortSignal.timeout(opts.timeoutMs ?? 120_000),
   });
-  if (!res.ok) throw new Error(`YHWH provider error: ${res.status}`);
+  if (!res.ok) throw new Error(`YHWH provider error: ${res.status} ${(await res.text().catch(() => "")).slice(0, 300)}`);
   const json = (await res.json()) as { response: string };
   return json.response;
 }
@@ -52,11 +57,14 @@ export async function plan(directive: Directive): Promise<ExecutionTree> {
     "3. For coding work: llm.reason to draft the code, then file.scaffold to write it, then shell.exec to build or test it, then llm.reason over the results if analysis is needed, then notify.",
     "4. For devops work: use shell.exec with concrete commands (npm test, git status, docker compose ps) and chain dependent steps with dependsOn.",
     "5. Payloads must be concrete and complete - never leave placeholders in final output.",
+    `6. All paths and cwd values are RELATIVE to the workspace root (${process.env.RAPHAEL_WORKSPACE ?? process.cwd()}). Use "." for the root. NEVER use absolute paths or invented directories such as /path/to/repo or workspace/.`,
+    "7. A node cannot see other nodes' output unless it lists them in dependsOn; llm.reason nodes automatically receive the output of their dependencies.",
   ].join(" ");
   try {
     const raw = await complete(
       `Directive: ${directive.text}\nContext: ${JSON.stringify(directive.context ?? {})}`,
       system,
+      { json: true },
     );
     const tree = JSON.parse(extractJson(raw)) as ExecutionTree;
     if (!tree.rootId || !Array.isArray(tree.nodes) || tree.nodes.length === 0) throw new Error("missing fields");
