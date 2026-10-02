@@ -1,4 +1,4 @@
-import StitchPage from "@/lib/stitch/StitchPage";
+import { ChainOfCommandMasterApp } from "@/components/ChainOfCommandMasterApp";
 
 export const dynamic = "force-dynamic";
 
@@ -8,5 +8,5 @@ export const metadata = {
 };
 
 export default function DocketPage() {
-  return <StitchPage folder="the_docket_cases_1" />;
+  return <ChainOfCommandMasterApp initialTab="docket" />;
 }

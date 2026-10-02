@@ -1,4 +1,4 @@
-import StitchPage from "@/lib/stitch/StitchPage";
+import { ChainOfCommandMasterApp } from "@/components/ChainOfCommandMasterApp";
 
 export const dynamic = "force-dynamic";
 
@@ -8,5 +8,5 @@ export const metadata = {
 };
 
 export default function ChambersPage() {
-  return <StitchPage folder="chambers_ai_legal_team_1" />;
+  return <ChainOfCommandMasterApp initialTab="chambers" />;
 }

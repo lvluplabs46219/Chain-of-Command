@@ -111,17 +111,80 @@ for (const folder of STITCH_FOLDERS) {
  */
 export const ROUTE_ALIASES: Record<string, string> = {
   "": "command_center_home",
+  "command-center": "command_center_home",
+  dashboard: "command_center_home",
+  
+  // 2. The Docket (Cases)
   docket: "the_docket_cases_1",
+  cases: "the_docket_cases_1",
+  "the-docket": "the_docket_cases_1",
+  "open-a-matter": "the_docket_open_a_matter",
+  "closed-matters": "the_docket_closed_matters",
+  "retrieve-from-court": "the_docket_retrieve_from_court",
+  
+  // 3. Chambers (AI Legal Team)
   chambers: "chambers_ai_legal_team_1",
+  "ai-legal-team": "chambers_ai_legal_team_1",
+  "plea-analysis": "chambers_plea_analysis",
+  "rights-audit": "chambers_rights_audit",
+  "mitigation-memo": "chambers_mitigation_memo",
+  "appoint-counsel": "chambers_appoint_counsel",
+  "counsel-brief": "chambers_counsel_brief",
+  "full-bench": "chambers_full_bench_view",
+  "transcripts": "chambers_session_transcripts",
+  
+  // 4. Law Library (Legal Library)
   "law-library": "law_library_research_1",
-  "record-room": "record_room_documents_1",
-  "court-watch": "court_watch_docket_activity",
-  timeline: "case_timeline_chronology_1",
+  "search-the-stacks": "law_library_search_the_stacks_1",
+  "citation-web": "law_library_citation_web",
+  "case-folders": "law_library_case_folders",
+  "prior-research": "law_library_prior_research",
+  
+  // 5. Investigations (Research + Evidence)
   investigations: "investigations_active_research_1",
-  counsel: "counsel_directory_search",
-  filing: "filing_center_court_submission",
+  "active-research": "investigations_active_research_1",
+  "evidence-locker": "investigations_evidence_locker_1",
+  "issue-spotter": "investigations_issue_spotter",
+  "exhibit-analysis": "investigations_exhibit_analysis",
+  "research-memo": "investigations_research_memo",
+  
+  // 6. Record Room (Documents)
+  "record-room": "record_room_documents_1",
+  documents: "record_room_documents_1",
+  "file-a-record": "record_room_file_a_record",
+  "record-preview": "record_room_record_preview",
+  "draft-desk": "record_room_draft_desk",
+  "exhibit-gallery": "record_room_exhibit_gallery",
+  
+  // 7. Case Timeline (Chronology)
+  timeline: "case_timeline_chronology_1",
+  chronology: "case_timeline_chronology_1",
+  "log-event": "case_timeline_log_event",
+  "event-record": "case_timeline_event_record",
+  
+  // 8. Court Watch (Court Activity)
+  "court-watch": "court_watch_docket_activity",
+  "court-activity": "court_watch_docket_activity",
+  "hearing-prep-kit": "court_watch_hearing_prep_kit",
+  "the-clerk": "the_clerk_notification_settings",
+  notifications: "the_clerk_notification_settings",
+  
+  // 9. Counsel Directory (Attorney Directory)
+  counsel: "counsel_directory_counsel_listings",
+  "counsel-directory": "counsel_directory_counsel_listings",
+  "attorney-directory": "counsel_directory_counsel_listings",
+  "attorney-profile": "counsel_directory_attorney_profile",
+  "pro-bono": "counsel_directory_pro_bono_legal_aid",
+  
+  // 10. Motions & Tasks (Tasks)
   motions: "motions_tasks_motion_board",
+  tasks: "motions_tasks_motion_board",
   calendar: "motions_tasks_court_calendar",
+  "court-calendar": "motions_tasks_court_calendar",
+  
+  // Platform & Security
+  filing: "filing_center_court_submission",
+  "filing-center": "filing_center_court_submission",
   security: "workspace_security",
   audit: "system_audit",
 };

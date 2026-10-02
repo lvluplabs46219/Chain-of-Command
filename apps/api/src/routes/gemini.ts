@@ -443,4 +443,174 @@ Disclaimer header and footer required.`;
   }
 });
 
+/**
+ * Blueprint Feature: CaseDocument AI Summarizer & Timeline Extraction
+ * Aligns directly with firebase-blueprint.json CaseDocument (aiSummary, extractedText)
+ * and generates candidate TimelineEvent entries.
+ */
+const handleDocumentSummary = async (req: Request, res: Response) => {
+  try {
+    const { matterId, title, extractedText, type = 'filing', jurisdiction = 'Federal & State' } = req.body;
+
+    if (!extractedText || String(extractedText).trim().length === 0) {
+      return res.status(400).json({ error: 'extractedText is required to generate an AI summary.' });
+    }
+
+    const client = getAI();
+    const sanitizedTitle = sanitizeUserInput(String(title || 'Legal Document'));
+    const sanitizedText = sanitizeUserInput(String(extractedText).slice(0, 48000));
+    const sanitizedType = sanitizeUserInput(String(type));
+    const sanitizedJurisdiction = sanitizeUserInput(String(jurisdiction));
+
+    const prompt = `Analyze this legal document for a self-represented (pro se) litigant according to the Chain of Command Blueprint:
+Document Title: ${sanitizedTitle}
+Declared Type: ${sanitizedType}
+Jurisdiction: ${sanitizedJurisdiction}
+Document Text:
+${sanitizedText}
+
+TASK:
+1. Generate an objective, plain-English summary (max 4500 characters) covering:
+   - Document Overview & Parties
+   - Substantive Claims, Allegations, or Orders
+   - Key Procedural Deadlines & Hearing Notices
+   - Evidentiary Inconsistencies or Unverified Claims
+2. Classify the document into one of the blueprint types:
+   ["filing", "evidence", "order", "correspondence", "transcript", "motion", "brief", "memo"]
+3. Extract any chronological factual events in JSON format matching the TimelineEvent blueprint:
+   Each event must have:
+   - title: concise title
+   - eventDate: ISO 8601 string or date description
+   - eventType: one of ["hearing", "filing_deadline", "discovery_deadline", "arrest", "general", "appearance", "motion", "order", "plea"]
+   - description: brief neutral description
+
+MANDATORY RULES:
+- Never say "In my legal opinion"
+- Prepend with: [PREPARED FOR SELF-REPRESENTED LITIGANT - NOT LEGAL ADVICE - REQUIRES INDEPENDENT HUMAN REVIEW]
+- Append with the mandatory educational disclaimer.`;
+
+    const { response, modelUsed } = await generateContentWithFallback(client, 'gemini-3.8-flash', {
+      contents: [createUserMessage(prompt)],
+      config: {
+        systemInstruction: UPL_SYSTEM_PROMPT,
+        temperature: 0.2,
+      },
+    });
+
+    const rawText = response.text || '';
+
+    // Safe extraction of any embedded JSON timeline events block if generated
+    let extractedTimelineEvents: Array<{ title: string; eventDate: string; eventType: string; description: string }> = [];
+    try {
+      const jsonMatch = rawText.match(/```json\s*([\s\S]*?)\s*```/) || rawText.match(/\[\s*\{\s*"title"[\s\S]*?\}\s*\]/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[1] || jsonMatch[0]);
+        if (Array.isArray(parsed)) {
+          extractedTimelineEvents = parsed.slice(0, 10);
+        }
+      }
+    } catch {
+      // Fallback: events handled in text format
+    }
+
+    return res.json({
+      success: true,
+      matterId: matterId || null,
+      title: sanitizedTitle,
+      type: sanitizedType,
+      aiSummary: rawText.slice(0, 5000),
+      extractedTimelineEvents,
+      modelUsed,
+      generatedAt: new Date().toISOString(),
+      disclaimer: "This information is provided for educational and procedural purposes only and does not constitute legal advice. No attorney-client relationship is formed. Consult a licensed attorney for case-specific representation."
+    });
+  } catch (err: any) {
+    if (err.message && err.message.includes('prompt injection detected')) {
+      console.warn('Document Summary: Prompt injection attempt blocked');
+      return res.status(400).json({ error: 'Invalid input - request rejected' });
+    }
+    console.error('Document Summary Error:', err);
+    return res.status(500).json({ error: GENERIC_ERROR_MESSAGE });
+  }
+};
+
+geminiRouter.post('/gemini/document-summary', handleDocumentSummary);
+geminiRouter.post('/ai/document-summary', handleDocumentSummary);
+
+/**
+ * Blueprint Feature: EvidenceItem Relevance Scorer
+ * Aligns directly with firebase-blueprint.json EvidenceItem (relevanceScore: number)
+ */
+const handleScoreEvidence = async (req: Request, res: Response) => {
+  try {
+    const { matterId, title, description, dateAcquired, charges = 'General Offense Allegations' } = req.body;
+
+    if (!title || !description) {
+      return res.status(400).json({ error: 'Both title and description are required to score evidence.' });
+    }
+
+    const client = getAI();
+    const sanitizedTitle = sanitizeUserInput(String(title));
+    const sanitizedDesc = sanitizeUserInput(String(description));
+    const sanitizedCharges = sanitizeUserInput(String(charges));
+    const sanitizedDate = dateAcquired ? sanitizeUserInput(String(dateAcquired)) : 'Unknown';
+
+    const prompt = `Evaluate this EvidenceItem for a pro se litigant case matter:
+Evidence Title: ${sanitizedTitle}
+Description / Notes: ${sanitizedDesc}
+Date Acquired: ${sanitizedDate}
+Relevant Charges / Allegations: ${sanitizedCharges}
+
+TASK:
+1. Assign a numeric relevance score between 0.00 and 1.00 based on standard evidentiary rules (probative value vs prejudice, factual nexus to elements of proof).
+2. Detail Chain of Custody & Authentication considerations (e.g. metadata, original source, timestamp verification).
+3. Detail admissibility grounds under Federal/State Rules of Evidence (e.g. hearsay exceptions, business records, Rule 403 balancing).
+4. Provide 3 specific procedural questions for the user to examine regarding this exhibit.
+
+OUTPUT FORMAT:
+First line: SCORE: <0.00 to 1.00>
+Followed by structured sections.
+MANDATE: Never say "In my legal opinion". Prepend with SRL header and end with educational disclaimer.`;
+
+    const { response, modelUsed } = await generateContentWithFallback(client, 'gemini-3.8-flash', {
+      contents: [createUserMessage(prompt)],
+      config: {
+        systemInstruction: UPL_SYSTEM_PROMPT,
+        temperature: 0.2,
+      },
+    });
+
+    const rawText = response.text || '';
+    let relevanceScore = 0.5;
+    const scoreMatch = rawText.match(/SCORE:\s*([0-1]?\.\d+)/i);
+    if (scoreMatch && scoreMatch[1]) {
+      const parsed = parseFloat(scoreMatch[1]);
+      if (!isNaN(parsed) && parsed >= 0 && parsed <= 1) {
+        relevanceScore = parsed;
+      }
+    }
+
+    return res.json({
+      success: true,
+      matterId: matterId || null,
+      title: sanitizedTitle,
+      relevanceScore,
+      analysis: rawText,
+      modelUsed,
+      scoredAt: new Date().toISOString(),
+      disclaimer: "This information is provided for educational and procedural purposes only and does not constitute legal advice."
+    });
+  } catch (err: any) {
+    if (err.message && err.message.includes('prompt injection detected')) {
+      console.warn('Score Evidence: Prompt injection attempt blocked');
+      return res.status(400).json({ error: 'Invalid input - request rejected' });
+    }
+    console.error('Score Evidence Error:', err);
+    return res.status(500).json({ error: GENERIC_ERROR_MESSAGE });
+  }
+};
+
+geminiRouter.post('/gemini/score-evidence', handleScoreEvidence);
+geminiRouter.post('/ai/score-evidence', handleScoreEvidence);
+
 export default geminiRouter;

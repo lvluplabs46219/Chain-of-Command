@@ -20,7 +20,7 @@ function getApiDestination() {
 const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
-  allowedDevOrigins: ['*.run.app', 'localhost:3000', '127.0.0.1:3000'],
+  allowedDevOrigins: ['*.run.app', '*.us-east1.run.app', '*.cloudrun.app', 'localhost:3000', '127.0.0.1:3000'],
   typescript: {
     ignoreBuildErrors: true,
   },
