@@ -12,8 +12,6 @@ permissions:
 
 jobs:
   test:
-    # Skips cleanly until playwright.config.* exists in the repo root
-    if: hashFiles('playwright.config.*') != ''
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -23,19 +21,32 @@ jobs:
       with:
         node-version: 20
 
+    - name: Detect Playwright config
+      id: pwcfg
+      run: |
+        if compgen -G 'playwright.config.*' > /dev/null; then
+          echo "exists=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "exists=false" >> "$GITHUB_OUTPUT"
+          echo "No playwright.config.* found - skipping Playwright tests."
+        fi
+
     - name: Install dependencies
+      if: steps.pwcfg.outputs.exists == 'true'
       run: npm install --no-audit --no-fund
 
     - name: Install Playwright Browsers
+      if: steps.pwcfg.outputs.exists == 'true'
       run: npx playwright install --with-deps chromium
 
     - name: Run Playwright tests
+      if: steps.pwcfg.outputs.exists == 'true'
       run: npx playwright test --passWithNoTests
       env:
         NODE_ENV: test
 
     - uses: actions/upload-artifact@v4
-      if: always()
+      if: always() && steps.pwcfg.outputs.exists == 'true'
       with:
         name: playwright-report
         path: playwright-report/
