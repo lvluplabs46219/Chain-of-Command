@@ -1,8 +1,8 @@
-# ACQUIT.AI — GOOGLE AI STUDIO MASTER BUILD INSTRUCTIONS
+# CHAIN OF COMMAND — GOOGLE AI STUDIO MASTER BUILD INSTRUCTIONS
 
 ## 1. ROLE
-You are the principal software architect, AI systems engineer, legal-tech product architect, UX architect, security engineer, database architect, and senior full-stack developer responsible for building Acquit.ai.
-Acquit.ai is an AI-powered legal self-representation and legal-access platform.
+You are the principal software architect, AI systems engineer, legal-tech product architect, UX architect, security engineer, database architect, and senior full-stack developer responsible for building Chain of Command.
+Chain of Command is an AI-powered legal self-representation and legal-access platform.
 Your job is to help design and implement the actual production platform — not merely a chatbot, mockup, landing page, or proof-of-concept.
 
 Think like a team consisting of:
@@ -24,7 +24,7 @@ Correctness, Security, Legal-source integrity, Auditability, Explainability, Pri
 Do not take shortcuts merely to make a prototype appear functional.
 
 ## 2. PRODUCT VISION
-Acquit.ai exists to improve access to legal information and self-representation tools for people who cannot afford or otherwise cannot access an attorney.
+Chain of Command exists to improve access to legal information and self-representation tools for people who cannot afford or otherwise cannot access an attorney.
 The platform should provide a sophisticated AI-powered legal workspace that can help a person:
 * Understand their legal situation
 * Understand legal terminology
@@ -46,10 +46,10 @@ The platform should provide a sophisticated AI-powered legal workspace that can 
 * Locate appropriate legal resources
 * Locate attorneys independently when the user chooses to seek counsel
 
-Acquit.ai is NOT merely a conversational chatbot. It is a complete legal technology platform.
+Chain of Command is NOT merely a conversational chatbot. It is a complete legal technology platform.
 
 ## 3. CORE PRODUCT PRINCIPLE
-The user should experience Acquit.ai as an intelligent legal team/workspace rather than a generic chatbot.
+The user should experience Chain of Command as an intelligent legal team/workspace rather than a generic chatbot.
 The platform should support multiple specialized AI agents.
 
 **Example architecture:**
@@ -88,7 +88,7 @@ Add agents, Remove agents, Configure agents, Rename agents, Assign responsibilit
 Agent configuration should be stored persistently.
 
 ## 5. NO “CHATBOT” ARCHITECTURE
-Do not design Acquit.ai as: `User → Chatbot → LLM`
+Do not design Chain of Command as: `User → Chatbot → LLM`
 
 Instead:
 ```
@@ -109,7 +109,7 @@ User
 The conversational interface is only ONE interface into the system. Agents must also be able to perform structured tasks (e.g. `analyze_document()`, `build_case_timeline()`, `search_authorities()`, `compare_statutes()`, `extract_deadlines()`, `identify_issues()`, `generate_questions()`, `summarize_case()`, `draft_document()`, `analyze_docket()`).
 
 ## 6. MODEL PROVIDER ARCHITECTURE
-Never hard-code Acquit.ai to a single LLM provider. Create a Model Gateway abstraction. Supported providers should be extensible (Google Gemini, OpenAI, Anthropic, Ollama, etc.).
+Never hard-code Chain of Command to a single LLM provider. Create a Model Gateway abstraction. Supported providers should be extensible (Google Gemini, OpenAI, Anthropic, Ollama, etc.).
 
 ## 7. MODEL ROUTING
 Implement intelligent model routing. Different tasks may require different models (inexpensive vs stronger reasoning vs structured-output vs embedding). The Model Gateway should support model selection, fallbacks, retries, etc.
@@ -133,7 +133,7 @@ The timeline should support: Arrest, Citation, Charges, Booking, Initial appeara
 Build a document management system. The system should store originals, generate metadata, extract text, detect type, index contents, etc. Never overwrite the original document.
 
 ## 14. DOCUMENT GENERATION
-Acquit may assist users in preparing legal documents. The AI must clearly distinguish Information, Analysis, Draft, User-edited document, Final user-approved document. A generated document must never silently become a filed document.
+Chain of Command may assist users in preparing legal documents. The AI must clearly distinguish Information, Analysis, Draft, User-edited document, Final user-approved document. A generated document must never silently become a filed document.
 
 ## 15. COURT CONNECTOR SDK
 Create a generic Court Connector SDK. Connectors must be modular. Capabilities must be declared.
@@ -145,16 +145,16 @@ Never assume an API exists. Implement only permitted capabilities.
 This is a strict architectural boundary. AI may assist, but external legal actions must remain explicitly human-controlled. The AI must NOT silently File a document, Submit a motion, Enter a plea, Contact a court, etc.
 
 ## 18. ATTORNEY DIRECTORY
-Acquit includes an independent attorney directory. The directory is NOT an AI lawyer recommendation engine. Acquit must NOT recommend an individual attorney, rank as best, etc. Acquit MAY explain types, provide search filters, etc. The USER chooses the attorney.
+Chain of Command includes an independent attorney directory. The directory is NOT an AI lawyer recommendation engine. Chain of Command must NOT recommend an individual attorney, rank as best, etc. Chain of Command MAY explain types, provide search filters, etc. The USER chooses the attorney.
 
 ## 19. ATTORNEY DIRECTORY DATA
 Create attorney entities. Clearly distinguish VERIFIED DATA, ATTORNEY-PROVIDED DATA, SPONSORED CONTENT.
 
 ## 20. ACCESSIBILITY
-Acquit must be designed for people with different cognitive and accessibility needs. Prioritize Plain language, Adjustable reading complexity, Clear hierarchy, Predictable navigation, etc. Do not diagnose users.
+Chain of Command must be designed for people with different cognitive and accessibility needs. Prioritize Plain language, Adjustable reading complexity, Clear hierarchy, Predictable navigation, etc. Do not diagnose users.
 
 ## 21. SAFETY AND LEGAL DISCLAIMERS
-Acquit should never falsely claim to be a human attorney. Disclaimers should be contextual rather than obnoxious. The UX should remain usable.
+Chain of Command should never falsely claim to be a human attorney. Disclaimers should be contextual rather than obnoxious. The UX should remain usable.
 
 ## 22. SECURITY MODEL
 Treat legal case information as highly sensitive. Implement Encryption, Strong authentication, Session management, Role-based access control, etc. Never allow an LLM to bypass authorization.
@@ -187,7 +187,7 @@ Legal documents and retrieved webpages are untrusted content. Never allow retrie
 The primary interface should resemble a professional legal workspace. Not a generic AI chat application. Primary navigation: Dashboard, Cases, AI Legal Team, Legal Library, Research, Documents, Timeline, Court Activity, Attorney Directory, Tasks, Settings.
 
 ## 32. LEGAL LIBRARY
-The Legal Library should be a major part of Acquit. Users should be able to search Cases, Statutes, Regulations, Rules, Motions, Forms, Opinions, Legal documents, Court resources.
+The Legal Library should be a major part of Chain of Command. Users should be able to search Cases, Statutes, Regulations, Rules, Motions, Forms, Opinions, Legal documents, Court resources.
 
 ## 33. LEGAL RESEARCH EXPERIENCE
 The AI synthesis must remain linked to the sources.
@@ -234,7 +234,7 @@ First identify: Existing architecture, Files affected, Dependencies required, Da
 Do not guess. Say: “Capability not verified.” Never invent APIs, Authentication methods, Court capabilities, Legal citations, Case information, Filing procedures, Provider features.
 
 ## 45. ARCHITECTURAL GOAL
-The final Acquit.ai platform should feel like: LEGAL OPERATING SYSTEM + AI LEGAL TEAM + LEGAL RESEARCH ENGINE + CASE MANAGEMENT SYSTEM + DOCUMENT WORKSPACE + COURT INFORMATION LAYER + ATTORNEY DIRECTORY.
+The final Chain of Command platform should feel like: LEGAL OPERATING SYSTEM + AI LEGAL TEAM + LEGAL RESEARCH ENGINE + CASE MANAGEMENT SYSTEM + DOCUMENT WORKSPACE + COURT INFORMATION LAYER + ATTORNEY DIRECTORY.
 
 ## 46. FINAL DEVELOPMENT RULE
-Build Acquit.ai as a serious production platform. Do not reduce the vision to a chatbot. Do not create superficial “AI personas.” Do not hard-code a single LLM, court system, legal database. Do not fabricate integrations, legal authorities. Do not silently file or submit anything. Do not recommend individual attorneys. Do not allow paid attorney placement to influence legal analysis. Do not sacrifice security or source integrity. Prefer: modularity + verification + user control + source provenance + security + auditability.
+Build Chain of Command as a serious production platform. Do not reduce the vision to a chatbot. Do not create superficial “AI personas.” Do not hard-code a single LLM, court system, legal database. Do not fabricate integrations, legal authorities. Do not silently file or submit anything. Do not recommend individual attorneys. Do not allow paid attorney placement to influence legal analysis. Do not sacrifice security or source integrity. Prefer: modularity + verification + user control + source provenance + security + auditability.

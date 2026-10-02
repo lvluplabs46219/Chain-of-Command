@@ -3,7 +3,7 @@ import StitchPage from "@/lib/stitch/StitchPage";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "The Docket | Acquit.ai",
+  title: "The Docket | Chain of Command",
   description: "Manage active legal matters and court submissions",
 };
 

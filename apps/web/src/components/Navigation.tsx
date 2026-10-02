@@ -8,7 +8,7 @@ export function Navigation() {
     { to: '/workspace', label: 'Case Workspace' },
     { to: '/ai-lab', label: 'AI Lab' },
     { to: '/directory', label: 'Attorney Directory' },
-    { to: '/academy', label: 'Acquit Academy' },
+    { to: '/academy', label: 'Command Academy' },
     { to: '/filing', label: 'Filing Center' },
     { to: '/library', label: 'Law Library' },
     { to: '/editor', label: 'Document Editor' },

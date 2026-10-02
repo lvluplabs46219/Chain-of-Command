@@ -34,7 +34,7 @@ export interface AuthContextType {
 const DEFAULT_LITIGANT_USER: AuthUser = {
   id: "usr_pro_se_litigant",
   name: "Arthur Marlowe",
-  email: "litigant@acquit.ai",
+  email: "litigant@chainofcommand.law",
   role: "pro_se",
   jurisdiction: "Arizona / Marion County",
   activeMatterId: "matter-001",
@@ -94,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(supaUser));
         }
       }).catch((err) => {
-        console.warn("[Acquit Auth] Supabase session check notice:", err);
+        console.warn("[Chain of Command Auth] Supabase session check notice:", err);
       });
 
       const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -127,7 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const loginAsLitigant = async (name = "Arthur Marlowe", email = "litigant@acquit.ai") => {
+  const loginAsLitigant = async (name = "Arthur Marlowe", email = "litigant@chainofcommand.law") => {
     setIsLoading(true);
     const newToken = "acquit-pro-se-token";
     const newUser: AuthUser = {

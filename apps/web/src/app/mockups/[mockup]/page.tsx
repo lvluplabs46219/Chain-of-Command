@@ -15,7 +15,12 @@ export default async function MockupPage({
     );
   }
 
-  const displayName = mockup.replace(/_/g, " ");
+  const displayName = mockup
+    .replace(/acquit\.ai_/gi, "Chain of Command ")
+    .replace(/acquit_/gi, "Chain of Command ")
+    .replace(/_acquit\.ai_/gi, " Chain of Command ")
+    .replace(/acquit/gi, "Chain of Command")
+    .replace(/_/g, " ");
 
   return (
     <main className="p-8 max-w-7xl mx-auto">

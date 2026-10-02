@@ -1,5 +1,5 @@
-import AcquitClientApp from "@/components/AcquitClientApp";
+import ChainOfCommandClientApp from "@/components/ChainOfCommandClientApp";
 
 export default function NotFound() {
-  return <AcquitClientApp />;
+  return <ChainOfCommandClientApp />;
 }

@@ -1,7 +1,7 @@
 /**
  * useRagStreaming Hook
  * Streams real-time AI reasoning, tokens, and verified statutory citations
- * from the Acquit.ai backend into RagCitationViewer.
+ * from the Chain of Command backend into RagCitationViewer.
  * Uses HTTP SSE streaming with bearer authentication.
  */
 
