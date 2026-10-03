@@ -51,13 +51,20 @@ async function pinLegalTextToIPFS(title: string, text: string): Promise<string |
  * Docs: https://www.courtlistener.com/help/api/rest/
  * Webhooks: https://www.courtlistener.com/help/api/webhooks/
  */
+function courtListenerToken(): string {
+  return (
+    process.env.COURTLISTENER_API_TOKEN ||
+    process.env.COURT_LISTENER_API_KEY ||
+    ""
+  ).trim();
+}
+
 function clHeaders(): Record<string, string> {
+  const token = courtListenerToken();
   return {
     "User-Agent": "ChainOfCommand/1.0 (Legal OS; research; contact@chainofcommand.law)",
     Accept: "application/json",
-    ...(process.env.COURTLISTENER_API_TOKEN
-      ? { Authorization: `Token ${process.env.COURTLISTENER_API_TOKEN}` }
-      : {}),
+    ...(token ? { Authorization: `Token ${token}` } : {}),
   };
 }
 
