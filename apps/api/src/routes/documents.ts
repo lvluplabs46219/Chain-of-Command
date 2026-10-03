@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
 import { verifySession, type AuthenticatedRequest } from "../middleware/verifySession";
+import { resolveAppUserId } from "../lib/resolveAppUser";
 import multer from "multer";
 import { db, documentsTable, documentChunksTable, mattersTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
@@ -76,12 +77,16 @@ documentsRouter.post(
       if (!req.user?.id) {
         return res.status(401).json({ error: "Unauthorized" });
       }
+      const resolved = await resolveAppUserId(req.user);
+      if (!resolved.ok) {
+        return res.status(resolved.status).json({ error: resolved.error });
+      }
       const { filename, fileType, matterId } = req.body;
       if (!filename || !matterId) {
         return res.status(400).json({ error: "filename and matterId are required" });
       }
 
-      const ownership = await assertMatterOwnedByUser(String(matterId), req.user.id);
+      const ownership = await assertMatterOwnedByUser(String(matterId), resolved.userId);
       if (!ownership.ok) {
         return res.status(ownership.status).json({ error: ownership.error });
       }
@@ -121,6 +126,10 @@ documentsRouter.post(
       if (!authenticatedReq.user?.id) {
         return res.status(401).json({ error: "Unauthorized" });
       }
+      const resolved = await resolveAppUserId(authenticatedReq.user);
+      if (!resolved.ok) {
+        return res.status(resolved.status).json({ error: resolved.error });
+      }
       if (!req.file) {
         return res.status(400).json({ error: "No document file uploaded" });
       }
@@ -131,7 +140,7 @@ documentsRouter.post(
 
       const ownership = await assertMatterOwnedByUser(
         String(matterId),
-        authenticatedReq.user.id
+        resolved.userId
       );
       if (!ownership.ok) {
         return res.status(ownership.status).json({ error: ownership.error });
@@ -160,7 +169,7 @@ documentsRouter.post(
               size: req.file.size,
               chunkCount: chunks.length,
               uploadedAt: new Date().toISOString(),
-              uploadedBy: authenticatedReq.user.id,
+              uploadedBy: resolved.userId,
             },
           })
           .returning({ id: documentsTable.id });
@@ -209,9 +218,13 @@ documentsRouter.get(
       if (!req.user?.id) {
         return res.status(401).json({ error: "Unauthorized" });
       }
+      const resolved = await resolveAppUserId(req.user);
+      if (!resolved.ok) {
+        return res.status(resolved.status).json({ error: resolved.error });
+      }
       const { matterId } = req.params;
 
-      const ownership = await assertMatterOwnedByUser(matterId, req.user.id);
+      const ownership = await assertMatterOwnedByUser(matterId, resolved.userId);
       if (!ownership.ok) {
         return res.status(ownership.status).json({ error: ownership.error });
       }

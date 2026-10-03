@@ -127,9 +127,9 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
         await saveMatter(m);
       }
     } else if (result.matter) {
-      setMatters([result.matter]);
-      setActiveMatter(result.matter);
-      await saveMatter(result.matter);
+      const saved = await saveMatter(result.matter);
+      setMatters([saved]);
+      setActiveMatter(saved);
     } else {
       setMatters([]);
       setActiveMatter(EMPTY_MATTER);
@@ -156,9 +156,12 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
   };
 
   const handleSaveMatter = async (updated: Matter) => {
-    setActiveMatter(updated);
-    setMatters((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
-    await saveMatter(updated);
+    const saved = await saveMatter(updated);
+    setActiveMatter(saved);
+    setMatters((prev) => {
+      const without = prev.filter((m) => m.id !== updated.id && m.id !== saved.id);
+      return [saved, ...without];
+    });
   };
 
   const handleUpdateAgent = (updated: SpecialistAgent) => {
@@ -216,9 +219,9 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
       ],
     };
 
-    await saveMatter(newM);
-    setMatters((prev) => [newM, ...prev]);
-    setActiveMatter(newM);
+    const saved = await saveMatter(newM);
+    setMatters((prev) => [saved, ...prev.filter((m) => m.id !== newM.id && m.id !== saved.id)]);
+    setActiveMatter(saved);
     setShowNewMatterModal(false);
     setNewMatterTitle("");
     setNewMatterCaseNumber("");

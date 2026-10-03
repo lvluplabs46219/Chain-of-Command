@@ -265,7 +265,66 @@ export const api = {
   // Case & Matters
   matters: {
     getAll: () => request<{ success: boolean; matters: any[] }>("/matters"),
-    getById: (matterId: string) => request<{ success: boolean; matter: any }>(`/matters/${matterId}`),
+    getById: (matterId: string) =>
+      request<{ success: boolean; matter: any }>(`/matters/${matterId}`),
+    create: (payload: {
+      title: string;
+      caseNumber?: string;
+      courtName?: string;
+      jurisdiction?: string;
+      description?: string;
+      summary?: string;
+      status?: string;
+    }) =>
+      request<{ success: boolean; matter: any }>("/matters", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }),
+    update: (
+      matterId: string,
+      payload: Partial<{
+        title: string;
+        caseNumber: string;
+        courtName: string;
+        jurisdiction: string;
+        description: string;
+        summary: string;
+        status: string;
+      }>
+    ) =>
+      request<{ success: boolean; matter: any }>(`/matters/${matterId}`, {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+      }),
+    listParties: (matterId: string) =>
+      request<{ success: boolean; parties: any[] }>(`/matters/${matterId}/parties`),
+    addParty: (
+      matterId: string,
+      payload: { name: string; role: string; contactInfo?: Record<string, unknown> }
+    ) =>
+      request<{ success: boolean; party: any }>(`/matters/${matterId}/parties`, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }),
+    listDeadlines: (matterId: string) =>
+      request<{ success: boolean; deadlines: any[] }>(`/matters/${matterId}/deadlines`),
+    addDeadline: (
+      matterId: string,
+      payload: { title: string; dueDate: string; status?: string; relatedDocumentId?: string }
+    ) =>
+      request<{ success: boolean; deadline: any }>(`/matters/${matterId}/deadlines`, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }),
+    updateDeadline: (
+      matterId: string,
+      deadlineId: string,
+      payload: Partial<{ title: string; dueDate: string; status: string }>
+    ) =>
+      request<{ success: boolean; deadline: any }>(
+        `/matters/${matterId}/deadlines/${deadlineId}`,
+        { method: "PATCH", body: JSON.stringify(payload) }
+      ),
   },
 
   // Documents
