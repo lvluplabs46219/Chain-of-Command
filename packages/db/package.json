@@ -14,14 +14,14 @@
   "dependencies": {
     "drizzle-orm": "^0.45.2",
     "drizzle-zod": "^0.8.3",
-    "firebase-admin": "^14.3.0",
+    "firebase-admin": "^14.5.0",
     "pg": "^8.22.0",
-    "workflow": "4.2.0",
-    "zod": "^3.25.76"
+    "workflow": "5.0.1",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@types/node": "^22.10.0",
+    "@types/node": "^26.6.4",
     "@types/pg": "^8.20.0",
-    "drizzle-kit": "^0.18.1"
+    "drizzle-kit": "^0.31.11"
   }
 }
