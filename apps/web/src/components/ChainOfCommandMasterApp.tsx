@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import {
   Matter,
   INITIAL_MATTERS,
@@ -20,7 +21,11 @@ import {
   saveEvidenceRecord,
 } from "@/lib/workspace-sync";
 import { WorkspaceHeader } from "./workspace/WorkspaceHeader";
-import { WorkspaceNavigation, WorkspaceTab } from "./workspace/WorkspaceNavigation";
+import {
+  WorkspaceNavigation,
+  WorkspaceTab,
+  pathToTab,
+} from "./workspace/WorkspaceNavigation";
 import { DashboardView } from "./workspace/DashboardView";
 import { DocketView } from "./workspace/DocketView";
 import { ChambersView } from "./workspace/ChambersView";
@@ -39,6 +44,7 @@ interface ChainOfCommandMasterAppProps {
 }
 
 export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCommandMasterAppProps) {
+  const pathname = usePathname();
   const [matters, setMatters] = useState<Matter[]>(INITIAL_MATTERS);
   const [activeMatter, setActiveMatter] = useState<Matter>(INITIAL_MATTERS[0]);
   const [agents, setAgents] = useState<SpecialistAgent[]>(SPECIALIST_AGENTS_ROSTER);
@@ -46,6 +52,11 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
   const [evidence, setEvidence] = useState<EvidenceRecord[]>([]);
   const [activeTab, setActiveTab] = useState<WorkspaceTab>(initialTab);
   const [jurisdiction, setJurisdiction] = useState<string>("Indiana");
+
+  useEffect(() => {
+    const fromPath = pathToTab(pathname || "/");
+    if (fromPath) setActiveTab(fromPath);
+  }, [pathname]);
 
   // New Matter Modal
   const [showNewMatterModal, setShowNewMatterModal] = useState<boolean>(false);
