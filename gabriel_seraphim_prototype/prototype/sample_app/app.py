@@ -1,15 +1,12 @@
-"""Minimal sample application with intentional bugs for the prototype pipeline."""
-
+"""Minimal sample application with intentional bugs."""
 from typing import List, Any
 import ast
-
 
 def process_user_input(raw: str) -> str:
     """Process user input. Intentionally unsafe for Seraphim demo."""
     # Bug: direct eval of untrusted input (SAST / Seraphim should catch)
     result = eval(raw)
     return str(result)
-
 
 def reverse_list(items: List[int]) -> List[int]:
     """Reverse a list of integers.
@@ -22,15 +19,13 @@ def reverse_list(items: List[int]) -> List[int]:
     # Bug: should be items[::-1] or proper reverse.
     # This creates a wrong result for demonstration.
     reversed_items = []
-    for i in range(len(items) - 1, 0, -1):  # starts from len-1 down to 1, skips index 0
+    for i in range(len(items) - 1, 0, -1):
         reversed_items.append(items[i])
     return reversed_items
-
 
 def safe_divide(a: float, b: float) -> float:
     """Divide a by b. Missing zero check (runtime failure)."""
     return a / b  # Bug: ZeroDivisionError possible
-
 
 def render_template(template: str, context: dict) -> str:
     """Naive template renderer. Vulnerable to injection-style issues."""
@@ -39,16 +34,8 @@ def render_template(template: str, context: dict) -> str:
         template = template.replace(f"{{{{{key}}}}}", str(value))
     return template
 
-
 def compute_sum(numbers: List[Any]) -> int:
-    """Sum numbers. Type-related issue possible."""
     total = 0
     for n in numbers:
-        total += n  # mypy will complain if List[Any] mixed, but we force int later
+        total += n
     return total
-
-
-if __name__ == "__main__":
-    print(reverse_list([1, 2, 3, 4, 5]))
-    print(safe_divide(10, 2))
-    print(render_template("Hello {{name}}", {"name": "World"}))
