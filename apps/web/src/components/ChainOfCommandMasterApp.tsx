@@ -231,6 +231,8 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
     setActiveTab("docket");
   };
 
+  const isEmptyWorkspace = !matters.length || activeMatter.id === "matter-empty";
+
   return (
     <div className="min-h-screen bg-[#0C0D10] text-[#E1E2E5] flex flex-col font-sans selection:bg-[#D4AF37]/30">
       {/* Header */}
@@ -245,6 +247,24 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
 
       {/* Navigation */}
       <WorkspaceNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+
+      {isEmptyWorkspace && (
+        <div className="mx-4 mt-3 rounded-xl border border-[#D4AF37]/25 bg-[#D4AF37]/5 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm text-[#EFE6D0] font-medium">No active matter yet</p>
+            <p className="text-xs text-neutral-400 mt-0.5">
+              Open a case file to unlock deadlines, evidence, and the AI team on real data.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowNewMatterModal(true)}
+            className="shrink-0 px-3 py-1.5 rounded-lg bg-[#D4AF37] text-neutral-950 text-xs font-semibold hover:bg-[#c49f27]"
+          >
+            Open new matter
+          </button>
+        </div>
+      )}
 
       {/* Main Content Area */}
       <section aria-label="Active Case Workspace" className="flex-1">

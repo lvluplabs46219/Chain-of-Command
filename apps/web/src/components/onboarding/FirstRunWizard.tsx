@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   Scale,
   ArrowRight,
@@ -172,6 +173,13 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
                 Get started
                 <ArrowRight className="w-4 h-4" />
               </button>
+
+              <p className="text-center text-xs text-neutral-500 pt-1">
+                Returning user?{" "}
+                <Link href="/login" className="text-[#D4AF37] hover:underline font-medium">
+                  Sign in instead
+                </Link>
+              </p>
             </div>
           )}
 

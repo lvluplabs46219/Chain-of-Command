@@ -1,47 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Scale, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Scale, Eye, EyeOff, Loader2, ArrowRight, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { loginAsLitigant, loginWithGoogle, isLoading } = useAuth();
+  const { loginAsLitigant, loginWithGoogle, isLoading, isAuthenticated, completeFirstRun } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const validate = () => {
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setError("Enter a valid email address.");
-      return false;
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace("/");
     }
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      return false;
+  }, [isLoading, isAuthenticated, router]);
+
+  const enterWorkspace = async (name: string, mail: string) => {
+    setSubmitting(true);
+    setError(null);
+    try {
+      await loginAsLitigant(name, mail);
+      completeFirstRun();
+      router.push("/");
+    } catch {
+      setError("Could not start session. Try again.");
+    } finally {
+      setSubmitting(false);
     }
-    return true;
+  };
+
+  const handleDemo = async () => {
+    await enterWorkspace("Pro Se Litigant", "litigant@local.chainofcommand");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!validate()) return;
-    setSubmitting(true);
-    try {
-      // Local session: name from email local-part until Supabase password auth is wired
-      const name = email.split("@")[0].replace(/[._]/g, " ");
-      await loginAsLitigant(name, email.trim().toLowerCase());
-      router.push("/");
-    } catch {
-      setError("Invalid credentials. Check email and password, or use demo session.");
-    } finally {
-      setSubmitting(false);
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError("Enter a valid email address.");
+      return;
     }
+    // Password is collected for future Supabase auth; local session does not verify it yet
+    const name = email
+      .split("@")[0]
+      .replace(/[._]/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+    await enterWorkspace(name || "Pro Se Litigant", email.trim().toLowerCase());
   };
 
   const handleGoogle = async () => {
@@ -49,13 +59,22 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await loginWithGoogle();
+      completeFirstRun();
       router.push("/");
     } catch {
-      setError("Google sign-in failed. Try email login or demo session.");
+      setError("Google sign-in is unavailable in this environment. Use email or demo session.");
     } finally {
       setSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#0C0D10] flex items-center justify-center text-neutral-400 text-sm">
+        Checking session…
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0C0D10] text-[#E1E2E5] flex flex-col items-center justify-center p-6">
@@ -70,9 +89,39 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="bg-[#141519] border border-[#2A2B35] rounded-xl p-6 shadow-2xl">
-          <h2 className="text-lg font-semibold text-white mb-1">Sign in</h2>
-          <p className="text-xs text-neutral-400 mb-5">Access your matter workspace and AI legal team.</p>
+        <div className="bg-[#141519] border border-[#2A2B35] rounded-xl p-6 shadow-2xl space-y-5">
+          <div>
+            <h2 className="text-lg font-semibold text-white mb-1">Sign in</h2>
+            <p className="text-xs text-neutral-400 leading-relaxed">
+              Open your matter workspace. Cloud password auth is optional for now — a local pro se
+              session is enough to use the tools.
+            </p>
+          </div>
+
+          {/* Primary path: one-click demo */}
+          <button
+            type="button"
+            onClick={handleDemo}
+            disabled={submitting || isLoading}
+            className="w-full py-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {(submitting || isLoading) ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Sparkles className="w-4 h-4" />
+            )}
+            Continue with demo session
+            <ArrowRight className="w-4 h-4" />
+          </button>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#2A2B35]" />
+            </div>
+            <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
+              <span className="bg-[#141519] px-2 text-neutral-500">or use email</span>
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
@@ -87,13 +136,12 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-[#101114] border border-[#2A2B35] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#D4AF37]"
                 placeholder="you@example.com"
-                required
               />
             </div>
 
             <div>
               <label htmlFor="password" className="block text-[10px] font-mono uppercase tracking-wider text-neutral-400 mb-1.5">
-                Password
+                Password <span className="text-neutral-600 normal-case">(optional until cloud auth)</span>
               </label>
               <div className="relative">
                 <input
@@ -103,9 +151,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-[#101114] border border-[#2A2B35] rounded-lg px-3 py-2.5 pr-10 text-sm text-white focus:outline-none focus:border-[#D4AF37]"
-                  placeholder="••••••••"
-                  required
-                  minLength={6}
+                  placeholder="Optional"
                 />
                 <button
                   type="button"
@@ -127,21 +173,12 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={submitting || isLoading}
-              className="w-full py-2.5 rounded-lg bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-2.5 rounded-lg border border-[#2A2B35] hover:border-[#D4AF37]/50 text-neutral-100 font-medium text-sm disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {(submitting || isLoading) && <Loader2 className="w-4 h-4 animate-spin" />}
-              Sign in
+              Sign in with email
             </button>
           </form>
-
-          <div className="relative my-5">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#2A2B35]" />
-            </div>
-            <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
-              <span className="bg-[#141519] px-2 text-neutral-500">or</span>
-            </div>
-          </div>
 
           <button
             type="button"
@@ -152,10 +189,14 @@ export default function LoginPage() {
             Continue with Google
           </button>
 
-          <p className="mt-5 text-center text-xs text-neutral-500">
-            No account?{" "}
+          <p className="text-center text-xs text-neutral-500">
+            New here?{" "}
+            <Link href="/" className="text-[#D4AF37] hover:underline font-medium">
+              First-time setup wizard
+            </Link>
+            {" · "}
             <Link href="/signup" className="text-[#D4AF37] hover:underline font-medium">
-              Create one
+              Create account
             </Link>
           </p>
         </div>

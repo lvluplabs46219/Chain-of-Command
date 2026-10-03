@@ -33,12 +33,12 @@ export function getApiBaseUrl(): string {
 /**
  * Retrieves the active bearer token from storage or defaults to a valid pro se session token.
  */
-export function getAuthToken(): string {
+export function getAuthToken(): string | null {
   if (typeof window !== "undefined") {
     const stored = localStorage.getItem("acquit_auth_token");
-    if (stored) return stored;
+    if (stored && stored.trim()) return stored;
   }
-  return "acquit-pro-se-token";
+  return null;
 }
 
 /**
