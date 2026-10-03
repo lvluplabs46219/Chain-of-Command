@@ -144,3 +144,9 @@ __pycache__/
 # Supabase
 supabase/.temp/
 dev.env
+
+# Archives / session dumps (never commit)
+dist.tar.gz
+*.tar.gz
+Supabase.session.sql
+**/*.session.sql

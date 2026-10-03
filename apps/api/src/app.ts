@@ -31,23 +31,36 @@ app.use(
 );
 
 const parseAllowedOrigins = (): (string | RegExp)[] => {
+  const isProd = process.env.NODE_ENV === "production";
   const envOrigins = process.env.ALLOWED_ORIGINS;
-  const base: (string | RegExp)[] = [
+
+  // Local development defaults only
+  const devBase: (string | RegExp)[] = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:5173",
-    "https://ai.studio",
-    "https://aistudio.google.com",
-    /^https:\/\/.*\.vercel\.app$/,
-    /^https:\/\/.*\.pages\.dev$/,
-    /^https:\/\/.*\.workers\.dev$/,
-    /^https:\/\/.*\.run\.app$/,
   ];
-  if (!envOrigins) {
-    return base;
+
+  // Production: ONLY explicit ALLOWED_ORIGINS (comma-separated). No wildcard *.vercel.app.
+  if (isProd) {
+    if (!envOrigins || !envOrigins.trim()) {
+      console.warn(
+        "[CORS] NODE_ENV=production but ALLOWED_ORIGINS is empty — denying browser cross-origin requests."
+      );
+      return [];
+    }
+    return envOrigins.split(",").map((o) => o.trim()).filter(Boolean);
   }
-  const origins = envOrigins.split(",").map(o => o.trim()).filter(Boolean);
-  return [...base, ...origins];
+
+  // Non-production: localhost + optional ALLOWED_ORIGINS + optional preview regex if ALLOW_PREVIEW_CORS=true
+  const list: (string | RegExp)[] = [...devBase];
+  if (envOrigins) {
+    list.push(...envOrigins.split(",").map((o) => o.trim()).filter(Boolean));
+  }
+  if (process.env.ALLOW_PREVIEW_CORS === "true") {
+    list.push(/^https:\/\/.*\.vercel\.app$/);
+  }
+  return list;
 };
 
 app.use(cors({
