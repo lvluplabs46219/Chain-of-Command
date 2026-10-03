@@ -44,37 +44,116 @@ async function pinLegalTextToIPFS(title: string, text: string): Promise<string |
   return `bafk2bzace${hash.slice(0, 48)}`;
 }
 
+/**
+ * CourtListener (Free Law Project) — two product surfaces:
+ * 1) Case law (opinions): type=o — Law Library / research (this endpoint default)
+ * 2) RECAP federal dockets: type=r — docket archive + webhook alerts
+ * Docs: https://www.courtlistener.com/help/api/rest/
+ * Webhooks: https://www.courtlistener.com/help/api/webhooks/
+ */
+function clHeaders(): Record<string, string> {
+  return {
+    "User-Agent": "ChainOfCommand/1.0 (Legal OS; research; contact@chainofcommand.law)",
+    Accept: "application/json",
+    ...(process.env.COURTLISTENER_API_TOKEN
+      ? { Authorization: `Token ${process.env.COURTLISTENER_API_TOKEN}` }
+      : {}),
+  };
+}
+
 // Search endpoint proxying to CourtListener REST API v4
 courtlistenerRouter.get("/courtlistener/search", async (req: Request, res: ExpressResponse) => {
   try {
-    const { q, court, type = "o", page = 1 } = req.query;
-    const queryStr = (q as string) || "criminal procedure discovery";
-
-    const url = new URL("https://www.courtlistener.com/api/rest/v4/search/");
-    url.searchParams.set("q", queryStr);
-    url.searchParams.set("type", type as string);
-    if (court) url.searchParams.set("court", court as string);
-    url.searchParams.set("page", String(page));
-
-    const response = await fetch(url.toString(), {
-      headers: {
-        "User-Agent": "AcquitLegalAI/1.0 (https://acquit.ai; contact@acquit.ai)",
-        ...(process.env.COURTLISTENER_API_TOKEN ? { Authorization: `Token ${process.env.COURTLISTENER_API_TOKEN}` } : {}),
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`CourtListener search failed: ${response.statusText}`);
+    const { q, court, type = "o", page = 1, filed_after, filed_before } = req.query;
+    const queryStr = String(q || "").trim();
+    if (!queryStr) {
+      return res.status(400).json({ error: "Query parameter q is required" });
     }
 
-    const data = await response.json();
-    return res.json(data);
+    // type: o = opinions (case law), r = RECAP dockets, rd = RECAP documents
+    const searchType = String(type || "o");
+    const url = new URL("https://www.courtlistener.com/api/rest/v4/search/");
+    url.searchParams.set("q", queryStr);
+    url.searchParams.set("type", searchType);
+    if (court) url.searchParams.set("court", String(court));
+    if (filed_after) url.searchParams.set("filed_after", String(filed_after));
+    if (filed_before) url.searchParams.set("filed_before", String(filed_before));
+    url.searchParams.set("page", String(page));
+
+    const response = await fetch(url.toString(), { headers: clHeaders() });
+
+    if (!response.ok) {
+      const body = await response.text().catch(() => "");
+      console.error("CourtListener search HTTP", response.status, body.slice(0, 300));
+      return res.status(response.status === 429 ? 429 : 502).json({
+        error: "CourtListener search failed",
+        status: response.status,
+        hint:
+          response.status === 401 || response.status === 403
+            ? "Set COURTLISTENER_API_TOKEN in .env (token from courtlistener.com profile)"
+            : response.status === 429
+              ? "Rate limited — add an API token or retry later"
+              : undefined,
+      });
+    }
+
+    const data = (await response.json()) as {
+      count?: number;
+      next?: string | null;
+      previous?: string | null;
+      results?: any[];
+    };
+
+    const results = (data.results || []).map((item: any) => ({
+      id: item.id ?? item.cluster_id ?? item.docket_id,
+      caseName: item.caseName || item.case_name || item.caseNameFull || "Untitled",
+      citation: item.citation || item.citation_string || (Array.isArray(item.citation) ? item.citation.join(", ") : ""),
+      court: item.court || item.court_id || "",
+      dateFiled: item.dateFiled || item.date_filed || item.date_created || "",
+      snippet: (item.snippet || item.snippet_text || "").replace(/<[^>]+>/g, " ").trim(),
+      absoluteUrl: item.absolute_url
+        ? `https://www.courtlistener.com${item.absolute_url}`
+        : item.absolute_url || null,
+      clusterId: item.cluster_id,
+      docketId: item.docket_id || item.docket_id,
+      precedentialStatus: item.precedential_status || item.status || null,
+      type: searchType,
+      raw: undefined, // strip bulk raw from client payload
+    }));
+
+    return res.json({
+      count: data.count ?? results.length,
+      next: data.next ?? null,
+      previous: data.previous ?? null,
+      results,
+      provider: "courtlistener",
+      searchType,
+      query: queryStr,
+    });
   } catch (error) {
     console.error("CourtListener API search error:", error);
     return res.status(500).json({
       error: "Failed to fetch from CourtListener",
       details: error instanceof Error ? error.message : String(error),
     });
+  }
+});
+
+/** Opinion detail by cluster id */
+courtlistenerRouter.get("/courtlistener/opinions/:id", async (req: Request, res: ExpressResponse) => {
+  try {
+    const id = req.params.id;
+    const response = await fetch(`https://www.courtlistener.com/api/rest/v4/clusters/${id}/`, {
+      headers: clHeaders(),
+    });
+    if (!response.ok) {
+      return res.status(response.status).json({ error: "Opinion not found on CourtListener" });
+    }
+    const data = await response.json();
+    return res.json({ provider: "courtlistener", opinion: data });
+  } catch (error) {
+    console.error("CourtListener opinion error:", error);
+    return res.status(500).json({ error: "Failed to fetch opinion" });
   }
 });
 

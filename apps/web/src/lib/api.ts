@@ -276,12 +276,42 @@ export const api = {
       }),
   },
 
-  // CourtListener Legal Research
+  // CourtListener (Free Law Project) — case law + RECAP
   courtlistener: {
-    search: (q: string, court?: string, type = "o", page = 1) =>
-      request<{ count: number; results: any[] }>("/courtlistener/search", {
-        params: { q, court, type, page },
+    /** type: o = opinions (case law), r = RECAP dockets */
+    search: (
+      q: string,
+      opts?: { court?: string; type?: string; page?: number }
+    ) =>
+      request<{
+        count: number;
+        results: Array<{
+          id: string | number;
+          caseName: string;
+          citation: string;
+          court: string;
+          dateFiled: string;
+          snippet: string;
+          absoluteUrl: string | null;
+          clusterId?: number;
+          precedentialStatus?: string | null;
+          type: string;
+        }>;
+        provider: string;
+        searchType: string;
+        query: string;
+        error?: string;
+        hint?: string;
+      }>("/courtlistener/search", {
+        params: {
+          q,
+          court: opts?.court,
+          type: opts?.type ?? "o",
+          page: opts?.page ?? 1,
+        },
       }),
+    opinion: (id: string) =>
+      request<{ provider: string; opinion: unknown }>(`/courtlistener/opinions/${id}`),
   },
 
   // Health

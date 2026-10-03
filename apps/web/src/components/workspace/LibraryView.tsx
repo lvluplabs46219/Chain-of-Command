@@ -26,7 +26,9 @@ import {
   Package,
   Calendar,
   RefreshCw,
+  Gavel,
 } from "lucide-react";
+import { api, ApiError } from "@/lib/api";
 
 interface LibraryViewProps {
   evidence?: EvidenceRecord[];
@@ -46,8 +48,21 @@ interface RagSearchResult {
   timestamp: string;
 }
 
+type ClResult = {
+  id: string | number;
+  caseName: string;
+  citation: string;
+  court: string;
+  dateFiled: string;
+  snippet: string;
+  absoluteUrl: string | null;
+  clusterId?: number;
+  precedentialStatus?: string | null;
+  type: string;
+};
+
 export function LibraryView({ evidence = INITIAL_EVIDENCE_RECORDS, matter }: LibraryViewProps) {
-  const [activeSubTab, setActiveSubTab] = useState<"rag_search" | "precedents">("rag_search");
+  const [activeSubTab, setActiveSubTab] = useState<"rag_search" | "case_law" | "precedents">("case_law");
 
   // RAG Search State
   const [ragQuery, setRagQuery] = useState<string>("");
@@ -55,7 +70,16 @@ export function LibraryView({ evidence = INITIAL_EVIDENCE_RECORDS, matter }: Lib
   const [ragResult, setRagResult] = useState<RagSearchResult | null>(null);
   const [ragError, setRagError] = useState<string | null>(null);
 
-  // Precedent Search State
+  // CourtListener case law (opinions) + optional RECAP docket search
+  const [clQuery, setClQuery] = useState("");
+  const [clType, setClType] = useState<"o" | "r">("o");
+  const [clCourt, setClCourt] = useState("");
+  const [clLoading, setClLoading] = useState(false);
+  const [clError, setClError] = useState<string | null>(null);
+  const [clResults, setClResults] = useState<ClResult[]>([]);
+  const [clCount, setClCount] = useState(0);
+
+  // Precedent Search State (local curated)
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [categoryFilter, setCategoryFilter] = useState<string>("All");
   const [citationInput, setCitationInput] = useState<string>("");
@@ -64,6 +88,38 @@ export function LibraryView({ evidence = INITIAL_EVIDENCE_RECORDS, matter }: Lib
     citation: string;
     details: string;
   } | null>(null);
+
+  const handleCourtListenerSearch = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!clQuery.trim() || clLoading) return;
+    setClLoading(true);
+    setClError(null);
+    setClResults([]);
+    try {
+      const data = await api.courtlistener.search(clQuery.trim(), {
+        type: clType,
+        court: clCourt || undefined,
+        page: 1,
+      });
+      setClResults(data.results || []);
+      setClCount(data.count ?? data.results?.length ?? 0);
+      if (!data.results?.length) {
+        setClError("No results. Try broader terms, another court filter, or switch Opinions / RECAP.");
+      }
+    } catch (err: unknown) {
+      const msg =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "CourtListener request failed";
+      setClError(
+        `${msg}. Ensure the API is running and COURTLISTENER_API_TOKEN is set for higher limits (courtlistener.com profile → API).`
+      );
+    } finally {
+      setClLoading(false);
+    }
+  };
 
   const activeEvidence = evidence && evidence.length > 0 ? evidence : INITIAL_EVIDENCE_RECORDS;
 
@@ -272,7 +328,18 @@ export function LibraryView({ evidence = INITIAL_EVIDENCE_RECORDS, matter }: Lib
         </div>
 
         {/* Sub-Tab Navigation Switcher */}
-        <div className="flex items-center bg-[#141519] border border-[#272830] p-1 rounded-lg">
+        <div className="flex items-center bg-[#141519] border border-[#272830] p-1 rounded-lg flex-wrap">
+          <button
+            onClick={() => setActiveSubTab("case_law")}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+              activeSubTab === "case_law"
+                ? "bg-[#D4AF37] text-neutral-950 font-semibold shadow-sm"
+                : "text-neutral-400 hover:text-white"
+            }`}
+          >
+            <Gavel className="w-3.5 h-3.5" />
+            <span>Case Law (CourtListener)</span>
+          </button>
           <button
             onClick={() => setActiveSubTab("rag_search")}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
@@ -282,7 +349,7 @@ export function LibraryView({ evidence = INITIAL_EVIDENCE_RECORDS, matter }: Lib
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Document Library RAG</span>
+            <span>Evidence RAG</span>
           </button>
           <button
             onClick={() => setActiveSubTab("precedents")}
@@ -293,10 +360,137 @@ export function LibraryView({ evidence = INITIAL_EVIDENCE_RECORDS, matter }: Lib
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span>Statutes & Precedents</span>
+            <span>Curated Precedents</span>
           </button>
         </div>
       </div>
+
+      {/* SUB-TAB: CourtListener case law + RECAP */}
+      {activeSubTab === "case_law" && (
+        <div className="space-y-5">
+          <div className="bg-[#141519] border border-[#272830] rounded-xl p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4AF37]">Free Law Project</p>
+                <h2 className="text-lg font-serif font-semibold text-white">Search CourtListener</h2>
+                <p className="text-xs text-neutral-400 mt-1 max-w-2xl leading-relaxed">
+                  <strong className="text-neutral-300">Opinions</strong> = case law database (authorities for research).
+                  <strong className="text-neutral-300"> RECAP</strong> = federal docket archive (PACER copies).
+                  Webhook alerts for docket changes use a separate endpoint — see .env COURTLISTENER_WEBHOOK_SECRET.
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleCourtListenerSearch} className="space-y-3">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setClType("o")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border ${
+                    clType === "o"
+                      ? "border-[#D4AF37] bg-[#D4AF37]/15 text-[#D4AF37]"
+                      : "border-[#2A2B35] text-neutral-400"
+                  }`}
+                >
+                  Opinions (case law)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setClType("r")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border ${
+                    clType === "r"
+                      ? "border-[#D4AF37] bg-[#D4AF37]/15 text-[#D4AF37]"
+                      : "border-[#2A2B35] text-neutral-400"
+                  }`}
+                >
+                  RECAP (federal dockets)
+                </button>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    value={clQuery}
+                    onChange={(e) => setClQuery(e.target.value)}
+                    placeholder={
+                      clType === "o"
+                        ? 'e.g. "Terry stop reasonable suspicion" or "Miranda v. Arizona"'
+                        : 'e.g. docket number or party name in federal RECAP'
+                    }
+                    className="w-full bg-[#101114] border border-[#2A2B35] rounded-lg pl-10 pr-4 py-3 text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-[#D4AF37]"
+                  />
+                </div>
+                <input
+                  value={clCourt}
+                  onChange={(e) => setClCourt(e.target.value)}
+                  placeholder="Court id (optional, e.g. scotus, ca9, ind)"
+                  className="sm:w-48 bg-[#101114] border border-[#2A2B35] rounded-lg px-3 py-3 text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-[#D4AF37]"
+                />
+                <button
+                  type="submit"
+                  disabled={clLoading || !clQuery.trim()}
+                  className="px-5 py-3 bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-xs rounded-lg disabled:opacity-50 flex items-center justify-center gap-2 shrink-0"
+                >
+                  {clLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                  Search
+                </button>
+              </div>
+            </form>
+
+            {clError && (
+              <div role="alert" className="mt-4 text-xs text-amber-200/90 bg-amber-950/30 border border-amber-500/30 rounded-lg px-3 py-2">
+                {clError}
+              </div>
+            )}
+
+            {clResults.length > 0 && (
+              <div className="mt-5 space-y-3">
+                <p className="text-[11px] font-mono text-neutral-500">
+                  {clCount.toLocaleString()} hits · showing {clResults.length} · source CourtListener API v4
+                </p>
+                {clResults.map((r) => (
+                  <article
+                    key={String(r.id)}
+                    className="bg-[#101114] border border-[#2A2B35] rounded-lg p-4 hover:border-[#D4AF37]/30 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-semibold text-white leading-snug">{r.caseName}</h3>
+                        <p className="text-[11px] text-neutral-400 mt-1 font-mono">
+                          {[r.citation, r.court, r.dateFiled].filter(Boolean).join(" · ")}
+                        </p>
+                        {r.precedentialStatus && (
+                          <span className="inline-block mt-1.5 text-[10px] uppercase tracking-wider text-emerald-400/90 border border-emerald-500/20 bg-emerald-950/30 px-1.5 py-0.5 rounded">
+                            {r.precedentialStatus}
+                          </span>
+                        )}
+                      </div>
+                      {r.absoluteUrl && (
+                        <a
+                          href={r.absoluteUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="shrink-0 text-[#D4AF37] hover:underline text-xs flex items-center gap-1"
+                        >
+                          Open <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                    </div>
+                    {r.snippet && (
+                      <p className="text-xs text-neutral-400 mt-2 leading-relaxed line-clamp-4">{r.snippet}</p>
+                    )}
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <p className="text-[10px] text-neutral-600 font-mono text-center">
+            Data © Free Law Project / CourtListener · Educational research only · Not legal advice
+          </p>
+        </div>
+      )}
 
       {/* SUB-TAB 1: RAG DOCUMENT LIBRARY SEARCH */}
       {activeSubTab === "rag_search" && (
