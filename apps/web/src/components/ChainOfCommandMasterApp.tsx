@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import {
   Matter,
-  INITIAL_MATTERS,
+  EMPTY_MATTER,
   SpecialistAgent,
   SPECIALIST_AGENTS_ROSTER,
   TimelineRecord,
@@ -26,6 +26,9 @@ import {
   WorkspaceTab,
   pathToTab,
 } from "./workspace/WorkspaceNavigation";
+import { FirstRunWizard, type OnboardingResult } from "./onboarding/FirstRunWizard";
+import { useAuth } from "@/contexts/AuthContext";
+import { SAMPLE_MATTERS } from "@/lib/workspace-data";
 import { DashboardView } from "./workspace/DashboardView";
 import { DocketView } from "./workspace/DocketView";
 import { ChambersView } from "./workspace/ChambersView";
@@ -45,13 +48,15 @@ interface ChainOfCommandMasterAppProps {
 
 export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCommandMasterAppProps) {
   const pathname = usePathname();
-  const [matters, setMatters] = useState<Matter[]>(INITIAL_MATTERS);
-  const [activeMatter, setActiveMatter] = useState<Matter>(INITIAL_MATTERS[0]);
+  const { isAuthenticated, isLoading: authLoading, isFirstRun, completeFirstRun } = useAuth();
+  const [matters, setMatters] = useState<Matter[]>([]);
+  const [activeMatter, setActiveMatter] = useState<Matter>(EMPTY_MATTER);
   const [agents, setAgents] = useState<SpecialistAgent[]>(SPECIALIST_AGENTS_ROSTER);
   const [timeline, setTimeline] = useState<TimelineRecord[]>([]);
   const [evidence, setEvidence] = useState<EvidenceRecord[]>([]);
   const [activeTab, setActiveTab] = useState<WorkspaceTab>(initialTab);
-  const [jurisdiction, setJurisdiction] = useState<string>("Indiana");
+  const [jurisdiction, setJurisdiction] = useState<string>("");
+  const [dataReady, setDataReady] = useState(false);
 
   useEffect(() => {
     const fromPath = pathToTab(pathname || "/");
@@ -68,26 +73,80 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
 
   useEffect(() => {
     async function initData() {
+      // Drop legacy demo seed if still in localStorage
+      try {
+        const raw = localStorage.getItem("chain_of_command_matters");
+        if (raw) {
+          const parsed = JSON.parse(raw) as Matter[];
+          if (
+            Array.isArray(parsed) &&
+            parsed.some((m) => m.id === "matter-001" && m.title?.includes("Marcus Vance"))
+          ) {
+            localStorage.removeItem("chain_of_command_matters");
+          }
+        }
+      } catch {
+        /* ignore */
+      }
+
       const loaded = await loadMatters();
       if (loaded && loaded.length > 0) {
         setMatters(loaded);
         setActiveMatter(loaded[0]);
-        setJurisdiction(loaded[0].jurisdiction || "Indiana");
+        setJurisdiction(loaded[0].jurisdiction || "");
+      } else {
+        setMatters([]);
+        setActiveMatter(EMPTY_MATTER);
       }
       setAgents(loadAgents());
+      setDataReady(true);
     }
     initData();
   }, []);
 
   useEffect(() => {
-    if (activeMatter) {
+    if (activeMatter && activeMatter.id !== "matter-empty") {
       setTimeline(loadTimeline(activeMatter.id));
       setEvidence(loadEvidence(activeMatter.id));
       if (activeMatter.jurisdiction) {
         setJurisdiction(activeMatter.jurisdiction);
       }
+    } else {
+      setTimeline([]);
+      setEvidence([]);
     }
   }, [activeMatter.id]);
+
+  const handleOnboardingComplete = async (result: OnboardingResult) => {
+    completeFirstRun();
+    setJurisdiction(result.jurisdiction);
+    if (result.loadSample) {
+      setMatters(SAMPLE_MATTERS);
+      setActiveMatter(SAMPLE_MATTERS[0]);
+      for (const m of SAMPLE_MATTERS) {
+        await saveMatter(m);
+      }
+    } else if (result.matter) {
+      setMatters([result.matter]);
+      setActiveMatter(result.matter);
+      await saveMatter(result.matter);
+    } else {
+      setMatters([]);
+      setActiveMatter(EMPTY_MATTER);
+    }
+  };
+
+  if (authLoading || !dataReady) {
+    return (
+      <div className="min-h-screen bg-[#0C0D10] flex items-center justify-center text-neutral-400 text-sm">
+        Preparing your workspace…
+      </div>
+    );
+  }
+
+  if (isFirstRun || !isAuthenticated) {
+    return <FirstRunWizard onComplete={handleOnboardingComplete} />;
+  }
 
   const handleSelectMatter = (m: Matter) => {
     setActiveMatter(m);

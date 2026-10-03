@@ -29,7 +29,7 @@ function setLocal<T>(key: string, value: T): void {
 }
 
 export async function loadMatters(): Promise<Matter[]> {
-  const localMatters = getLocal<Matter[]>("matters", INITIAL_MATTERS);
+  const localMatters = getLocal<Matter[]>("matters", [] as Matter[]);
   
   if (!auth.currentUser) {
     return localMatters;
@@ -41,10 +41,7 @@ export async function loadMatters(): Promise<Matter[]> {
     const snapshot = await getDocs(q);
     
     if (snapshot.empty) {
-      // Seed initial matter to Firestore for the user
-      for (const m of localMatters) {
-        await saveMatter(m);
-      }
+      // Do not seed demo cases — first-run workspaces stay empty until the user opens a matter
       return localMatters;
     }
 
@@ -65,7 +62,7 @@ export async function loadMatters(): Promise<Matter[]> {
 }
 
 export async function saveMatter(matter: Matter): Promise<void> {
-  const current = getLocal<Matter[]>("matters", INITIAL_MATTERS);
+  const current = getLocal<Matter[]>("matters", [] as Matter[]);
   const index = current.findIndex((m) => m.id === matter.id);
   if (index >= 0) {
     current[index] = matter;

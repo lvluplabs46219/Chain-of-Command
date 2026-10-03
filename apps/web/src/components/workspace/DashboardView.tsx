@@ -42,13 +42,46 @@ export function DashboardView({
   onOpenAddTimeline,
   onOpenAddEvidence,
 }: DashboardViewProps) {
-  // Calculate days to next court date
-  const nextDate = new Date(matter.nextCourtDate);
+  const hasMatter = matter.id !== "matter-empty";
+  const nextDate = matter.nextCourtDate ? new Date(matter.nextCourtDate) : null;
   const now = new Date();
-  const diffTime = nextDate.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffDays =
+    nextDate && !Number.isNaN(nextDate.getTime())
+      ? Math.ceil((nextDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+      : null;
 
   const contradictionCount = timeline.filter((t) => t.isContradiction).length;
+
+  if (!hasMatter) {
+    return (
+      <div className="p-6 max-w-3xl mx-auto">
+        <div className="bg-[#141519] border border-[#272830] rounded-xl p-8 text-center space-y-4">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4AF37]">Command Center</p>
+          <h1 className="text-2xl font-serif font-bold text-white">Welcome to your workspace</h1>
+          <p className="text-sm text-neutral-400 max-w-md mx-auto leading-relaxed">
+            You do not have an open matter yet. Create one from the header, or open the Docket to
+            start organizing filings, evidence, and deadlines.
+          </p>
+          <div className="flex flex-wrap justify-center gap-2 pt-2">
+            <button
+              type="button"
+              onClick={() => onNavigateTab("docket")}
+              className="px-4 py-2.5 text-xs font-semibold rounded-lg bg-[#D4AF37] text-neutral-950 hover:bg-[#c49f27]"
+            >
+              Go to The Docket
+            </button>
+            <button
+              type="button"
+              onClick={() => onNavigateTab("chambers")}
+              className="px-4 py-2.5 text-xs font-medium rounded-lg border border-[#2A2B35] text-neutral-200 hover:border-[#D4AF37]/40"
+            >
+              Open Chambers (AI)
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -96,7 +129,9 @@ export function DashboardView({
               <span>NEXT APPEARANCE</span>
               <Calendar className="w-3.5 h-3.5 text-[#D4AF37]" />
             </div>
-            <div className="text-xl font-bold text-white tabular-nums">{diffDays > 0 ? `${diffDays} Days` : "Today"}</div>
+            <div className="text-xl font-bold text-white tabular-nums">
+              {diffDays == null ? "—" : diffDays > 0 ? `${diffDays} Days` : "Today"}
+            </div>
             <div className="text-[11px] text-neutral-400 truncate mt-0.5">{matter.nextCourtType}</div>
           </div>
 
