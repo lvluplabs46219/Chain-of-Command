@@ -1,2 +1,1 @@
-Sandbox tests failed after patch application.
-/usr/bin/python3: No module named pytest
+Combined sandbox failed for ['reverse_list', 'eval', 'template']

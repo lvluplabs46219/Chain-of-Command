@@ -20,8 +20,9 @@
     },
     {
       "name": "tsc",
-      "status": "skipped",
-      "detail": "tsc binary not found"
+      "status": "fail",
+      "stdout": "index.ts(14,3): error TS2322: Type 'string' is not assignable to type 'number'.\n",
+      "stderr": ""
     },
     {
       "name": "container_build_mock",
@@ -29,6 +30,8 @@
       "detail": "Docker not available in sandbox; static checks treated as build gate"
     }
   ],
-  "passed": true,
-  "errors": []
+  "passed": false,
+  "errors": [
+    "tsc failed"
+  ]
 }

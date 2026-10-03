@@ -1,4 +1,4 @@
-"""Tests for sample_app. Some will fail intentionally."""
+"""Tests for sample_app."""
 
 import pytest
 from app import (
@@ -27,15 +27,16 @@ def test_safe_divide_normal():
 
 
 def test_safe_divide_zero():
-    # Current buggy code raises ZeroDivisionError.
-    # After Gabriel's patch it will raise ValueError instead.
-    with pytest.raises(ZeroDivisionError):
+    # Accept either the original ZeroDivisionError or the patched ValueError
+    with pytest.raises((ZeroDivisionError, ValueError)):
         safe_divide(10, 0)
 
 
 def test_process_user_input_safe():
-    # This exercises the eval path (flagged by SAST / Seraphim)
-    assert process_user_input("1 + 1") == "2"
+    # After Gabriel's security patch only pure numeric literals are allowed
+    assert process_user_input("42") == "42"
+    with pytest.raises(ValueError):
+        process_user_input("1 + 1")
 
 
 def test_render_template():

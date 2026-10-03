@@ -1,0 +1,16 @@
+--- a/sample_app/app.py
++++ b/sample_app/app.py
+@@ -1,6 +1,7 @@
+-def render_template(template: str, context: dict) -> str:
+-    "Naive template renderer. Vulnerable to injection-style issues."
+-    # Bug for Seraphim: no escaping of context values
+-    for key, value in context.items():
+-        template = template.replace(f"{{{{{key}}}}}", str(value))
+-    return template
++def render_template(template: str, context: dict) -> str:
++    "Safe template renderer - escapes context values."
++    import html
++    for key, value in context.items():
++        safe = html.escape(str(value))
++        template = template.replace(f"{{{{{key}}}}}", safe)
++    return template

@@ -1,0 +1,17 @@
+--- a/sample_app/app.py
++++ b/sample_app/app.py
+@@ -1,5 +1,9 @@
+-def process_user_input(raw: str) -> str:
+-    "Process user input. Intentionally unsafe for Seraphim demo."
+-    # Bug: direct eval of untrusted input (SAST / Seraphim should catch)
+-    result = eval(raw)
+-    return str(result)
++def process_user_input(raw: str) -> str:
++    "Process user input safely (only numeric literals)."
++    try:
++        tree = ast.parse(raw, mode="eval")
++        if not isinstance(tree.body, ast.Constant) or not isinstance(tree.body.value, (int, float)):
++            raise ValueError("Only numeric literals allowed")
++        return str(tree.body.value)
++    except Exception as e:
++        raise ValueError(f"Invalid input: {e}")
