@@ -329,3 +329,43 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 }
+
+/**
+ * Route guard for protected workspace tools.
+ * Renders children when authenticated; otherwise a compact sign-in prompt.
+ */
+export function WorkspaceGuard({ children }: { children: ReactNode }) {
+  const { isAuthenticated, isLoading, loginAsLitigant } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[40vh] flex items-center justify-center text-neutral-400 text-sm">
+        Checking session…
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[50vh] flex items-center justify-center p-6">
+        <div className="max-w-md w-full rounded-2xl border border-[#2A2B35] bg-[#141519] p-6 text-center space-y-4">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4AF37]">Protected workspace</p>
+          <h2 className="text-xl font-serif text-white">Sign in to continue</h2>
+          <p className="text-sm text-neutral-400 leading-relaxed">
+            This tool requires an authenticated session. Start a pro se session to access
+            documents, RAG, and the Chain of Command workspace.
+          </p>
+          <button
+            type="button"
+            onClick={() => loginAsLitigant()}
+            className="w-full rounded-xl bg-[#D4AF37] text-[#0C0D10] font-medium py-2.5 text-sm hover:bg-[#e0c04a] transition-colors"
+          >
+            Continue as pro se litigant
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
