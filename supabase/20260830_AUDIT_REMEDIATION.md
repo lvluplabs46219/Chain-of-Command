@@ -221,8 +221,10 @@ supabase db push --migration 20260830_storage_bucket_rls_and_cleanup.sql
 #### Option 3: Manual Execution
 
 ```bash
-# Connect to the database using psql
-psql postgresql://postgres:REDACTED_DB_PASSWORD@db.YOUR_PROJECT_REF.supabase.co:5432/postgres
+# Connect using the DATABASE_URL from your local .env (never commit credentials)
+# Example shape only — replace with values from Supabase Dashboard → Settings → Database:
+#   psql "$DATABASE_URL"
+psql "$DATABASE_URL"
 
 # Execute each migration
 \i supabase/migrations/20260830_security_hardening_critical_fixes.sql
