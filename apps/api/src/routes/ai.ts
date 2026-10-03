@@ -179,7 +179,7 @@ function writeEvent(res: Response, event: AgentEvent): void {
 
 async function executeRun(runId: string, record: RunRecord): Promise<void> {
   const agent = SPECIALIST_AGENTS[record.request.agentId];
-  const provider = (record.request.provider ?? "demo") as ModelProvider;
+  const provider = (record.request.provider ?? "ollama") as ModelProvider;
   const sources = (record.request.sources ?? []) as unknown as AgentSource[];
 
   // Check for prompt injection in the input

@@ -10,7 +10,6 @@ interface AuthenticatedRequest extends Request {
 import multer from 'multer';
 import { db, documentsTable, documentChunksTable, timelineEventsTable } from '@workspace/db';
 import { eq, desc } from 'drizzle-orm';
-import { GoogleGenAI } from '@google/genai';
 import crypto from 'crypto';
 
 export const documentsRouter = Router();
@@ -28,11 +27,13 @@ const upload = multer({
   limits: { fileSize: 25 * 1024 * 1024 }, // 25MB max
 });
 
-function getAI(): GoogleGenAI | null {
-  if (!process.env.GEMINI_API_KEY) {
-    return null;
+/** Text extraction only — Chain of Command uses Ollama for LLM, not cloud vision OCR. */
+function extractUploadText(file: Express.Multer.File): string {
+  const asText = file.buffer.toString('utf-8').slice(0, 20000);
+  if (asText && /[\x20-\x7E\n\r\t]{50,}/.test(asText)) {
+    return asText;
   }
-  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  return `Uploaded ${file.originalname} (${(file.size / 1024).toFixed(1)} KB, ${file.mimetype || 'application/octet-stream'}). Binary OCR is not applied; attach plain-text exports for AI indexing.`;
 }
 
 // Generate signed upload URL for direct client storage upload (Supabase/S3)
@@ -82,45 +83,8 @@ documentsRouter.post('/documents/upload', uploadLimiter, upload.single('document
       return res.status(400).json({ error: 'matterId is required' });
     }
 
-    const client = getAI();
-    let analysisResult = '';
+    let analysisResult = extractUploadText(req.file);
     let extractedDeadlines: Array<{ title: string; date: string; description: string }> = [];
-
-    if (client) {
-      try {
-        const extractionPrompt = `You are a legal document parsing system. 
-Analyze this legal document image/PDF and produce:
-1. DOCUMENT CLASSIFICATION: (e.g. Police Incident Report, Charging Affidavit, Motion to Suppress, Discovery Request, Subpoena)
-2. EXECUTIVE SUMMARY: (3-4 objective sentences summarizing factual allegations)
-3. EXTRACTED DATES & DEADLINES: (List any hearing dates, omnibus deadlines, or statute of limitations dates)
-4. FULL TRANSCRIPTION: (Accurate text transcription)`;
-
-        const extractionResponse = await client.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: [
-            {
-              role: 'user',
-              parts: [
-                { text: extractionPrompt },
-                {
-                  inlineData: {
-                    mimeType: req.file.mimetype || 'application/pdf',
-                    data: req.file.buffer.toString('base64'),
-                  },
-                },
-              ],
-            },
-          ],
-        });
-
-        analysisResult = extractionResponse.text || 'Transcription complete.';
-      } catch (aiErr) {
-        console.warn('Gemini OCR fallback to text stream:', aiErr);
-        analysisResult = req.file.buffer.toString('utf-8').slice(0, 10000) || 'Scanned legal document';
-      }
-    } else {
-      analysisResult = `Extracted text from ${req.file.originalname} (Size: ${(req.file.size / 1024).toFixed(1)} KB)`;
-    }
 
     // Split into 300-word semantic chunks
     const words = analysisResult.split(/\s+/);

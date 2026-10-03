@@ -116,7 +116,7 @@ export function AILab() {
       id: "msg-1",
       sender: "agent",
       agentName: "Lead Counsel Coordinator",
-      text: "Welcome to the Acquit.ai intelligence workspace. I am coordinating your legal team. How would you like to proceed? All outputs are educational legal information and must be reviewed by the self-represented litigant.",
+      text: "Welcome to the Chain of Command intelligence workspace. I am coordinating your legal team. How would you like to proceed? All outputs are educational legal information and must be reviewed by the self-represented litigant.",
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       citations: [{ title: "Ind. R. Crim. P. 2.5", cite: "Mandatory Prosecution Discovery" }],
     },
@@ -134,7 +134,7 @@ export function AILab() {
     scrollToBottom();
   }, [messages, isStreaming]);
 
-  /** Real Gemini-backed fact simulation via /ai/lawyer */
+  /** Ollama-backed fact simulation via /ai/lawyer */
   const handleSimulate = async () => {
     if (!prompt.trim() || isSimulating) return;
 
@@ -164,14 +164,14 @@ export function AILab() {
           ? err.message
           : err instanceof Error
             ? err.message
-            : "AI simulation failed. Check that the API is running and GEMINI_API_KEY is set.";
+            : "AI simulation failed. Check that the API is running and Ollama is available (OLLAMA_URL).";
       setSimulationError(message);
     } finally {
       setIsSimulating(false);
     }
   };
 
-  /** Real Gemini-backed team chat via /ai/lawyer */
+  /** Ollama-backed team chat via /ai/lawyer */
   const handleSendMessage = async () => {
     if (!chatInput.trim() || isStreaming) return;
 
@@ -233,7 +233,7 @@ export function AILab() {
           ? err.message
           : err instanceof Error
             ? err.message
-            : "AI request failed. Ensure the backend is running and GEMINI_API_KEY is configured.";
+            : "AI request failed. Ensure the backend is running and Ollama is available (OLLAMA_URL).";
 
       setChatError(message);
       setMessages((prev) =>
@@ -396,7 +396,7 @@ export function AILab() {
                 />
                 <div className="mt-3 flex items-center justify-between flex-wrap gap-2">
                   <span className="text-[11px] text-white/40 font-mono">
-                    Model: <strong className="text-white/70">Gemini (via /ai/lawyer)</strong> · Key from env
+                    Model: <strong className="text-white/70">Ollama (local via /ai/lawyer)</strong> · OLLAMA_URL
                   </span>
                   <button
                     type="button"
@@ -427,7 +427,7 @@ export function AILab() {
                     <p className="text-xs font-bold tracking-widest uppercase text-rose-300 mb-1">Simulation Error</p>
                     <p className="text-sm font-sans">{simulationError}</p>
                     <p className="text-[11px] text-rose-300/70 mt-2 font-mono">
-                      Ensure GEMINI_API_KEY is set and the API server is reachable (see .env.example).
+                      Ensure Ollama is running (OLLAMA_URL / OLLAMA_BASE_URL) and the API server is reachable (see .env.example).
                     </p>
                   </div>
                 </div>
