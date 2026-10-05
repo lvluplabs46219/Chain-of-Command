@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Scale, AlertCircle, Phone, FileWarning, CheckCircle2, ChevronDown, Plus, Database } from "lucide-react";
+import { Scale, AlertCircle, Phone, FileWarning, ChevronDown, Plus } from "lucide-react";
 import { Matter } from "@/lib/workspace-data";
+import { TelemetryPill } from "./primitives";
 
 interface WorkspaceHeaderProps {
   matters: Matter[];
@@ -28,7 +29,6 @@ export function WorkspaceHeader({
   return (
     <>
       <header className="bg-[#0E0E10] border-b border-[#222328] px-4 py-3 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-40">
-        {/* Left: Brand Wordmark */}
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37]">
             <Scale className="w-5 h-5" />
@@ -44,9 +44,7 @@ export function WorkspaceHeader({
           </div>
         </div>
 
-        {/* Center: Matter Selector & Jurisdiction */}
         <div className="flex items-center gap-2">
-          {/* Matter Dropdown */}
           <div className="relative">
             <button
               onClick={() => setMatterDropdownOpen(!matterDropdownOpen)}
@@ -74,7 +72,9 @@ export function WorkspaceHeader({
                     }`}
                   >
                     <span className="font-medium truncate">{m.title}</span>
-                    <span className="text-[10px] text-neutral-400">{m.caseNumber} · {m.courtName}</span>
+                    <span className="text-[10px] text-neutral-400">
+                      {m.caseNumber} · {m.courtName}
+                    </span>
                   </button>
                 ))}
                 <div className="border-t border-[#26272E] mt-1 pt-1">
@@ -93,7 +93,6 @@ export function WorkspaceHeader({
             )}
           </div>
 
-          {/* Jurisdiction Selector */}
           <select
             value={jurisdiction}
             onChange={(e) => onChangeJurisdiction(e.target.value)}
@@ -108,21 +107,8 @@ export function WorkspaceHeader({
           </select>
         </div>
 
-        {/* Right: Telemetry + Crisis Hotline & Non-Attorney Disclaimer */}
         <div className="flex items-center gap-2">
-          {/* Live Storage & Network Telemetry */}
-          <div
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-[#17181C] border border-[#2D2E35] text-[10px] font-mono text-neutral-400"
-            title="Local persistence and sync status"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <Database className="w-3 h-3 text-emerald-400/80" />
-            <span className="text-neutral-300">PERSISTED</span>
-            <span className="text-neutral-600">|</span>
-            <span>SYNC: 100%</span>
-            <span className="text-neutral-600">|</span>
-            <span>AES-256</span>
-          </div>
+          <TelemetryPill className="hidden sm:inline-flex" />
 
           <button
             onClick={() => setShowCrisisModal(true)}
@@ -143,7 +129,6 @@ export function WorkspaceHeader({
         </div>
       </header>
 
-      {/* Safety & Crisis Modal */}
       {showCrisisModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[#141418] border border-rose-700/60 rounded-xl max-w-lg w-full p-6 text-neutral-200 shadow-2xl">
@@ -152,16 +137,21 @@ export function WorkspaceHeader({
               <h2 className="text-lg font-bold text-white">Emergency Safety & Crisis Lifelines</h2>
             </div>
             <p className="text-xs text-neutral-300 mb-4 leading-relaxed">
-              If you or someone else is in immediate danger, experiencing domestic violence, or in distress, please prioritize personal safety above legal proceedings:
+              If you or someone else is in immediate danger, experiencing domestic violence, or in distress, please
+              prioritize personal safety above legal proceedings:
             </p>
             <div className="space-y-3 mb-6">
               <div className="p-3 bg-neutral-900/80 border border-neutral-800 rounded-lg">
                 <div className="font-semibold text-rose-300 text-sm">988 Suicide & Crisis Lifeline</div>
-                <div className="text-xs text-neutral-400 mt-0.5">Call or text 988 (Available 24 hours / Free & Confidential)</div>
+                <div className="text-xs text-neutral-400 mt-0.5">
+                  Call or text 988 (Available 24 hours / Free & Confidential)
+                </div>
               </div>
               <div className="p-3 bg-neutral-900/80 border border-neutral-800 rounded-lg">
                 <div className="font-semibold text-amber-300 text-sm">National Domestic Violence Hotline</div>
-                <div className="text-xs text-neutral-400 mt-0.5">Call 1-800-799-SAFE (7233) or text "START" to 88788</div>
+                <div className="text-xs text-neutral-400 mt-0.5">
+                  Call 1-800-799-SAFE (7233) or text "START" to 88788
+                </div>
               </div>
             </div>
             <button
@@ -174,7 +164,6 @@ export function WorkspaceHeader({
         </div>
       )}
 
-      {/* UPL Disclaimer Modal */}
       {showUplModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[#141418] border border-[#D4AF37]/50 rounded-xl max-w-lg w-full p-6 text-neutral-200 shadow-2xl">
@@ -187,13 +176,17 @@ export function WorkspaceHeader({
                 [PREPARED FOR SELF-REPRESENTED LITIGANT - NOT LEGAL ADVICE - REQUIRES INDEPENDENT HUMAN REVIEW]
               </p>
               <p>
-                Chain of Command is a legal technology operating system built to assist individuals in organizing factual records, understanding procedural rules, and researching statutory authorities.
+                Chain of Command is a legal technology operating system built to assist individuals in organizing
+                factual records, understanding procedural rules, and researching statutory authorities.
               </p>
               <p>
-                <strong>No Attorney-Client Relationship:</strong> Use of this software does not create an attorney-client relationship. The AI agents do not act as licensed legal counsel, cannot represent you in court, and will never autonomously file documents or enter pleas on your behalf.
+                <strong>No Attorney-Client Relationship:</strong> Use of this software does not create an
+                attorney-client relationship. The AI agents do not act as licensed legal counsel, cannot represent you
+                in court, and will never autonomously file documents or enter pleas on your behalf.
               </p>
               <p>
-                All generated drafts, checklists, and statutory citations must be reviewed independently by you or a licensed attorney before any court appearance or submission.
+                All generated drafts, checklists, and statutory citations must be reviewed independently by you or a
+                licensed attorney before any court appearance or submission.
               </p>
             </div>
             <button
