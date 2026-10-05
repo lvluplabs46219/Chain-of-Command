@@ -12,6 +12,7 @@ import {
   FileCheck,
   Hash,
 } from "lucide-react";
+import { SectionHeader, StatusBadge } from "./primitives";
 
 interface TasksDeadlinesViewProps {
   matter: Matter;
@@ -121,31 +122,26 @@ export function TasksDeadlinesView({ matter }: TasksDeadlinesViewProps) {
     );
   };
 
+  const statusVariant = (s: DeadlineTask["status"]) =>
+    s === "completed" ? "success" : s === "urgent" ? "danger" : s === "in_progress" ? "info" : "neutral";
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="border-b border-[#23242B] pb-4">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-xs font-mono text-[#D4AF37] uppercase tracking-wider">Deterministic Court Rules Engine</span>
-          <span className="text-neutral-500">·</span>
-          <span className="text-xs text-neutral-400">Cryptographic Audit Trail</span>
-        </div>
-        <h1 className="text-2xl font-serif font-bold text-white tracking-tight">Tasks, Deadlines & System Audit</h1>
-        <p className="text-xs text-neutral-400 mt-0.5">
-          Calculate strict statutory court deadlines and inspect the immutable audit log of all AI operations and sources.
-        </p>
-      </div>
+      <SectionHeader
+        eyebrow="Deterministic Court Rules Engine"
+        title="Tasks, Deadlines & System Audit"
+        description="Calculate strict statutory court deadlines and inspect the immutable audit log of all AI operations and sources."
+        actions={<StatusBadge variant="gold">Rules Engine: Rule 2.5 / Rule 16</StatusBadge>}
+      />
 
-      {/* Deadlines Section */}
       <div className="bg-[#141519] border border-[#272830] rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-sm font-semibold text-white">Court Rule Deadline Schedule</h2>
-            <p className="text-xs text-neutral-400">Deterministic calculation based on {matter.jurisdiction} criminal trial rules</p>
+            <p className="text-xs text-neutral-400">
+              Deterministic calculation based on {matter.jurisdiction} criminal trial rules
+            </p>
           </div>
-          <span className="text-xs font-mono text-[#D4AF37] bg-[#D4AF37]/10 px-2.5 py-1 rounded border border-[#D4AF37]/20">
-            Rules Engine: Rule 2.5 / Rule 16
-          </span>
         </div>
 
         <div className="space-y-3">
@@ -169,7 +165,11 @@ export function TasksDeadlinesView({ matter }: TasksDeadlinesViewProps) {
                   className="rounded border-[#2A2B35] text-[#D4AF37] focus:ring-0 mt-0.5"
                 />
                 <div>
-                  <div className={`text-xs font-semibold ${task.status === "completed" ? "line-through text-neutral-400" : "text-white"}`}>
+                  <div
+                    className={`text-xs font-semibold ${
+                      task.status === "completed" ? "line-through text-neutral-400" : "text-white"
+                    }`}
+                  >
                     {task.title}
                   </div>
                   <div className="text-[11px] text-neutral-400 font-mono mt-0.5">
@@ -180,29 +180,22 @@ export function TasksDeadlinesView({ matter }: TasksDeadlinesViewProps) {
 
               <div className="flex items-center gap-3 sm:text-right shrink-0">
                 <div>
-                  <span className="text-[10px] font-mono text-neutral-500 uppercase block">Due Date</span>
-                  <span className={`text-xs font-mono font-bold ${task.status === "urgent" ? "text-rose-400" : "text-white"}`}>
+                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Due Date</span>
+                  <span
+                    className={`text-sm font-bold font-mono ${
+                      task.status === "urgent" ? "text-rose-400" : "text-white"
+                    }`}
+                  >
                     {task.calculatedDueDate}
                   </span>
                 </div>
-                <span
-                  className={`text-[10px] font-mono px-2 py-0.5 rounded border uppercase ${
-                    task.status === "completed"
-                      ? "bg-emerald-950/40 text-emerald-400 border-emerald-800/40"
-                      : task.status === "urgent"
-                      ? "bg-rose-950/40 text-rose-400 border-rose-800/40"
-                      : "bg-blue-950/40 text-blue-400 border-blue-800/40"
-                  }`}
-                >
-                  {task.status}
-                </span>
+                <StatusBadge variant={statusVariant(task.status)}>{task.status}</StatusBadge>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Cryptographic Audit Trail (Rule 29) */}
       <div className="bg-[#141519] border border-[#272830] rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -215,13 +208,13 @@ export function TasksDeadlinesView({ matter }: TasksDeadlinesViewProps) {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-[#23242B] text-neutral-400 font-mono text-[10px] uppercase">
-                <th className="pb-2.5 font-medium">Timestamp</th>
-                <th className="pb-2.5 font-medium">Operation</th>
-                <th className="pb-2.5 font-medium">Agent</th>
-                <th className="pb-2.5 font-medium">Model</th>
-                <th className="pb-2.5 font-medium">Citations Retrieved</th>
-                <th className="pb-2.5 font-medium">Review Status</th>
+              <tr className="border-b border-[#23242B] text-slate-400 font-medium tracking-wider text-[10px] uppercase">
+                <th className="pb-2.5">Timestamp</th>
+                <th className="pb-2.5">Operation</th>
+                <th className="pb-2.5">Agent</th>
+                <th className="pb-2.5">Model</th>
+                <th className="pb-2.5">Citations Retrieved</th>
+                <th className="pb-2.5">Review Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#202128]">
@@ -234,16 +227,19 @@ export function TasksDeadlinesView({ matter }: TasksDeadlinesViewProps) {
                   <td className="py-2.5">
                     <div className="flex flex-wrap gap-1">
                       {log.retrievedCitations.map((c, i) => (
-                        <span key={i} className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-neutral-300">
+                        <span
+                          key={i}
+                          className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-neutral-300"
+                        >
                           {c}
                         </span>
                       ))}
                     </div>
                   </td>
                   <td className="py-2.5">
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-800/40">
+                    <StatusBadge variant={log.humanReviewStatus === "Verified" ? "success" : "warning"}>
                       {log.humanReviewStatus}
-                    </span>
+                    </StatusBadge>
                   </td>
                 </tr>
               ))}
