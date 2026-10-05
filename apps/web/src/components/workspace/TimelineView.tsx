@@ -11,7 +11,6 @@ import {
   FileText,
   BadgeAlert,
 } from "lucide-react";
-import { SectionHeader, StatusBadge } from "./primitives";
 
 interface TimelineViewProps {
   timeline: TimelineRecord[];
@@ -73,38 +72,46 @@ export function TimelineView({ timeline, onSaveTimelineRecord, matterId }: Timel
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <SectionHeader
-        eyebrow="Chronology Engine"
-        title="Case Timeline & Contradiction Audit"
-        description="Order filings, evidence acquisitions, and dispatch logs chronologically to spotlight factual contradictions."
-        actions={
-          <>
-            <button
-              onClick={() => setFilterContradictionsOnly(!filterContradictionsOnly)}
-              className={`px-3 py-1.5 text-xs rounded-lg border transition-colors flex items-center gap-1.5 ${
-                filterContradictionsOnly
-                  ? "bg-amber-950/60 text-amber-300 border-amber-700"
-                  : "bg-neutral-900 text-neutral-400 border-neutral-800 hover:text-white"
-              }`}
-            >
-              <AlertTriangle className="w-3.5 h-3.5" />
-              <span>{filterContradictionsOnly ? "Showing Discrepancies" : "Filter Discrepancies"}</span>
-            </button>
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 border-b border-[#23242B] pb-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-mono text-[#D4AF37] uppercase tracking-wider">Chronology Engine</span>
+            <span className="text-neutral-500">·</span>
+            <span className="text-xs text-neutral-400">Strict Factual Sequence</span>
+          </div>
+          <h1 className="text-2xl font-serif font-bold text-white tracking-tight">Case Timeline & Contradiction Audit</h1>
+          <p className="text-xs text-neutral-400 mt-0.5">
+            Order filings, evidence acquisitions, and dispatch logs chronologically to spotlight factual contradictions.
+          </p>
+        </div>
 
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="px-3.5 py-2 text-xs font-semibold text-neutral-950 bg-[#D4AF37] hover:bg-[#c49f27] rounded-lg flex items-center gap-1.5 transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Log Timeline Event</span>
-            </button>
-          </>
-        }
-      />
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setFilterContradictionsOnly(!filterContradictionsOnly)}
+            className={`px-3 py-1.5 text-xs rounded-lg border transition-colors flex items-center gap-1.5 ${
+              filterContradictionsOnly
+                ? "bg-amber-950/60 text-amber-300 border-amber-700"
+                : "bg-neutral-900 text-neutral-400 border-neutral-800 hover:text-white"
+            }`}
+          >
+            <AlertTriangle className="w-3.5 h-3.5" />
+            <span>{filterContradictionsOnly ? "Showing Discrepancies" : "Filter Discrepancies"}</span>
+          </button>
+
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-3.5 py-2 text-xs font-semibold text-neutral-950 bg-[#D4AF37] hover:bg-[#c49f27] rounded-lg flex items-center gap-1.5 transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Log Timeline Event</span>
+          </button>
+        </div>
+      </div>
 
       {/* Chronological Vertical Feed */}
       <div className="relative border-l border-[#262730] ml-4 md:ml-8 space-y-6 pl-6 py-2">
-        {displayedTimeline.map((item) => {
+        {displayedTimeline.map((item, idx) => {
           const parsed = new Date(item.dateTime);
           const dateStr = parsed.toLocaleDateString("en-US", {
             month: "short",
@@ -118,6 +125,7 @@ export function TimelineView({ timeline, onSaveTimelineRecord, matterId }: Timel
 
           return (
             <div key={item.id} className="relative group">
+              {/* Dot */}
               <div
                 className={`absolute -left-[31px] top-1.5 w-3.5 h-3.5 rounded-full border-2 ${
                   item.isContradiction
@@ -126,6 +134,7 @@ export function TimelineView({ timeline, onSaveTimelineRecord, matterId }: Timel
                 }`}
               />
 
+              {/* Event Card */}
               <div
                 className={`bg-[#141519] border rounded-xl p-4 transition-all ${
                   item.isContradiction
@@ -135,14 +144,14 @@ export function TimelineView({ timeline, onSaveTimelineRecord, matterId }: Timel
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-semibold text-white">
-                      {dateStr} · {timeStr}
-                    </span>
+                    <span className="font-mono text-xs font-semibold text-white">{dateStr} · {timeStr}</span>
                     <span className="text-neutral-500">·</span>
                     <span className="text-[11px] font-mono text-[#D4AF37]">{item.category}</span>
                   </div>
 
-                  <StatusBadge variant="neutral">{item.provenance}</StatusBadge>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-neutral-400 self-start sm:self-auto">
+                    {item.provenance}
+                  </span>
                 </div>
 
                 <h3 className="font-semibold text-sm text-white mb-1">{item.title}</h3>
@@ -160,7 +169,9 @@ export function TimelineView({ timeline, onSaveTimelineRecord, matterId }: Timel
 
                 <div className="mt-3 pt-2.5 border-t border-[#23242B] flex items-center justify-between text-[11px] text-neutral-500 font-mono">
                   <span>Source Document: {item.sourceDocument}</span>
-                  <StatusBadge variant="success">Verified Record</StatusBadge>
+                  <span className="text-emerald-400 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> Verified Record
+                  </span>
                 </div>
               </div>
             </div>
@@ -173,9 +184,7 @@ export function TimelineView({ timeline, onSaveTimelineRecord, matterId }: Timel
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[#141519] border border-[#2A2B35] rounded-xl max-w-md w-full p-6 text-neutral-200 shadow-2xl">
             <h3 className="text-base font-semibold text-white mb-1">Log Chronology Event</h3>
-            <p className="text-xs text-neutral-400 mb-4">
-              Record an exact timestamped incident, court event, or police action.
-            </p>
+            <p className="text-xs text-neutral-400 mb-4">Record an exact timestamped incident, court event, or police action.</p>
 
             <form onSubmit={handleAddEvent} className="space-y-3 text-xs">
               <div>
@@ -228,9 +237,7 @@ export function TimelineView({ timeline, onSaveTimelineRecord, matterId }: Timel
                   </select>
                 </div>
                 <div>
-                  <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">
-                    Source Provenance
-                  </label>
+                  <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Source Provenance</label>
                   <select
                     value={newProvenance}
                     onChange={(e) => setNewProvenance(e.target.value as any)}
@@ -245,9 +252,7 @@ export function TimelineView({ timeline, onSaveTimelineRecord, matterId }: Timel
               </div>
 
               <div>
-                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">
-                  Source Document Reference
-                </label>
+                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Source Document Reference</label>
                 <input
                   type="text"
                   placeholder="e.g. Officer Incident Narrative p. 2, Exhibit A"
@@ -258,9 +263,7 @@ export function TimelineView({ timeline, onSaveTimelineRecord, matterId }: Timel
               </div>
 
               <div>
-                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">
-                  Factual Description
-                </label>
+                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Factual Description</label>
                 <textarea
                   rows={2}
                   value={newDescription}
@@ -278,9 +281,7 @@ export function TimelineView({ timeline, onSaveTimelineRecord, matterId }: Timel
                     onChange={(e) => setIsContradiction(e.target.checked)}
                     className="rounded border-[#2A2B35] text-amber-500 focus:ring-0"
                   />
-                  <span className="text-amber-300 font-medium">
-                    Flag as Factual Contradiction / Discrepancy
-                  </span>
+                  <span className="text-amber-300 font-medium">Flag as Factual Contradiction / Discrepancy</span>
                 </label>
 
                 {isContradiction && (

@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { STITCH_FOLDERS } from "@/lib/stitch/route-map";
 import { Layers, ExternalLink, Search, Check, Folder } from "lucide-react";
-import { SectionHeader, StatusBadge } from "./primitives";
 
 export function DesignArchiveView() {
   const [search, setSearch] = useState("");
@@ -15,14 +14,21 @@ export function DesignArchiveView() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <SectionHeader
-        eyebrow="Visual Architectural Archive"
-        title="Design Blueprint Archive"
-        description="Browse and inspect the 85 original Stitch design blueprint mockups, UI wireframes, and layout references."
-        actions={<StatusBadge variant="gold">85 Screens</StatusBadge>}
-      />
+      {/* Header */}
+      <div className="border-b border-[#23242B] pb-4">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-xs font-mono text-[#D4AF37] uppercase tracking-wider">Visual Architectural Archive</span>
+          <span className="text-neutral-500">·</span>
+          <span className="text-xs text-neutral-400">85 High-Fidelity UI Screens</span>
+        </div>
+        <h1 className="text-2xl font-serif font-bold text-white tracking-tight">Design Blueprint Archive</h1>
+        <p className="text-xs text-neutral-400 mt-0.5">
+          Browse and inspect the 85 original Stitch design blueprint mockups, UI wireframes, and layout references.
+        </p>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left: Folder Picker (4 cols) */}
         <div className="lg:col-span-4 bg-[#141519] border border-[#272830] rounded-xl p-4 flex flex-col max-h-[700px]">
           <div className="mb-3">
             <input
@@ -55,6 +61,7 @@ export function DesignArchiveView() {
           </div>
         </div>
 
+        {/* Right: Screen Details & Preview (8 cols) */}
         <div className="lg:col-span-8 bg-[#141519] border border-[#272830] rounded-xl p-6 flex flex-col">
           <div className="flex items-center justify-between border-b border-[#23242B] pb-3 mb-4">
             <div>
@@ -76,8 +83,7 @@ export function DesignArchiveView() {
             <Layers className="w-12 h-12 text-[#D4AF37]/40 mb-3" />
             <h4 className="text-sm font-semibold text-white mb-1">Blueprint Specification: {selectedFolder}</h4>
             <p className="text-xs text-neutral-400 max-w-md leading-relaxed mb-4">
-              This layout template defines domain-specific typography tokens, button contracts, and table alignments
-              preserved in the Chain of Command platform.
+              This layout template defines domain-specific typography tokens, button contracts, and table alignments preserved in the Chain of Command platform.
             </p>
             <div className="text-[11px] font-mono text-neutral-500 bg-neutral-900 border border-neutral-800 px-3 py-1.5 rounded">
               Path: components/mockups/acquit-case-workspace/NEWSTITCH/{selectedFolder}/code.html
