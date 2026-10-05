@@ -12,6 +12,7 @@ import {
   AlertCircle,
   ExternalLink,
 } from "lucide-react";
+import { SectionHeader, StatusBadge } from "./primitives";
 
 export function DirectoryView() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,20 +34,12 @@ export function DirectoryView() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="border-b border-[#23242B] pb-4">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-xs font-mono text-[#D4AF37] uppercase tracking-wider">Independent Public Resource</span>
-          <span className="text-neutral-500">·</span>
-          <span className="text-xs text-neutral-400">Zero AI Endorsement Policy</span>
-        </div>
-        <h1 className="text-2xl font-serif font-bold text-white tracking-tight">Independent Attorney & Legal Aid Directory</h1>
-        <p className="text-xs text-neutral-400 mt-0.5">
-          Find licensed criminal defense counsel, pro bono legal aid societies, and public defender contact registries.
-        </p>
-      </div>
+      <SectionHeader
+        eyebrow="Independent Public Resource"
+        title="Independent Attorney & Legal Aid Directory"
+        description="Find licensed criminal defense counsel, pro bono legal aid societies, and public defender contact registries."
+      />
 
-      {/* Mandatory Non-Endorsement Disclaimer (Rule 18 & 42) */}
       <div className="p-4 bg-[#181612] border border-amber-900/40 rounded-xl text-xs text-amber-200/90 leading-relaxed flex items-start gap-3">
         <AlertCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
         <div>
@@ -55,7 +48,6 @@ export function DirectoryView() {
         </div>
       </div>
 
-      {/* Filters Bar */}
       <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
         <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -92,7 +84,6 @@ export function DirectoryView() {
         </div>
       </div>
 
-      {/* Directory Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredAttorneys.map((att) => (
           <div
@@ -102,15 +93,11 @@ export function DirectoryView() {
             <div>
               <div className="flex items-center justify-between gap-2 mb-2">
                 <span className="text-xs font-mono text-[#D4AF37] uppercase">{att.barNumber}</span>
-                <span
-                  className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
-                    att.representationType === "Pro Bono / Legal Aid"
-                      ? "bg-emerald-950/40 text-emerald-400 border-emerald-800/40"
-                      : "bg-blue-950/40 text-blue-400 border-blue-800/40"
-                  }`}
+                <StatusBadge
+                  variant={att.representationType === "Pro Bono / Legal Aid" ? "success" : "info"}
                 >
                   {att.representationType}
-                </span>
+                </StatusBadge>
               </div>
 
               <h3 className="font-serif font-bold text-white text-base mb-0.5">{att.name}</h3>
@@ -133,7 +120,10 @@ export function DirectoryView() {
 
               <div className="flex flex-wrap gap-1 mb-3">
                 {att.practiceAreas.map((area, i) => (
-                  <span key={i} className="text-[10px] bg-neutral-900 border border-neutral-800 text-neutral-300 px-2 py-0.5 rounded">
+                  <span
+                    key={i}
+                    className="text-[10px] bg-neutral-900 border border-neutral-800 text-neutral-300 px-2 py-0.5 rounded"
+                  >
                     {area}
                   </span>
                 ))}
@@ -141,9 +131,7 @@ export function DirectoryView() {
             </div>
 
             <div className="pt-3 border-t border-[#23242B] flex items-center justify-between text-[11px] text-neutral-500 font-mono">
-              <span className="flex items-center gap-1 text-emerald-400">
-                <ShieldCheck className="w-3.5 h-3.5" /> {att.verifiedSource}
-              </span>
+              <StatusBadge variant="success">{att.verifiedSource}</StatusBadge>
               <a
                 href={`tel:${att.phone}`}
                 className="text-[#D4AF37] hover:underline flex items-center gap-1 font-sans font-medium"
