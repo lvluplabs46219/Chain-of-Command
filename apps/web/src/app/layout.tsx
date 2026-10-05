@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { BotIdClient } from "botid/client";
 import "../index.css";
+
+const Analytics = () => null;
+const SpeedInsights = () => null;
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -32,16 +33,16 @@ const protectedRoutes = [
 ];
 
 export const metadata: Metadata = {
-  title: "Chain of Command — Legal OS & Pro Se Case Workspace",
+  title: "Chain of Command",
   description: "AI-powered legal self-representation workspace and case intelligence platform.",
   openGraph: {
-    title: "Chain of Command — Legal OS & Pro Se Case Workspace",
+    title: "Chain of Command",
     description: "AI-powered legal self-representation workspace and case intelligence platform.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Chain of Command — Legal OS & Pro Se Case Workspace",
+    title: "Chain of Command",
     description: "AI-powered legal self-representation workspace and case intelligence platform.",
   },
 };
