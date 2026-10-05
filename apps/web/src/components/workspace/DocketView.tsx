@@ -13,6 +13,7 @@ import {
   Clock,
   Shield,
 } from "lucide-react";
+import { SectionHeader, StatusBadge, MonoPill } from "./primitives";
 
 interface DocketViewProps {
   matters: Matter[];
@@ -77,52 +78,60 @@ export function DocketView({
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 border-b border-[#23242B] pb-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-mono text-[#D4AF37] uppercase tracking-wider">The Docket</span>
-            <span className="text-neutral-500">·</span>
-            <span className="text-xs text-neutral-400">Case Matter Registry</span>
-          </div>
-          <h1 className="text-2xl font-serif font-bold text-white tracking-tight">{activeMatter.title}</h1>
-          <p className="text-xs text-neutral-400 mt-0.5">
-            {activeMatter.courtName} · Case Number: <span className="font-mono text-neutral-200">{activeMatter.caseNumber}</span>
-          </p>
-        </div>
-
-        <button
-          onClick={onOpenNewMatterModal}
-          className="px-3.5 py-2 text-xs font-semibold text-neutral-950 bg-[#D4AF37] hover:bg-[#c49f27] rounded-lg flex items-center gap-1.5 transition-colors"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Open New Case Matter</span>
-        </button>
-      </div>
+      <SectionHeader
+        eyebrow="The Docket"
+        title={activeMatter.title}
+        description={`${activeMatter.courtName} · Case Number: ${activeMatter.caseNumber}`}
+        actions={
+          <button
+            onClick={onOpenNewMatterModal}
+            className="px-3.5 py-2 text-xs font-semibold text-neutral-950 bg-[#D4AF37] hover:bg-[#c49f27] rounded-lg flex items-center gap-1.5 transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Open New Case Matter</span>
+          </button>
+        }
+      />
 
       {/* Case Details Card */}
       <div className="bg-[#141519] border border-[#272830] rounded-xl p-5">
-        <h2 className="text-xs font-mono text-neutral-400 uppercase tracking-wider mb-3">Case Facts & Procedural Summary</h2>
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          <h2 className="text-xs font-mono text-neutral-400 uppercase tracking-wider">
+            Case Facts & Procedural Summary
+          </h2>
+          <MonoPill>{activeMatter.caseNumber}</MonoPill>
+          <StatusBadge variant="pro-se" pulse>
+            {activeMatter.defenseStatus}
+          </StatusBadge>
+        </div>
         <p className="text-xs text-neutral-300 leading-relaxed bg-[#191A20] p-4 rounded-lg border border-[#2A2B33]">
           {activeMatter.summary}
         </p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-[#23242B] text-xs">
           <div>
-            <span className="text-neutral-500 font-mono text-[10px] uppercase block">Presiding Judge</span>
-            <span className="text-white font-medium">{activeMatter.judge}</span>
+            <span className="text-slate-400 font-medium tracking-wider text-[10px] uppercase block mb-0.5">
+              Presiding Judge
+            </span>
+            <span className="text-white font-semibold">{activeMatter.judge}</span>
           </div>
           <div>
-            <span className="text-neutral-500 font-mono text-[10px] uppercase block">Prosecuting Agency</span>
-            <span className="text-white font-medium">{activeMatter.prosecutor}</span>
+            <span className="text-slate-400 font-medium tracking-wider text-[10px] uppercase block mb-0.5">
+              Prosecuting Agency
+            </span>
+            <span className="text-white font-semibold">{activeMatter.prosecutor}</span>
           </div>
           <div>
-            <span className="text-neutral-500 font-mono text-[10px] uppercase block">Representation</span>
-            <span className="text-emerald-400 font-medium">{activeMatter.defenseStatus}</span>
+            <span className="text-slate-400 font-medium tracking-wider text-[10px] uppercase block mb-0.5">
+              Representation
+            </span>
+            <StatusBadge variant="pro-se">{activeMatter.defenseStatus}</StatusBadge>
           </div>
           <div>
-            <span className="text-neutral-500 font-mono text-[10px] uppercase block">Speedy Trial Cutoff</span>
-            <span className="text-white font-medium font-mono">{activeMatter.speedyTrialDeadline}</span>
+            <span className="text-slate-400 font-medium tracking-wider text-[10px] uppercase block mb-0.5">
+              Speedy Trial Cutoff
+            </span>
+            <span className="text-white font-semibold font-mono">{activeMatter.speedyTrialDeadline}</span>
           </div>
         </div>
       </div>
@@ -132,7 +141,9 @@ export function DocketView({
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="font-semibold text-white text-sm">Formal Charges & Statutory Elements</h3>
-            <p className="text-xs text-neutral-400">Deconstructed elements the State must prove beyond a reasonable doubt</p>
+            <p className="text-xs text-neutral-400">
+              Deconstructed elements the State must prove beyond a reasonable doubt
+            </p>
           </div>
           <button
             onClick={() => setShowAddChargeModal(true)}
@@ -155,7 +166,9 @@ export function DocketView({
                   : "bg-neutral-800/60 text-neutral-400 hover:text-white border border-transparent"
               }`}
             >
-              <span>Count {idx + 1}: {ch.title}</span>
+              <span>
+                Count {idx + 1}: {ch.title}
+              </span>
             </button>
           ))}
         </div>
@@ -167,16 +180,21 @@ export function DocketView({
               <div>
                 <span className="text-xs font-mono text-[#D4AF37] uppercase">{currentCharge.statute}</span>
                 <h4 className="text-base font-semibold text-white mt-0.5">{currentCharge.title}</h4>
-                <div className="text-[11px] text-neutral-400 font-mono mt-0.5">Classification: {currentCharge.level}</div>
+                <div className="text-[11px] text-neutral-400 font-mono mt-0.5">
+                  Classification: {currentCharge.level}
+                </div>
               </div>
               <div className="text-right sm:border-l sm:border-[#2D2E37] sm:pl-4">
-                <div className="text-[10px] font-mono text-neutral-500 uppercase">Max Statutory Exposure</div>
-                <div className="text-xs font-semibold text-rose-300">{currentCharge.statutoryMaxPenalty}</div>
-                <div className="text-[11px] text-neutral-400 font-mono">Min: {currentCharge.statutoryMinPenalty}</div>
+                <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+                  Max Statutory Exposure
+                </div>
+                <div className="text-sm font-bold text-rose-300">{currentCharge.statutoryMaxPenalty}</div>
+                <div className="text-[11px] text-neutral-400 font-mono">
+                  Min: {currentCharge.statutoryMinPenalty}
+                </div>
               </div>
             </div>
 
-            {/* Elements Checklist */}
             <div className="space-y-2.5">
               <div className="text-xs font-mono text-neutral-400 uppercase tracking-wider">
                 Statutory Elements to Contest ({currentCharge.elements.length})
@@ -186,17 +204,17 @@ export function DocketView({
                 <div key={i} className="p-3.5 bg-[#17181D] border border-[#262730] rounded-lg">
                   <div className="flex items-center justify-between mb-1">
                     <span className="font-semibold text-white text-xs">{elem.name}</span>
-                    <span
-                      className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
+                    <StatusBadge
+                      variant={
                         elem.stateProofStatus === "Refuted by Exhibit"
-                          ? "bg-emerald-950/40 text-emerald-400 border-emerald-800/40"
+                          ? "success"
                           : elem.stateProofStatus === "Insufficient Evidence"
-                          ? "bg-amber-950/40 text-amber-400 border-amber-800/40"
-                          : "bg-blue-950/40 text-blue-400 border-blue-800/40"
-                      }`}
+                          ? "warning"
+                          : "info"
+                      }
                     >
                       {elem.stateProofStatus}
-                    </span>
+                    </StatusBadge>
                   </div>
                   <p className="text-xs text-neutral-400 leading-relaxed">{elem.description}</p>
                 </div>
@@ -211,11 +229,15 @@ export function DocketView({
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[#141519] border border-[#2B2B35] rounded-xl max-w-md w-full p-6 text-neutral-200 shadow-2xl">
             <h3 className="text-base font-semibold text-white mb-1">Add Formal Charge / Count</h3>
-            <p className="text-xs text-neutral-400 mb-4">Enter statutory information from the charging information or indictment.</p>
+            <p className="text-xs text-neutral-400 mb-4">
+              Enter statutory information from the charging information or indictment.
+            </p>
 
             <form onSubmit={handleAddCharge} className="space-y-3 text-xs">
               <div>
-                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Statutory Code</label>
+                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">
+                  Statutory Code
+                </label>
                 <input
                   type="text"
                   required
@@ -227,7 +249,9 @@ export function DocketView({
               </div>
 
               <div>
-                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Charge Title</label>
+                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">
+                  Charge Title
+                </label>
                 <input
                   type="text"
                   required
@@ -239,7 +263,9 @@ export function DocketView({
               </div>
 
               <div>
-                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Maximum Statutory Penalty</label>
+                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">
+                  Maximum Statutory Penalty
+                </label>
                 <input
                   type="text"
                   placeholder="e.g. 2.5 years imprisonment; $10,000 fine"
