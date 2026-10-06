@@ -132,6 +132,43 @@ export const AiRunResponse = z.object({
   agentName: z.string().optional(),
 });
 
+/** ADR / production lockout: demo is never the default in production. */
+export function resolveModelProvider(requested?: ModelProvider): ModelProvider {
+  const envDefault = process.env.LLM_DEFAULT_PROVIDER as ModelProvider | undefined;
+  const isProd = process.env.NODE_ENV === "production";
+
+  if (requested === "demo" && isProd) {
+    throw new Error("Demo model provider is disabled in production (ADR production lockout).");
+  }
+
+  if (requested) return requested;
+
+  if (envDefault) {
+    if (envDefault === "demo" && isProd) {
+      throw new Error("LLM_DEFAULT_PROVIDER=demo is not allowed in production.");
+    }
+    return envDefault;
+  }
+
+  // Non-production may use demo for local smoke tests; production requires a real provider.
+  return isProd ? "ollama" : "demo";
+}
+
+function defaultModelForProvider(provider: ModelProvider, requested?: string): string {
+  if (requested) return requested;
+  switch (provider) {
+    case "ollama":
+      return process.env.OLLAMA_DEFAULT_MODEL ?? "llama3.2";
+    case "openai":
+      return process.env.OPENAI_DEFAULT_MODEL ?? "gpt-4o-mini";
+    case "gemini":
+      return process.env.GEMINI_DEFAULT_MODEL ?? "gemini-2.5-flash";
+    case "demo":
+    default:
+      return "acquit-demo-1";
+  }
+}
+
 const router: IRouter = Router();
 
 interface RunRecord {
@@ -140,13 +177,11 @@ interface RunRecord {
   listeners: Set<(event: AgentEvent) => void>;
   request: z.infer<typeof AiRunRequest>;
   createdAt: number;
-  ownerUserId: string; // CRITICAL: Track owner for authorization
+  ownerUserId: string;
 }
 
-// In-memory active stream listeners map
 const memoryRuns = new Map<string, RunRecord>();
 
-// Upstash Redis instance with 60-min TTL
 let redisClient: Redis | null = null;
 if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
   redisClient = new Redis({
@@ -155,7 +190,6 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
   });
 }
 
-// Helper to save run events with 60 min TTL
 async function persistRunState(runId: string, record: RunRecord): Promise<void> {
   if (!redisClient) return;
   try {
@@ -165,7 +199,7 @@ async function persistRunState(runId: string, record: RunRecord): Promise<void> 
       done: record.done,
       request: record.request,
       createdAt: record.createdAt,
-      ownerUserId: record.ownerUserId, // CRITICAL: Persist owner
+      ownerUserId: record.ownerUserId,
     };
     await redisClient.set(`agent_run:${runId}`, JSON.stringify(payload), { ex: 3600 });
   } catch (err) {
@@ -179,15 +213,29 @@ function writeEvent(res: Response, event: AgentEvent): void {
 
 async function executeRun(runId: string, record: RunRecord): Promise<void> {
   const agent = SPECIALIST_AGENTS[record.request.agentId];
-  const provider = (record.request.provider ?? "demo") as ModelProvider;
+  let provider: ModelProvider;
+  try {
+    provider = resolveModelProvider(record.request.provider as ModelProvider | undefined);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    record.events.push({
+      type: "error",
+      timestamp: Date.now(),
+      payload: { error: message },
+    });
+    record.done = true;
+    await persistRunState(runId, record);
+    for (const listener of record.listeners) listener(record.events[record.events.length - 1]);
+    return;
+  }
+
   const sources = (record.request.sources ?? []) as unknown as AgentSource[];
 
-  // Check for prompt injection in the input
   if (detectPromptInjection(record.request.input)) {
     record.events.push({
-      type: 'error',
+      type: "error",
       timestamp: Date.now(),
-      payload: { error: 'Prompt injection detected - request aborted' },
+      payload: { error: "Prompt injection detected - request aborted" },
     });
     record.done = true;
     await persistRunState(runId, record);
@@ -204,7 +252,7 @@ async function executeRun(runId: string, record: RunRecord): Promise<void> {
       input: record.request.input,
       sources,
       provider,
-      model: record.request.model ?? (provider === "ollama" ? "llama3.2" : "acquit-demo-1"),
+      model: defaultModelForProvider(provider, record.request.model),
     })) {
       record.events.push(event);
       for (const listener of record.listeners) listener(event);
@@ -219,7 +267,6 @@ async function executeRun(runId: string, record: RunRecord): Promise<void> {
   }
 }
 
-// Get directory of specialist agents
 router.get("/ai/agents", (_req: Request, res: Response) => {
   const list = Object.entries(SPECIALIST_AGENTS).map(([id, meta]) => ({
     id,
@@ -231,14 +278,13 @@ router.get("/ai/agents", (_req: Request, res: Response) => {
   return res.json({ agents: list });
 });
 
-// Launch an AI agent run - requires authentication
 router.post("/ai/agents/:agentId/runs", (req: AuthenticatedRequest, res: Response) => {
   const user = req.user;
-  
+
   if (!user || !user.id) {
     return res.status(401).json({ message: "Unauthorized: User not authenticated" });
   }
-  
+
   const parsed = AiRunRequest.safeParse({
     ...req.body,
     agentId: req.params.agentId,
@@ -248,7 +294,15 @@ router.post("/ai/agents/:agentId/runs", (req: AuthenticatedRequest, res: Respons
     return res.status(400).json({ message: "Invalid AI run request.", issues: parsed.error.issues });
   }
 
-  // Check for prompt injection before creating the run
+  // Reject demo provider at the edge in production before queueing work
+  try {
+    resolveModelProvider(parsed.data.provider as ModelProvider | undefined);
+  } catch (err) {
+    return res.status(400).json({
+      message: err instanceof Error ? err.message : "Invalid model provider for this environment",
+    });
+  }
+
   if (detectPromptInjection(parsed.data.input)) {
     console.warn(`Prompt injection detected in AI run request from user ${user.id}`);
     return res.status(400).json({ message: "Invalid input - request rejected" });
@@ -261,7 +315,7 @@ router.post("/ai/agents/:agentId/runs", (req: AuthenticatedRequest, res: Respons
     listeners: new Set(),
     request: parsed.data,
     createdAt: Date.now(),
-    ownerUserId: user.id, // CRITICAL: Store the authenticated user's ID
+    ownerUserId: user.id,
   };
 
   memoryRuns.set(runId, record);
@@ -281,20 +335,17 @@ router.post("/ai/agents/:agentId/runs", (req: AuthenticatedRequest, res: Respons
   return res.status(202).json(response);
 });
 
-// Stream real-time agent output with SSE
-// CRITICAL: Verify that the requesting user matches the owner
 router.get("/ai/runs/:runId/stream", async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const user = req.user;
   const runId = String(req.params.runId);
-  
+
   if (!user || !user.id) {
     res.status(401).json({ message: "Unauthorized: User not authenticated" });
     return;
   }
-  
+
   let record = memoryRuns.get(runId);
 
-  // If not in local memory, check Redis store for completed run
   if (!record && redisClient) {
     try {
       const cached = await redisClient.get<string>(`agent_run:${runId}`);
@@ -306,7 +357,7 @@ router.get("/ai/runs/:runId/stream", async (req: AuthenticatedRequest, res: Resp
           listeners: new Set(),
           request: parsed.request,
           createdAt: parsed.createdAt || Date.now(),
-          ownerUserId: parsed.ownerUserId || '',
+          ownerUserId: parsed.ownerUserId || "",
         };
       }
     } catch (err) {
@@ -319,7 +370,6 @@ router.get("/ai/runs/:runId/stream", async (req: AuthenticatedRequest, res: Resp
     return;
   }
 
-  // CRITICAL SECURITY CHECK: Verify that the authenticated user matches the owner
   if (record.ownerUserId !== user.id) {
     console.warn(`User ${user.id} attempted to access run ${runId} owned by ${record.ownerUserId}`);
     res.status(403).json({ message: "Unauthorized: This AI run belongs to another user" });

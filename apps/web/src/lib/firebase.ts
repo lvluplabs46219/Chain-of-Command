@@ -1,12 +1,8 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore, doc, getDocFromServer } from "firebase/firestore";
-import firebaseConfig from "../firebase-applet-config.json";
-
-export const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-export const auth = getAuth(app);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
-export const googleAuthProvider = new GoogleAuthProvider();
+/**
+ * ADR-001: Firebase is not a production identity or data plane.
+ * This module intentionally does not initialize Firebase Auth or Firestore.
+ * Importing auth/db from here will throw — migrate callers to Supabase.
+ */
 
 export enum OperationType {
   CREATE = "create",
@@ -17,56 +13,39 @@ export enum OperationType {
   WRITE = "write",
 }
 
-export interface FirestoreErrorInfo {
-  error: string;
-  operationType: OperationType;
-  path: string | null;
-  authInfo: {
-    userId?: string | null;
-    email?: string | null;
-    emailVerified?: boolean | null;
-    isAnonymous?: boolean | null;
-    tenantId?: string | null;
-    providerInfo?: {
-      providerId?: string | null;
-      email?: string | null;
-    }[];
-  };
+function removed(feature: string): never {
+  throw new Error(
+    `Firebase ${feature} was removed (ADR-001). Use Supabase Auth and the API/matters store instead.`,
+  );
 }
 
-export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null): never {
-  const currentUser = auth.currentUser;
-  const errInfo: FirestoreErrorInfo = {
-    error: error instanceof Error ? error.message : String(error),
-    authInfo: {
-      userId: currentUser?.uid,
-      email: currentUser?.email,
-      emailVerified: currentUser?.emailVerified,
-      isAnonymous: currentUser?.isAnonymous,
-      tenantId: currentUser?.tenantId,
-      providerInfo: currentUser?.providerData?.map((provider) => ({
-        providerId: provider.providerId,
-        email: provider.email,
-      })) || [],
+/** @deprecated ADR-001 — always null; do not use for sessions. */
+export const auth = {
+  get currentUser() {
+    return null;
+  },
+};
+
+/** @deprecated ADR-001 — Firestore client disabled. */
+export const db = new Proxy(
+  {},
+  {
+    get() {
+      return removed("Firestore");
     },
-    operationType,
-    path,
-  };
-  console.error("Firestore Error: ", JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
+  },
+);
+
+/** @deprecated ADR-001 */
+export const app = null;
+
+/** @deprecated ADR-001 — use Supabase Google OAuth via AuthContext.loginWithGoogle */
+export const googleAuthProvider = null;
+
+export function handleFirestoreError(_error: unknown, _operationType: OperationType, _path: string | null): never {
+  return removed("error handler");
 }
 
-// Test connection on boot per Firebase skill guidelines
 export async function testFirestoreConnection(): Promise<void> {
-  try {
-    await getDocFromServer(doc(db, "test", "connection"));
-  } catch (error) {
-    if (error instanceof Error && error.message.includes("the client is offline")) {
-      console.warn("Please check your Firebase configuration or network status.");
-    }
-  }
-}
-
-if (typeof window !== "undefined") {
-  testFirestoreConnection().catch(() => {});
+  // no-op: Firebase is not initialized
 }
