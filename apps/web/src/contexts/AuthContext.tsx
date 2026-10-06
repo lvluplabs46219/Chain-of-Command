@@ -59,23 +59,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const existingToken = getAuthToken();
       const savedUserStr = localStorage.getItem(USER_STORAGE_KEY);
+      const isProd =
+        typeof process !== "undefined" && process.env.NODE_ENV === "production";
+      const allowDemo =
+        !isProd && process.env.NEXT_PUBLIC_ALLOW_DEMO_AUTH !== "false";
 
+      // Never auto-mint demo tokens. Restore prior session only if present.
+      // Production: only Supabase JWTs are valid against the API (ADR-001).
       if (existingToken) {
-        setTokenState(existingToken);
-        if (savedUserStr) {
-          setUser(JSON.parse(savedUserStr));
+        const isDemo =
+          existingToken === "acquit-pro-se-token" ||
+          existingToken.startsWith("demo-token") ||
+          existingToken.startsWith("mock-token") ||
+          existingToken.startsWith("dev-token") ||
+          existingToken.startsWith("coc-session-");
+        if (isDemo && !allowDemo) {
+          setAuthToken(null);
+          setTokenState(null);
+          setUser(null);
+          localStorage.removeItem(USER_STORAGE_KEY);
         } else {
-          // Default to verified self-represented litigant
-          setUser(DEFAULT_LITIGANT_USER);
-          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(DEFAULT_LITIGANT_USER));
+          setTokenState(existingToken);
+          if (savedUserStr) {
+            setUser(JSON.parse(savedUserStr));
+          } else if (allowDemo && isDemo) {
+            setUser(DEFAULT_LITIGANT_USER);
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(DEFAULT_LITIGANT_USER));
+          }
         }
-      } else {
-        // Auto-provision standard pro se demo session for instant usability
-        const defaultToken = "acquit-pro-se-token";
-        setAuthToken(defaultToken);
-        setTokenState(defaultToken);
-        setUser(DEFAULT_LITIGANT_USER);
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(DEFAULT_LITIGANT_USER));
       }
 
       // Initialize Supabase auth listener for real session sync
@@ -148,7 +159,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
     } catch (e) {
       console.warn("Auth initialization warning:", e);
-      setUser(DEFAULT_LITIGANT_USER);
+      // Do not invent a session on error
     } finally {
       setIsLoading(false);
     }
@@ -183,8 +194,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const loginAsLitigant = async (name = "Arthur Marlowe", email = "litigant@chainofcommand.law") => {
+    const isProd =
+      typeof process !== "undefined" && process.env.NODE_ENV === "production";
+    if (isProd || process.env.NEXT_PUBLIC_ALLOW_DEMO_AUTH === "false") {
+      throw new Error(
+        "Demo pro se sessions are disabled in this environment. Sign in with Supabase Auth."
+      );
+    }
     setIsLoading(true);
-    const newToken = "acquit-pro-se-token";
+    const newToken = `coc-session-${
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : String(Date.now())
+    }`;
     const newUser: AuthUser = {
       ...DEFAULT_LITIGANT_USER,
       name,

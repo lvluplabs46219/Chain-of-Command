@@ -2,7 +2,7 @@ name: Security & QA Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "feature/**" ]
   pull_request:
     branches: [ "main" ]
 
@@ -15,38 +15,48 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
+          cache: npm
+
+      - name: Reject dual lockfiles
+        run: |
+          if [ -f pnpm-lock.yaml ] && [ -f package-lock.json ]; then
+            echo "Both pnpm-lock.yaml and package-lock.json present — pick one package manager"
+            exit 1
+          fi
 
       - name: Install Dependencies
-        run: npm ci || npm install --no-audit --no-fund
+        run: npm ci
 
-      - name: Security Scan (npm audit)
-        run: npm audit --audit-level=moderate || echo "Audit found vulnerabilities, check the report."
-
-      # There is no root tsconfig.json (workspaces only). Build the real projects.
-      - name: Type Check (workspace projects)
-        run: |
-          npx tsc --build apps/web apps/api packages/db packages/rag-engine scripts 2>&1 || {
-            echo "::warning::typecheck reported errors (see log above)"
-            exit 0
-          }
+      - name: Security Scan (npm audit — critical)
+        run: npm audit --audit-level=critical
 
       - name: Secret Scanning (TruffleHog)
         uses: trufflesecurity/trufflehog@main
-        continue-on-error: true
         with:
           path: ./
           base: ${{ github.event.repository.default_branch }}
           head: HEAD
           extra_args: --only-verified
 
-      - name: Build Check
+      - name: Type Check
+        run: npm run typecheck
+
+      - name: Build web
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: API security smoke (if test file present)
         run: |
-          npm run build 2>&1 || {
-            echo "::warning::build reported errors (see log above)"
-            exit 0
-          }
+          if [ -f apps/api/tests/security.test.ts ]; then
+            npx tsx apps/api/tests/security.test.ts || exit 1
+          else
+            echo "No security.test.ts — skip"
+          fi
