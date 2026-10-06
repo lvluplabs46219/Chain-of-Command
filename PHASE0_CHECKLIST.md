@@ -20,3 +20,12 @@
 - [ ] Default LLM provider from env (not silent `demo`)
 - [ ] Domain code must not construct `GoogleGenAI` directly — gateway only
 - [ ] Expand `security.test.ts`; restore `scripts/ts/test_compliance_and_security.ts` or drop npm script
+
+## 2026-10-05 main merge progress
+- [x] Merged feature/v2-phase0-foundation into main
+- [x] AuthContext Supabase-only (no Firebase Auth)
+- [x] Dead trees moved under archive/legacy-prototypes
+- [x] Root firebase configs -> archive/legacy-firebase
+- [x] LLM default: env LLM_DEFAULT_PROVIDER or ollama in production / demo in dev
+- [~] workspace-sync still uses Firestore client (legacy)
+- [~] package-lock.json generation may still be in progress

@@ -512,13 +512,13 @@ export class ModelGateway {
   }
 
   async complete(request: ModelRequest): Promise<ModelResponse> {
-    const provider = request.provider ?? "demo";
+    const provider = request.provider ?? (process.env.LLM_DEFAULT_PROVIDER as ModelProvider | undefined) ?? (process.env.NODE_ENV === "production" ? "ollama" : "demo");
     const adapter = await this.resolve(provider, request.model);
     return adapter.complete(request);
   }
 
   async *stream(request: ModelRequest): AsyncIterable<ModelStreamEvent> {
-    const provider = request.provider ?? "demo";
+    const provider = request.provider ?? (process.env.LLM_DEFAULT_PROVIDER as ModelProvider | undefined) ?? (process.env.NODE_ENV === "production" ? "ollama" : "demo");
     const adapter = await this.resolve(provider, request.model);
     for await (const event of adapter.stream(request)) {
       yield event;
