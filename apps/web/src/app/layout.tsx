@@ -15,60 +15,29 @@ export const viewport: Viewport = {
 };
 
 const protectedRoutes = [
-  {
-    path: "/api/checkout",
-    method: "POST" as const,
-  },
-  {
-    path: "/api/sensitive/*",
-    method: "POST" as const,
-  },
-  {
-    path: "/api/user/*",
-    method: "POST" as const,
-  },
-  {
-    path: "/api/v1/*",
-    method: "POST" as const,
-  },
+  { path: "/api/checkout", method: "POST" as const },
+  { path: "/api/sensitive/*", method: "POST" as const },
+  { path: "/api/user/*", method: "POST" as const },
+  { path: "/api/v1/*", method: "POST" as const },
 ];
 
 export const metadata: Metadata = {
   title: "Chain of Command",
-  description: "AI-powered legal self-representation workspace and case intelligence platform.",
+  description:
+    "AI-powered legal self-representation workspace and case intelligence platform.",
   openGraph: {
     title: "Chain of Command",
-    description: "AI-powered legal self-representation workspace and case intelligence platform.",
+    description:
+      "AI-powered legal self-representation workspace and case intelligence platform.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Chain of Command",
-    description: "AI-powered legal self-representation workspace and case intelligence platform.",
+    description:
+      "AI-powered legal self-representation workspace and case intelligence platform.",
   },
 };
-
-const FETCH_GUARD_SCRIPT = `(function(){
-  try {
-    if (typeof window !== 'undefined') {
-      var proto = window.Window ? window.Window.prototype : Object.getPrototypeOf(window);
-      var desc = Object.getOwnPropertyDescriptor(window, 'fetch') ||
-                 (proto && Object.getOwnPropertyDescriptor(proto, 'fetch'));
-      if (!desc || !desc.set || !desc.writable) {
-        var _origFetch = window.fetch ? window.fetch.bind(window) : null;
-        var _currentFetch = _origFetch;
-        Object.defineProperty(window, 'fetch', {
-          configurable: true,
-          enumerable: true,
-          get: function() { return _currentFetch; },
-          set: function(fn) { _currentFetch = fn; }
-        });
-      }
-    }
-  } catch (e) {
-    console.warn('[FetchGuard] Warning:', e);
-  }
-})();`;
 
 export default function RootLayout({
   children,
@@ -77,21 +46,23 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <Script src="/fetch-guard.js" strategy="beforeInteractive" />
+      </head>
       <body className="bg-[#111214] text-[#e1e2e5] antialiased min-h-screen">
-        <Script
-          id="window-fetch-guard"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: FETCH_GUARD_SCRIPT }}
-        />
         <BotIdClient protect={protectedRoutes} />
-        {/* WCAG Accessible Skip Link */}
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#D4AF37] focus:text-black focus:font-semibold focus:rounded focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
         >
           Skip to main content
         </a>
-        <main id="main-content" role="main" tabIndex={-1} className="min-h-screen flex flex-col focus:outline-none">
+        <main
+          id="main-content"
+          role="main"
+          tabIndex={-1}
+          className="min-h-screen flex flex-col focus:outline-none"
+        >
           {children}
         </main>
         <Analytics />

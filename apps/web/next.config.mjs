@@ -37,20 +37,21 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/:path*\\.(js|mjs)',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'text/javascript; charset=utf-8',
-          },
-        ],
-      },
-      {
+        // Hashed production assets only — short cache for HTML/RSC to avoid stale module factories
         source: '/_next/static/:path*',
         headers: [
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/fetch-guard.js',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600',
           },
         ],
       },

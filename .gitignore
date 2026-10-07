@@ -97,7 +97,9 @@ dist
 
 # Gatsby files
 .cache/
-public
+# Track Next.js static public assets; ignore only generated stitch/mockups (see below)
+# public  # was ignoring apps/web/public entirely
+/public
 
 # vuepress build output
 .vuepress/dist
