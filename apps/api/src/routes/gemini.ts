@@ -1,13 +1,15 @@
+/**
+ * Chain of Command — Local AI routes (Ollama).
+ * Legacy path prefixes (/gemini/*, /ai/*) are preserved for frontend compatibility.
+ * All generation goes through Ollama — no cloud Gemini calls.
+ */
 import { Router, Request, Response } from 'express';
-import { GoogleGenAI } from '@google/genai';
-import { LegalInfoResponseSchema } from '../types/legalResponse';
-import { zodToJsonSchema } from 'zod-to-json-schema';
+import { OllamaAdapter, type ChatMessage } from '../ai/model-gateway';
 import { detectPromptInjection } from '../ai/runtime';
 
 export const geminiRouter = Router();
 
-// Server-side only system prompt - NEVER accept client-controlled system instructions
-export const UPL_SYSTEM_PROMPT = `You are a legal document assistant and educational information system.
+export const UPL_SYSTEM_PROMPT = `You are a legal document assistant and educational information system for Chain of Command Legal OS.
 You are strictly prohibited from providing legal advice or engaging in the Unauthorized Practice of Law (UPL).
 
 STRICT OPERATIONAL RULES:
@@ -28,138 +30,100 @@ STRICT OPERATIONAL RULES:
    Prepend all generated document drafts with:
    "[PREPARED FOR SELF-REPRESENTED LITIGANT - NOT LEGAL ADVICE - REQUIRES INDEPENDENT HUMAN REVIEW]"`;
 
-const DEFAULT_MODEL = 'gemini-3.1-flash-lite';
-const MODEL_FALLBACK_CHAIN = ['gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.8-flash'];
+const DEFAULT_MODEL = process.env.OLLAMA_MODEL || 'llama3.2';
+const OLLAMA_BASE =
+  process.env.OLLAMA_BASE_URL || process.env.OLLAMA_URL || 'http://localhost:11434';
 
-// Helper to sanitize user input - treat as untrusted data
+const ollama = new OllamaAdapter(OLLAMA_BASE);
+
+const GENERIC_ERROR_MESSAGE = 'AI request failed';
+
 function sanitizeUserInput(input: string): string {
   if (!input) return '';
-  
   if (detectPromptInjection(input)) {
     throw new Error('Invalid input - prompt injection detected');
   }
-  
   return String(input);
 }
 
-// Helper to create safe user message
-function createUserMessage(text: string): { role: 'user'; parts: { text: string }[] } {
-  const sanitized = sanitizeUserInput(text);
-  return { role: 'user', parts: [{ text: sanitized }] };
+async function generateWithOllama(
+  messages: ChatMessage[],
+  model?: string
+): Promise<{ text: string; modelUsed: string }> {
+  const response = await ollama.complete({
+    provider: 'ollama',
+    model: model || DEFAULT_MODEL,
+    messages,
+    maxTokens: 4096,
+  });
+  return { text: response.content || '', modelUsed: response.model };
 }
 
-// Generic error message to avoid leaking internal details
-const GENERIC_ERROR_MESSAGE = 'AI request failed';
-
-function getAI() {
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error('GEMINI_API_KEY environment variable is missing');
-  }
-  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-}
-
-export async function generateContentWithFallback(
-  client: GoogleGenAI,
-  preferredModel: string | undefined,
-  params: {
-    contents: any;
-    config?: any;
-  }
-): Promise<{ response: any; modelUsed: string }> {
-  const primary = preferredModel || DEFAULT_MODEL;
-  const candidateModels = [primary, ...MODEL_FALLBACK_CHAIN.filter((m) => m !== primary)];
-  let lastError: any = null;
-
-  for (const model of candidateModels) {
-    try {
-      const response = await client.models.generateContent({
-        model,
-        contents: params.contents,
-        config: params.config,
-      });
-      return { response, modelUsed: model };
-    } catch (err: any) {
-      lastError = err;
-      console.warn(`[Gemini Fallback] Model "${model}" failed. Trying fallback model...`);
-    }
-  }
-
-  throw lastError || new Error("All Gemini model fallbacks failed");
+function systemAndUser(system: string, user: string): ChatMessage[] {
+  return [
+    { role: 'system', content: system },
+    { role: 'user', content: user },
+  ];
 }
 
 geminiRouter.post('/gemini/chat', async (req: Request, res: Response) => {
   try {
-    const { history = [], prompt, modelName, useSearch, useHighThinking } = req.body;
-    
-    // REJECT client-controlled system instructions - server-side only
     if (req.body.systemInstruction) {
-      console.warn('Gemini chat: Client attempted to override system instruction - rejected');
-      return res.status(400).json({ error: "System instructions are server-controlled only" });
-    }
-    
-    const client = getAI();
-    let model = modelName || DEFAULT_MODEL;
-    let config: any = {};
-
-    // Server-side system instruction ONLY - never client-controlled
-    config.systemInstruction = UPL_SYSTEM_PROMPT;
-    if (useSearch) config.tools = [{ googleSearch: {} }];
-
-    if (useHighThinking) {
-      model = 'gemini-3.1-pro-preview';
+      console.warn('Chat: Client attempted to override system instruction - rejected');
+      return res.status(400).json({ error: 'System instructions are server-controlled only' });
     }
 
-    // Build safe user messages - user content is untrusted data
-    const userPrompt = sanitizeUserInput(prompt || '');
-    const safeHistory = history.map((h: any) => {
+    const userPrompt = sanitizeUserInput(req.body.prompt || '');
+    const history = Array.isArray(req.body.history) ? req.body.history : [];
+
+    const messages: ChatMessage[] = [{ role: 'system', content: UPL_SYSTEM_PROMPT }];
+    for (const h of history) {
       if (typeof h === 'string') {
-        return createUserMessage(h);
+        messages.push({ role: 'user', content: sanitizeUserInput(h) });
+      } else if (h?.role === 'user' && Array.isArray(h.parts)) {
+        const text = h.parts.map((p: any) => p?.text || '').join(' ');
+        messages.push({ role: 'user', content: sanitizeUserInput(text) });
+      } else if (h?.role === 'assistant' || h?.role === 'model') {
+        const text = typeof h.content === 'string' ? h.content : h.parts?.map((p: any) => p?.text || '').join(' ') || '';
+        messages.push({ role: 'assistant', content: String(text) });
       }
-      if (h && h.role === 'user' && Array.isArray(h.parts)) {
-        return {
-          role: 'user',
-          parts: h.parts.map((p: any) => createUserMessage(p.text || '').parts[0]),
-        };
-      }
-      return h;
-    });
+    }
+    messages.push({ role: 'user', content: userPrompt });
 
-    const { response, modelUsed } = await generateContentWithFallback(client, model, {
-      contents: [...safeHistory, createUserMessage(userPrompt)],
-      config,
-    });
-
-    return res.json({ text: response.text || '', modelUsed });
+    const { text, modelUsed } = await generateWithOllama(messages, req.body.modelName);
+    return res.json({ text, modelUsed, provider: 'ollama' });
   } catch (err: any) {
-    // Return generic error to avoid leaking internal details
-    if (err.message && err.message.includes('prompt injection detected')) {
-      console.warn('Gemini Chat: Prompt injection attempt blocked');
+    if (err.message?.includes('prompt injection detected')) {
       return res.status(400).json({ error: 'Invalid input - request rejected' });
     }
-    console.error('Gemini Chat Error:', err);
+    console.error('Ollama Chat Error:', err);
     return res.status(500).json({ error: GENERIC_ERROR_MESSAGE });
   }
 });
 
-// AI Lawyer / Legal Team Counselor Unified Endpoint
 const handleLawyerChat = async (req: Request, res: Response) => {
   try {
     const promptText = req.body.message || req.body.prompt || req.body.query || req.body.input;
-    const { history = [], jurisdiction = 'State & Federal Rules', context, agentRole = 'Legal Information Specialist' } = req.body;
+    const {
+      jurisdiction = 'State & Federal Rules',
+      context,
+      agentRole = 'Legal Information Specialist',
+    } = req.body;
 
     if (!promptText) {
       return res.status(400).json({ error: 'Message or prompt is required.' });
     }
-    
-    const client = getAI();
 
-    // Sanitize all user inputs
     const sanitizedPrompt = sanitizeUserInput(String(promptText));
     const sanitizedJurisdiction = sanitizeUserInput(String(jurisdiction));
-    const sanitizedContext = context ? (typeof context === 'string' ? sanitizeUserInput(context) : JSON.stringify(context)) : 'Pro Se Matter';
+    const sanitizedContext = context
+      ? typeof context === 'string'
+        ? sanitizeUserInput(context)
+        : JSON.stringify(context)
+      : 'Pro Se Matter';
     const sanitizedAgentRole = sanitizeUserInput(String(agentRole));
 
-    const lawyerPrompt = `Role: Acquit.ai Legal Team Assistant (${sanitizedAgentRole})
+    const lawyerPrompt = `Role: Chain of Command Legal Team Assistant (${sanitizedAgentRole})
 Mission: Assist self-represented (pro se) litigant with legal education, procedural rules, and factual organization.
 Jurisdiction: ${sanitizedJurisdiction}
 Case Context: ${sanitizedContext}
@@ -174,25 +138,23 @@ STRICT MANDATES:
 
 User Question: ${sanitizedPrompt}`;
 
-    const { response, modelUsed } = await generateContentWithFallback(client, DEFAULT_MODEL, {
-      contents: [createUserMessage(lawyerPrompt)],
-      config: {
-        systemInstruction: UPL_SYSTEM_PROMPT,
-      },
-    });
+    const { text, modelUsed } = await generateWithOllama(
+      systemAndUser(UPL_SYSTEM_PROMPT, lawyerPrompt),
+      req.body.modelName
+    );
 
-    const text = response.text || 'Unable to generate response.';
     return res.json({
       success: true,
-      text,
+      text: text || 'Unable to generate response.',
       agentRole,
       modelUsed,
+      provider: 'ollama',
       timestamp: new Date().toISOString(),
-      disclaimer: "This information is provided for educational and procedural purposes only and does not constitute legal advice. No attorney-client relationship is formed.",
+      disclaimer:
+        'This information is provided for educational and procedural purposes only and does not constitute legal advice. No attorney-client relationship is formed.',
     });
   } catch (err: any) {
-    if (err.message && err.message.includes('prompt injection detected')) {
-      console.warn('Lawyer Chat: Prompt injection attempt blocked');
+    if (err.message?.includes('prompt injection detected')) {
       return res.status(400).json({ error: 'Invalid input - request rejected' });
     }
     console.error('Lawyer Chat Error:', err);
@@ -209,85 +171,78 @@ geminiRouter.post('/chat', handleLawyerChat);
 
 geminiRouter.post('/gemini/legal-info', async (req: Request, res: Response) => {
   try {
-    const { prompt, modelName, jurisdiction } = req.body;
-    
-    const client = getAI();
-    let model = modelName || DEFAULT_MODEL;
+    const { prompt, jurisdiction } = req.body;
+    const sanitizedPrompt = sanitizeUserInput(String(prompt || ''));
+    const sanitizedJurisdiction = jurisdiction
+      ? JSON.stringify(jurisdiction)
+      : JSON.stringify({ state: 'IN' });
 
-    const jsonSchema = zodToJsonSchema(LegalInfoResponseSchema);
+    const userMsg = `Jurisdiction: ${sanitizedJurisdiction}
 
-    const sanitizedPrompt = sanitizeUserInput(String(prompt));
-    const sanitizedJurisdiction = jurisdiction ? JSON.stringify(jurisdiction) : JSON.stringify({ state: 'AZ' });
+Respond in plain English legal information only (not advice). Include citations and procedural steps.
 
-    const { response } = await generateContentWithFallback(client, model, {
-      contents: [createUserMessage(`Jurisdiction: ${sanitizedJurisdiction}\n\nLegal Query:\n${sanitizedPrompt}`)],
-      config: {
-        systemInstruction: UPL_SYSTEM_PROMPT,
-        responseMimeType: 'application/json',
-        responseSchema: jsonSchema as any,
-      },
+Legal Query:
+${sanitizedPrompt}`;
+
+    const { text, modelUsed } = await generateWithOllama(
+      systemAndUser(UPL_SYSTEM_PROMPT, userMsg),
+      req.body.modelName
+    );
+
+    return res.json({
+      disclaimer:
+        'This information is provided for educational and procedural purposes only and does not constitute legal advice. No attorney-client relationship is formed. Consult a licensed attorney for case-specific representation.',
+      jurisdiction: typeof jurisdiction === 'object' ? jurisdiction : { state: 'IN' },
+      text,
+      modelUsed,
+      provider: 'ollama',
+      requiresHumanReview: true,
+      outcomePredictionAllowed: false,
     });
-
-    if (!response.text) {
-      throw new Error('No text returned from Gemini');
-    }
-
-    const data = JSON.parse(response.text);
-    const parsedData = LegalInfoResponseSchema.parse(data);
-
-    return res.json(parsedData);
   } catch (err: any) {
-    if (err.message && err.message.includes('prompt injection detected')) {
-      console.warn('Legal Info: Prompt injection attempt blocked');
+    if (err.message?.includes('prompt injection detected')) {
       return res.status(400).json({ error: 'Invalid input - request rejected' });
     }
-    console.error('Gemini Legal Info Error:', err);
+    console.error('Legal Info Error:', err);
     return res.status(500).json({ error: GENERIC_ERROR_MESSAGE });
   }
 });
 
-// The Clerk AI Assistant (Pro Se Court Guide)
 geminiRouter.post('/gemini/clerk-chat', async (req: Request, res: Response) => {
   try {
     const { message, context, jurisdiction = 'Indiana' } = req.body;
-    
-    const client = getAI();
-
-    const sanitizedMessage = sanitizeUserInput(String(message));
+    const sanitizedMessage = sanitizeUserInput(String(message || ''));
     const sanitizedContext = context ? JSON.stringify(context) : 'General Criminal / Procedural Inquiry';
     const sanitizedJurisdiction = sanitizeUserInput(String(jurisdiction));
 
-    const clerkPrompt = `You are "The Clerk", an AI court procedural guide and legal education assistant for pro se (self-represented) litigants on Acquit.ai.
+    const clerkPrompt = `You are "The Clerk", an AI court procedural guide for Chain of Command Legal OS.
 Jurisdiction: ${sanitizedJurisdiction}
 Case Context: ${sanitizedContext}
 
 STRICT MANDATES:
 1. Provide plain-English legal information (~8th grade reading level).
 2. NEVER say "In my legal opinion"
-3. Every procedural rule or deadline MUST cite the active statutory authority. If unknown or unverified, state [Authority Not Verified].
+3. Every procedural rule or deadline MUST cite the active statutory authority. If unknown, state [Authority Not Verified].
 4. Help the self-represented person understand court procedures.
-5. End with the mandatory notice:
-"This information is provided for educational and procedural purposes only and does not constitute legal advice."
+5. End with: "This information is provided for educational and procedural purposes only and does not constitute legal advice."
 
 User Question: ${sanitizedMessage}`;
 
-    const { response, modelUsed } = await generateContentWithFallback(client, DEFAULT_MODEL, {
-      contents: [createUserMessage(clerkPrompt)],
-      config: {
-        systemInstruction: UPL_SYSTEM_PROMPT,
-      },
-    });
+    const { text, modelUsed } = await generateWithOllama(
+      systemAndUser(UPL_SYSTEM_PROMPT, clerkPrompt)
+    );
 
     return res.json({
       success: true,
-      text: response.text || 'Unable to generate response.',
+      text: text || 'Unable to generate response.',
       modelUsed,
+      provider: 'ollama',
       timestamp: new Date().toISOString(),
-      disclaimer: "This information is provided for educational and procedural purposes only and does not constitute legal advice.",
+      disclaimer:
+        'This information is provided for educational and procedural purposes only and does not constitute legal advice.',
     });
   } catch (err: any) {
-    if (err.message && err.message.includes('prompt injection detected')) {
-      console.warn('Clerk Chat: Prompt injection attempt blocked');
+    if (err.message?.includes('prompt injection detected')) {
       return res.status(400).json({ error: 'Invalid input - request rejected' });
     }
     console.error('Clerk Chat Error:', err);
@@ -295,27 +250,25 @@ User Question: ${sanitizedMessage}`;
   }
 });
 
-// Evidence Analysis Endpoint
 geminiRouter.post('/gemini/analyze-evidence', async (req: Request, res: Response) => {
   try {
     const { title, description, category, tags, charges } = req.body;
-    
-    const client = getAI();
-
-    const sanitizedTitle = sanitizeUserInput(String(title));
-    const sanitizedDescription = sanitizeUserInput(String(description));
-    const sanitizedCategory = sanitizeUserInput(String(category));
-    const sanitizedTags = Array.isArray(tags) ? tags.map((t: any) => sanitizeUserInput(String(t))).join(', ') : sanitizeUserInput(String(tags));
+    const sanitizedTitle = sanitizeUserInput(String(title || ''));
+    const sanitizedDescription = sanitizeUserInput(String(description || ''));
+    const sanitizedCategory = sanitizeUserInput(String(category || ''));
+    const sanitizedTags = Array.isArray(tags)
+      ? tags.map((t: any) => sanitizeUserInput(String(t))).join(', ')
+      : sanitizeUserInput(String(tags || ''));
     const sanitizedCharges = sanitizeUserInput(String(charges || 'General'));
 
-    const prompt = `Analyze this piece of evidentiary record for a self-represented criminal defense matter:
+    const prompt = `Analyze this evidentiary record for a self-represented criminal defense matter on Chain of Command:
 Title: ${sanitizedTitle}
 Category: ${sanitizedCategory}
 Description: ${sanitizedDescription}
 Tags: ${sanitizedTags}
 Charges at Issue: ${sanitizedCharges}
 
-Provide a structured factual analysis:
+Provide structured factual analysis:
 1. Factual Summary (plain English)
 2. Chain of Custody & Authenticity Considerations
 3. Potential Evidentiary Issues
@@ -324,20 +277,19 @@ Provide a structured factual analysis:
 
 MANDATE: Maintain neutrality, do not calculate win probability, include disclaimer header.`;
 
-    const { response, modelUsed } = await generateContentWithFallback(client, DEFAULT_MODEL, {
-      contents: [createUserMessage(prompt)],
-      config: { systemInstruction: UPL_SYSTEM_PROMPT },
-    });
+    const { text, modelUsed } = await generateWithOllama(
+      systemAndUser(UPL_SYSTEM_PROMPT, prompt)
+    );
 
     return res.json({
       success: true,
-      analysis: response.text,
+      analysis: text,
       modelUsed,
+      provider: 'ollama',
       analyzedAt: new Date().toISOString(),
     });
   } catch (err: any) {
-    if (err.message && err.message.includes('prompt injection detected')) {
-      console.warn('Evidence Analysis: Prompt injection attempt blocked');
+    if (err.message?.includes('prompt injection detected')) {
       return res.status(400).json({ error: 'Invalid input - request rejected' });
     }
     console.error('Evidence Analysis Error:', err);
@@ -345,46 +297,35 @@ MANDATE: Maintain neutrality, do not calculate win probability, include disclaim
   }
 });
 
-// Legal Document / Motion Drafter
 geminiRouter.post('/gemini/draft-motion', async (req: Request, res: Response) => {
   try {
     const { motionType, courtName, caseNumber, defendantName, grounds, requestedRelief } = req.body;
-    
-    const client = getAI();
 
-    const sanitizedMotionType = sanitizeUserInput(String(motionType || 'Motion'));
-    const sanitizedCourtName = sanitizeUserInput(String(courtName || 'Court'));
-    const sanitizedCaseNumber = sanitizeUserInput(String(caseNumber || 'Case'));
-    const sanitizedDefendantName = sanitizeUserInput(String(defendantName || 'Defendant'));
-    const sanitizedGrounds = sanitizeUserInput(String(grounds || 'General'));
-    const sanitizedRequestedRelief = sanitizeUserInput(String(requestedRelief || 'Relief'));
-
-    const prompt = `Draft a standard court pleading template for a self-represented litigant:
-Motion Type: ${sanitizedMotionType}
-Court: ${sanitizedCourtName}
-Case No.: ${sanitizedCaseNumber}
-Defendant: ${sanitizedDefendantName}
-Factual Grounds: ${sanitizedGrounds}
-Requested Relief: ${sanitizedRequestedRelief}
+    const prompt = `Draft a standard court pleading template for a self-represented litigant (Chain of Command):
+Motion Type: ${sanitizeUserInput(String(motionType || 'Motion'))}
+Court: ${sanitizeUserInput(String(courtName || 'Court'))}
+Case No.: ${sanitizeUserInput(String(caseNumber || 'Case'))}
+Defendant: ${sanitizeUserInput(String(defendantName || 'Defendant'))}
+Factual Grounds: ${sanitizeUserInput(String(grounds || 'General'))}
+Requested Relief: ${sanitizeUserInput(String(requestedRelief || 'Relief'))}
 
 MANDATORY FORMAT:
 Prepend draft with: [PREPARED FOR SELF-REPRESENTED LITIGANT - NOT LEGAL ADVICE - REQUIRES INDEPENDENT HUMAN REVIEW]
 Include caption, standard title, factual assertions, statutory authorities, certificate of service, and signature block.`;
 
-    const { response, modelUsed } = await generateContentWithFallback(client, DEFAULT_MODEL, {
-      contents: [createUserMessage(prompt)],
-      config: { systemInstruction: UPL_SYSTEM_PROMPT },
-    });
+    const { text, modelUsed } = await generateWithOllama(
+      systemAndUser(UPL_SYSTEM_PROMPT, prompt)
+    );
 
     return res.json({
       success: true,
-      draft: response.text,
+      draft: text,
       modelUsed,
+      provider: 'ollama',
       generatedAt: new Date().toISOString(),
     });
   } catch (err: any) {
-    if (err.message && err.message.includes('prompt injection detected')) {
-      console.warn('Motion Drafting: Prompt injection attempt blocked');
+    if (err.message?.includes('prompt injection detected')) {
       return res.status(400).json({ error: 'Invalid input - request rejected' });
     }
     console.error('Motion Drafting Error:', err);
@@ -392,26 +333,18 @@ Include caption, standard title, factual assertions, statutory authorities, cert
   }
 });
 
-// Neutral Plea Decision Assistant
 geminiRouter.post('/gemini/plea-assistant', async (req: Request, res: Response) => {
   try {
     const { charges, pleaOffer, trialRisks, collateralConsequences } = req.body;
-    
-    const client = getAI();
 
-    const sanitizedCharges = sanitizeUserInput(String(charges || 'General'));
-    const sanitizedPleaOffer = sanitizeUserInput(String(pleaOffer || 'General'));
-    const sanitizedTrialRisks = sanitizeUserInput(String(trialRisks || 'General'));
-    const sanitizedCollateralConsequences = sanitizeUserInput(String(collateralConsequences || 'General'));
-
-    const prompt = `Act as the neutral Plea Decision Assistant for Acquit.ai.
+    const prompt = `Act as the neutral Plea Decision Assistant for Chain of Command Legal OS.
 CRITICAL MANDATE: You MUST NOT tell the user to take or reject the plea.
 
 Input Data:
-Charges: ${sanitizedCharges}
-Plea Offer: ${sanitizedPleaOffer}
-Trial Considerations: ${sanitizedTrialRisks}
-Collateral Concerns: ${sanitizedCollateralConsequences}
+Charges: ${sanitizeUserInput(String(charges || 'General'))}
+Plea Offer: ${sanitizeUserInput(String(pleaOffer || 'General'))}
+Trial Considerations: ${sanitizeUserInput(String(trialRisks || 'General'))}
+Collateral Concerns: ${sanitizeUserInput(String(collateralConsequences || 'General'))}
 
 Structure the output into:
 1. Summary of Current Charges & Statutory Penalty Maximums
@@ -422,20 +355,19 @@ Structure the output into:
 
 Disclaimer header and footer required.`;
 
-    const { response, modelUsed } = await generateContentWithFallback(client, DEFAULT_MODEL, {
-      contents: [createUserMessage(prompt)],
-      config: { systemInstruction: UPL_SYSTEM_PROMPT },
-    });
+    const { text, modelUsed } = await generateWithOllama(
+      systemAndUser(UPL_SYSTEM_PROMPT, prompt)
+    );
 
     return res.json({
       success: true,
-      decisionStructure: response.text,
+      decisionStructure: text,
       modelUsed,
+      provider: 'ollama',
       timestamp: new Date().toISOString(),
     });
   } catch (err: any) {
-    if (err.message && err.message.includes('prompt injection detected')) {
-      console.warn('Plea Assistant: Prompt injection attempt blocked');
+    if (err.message?.includes('prompt injection detected')) {
       return res.status(400).json({ error: 'Invalid input - request rejected' });
     }
     console.error('Plea Assistant Error:', err);
@@ -443,26 +375,20 @@ Disclaimer header and footer required.`;
   }
 });
 
-/**
- * Blueprint Feature: CaseDocument AI Summarizer & Timeline Extraction
- * Aligns directly with firebase-blueprint.json CaseDocument (aiSummary, extractedText)
- * and generates candidate TimelineEvent entries.
- */
 const handleDocumentSummary = async (req: Request, res: Response) => {
   try {
-    const { matterId, title, extractedText, type = 'filing', jurisdiction = 'Federal & State' } = req.body;
+    const { title, extractedText, type = 'filing', jurisdiction = 'Federal & State' } = req.body;
 
     if (!extractedText || String(extractedText).trim().length === 0) {
       return res.status(400).json({ error: 'extractedText is required to generate an AI summary.' });
     }
 
-    const client = getAI();
     const sanitizedTitle = sanitizeUserInput(String(title || 'Legal Document'));
     const sanitizedText = sanitizeUserInput(String(extractedText).slice(0, 48000));
     const sanitizedType = sanitizeUserInput(String(type));
     const sanitizedJurisdiction = sanitizeUserInput(String(jurisdiction));
 
-    const prompt = `Analyze this legal document for a self-represented (pro se) litigant according to the Chain of Command Blueprint:
+    const prompt = `Analyze this legal document for a self-represented litigant on Chain of Command:
 Document Title: ${sanitizedTitle}
 Declared Type: ${sanitizedType}
 Jurisdiction: ${sanitizedJurisdiction}
@@ -470,63 +396,24 @@ Document Text:
 ${sanitizedText}
 
 TASK:
-1. Generate an objective, plain-English summary (max 4500 characters) covering:
-   - Document Overview & Parties
-   - Substantive Claims, Allegations, or Orders
-   - Key Procedural Deadlines & Hearing Notices
-   - Evidentiary Inconsistencies or Unverified Claims
-2. Classify the document into one of the blueprint types:
-   ["filing", "evidence", "order", "correspondence", "transcript", "motion", "brief", "memo"]
-3. Extract any chronological factual events in JSON format matching the TimelineEvent blueprint:
-   Each event must have:
-   - title: concise title
-   - eventDate: ISO 8601 string or date description
-   - eventType: one of ["hearing", "filing_deadline", "discovery_deadline", "arrest", "general", "appearance", "motion", "order", "plea"]
-   - description: brief neutral description
+1. Generate an objective, plain-English summary (max 4500 characters).
+2. List key procedural deadlines if any.
+3. Note evidentiary inconsistencies or unverified claims.
+Include the mandatory UPL disclaimer.`;
 
-MANDATORY RULES:
-- Never say "In my legal opinion"
-- Prepend with: [PREPARED FOR SELF-REPRESENTED LITIGANT - NOT LEGAL ADVICE - REQUIRES INDEPENDENT HUMAN REVIEW]
-- Append with the mandatory educational disclaimer.`;
-
-    const { response, modelUsed } = await generateContentWithFallback(client, 'gemini-3.8-flash', {
-      contents: [createUserMessage(prompt)],
-      config: {
-        systemInstruction: UPL_SYSTEM_PROMPT,
-        temperature: 0.2,
-      },
-    });
-
-    const rawText = response.text || '';
-
-    // Safe extraction of any embedded JSON timeline events block if generated
-    let extractedTimelineEvents: Array<{ title: string; eventDate: string; eventType: string; description: string }> = [];
-    try {
-      const jsonMatch = rawText.match(/```json\s*([\s\S]*?)\s*```/) || rawText.match(/\[\s*\{\s*"title"[\s\S]*?\}\s*\]/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[1] || jsonMatch[0]);
-        if (Array.isArray(parsed)) {
-          extractedTimelineEvents = parsed.slice(0, 10);
-        }
-      }
-    } catch {
-      // Fallback: events handled in text format
-    }
+    const { text, modelUsed } = await generateWithOllama(
+      systemAndUser(UPL_SYSTEM_PROMPT, prompt)
+    );
 
     return res.json({
       success: true,
-      matterId: matterId || null,
-      title: sanitizedTitle,
-      type: sanitizedType,
-      aiSummary: rawText.slice(0, 5000),
-      extractedTimelineEvents,
+      summary: text,
       modelUsed,
+      provider: 'ollama',
       generatedAt: new Date().toISOString(),
-      disclaimer: "This information is provided for educational and procedural purposes only and does not constitute legal advice. No attorney-client relationship is formed. Consult a licensed attorney for case-specific representation."
     });
   } catch (err: any) {
-    if (err.message && err.message.includes('prompt injection detected')) {
-      console.warn('Document Summary: Prompt injection attempt blocked');
+    if (err.message?.includes('prompt injection detected')) {
       return res.status(400).json({ error: 'Invalid input - request rejected' });
     }
     console.error('Document Summary Error:', err);
@@ -537,74 +424,28 @@ MANDATORY RULES:
 geminiRouter.post('/gemini/document-summary', handleDocumentSummary);
 geminiRouter.post('/ai/document-summary', handleDocumentSummary);
 
-/**
- * Blueprint Feature: EvidenceItem Relevance Scorer
- * Aligns directly with firebase-blueprint.json EvidenceItem (relevanceScore: number)
- */
 const handleScoreEvidence = async (req: Request, res: Response) => {
   try {
-    const { matterId, title, description, dateAcquired, charges = 'General Offense Allegations' } = req.body;
+    const { title, description, category } = req.body;
+    const prompt = `Score this exhibit for organizational completeness only (not case strength) for Chain of Command:
+Title: ${sanitizeUserInput(String(title || ''))}
+Category: ${sanitizeUserInput(String(category || ''))}
+Description: ${sanitizeUserInput(String(description || ''))}
 
-    if (!title || !description) {
-      return res.status(400).json({ error: 'Both title and description are required to score evidence.' });
-    }
+Return: completeness notes, missing metadata fields, and suggested tags. No outcome predictions.`;
 
-    const client = getAI();
-    const sanitizedTitle = sanitizeUserInput(String(title));
-    const sanitizedDesc = sanitizeUserInput(String(description));
-    const sanitizedCharges = sanitizeUserInput(String(charges));
-    const sanitizedDate = dateAcquired ? sanitizeUserInput(String(dateAcquired)) : 'Unknown';
-
-    const prompt = `Evaluate this EvidenceItem for a pro se litigant case matter:
-Evidence Title: ${sanitizedTitle}
-Description / Notes: ${sanitizedDesc}
-Date Acquired: ${sanitizedDate}
-Relevant Charges / Allegations: ${sanitizedCharges}
-
-TASK:
-1. Assign a numeric relevance score between 0.00 and 1.00 based on standard evidentiary rules (probative value vs prejudice, factual nexus to elements of proof).
-2. Detail Chain of Custody & Authentication considerations (e.g. metadata, original source, timestamp verification).
-3. Detail admissibility grounds under Federal/State Rules of Evidence (e.g. hearsay exceptions, business records, Rule 403 balancing).
-4. Provide 3 specific procedural questions for the user to examine regarding this exhibit.
-
-OUTPUT FORMAT:
-First line: SCORE: <0.00 to 1.00>
-Followed by structured sections.
-MANDATE: Never say "In my legal opinion". Prepend with SRL header and end with educational disclaimer.`;
-
-    const { response, modelUsed } = await generateContentWithFallback(client, 'gemini-3.8-flash', {
-      contents: [createUserMessage(prompt)],
-      config: {
-        systemInstruction: UPL_SYSTEM_PROMPT,
-        temperature: 0.2,
-      },
-    });
-
-    const rawText = response.text || '';
-    let relevanceScore = 0.5;
-    const scoreMatch = rawText.match(/SCORE:\s*([0-1]?\.\d+)/i);
-    if (scoreMatch && scoreMatch[1]) {
-      const parsed = parseFloat(scoreMatch[1]);
-      if (!isNaN(parsed) && parsed >= 0 && parsed <= 1) {
-        relevanceScore = parsed;
-      }
-    }
+    const { text, modelUsed } = await generateWithOllama(
+      systemAndUser(UPL_SYSTEM_PROMPT, prompt)
+    );
 
     return res.json({
       success: true,
-      matterId: matterId || null,
-      title: sanitizedTitle,
-      relevanceScore,
-      analysis: rawText,
+      scoreNotes: text,
       modelUsed,
-      scoredAt: new Date().toISOString(),
-      disclaimer: "This information is provided for educational and procedural purposes only and does not constitute legal advice."
+      provider: 'ollama',
+      timestamp: new Date().toISOString(),
     });
   } catch (err: any) {
-    if (err.message && err.message.includes('prompt injection detected')) {
-      console.warn('Score Evidence: Prompt injection attempt blocked');
-      return res.status(400).json({ error: 'Invalid input - request rejected' });
-    }
     console.error('Score Evidence Error:', err);
     return res.status(500).json({ error: GENERIC_ERROR_MESSAGE });
   }
@@ -613,103 +454,47 @@ MANDATE: Never say "In my legal opinion". Prepend with SRL header and end with e
 geminiRouter.post('/gemini/score-evidence', handleScoreEvidence);
 geminiRouter.post('/ai/score-evidence', handleScoreEvidence);
 
-/**
- * RAG Evidence & Document Library Search
- * Searches across user's stored evidence, retrieves relevant exhibits,
- * and synthesizes an evidence-grounded procedural answer with exact citations.
- */
-const handleRagEvidenceSearch = async (req: Request, res: Response) => {
+geminiRouter.post('/gemini/rag-evidence', async (req: Request, res: Response) => {
   try {
-    const { query, evidence = [], matterTitle, jurisdiction = 'State & Federal' } = req.body;
+    const { query, evidence, matterTitle, jurisdiction } = req.body;
+    const prompt = `Chain of Command RAG evidence query.
+Matter: ${sanitizeUserInput(String(matterTitle || 'Matter'))}
+Jurisdiction: ${sanitizeUserInput(String(jurisdiction || 'Unknown'))}
+Query: ${sanitizeUserInput(String(query || ''))}
+Evidence pack: ${sanitizeUserInput(JSON.stringify(evidence || []).slice(0, 20000))}
 
-    if (!query || String(query).trim().length === 0) {
-      return res.status(400).json({ error: 'Search query is required.' });
-    }
+Answer using only the supplied evidence. Cite exhibit titles. Educational information only.`;
 
-    const client = getAI();
-    const sanitizedQuery = sanitizeUserInput(String(query));
-    const sanitizedMatter = matterTitle ? sanitizeUserInput(String(matterTitle)) : 'Active Legal Matter';
-    const sanitizedJurisdiction = sanitizeUserInput(String(jurisdiction));
-
-    // Format stored evidence as structured RAG context
-    const evidenceContext = Array.isArray(evidence) && evidence.length > 0
-      ? evidence.map((item: any, idx: number) => {
-          return `--- EXHIBIT ${item.exhibitNumber || `Exhibit ${idx + 1}`}: ${item.title || 'Untitled'} ---
-Type: ${item.type || 'Document'}
-Date Acquired: ${item.dateAcquired || 'Unknown'}
-Custodian: ${item.custodian || 'Unknown'}
-Chain of Custody Status: ${item.chainOfCustodyStatus || 'Not specified'}
-Relevant Charge / Element: ${item.relevantCharge || 'General'}
-Summary / Content:
-${item.summary || item.description || ''}
-Storage Hash: ${item.storageHash || 'Verified'}`;
-        }).join('\n\n')
-      : 'No stored evidence exhibits available in case locker.';
-
-    const prompt = `You are the Chain of Command RAG Document Retrieval and Evidence Synthesis Engine for a self-represented (pro se) litigant.
-Case Matter: ${sanitizedMatter}
-Jurisdiction: ${sanitizedJurisdiction}
-
-USER INQUIRY:
-"${sanitizedQuery}"
-
-STORED CASE EVIDENCE & DOCUMENT LIBRARY:
-${evidenceContext}
-
-TASK:
-1. Conduct a deep RAG analysis matching the user's query directly against the stored evidence exhibits above.
-2. In the answer, cite the specific Exhibit Numbers (e.g. Exhibit A, Exhibit B, Exhibit C) and provenance details (timestamps, dates, custodians) that answer the question or substantiate/refute the claim.
-3. If the stored evidence contains contradictions (e.g., between an incident report and video surveillance or store receipts), highlight them explicitly.
-4. If the stored evidence does not contain sufficient facts to answer the question, explicitly state: "[Information Not Found in Stored Evidence - Request Supplemental Discovery or Subpoena Records]".
-5. Provide actionable procedural next steps for a self-represented litigant (e.g., filing a motion to compel, subpoenaing records, or introducing the exhibit at hearing).
-
-STRICT MANDATES:
-- NEVER use the phrase "In my legal opinion".
-- Prepend output with:
-[PREPARED FOR SELF-REPRESENTED LITIGANT - NOT LEGAL ADVICE - REQUIRES INDEPENDENT HUMAN REVIEW]
-- Append the mandatory educational disclaimer.`;
-
-    const { response, modelUsed } = await generateContentWithFallback(client, 'gemini-3.8-flash', {
-      contents: [createUserMessage(prompt)],
-      config: {
-        systemInstruction: UPL_SYSTEM_PROMPT,
-        temperature: 0.2,
-      },
-    });
-
-    const rawText = response.text || '';
-
-    // Extract mentioned exhibits from the text
-    const mentionedExhibits: string[] = [];
-    if (Array.isArray(evidence)) {
-      for (const item of evidence) {
-        if (item.exhibitNumber && rawText.includes(item.exhibitNumber)) {
-          mentionedExhibits.push(item.exhibitNumber);
-        }
-      }
-    }
+    const { text, modelUsed } = await generateWithOllama(
+      systemAndUser(UPL_SYSTEM_PROMPT, prompt)
+    );
 
     return res.json({
       success: true,
-      query: sanitizedQuery,
-      answer: rawText,
+      query: query || '',
+      answer: text,
       modelUsed,
-      citedExhibits: mentionedExhibits,
+      provider: 'ollama',
+      citedExhibits: [],
       timestamp: new Date().toISOString(),
-      disclaimer: "This information is provided for educational and procedural purposes only and does not constitute legal advice."
+      disclaimer:
+        'This information is provided for educational and procedural purposes only and does not constitute legal advice.',
     });
   } catch (err: any) {
-    if (err.message && err.message.includes('prompt injection detected')) {
-      console.warn('RAG Evidence Search: Prompt injection attempt blocked');
-      return res.status(400).json({ error: 'Invalid input - request rejected' });
-    }
-    console.error('RAG Evidence Search Error:', err);
+    console.error('RAG Evidence Error:', err);
     return res.status(500).json({ error: GENERIC_ERROR_MESSAGE });
   }
-};
+});
 
-geminiRouter.post('/gemini/rag-evidence', handleRagEvidenceSearch);
-geminiRouter.post('/ai/rag-evidence', handleRagEvidenceSearch);
-geminiRouter.post('/rag/search', handleRagEvidenceSearch);
-
-export default geminiRouter;
+/** Health check for local Ollama */
+geminiRouter.get('/ai/ollama/health', async (_req: Request, res: Response) => {
+  const health = await ollama.health();
+  const models = health.ok ? await ollama.listModels() : [];
+  return res.status(health.ok ? 200 : 503).json({
+    provider: 'ollama',
+    baseUrl: OLLAMA_BASE,
+    defaultModel: DEFAULT_MODEL,
+    ...health,
+    models,
+  });
+});

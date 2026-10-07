@@ -33,12 +33,12 @@ export function getApiBaseUrl(): string {
 /**
  * Retrieves the active bearer token from storage or defaults to a valid pro se session token.
  */
-export function getAuthToken(): string {
+export function getAuthToken(): string | null {
   if (typeof window !== "undefined") {
     const stored = localStorage.getItem("acquit_auth_token");
-    if (stored) return stored;
+    if (stored && stored.trim()) return stored;
   }
-  return "acquit-pro-se-token";
+  return null;
 }
 
 /**
@@ -265,7 +265,66 @@ export const api = {
   // Case & Matters
   matters: {
     getAll: () => request<{ success: boolean; matters: any[] }>("/matters"),
-    getById: (matterId: string) => request<{ success: boolean; matter: any }>(`/matters/${matterId}`),
+    getById: (matterId: string) =>
+      request<{ success: boolean; matter: any }>(`/matters/${matterId}`),
+    create: (payload: {
+      title: string;
+      caseNumber?: string;
+      courtName?: string;
+      jurisdiction?: string;
+      description?: string;
+      summary?: string;
+      status?: string;
+    }) =>
+      request<{ success: boolean; matter: any }>("/matters", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }),
+    update: (
+      matterId: string,
+      payload: Partial<{
+        title: string;
+        caseNumber: string;
+        courtName: string;
+        jurisdiction: string;
+        description: string;
+        summary: string;
+        status: string;
+      }>
+    ) =>
+      request<{ success: boolean; matter: any }>(`/matters/${matterId}`, {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+      }),
+    listParties: (matterId: string) =>
+      request<{ success: boolean; parties: any[] }>(`/matters/${matterId}/parties`),
+    addParty: (
+      matterId: string,
+      payload: { name: string; role: string; contactInfo?: Record<string, unknown> }
+    ) =>
+      request<{ success: boolean; party: any }>(`/matters/${matterId}/parties`, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }),
+    listDeadlines: (matterId: string) =>
+      request<{ success: boolean; deadlines: any[] }>(`/matters/${matterId}/deadlines`),
+    addDeadline: (
+      matterId: string,
+      payload: { title: string; dueDate: string; status?: string; relatedDocumentId?: string }
+    ) =>
+      request<{ success: boolean; deadline: any }>(`/matters/${matterId}/deadlines`, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }),
+    updateDeadline: (
+      matterId: string,
+      deadlineId: string,
+      payload: Partial<{ title: string; dueDate: string; status: string }>
+    ) =>
+      request<{ success: boolean; deadline: any }>(
+        `/matters/${matterId}/deadlines/${deadlineId}`,
+        { method: "PATCH", body: JSON.stringify(payload) }
+      ),
   },
 
   // Documents
@@ -276,12 +335,42 @@ export const api = {
       }),
   },
 
-  // CourtListener Legal Research
+  // CourtListener (Free Law Project) — case law + RECAP
   courtlistener: {
-    search: (q: string, court?: string, type = "o", page = 1) =>
-      request<{ count: number; results: any[] }>("/courtlistener/search", {
-        params: { q, court, type, page },
+    /** type: o = opinions (case law), r = RECAP dockets */
+    search: (
+      q: string,
+      opts?: { court?: string; type?: string; page?: number }
+    ) =>
+      request<{
+        count: number;
+        results: Array<{
+          id: string | number;
+          caseName: string;
+          citation: string;
+          court: string;
+          dateFiled: string;
+          snippet: string;
+          absoluteUrl: string | null;
+          clusterId?: number;
+          precedentialStatus?: string | null;
+          type: string;
+        }>;
+        provider: string;
+        searchType: string;
+        query: string;
+        error?: string;
+        hint?: string;
+      }>("/courtlistener/search", {
+        params: {
+          q,
+          court: opts?.court,
+          type: opts?.type ?? "o",
+          page: opts?.page ?? 1,
+        },
       }),
+    opinion: (id: string) =>
+      request<{ provider: string; opinion: unknown }>(`/courtlistener/opinions/${id}`),
   },
 
   // Health

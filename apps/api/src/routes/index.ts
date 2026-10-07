@@ -15,11 +15,16 @@ import { verifySession } from "../middleware/verifySession";
 
 const router: IRouter = Router();
 
+// Public (no session)
 router.use(healthRouter);
-router.use(webhooksRouter); // public via HMAC
-router.use(workflowRouter); // workflow inspection and durable workflows
+router.use(webhooksRouter); // authenticated via HMAC secrets, not session
 
+// Everything below requires a verified session
 router.use(verifySession as any);
+
+// Workflow DAG / signup / execution lookup — previously public; must be authenticated
+router.use(workflowRouter);
+
 router.use(aiRouter);
 router.use(directoryRouter);
 router.use(courtlistenerRouter);
@@ -27,7 +32,7 @@ router.use(documentsRouter);
 router.use(mattersRouter);
 router.use(geminiRouter);
 router.use(filingRouter);
-router.use('/audit', auditRouter as any);
-router.use('/chain-of-command', chainOfCommandRouter as any);
+router.use("/audit", auditRouter as any);
+router.use("/chain-of-command", chainOfCommandRouter as any);
 
 export default router;

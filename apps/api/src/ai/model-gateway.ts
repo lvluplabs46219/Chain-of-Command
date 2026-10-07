@@ -173,7 +173,10 @@ export class DemoModelAdapter implements ModelAdapter {
 export class OllamaAdapter implements ModelAdapter {
   provider = "ollama" as const;
 
-  constructor(private readonly baseUrl = process.env.OLLAMA_BASE_URL ?? "http://localhost:11434") {}
+  constructor(
+    private readonly baseUrl =
+      process.env.OLLAMA_BASE_URL || process.env.OLLAMA_URL || "http://localhost:11434"
+  ) {}
 
   async listModels(): Promise<string[]> {
     try {
@@ -440,8 +443,9 @@ export class ModelGateway {
     if (!adapter) {
       throw new Error(`No model adapter is registered for provider "${provider}".`);
     }
-    const models = await adapter.listModels();
-    if (provider !== "demo") {
+    // Ollama: allow any model name (pull-on-demand / tags may lag). Demo: always ok.
+    if (provider !== "demo" && provider !== "ollama") {
+      const models = await adapter.listModels();
       if (models.length === 0) {
         throw new Error(`Failed to list available models for provider "${provider}".`);
       }

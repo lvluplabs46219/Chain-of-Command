@@ -2,14 +2,26 @@ import { Router, Request, Response } from "express";
 import { handleUserSignup } from "../workflows/userSignup";
 import { michaelOrchestrator, TaskNode } from "../ai/MichaelOrchestrator";
 import { SPECIALIST_AGENTS } from "./ai";
+import type { AuthenticatedRequest } from "../middleware/verifySession";
 import crypto from "crypto";
 
 const workflowRouter = Router();
 
+/** Defense in depth: router is mounted after verifySession in routes/index.ts */
+function requireUser(req: Request, res: Response): req is AuthenticatedRequest {
+  const user = (req as AuthenticatedRequest).user;
+  if (!user?.id) {
+    res.status(401).json({ error: "UNAUTHORIZED", message: "Authentication required" });
+    return false;
+  }
+  return true;
+}
+
 /**
  * Global Status of AI Agents & Workflow Engines
  */
-workflowRouter.get("/workflow/status", (_req: Request, res: Response) => {
+workflowRouter.get("/workflow/status", (req: Request, res: Response) => {
+  if (!requireUser(req, res)) return;
   const registeredAgents = Object.entries(SPECIALIST_AGENTS).map(([id, meta]) => ({
     id,
     name: meta.name,
@@ -33,6 +45,7 @@ workflowRouter.get("/workflow/status", (_req: Request, res: Response) => {
  * Trigger User Onboarding Durable Workflow
  */
 workflowRouter.post("/workflow/signup", async (req: Request, res: Response) => {
+  if (!requireUser(req, res)) return;
   const { email } = req.body;
   if (!email || typeof email !== "string" || !email.includes("@")) {
     return res.status(400).json({ error: "VALIDATION_ERROR", message: "A valid email address is required" });
@@ -57,6 +70,7 @@ workflowRouter.post("/workflow/signup", async (req: Request, res: Response) => {
  * Dispatch Multi-Agent Legal Workflow DAG
  */
 workflowRouter.post("/workflow/dag/dispatch", async (req: Request, res: Response) => {
+  if (!requireUser(req, res)) return;
   const { matterId, objective, selectedAgents } = req.body;
   const executionId = "exec_" + crypto.randomBytes(8).toString("hex");
 
@@ -143,6 +157,7 @@ workflowRouter.post("/workflow/dag/dispatch", async (req: Request, res: Response
  * Query DAG Execution State
  */
 workflowRouter.get("/workflow/dag/:executionId", (req: Request, res: Response) => {
+  if (!requireUser(req, res)) return;
   const { executionId } = req.params;
   const state = michaelOrchestrator.getExecutionState(executionId);
 

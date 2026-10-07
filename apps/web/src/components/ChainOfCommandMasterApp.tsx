@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import {
   Matter,
-  INITIAL_MATTERS,
+  EMPTY_MATTER,
   SpecialistAgent,
   SPECIALIST_AGENTS_ROSTER,
   TimelineRecord,
@@ -20,7 +21,14 @@ import {
   saveEvidenceRecord,
 } from "@/lib/workspace-sync";
 import { WorkspaceHeader } from "./workspace/WorkspaceHeader";
-import { WorkspaceNavigation, WorkspaceTab } from "./workspace/WorkspaceNavigation";
+import {
+  WorkspaceNavigation,
+  WorkspaceTab,
+  pathToTab,
+} from "./workspace/WorkspaceNavigation";
+import { FirstRunWizard, type OnboardingResult } from "./onboarding/FirstRunWizard";
+import { useAuth } from "@/contexts/AuthContext";
+import { SAMPLE_MATTERS } from "@/lib/workspace-data";
 import { DashboardView } from "./workspace/DashboardView";
 import { DocketView } from "./workspace/DocketView";
 import { ChambersView } from "./workspace/ChambersView";
@@ -39,13 +47,21 @@ interface ChainOfCommandMasterAppProps {
 }
 
 export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCommandMasterAppProps) {
-  const [matters, setMatters] = useState<Matter[]>(INITIAL_MATTERS);
-  const [activeMatter, setActiveMatter] = useState<Matter>(INITIAL_MATTERS[0]);
+  const pathname = usePathname();
+  const { isAuthenticated, isLoading: authLoading, isFirstRun, completeFirstRun } = useAuth();
+  const [matters, setMatters] = useState<Matter[]>([]);
+  const [activeMatter, setActiveMatter] = useState<Matter>(EMPTY_MATTER);
   const [agents, setAgents] = useState<SpecialistAgent[]>(SPECIALIST_AGENTS_ROSTER);
   const [timeline, setTimeline] = useState<TimelineRecord[]>([]);
   const [evidence, setEvidence] = useState<EvidenceRecord[]>([]);
   const [activeTab, setActiveTab] = useState<WorkspaceTab>(initialTab);
-  const [jurisdiction, setJurisdiction] = useState<string>("Indiana");
+  const [jurisdiction, setJurisdiction] = useState<string>("");
+  const [dataReady, setDataReady] = useState(false);
+
+  useEffect(() => {
+    const fromPath = pathToTab(pathname || "/");
+    if (fromPath) setActiveTab(fromPath);
+  }, [pathname]);
 
   // New Matter Modal
   const [showNewMatterModal, setShowNewMatterModal] = useState<boolean>(false);
@@ -57,26 +73,80 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
 
   useEffect(() => {
     async function initData() {
+      // Drop legacy demo seed if still in localStorage
+      try {
+        const raw = localStorage.getItem("chain_of_command_matters");
+        if (raw) {
+          const parsed = JSON.parse(raw) as Matter[];
+          if (
+            Array.isArray(parsed) &&
+            parsed.some((m) => m.id === "matter-001" && m.title?.includes("Marcus Vance"))
+          ) {
+            localStorage.removeItem("chain_of_command_matters");
+          }
+        }
+      } catch {
+        /* ignore */
+      }
+
       const loaded = await loadMatters();
       if (loaded && loaded.length > 0) {
         setMatters(loaded);
         setActiveMatter(loaded[0]);
-        setJurisdiction(loaded[0].jurisdiction || "Indiana");
+        setJurisdiction(loaded[0].jurisdiction || "");
+      } else {
+        setMatters([]);
+        setActiveMatter(EMPTY_MATTER);
       }
       setAgents(loadAgents());
+      setDataReady(true);
     }
     initData();
   }, []);
 
   useEffect(() => {
-    if (activeMatter) {
+    if (activeMatter && activeMatter.id !== "matter-empty") {
       setTimeline(loadTimeline(activeMatter.id));
       setEvidence(loadEvidence(activeMatter.id));
       if (activeMatter.jurisdiction) {
         setJurisdiction(activeMatter.jurisdiction);
       }
+    } else {
+      setTimeline([]);
+      setEvidence([]);
     }
   }, [activeMatter.id]);
+
+  const handleOnboardingComplete = async (result: OnboardingResult) => {
+    completeFirstRun();
+    setJurisdiction(result.jurisdiction);
+    if (result.loadSample) {
+      setMatters(SAMPLE_MATTERS);
+      setActiveMatter(SAMPLE_MATTERS[0]);
+      for (const m of SAMPLE_MATTERS) {
+        await saveMatter(m);
+      }
+    } else if (result.matter) {
+      const saved = await saveMatter(result.matter);
+      setMatters([saved]);
+      setActiveMatter(saved);
+    } else {
+      setMatters([]);
+      setActiveMatter(EMPTY_MATTER);
+    }
+  };
+
+  if (authLoading || !dataReady) {
+    return (
+      <div className="min-h-screen bg-[#0C0D10] flex items-center justify-center text-neutral-400 text-sm">
+        Preparing your workspace…
+      </div>
+    );
+  }
+
+  if (isFirstRun || !isAuthenticated) {
+    return <FirstRunWizard onComplete={handleOnboardingComplete} />;
+  }
 
   const handleSelectMatter = (m: Matter) => {
     setActiveMatter(m);
@@ -86,9 +156,12 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
   };
 
   const handleSaveMatter = async (updated: Matter) => {
-    setActiveMatter(updated);
-    setMatters((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
-    await saveMatter(updated);
+    const saved = await saveMatter(updated);
+    setActiveMatter(saved);
+    setMatters((prev) => {
+      const without = prev.filter((m) => m.id !== updated.id && m.id !== saved.id);
+      return [saved, ...without];
+    });
   };
 
   const handleUpdateAgent = (updated: SpecialistAgent) => {
@@ -146,9 +219,9 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
       ],
     };
 
-    await saveMatter(newM);
-    setMatters((prev) => [newM, ...prev]);
-    setActiveMatter(newM);
+    const saved = await saveMatter(newM);
+    setMatters((prev) => [saved, ...prev.filter((m) => m.id !== newM.id && m.id !== saved.id)]);
+    setActiveMatter(saved);
     setShowNewMatterModal(false);
     setNewMatterTitle("");
     setNewMatterCaseNumber("");
@@ -157,6 +230,8 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
     setNewMatterSummary("");
     setActiveTab("docket");
   };
+
+  const isEmptyWorkspace = !matters.length || activeMatter.id === "matter-empty";
 
   return (
     <div className="min-h-screen bg-[#0C0D10] text-[#E1E2E5] flex flex-col font-sans selection:bg-[#D4AF37]/30">
@@ -172,6 +247,24 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
 
       {/* Navigation */}
       <WorkspaceNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+
+      {isEmptyWorkspace && (
+        <div className="mx-4 mt-3 rounded-xl border border-[#D4AF37]/25 bg-[#D4AF37]/5 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm text-[#EFE6D0] font-medium">No active matter yet</p>
+            <p className="text-xs text-neutral-400 mt-0.5">
+              Open a case file to unlock deadlines, evidence, and the AI team on real data.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowNewMatterModal(true)}
+            className="shrink-0 px-3 py-1.5 rounded-lg bg-[#D4AF37] text-neutral-950 text-xs font-semibold hover:bg-[#c49f27]"
+          >
+            Open new matter
+          </button>
+        </div>
+      )}
 
       {/* Main Content Area */}
       <section aria-label="Active Case Workspace" className="flex-1">

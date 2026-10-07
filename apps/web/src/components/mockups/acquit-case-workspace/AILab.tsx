@@ -1,31 +1,21 @@
+"use client";
+
 import React, { useState, useRef, useEffect } from "react";
-import { EvidenceCarousel, type EvidenceItem } from "./EvidenceCarousel";
+import { EvidenceCarousel } from "./EvidenceCarousel";
 import {
   ShieldAlert,
-  BookOpen,
-  Download,
-  AlertTriangle,
-  BadgeCheck,
-  XCircle,
   Search,
   MessageSquare,
-  FileText,
-  Calendar,
   Clock,
-  Plus,
-  ChevronRight,
-  ChevronLeft,
-  Image as ImageIcon,
-  Paperclip,
-  Mic,
   Send,
   Sparkles,
   Bot,
   User,
-  CheckCircle2,
   RefreshCw,
-  Scale
+  AlertTriangle,
+  XCircle,
 } from "lucide-react";
+import { api, ApiError } from "@/lib/api";
 
 export interface AgentProfile {
   id: string;
@@ -43,7 +33,7 @@ export const LEGAL_AGENTS: AgentProfile[] = [
     role: "Strategy & Issue Synthesis",
     badge: "Coordinator",
     description: "Decomposes complex objectives and synthesizes unified procedural workspaces.",
-    initials: "LC"
+    initials: "LC",
   },
   {
     id: "paralegal",
@@ -51,7 +41,7 @@ export const LEGAL_AGENTS: AgentProfile[] = [
     role: "Deadlines & Procedural Rules",
     badge: "Procedural",
     description: "Calculates statutory court deadlines and compiles court filing checklists.",
-    initials: "PL"
+    initials: "PL",
   },
   {
     id: "investigator",
@@ -59,7 +49,7 @@ export const LEGAL_AGENTS: AgentProfile[] = [
     role: "Timeline & Fact Verification",
     badge: "Factual",
     description: "Analyzes chronological records and detects inconsistencies in police narratives.",
-    initials: "IN"
+    initials: "IN",
   },
   {
     id: "evidence-analyst",
@@ -67,7 +57,7 @@ export const LEGAL_AGENTS: AgentProfile[] = [
     role: "Chain of Custody & Hash Checks",
     badge: "Forensics",
     description: "Evaluates dashcam telemetry, bodycam logs, and calibration records.",
-    initials: "EA"
+    initials: "EA",
   },
   {
     id: "court-prep",
@@ -75,7 +65,7 @@ export const LEGAL_AGENTS: AgentProfile[] = [
     role: "Hearing Q&A & Demeanor",
     badge: "Advocacy",
     description: "Simulates judicial questions and courtroom procedures for pro se litigants.",
-    initials: "CP"
+    initials: "CP",
   },
   {
     id: "rights-checker",
@@ -83,7 +73,7 @@ export const LEGAL_AGENTS: AgentProfile[] = [
     role: "Constitutional & Miranda Audits",
     badge: "Constitutional",
     description: "Audits 4th/5th Amendment stop legality and detention duration thresholds.",
-    initials: "RC"
+    initials: "RC",
   },
   {
     id: "charge-explainer",
@@ -91,8 +81,8 @@ export const LEGAL_AGENTS: AgentProfile[] = [
     role: "Statutory Elements Breakdown",
     badge: "Statutory",
     description: "Translates charging affidavits into plain English elements of proof.",
-    initials: "CE"
-  }
+    initials: "CE",
+  },
 ];
 
 interface ChatMessage {
@@ -103,6 +93,13 @@ interface ChatMessage {
   timestamp: string;
   citations?: { title: string; cite: string }[];
   isStreaming?: boolean;
+  isError?: boolean;
+}
+
+interface SimulationResult {
+  rawText: string;
+  disclaimer?: string;
+  modelUsed?: string;
 }
 
 export function AILab() {
@@ -110,27 +107,25 @@ export function AILab() {
   const [selectedAgent, setSelectedAgent] = useState<AgentProfile>(LEGAL_AGENTS[0]);
   const [prompt, setPrompt] = useState("");
   const [isSimulating, setIsSimulating] = useState(false);
-  const [simulationResult, setSimulationResult] = useState<any>(null);
+  const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
+  const [simulationError, setSimulationError] = useState<string | null>(null);
 
-  // Chat State
   const [chatInput, setChatInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "msg-1",
       sender: "agent",
       agentName: "Lead Counsel Coordinator",
-      text: "Welcome to the Acquit.ai intelligence workspace. I am coordinating your legal team. We have ingested Marion County Docket #18 and 7 evidence artifacts. How would you like to proceed?",
-      timestamp: "10:14 AM",
-      citations: [
-        { title: "Ind. R. Crim. P. 2.5", cite: "Mandatory Prosecution Discovery" }
-      ]
-    }
+      text: "Welcome to the Chain of Command intelligence workspace. I am coordinating your legal team. How would you like to proceed? All outputs are educational legal information and must be reviewed by the self-represented litigant.",
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      citations: [{ title: "Ind. R. Crim. P. 2.5", cite: "Mandatory Prosecution Discovery" }],
+    },
   ]);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
 
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll chat to bottom smoothly
   const scrollToBottom = () => {
     chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -139,47 +134,45 @@ export function AILab() {
     scrollToBottom();
   }, [messages, isStreaming]);
 
+  /** Ollama-backed fact simulation via /ai/lawyer */
   const handleSimulate = async () => {
+    if (!prompt.trim() || isSimulating) return;
+
     setIsSimulating(true);
-    setTimeout(() => {
-      setSimulationResult({
-        whatWeKnow: [
-          "Traffic stop occurred on May 12 at 11:45 PM by Marion County Unit #402.",
-          "Dashcam footage exhibits minor lane deviation under rainy night conditions.",
-          "Charging affidavit cites IC § 9-21-8-24 (Single Lane Driving).",
-        ],
-        whatWeDontKnow: [
-          "Whether Stalker DSR 2X Radar unit calibration was logged within mandatory 30-day window.",
-          "Whether the officer's initial stop rationale constituted prolonged detention under State v. Quirk.",
-        ],
-        potentialConsiderations: [
-          "Indiana Code § 9-21-8-24 requires vehicles to stay in single lane 'as nearly as practicable'.",
-          "State v. Quirk (Ind. 2006) limits traffic stop duration without reasonable articulable suspicion.",
-        ],
-        questionsForCourt: [
-          "Request radar calibration maintenance log under Ind. R. Crim. P. 2.5.",
-          "Review dashcam timestamp delta between initial stop and citation issuance.",
-        ],
-        citations: [
-          {
-            id: "cid-1",
-            title: "State v. Quirk",
-            citation: "842 N.E.2d 334 (Ind. 2006)",
-            badge: "Primary Authority",
-          },
-          {
-            id: "cid-2",
-            title: "Ind. Code § 9-21-8-24",
-            citation: "Vehicle Operation within Marked Lanes",
-            badge: "Indiana Statute",
-          },
-        ],
+    setSimulationError(null);
+    setSimulationResult(null);
+
+    try {
+      const data = await api.ai.askLawyer({
+        message: `Issue-to-proof strategy simulation. Structure the response with clear sections for: (1) Established Facts from the user's description, (2) Factual Uncertainties / what is unknown, (3) Procedural next steps the self-represented litigant should consider, and (4) Primary statutory or case authorities. User scenario:\n\n${prompt.trim()}`,
+        jurisdiction: "Indiana",
+        agentRole: selectedAgent.role,
+        context: {
+          mode: "fact-simulation",
+          agentId: selectedAgent.id,
+        },
       });
+
+      setSimulationResult({
+        rawText: data.text || "No analysis returned.",
+        disclaimer: data.disclaimer,
+        modelUsed: (data as any).modelUsed,
+      });
+    } catch (err: unknown) {
+      const message =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "AI simulation failed. Check that the API is running and Ollama is available (OLLAMA_URL).";
+      setSimulationError(message);
+    } finally {
       setIsSimulating(false);
-    }, 1200);
+    }
   };
 
-  const handleSendMessage = () => {
+  /** Ollama-backed team chat via /ai/lawyer */
+  const handleSendMessage = async () => {
     if (!chatInput.trim() || isStreaming) return;
 
     const userText = chatInput.trim();
@@ -188,54 +181,76 @@ export function AILab() {
       id: newMsgId,
       sender: "user",
       text: userText,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
 
     setMessages((prev) => [...prev, userMsg]);
     setChatInput("");
     setIsStreaming(true);
+    setChatError(null);
 
-    // Simulate real-time streaming response from selected agent
     const agentMsgId = `agent-${Date.now()}`;
-    const agentResponseText = `[${selectedAgent.name}]: Based on your query regarding "${userText.slice(0, 30)}...", I have cross-referenced the Marion County discovery rules. Under Ind. R. Crim. P. 2.5, you may file a Pro Se motion to inspect the calibration logs. All outputs are educational legal information and must be reviewed by the self-represented litigant.`;
-
     const placeholderMsg: ChatMessage = {
       id: agentMsgId,
       sender: "agent",
       agentName: selectedAgent.name,
       text: "",
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       isStreaming: true,
-      citations: [
-        { title: "Ind. R. Crim. P. 2.5", cite: "Discovery & Inspection Standard" }
-      ]
     };
-
     setMessages((prev) => [...prev, placeholderMsg]);
 
-    let charIndex = 0;
-    const streamInterval = setInterval(() => {
-      charIndex += 4;
-      if (charIndex <= agentResponseText.length) {
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === agentMsgId
-              ? { ...msg, text: agentResponseText.slice(0, charIndex) }
-              : msg
-          )
-        );
-      } else {
-        clearInterval(streamInterval);
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === agentMsgId
-              ? { ...msg, text: agentResponseText, isStreaming: false }
-              : msg
-          )
-        );
-        setIsStreaming(false);
-      }
-    }, 30);
+    try {
+      const data = await api.ai.askLawyer({
+        message: userText,
+        jurisdiction: "Indiana",
+        agentRole: selectedAgent.role,
+        context: {
+          agentId: selectedAgent.id,
+          agentName: selectedAgent.name,
+        },
+      });
+
+      const responseText = data.text || "Unable to generate a response.";
+
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === agentMsgId
+            ? {
+                ...msg,
+                text: responseText,
+                isStreaming: false,
+                citations: data.disclaimer
+                  ? [{ title: "Disclaimer", cite: data.disclaimer.slice(0, 80) + "…" }]
+                  : undefined,
+              }
+            : msg
+        )
+      );
+    } catch (err: unknown) {
+      const message =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "AI request failed. Ensure the backend is running and Ollama is available (OLLAMA_URL).";
+
+      setChatError(message);
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === agentMsgId
+            ? {
+                ...msg,
+                text: message,
+                isStreaming: false,
+                isError: true,
+              }
+            : msg
+        )
+      );
+    } finally {
+      setIsStreaming(false);
+    }
   };
 
   return (
@@ -260,6 +275,7 @@ export function AILab() {
             return (
               <button
                 key={agent.id}
+                type="button"
                 onClick={() => setSelectedAgent(agent)}
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-all shrink-0 border cursor-pointer ${
                   isSelected
@@ -267,18 +283,16 @@ export function AILab() {
                     : "bg-white/[0.02] border-white/10 text-white/60 hover:text-white hover:bg-white/5"
                 }`}
               >
-                <div className={`h-7 w-7 rounded-lg flex items-center justify-center font-bold text-[10px] shrink-0 ${
-                  isSelected ? "bg-[#D4AF37] text-black" : "bg-white/10 text-white/70"
-                }`}>
+                <div
+                  className={`h-7 w-7 rounded-lg flex items-center justify-center font-bold text-[10px] shrink-0 ${
+                    isSelected ? "bg-[#D4AF37] text-black" : "bg-white/10 text-white/70"
+                  }`}
+                >
                   {agent.initials}
                 </div>
                 <div className="overflow-hidden">
-                  <p className="text-[11px] font-semibold truncate max-w-[130px]">
-                    {agent.name}
-                  </p>
-                  <p className="text-[9px] text-white/40 truncate max-w-[130px]">
-                    {agent.badge}
-                  </p>
+                  <p className="text-[11px] font-semibold truncate max-w-[130px]">{agent.name}</p>
+                  <p className="text-[9px] text-white/40 truncate max-w-[130px]">{agent.badge}</p>
                 </div>
               </button>
             );
@@ -296,7 +310,7 @@ export function AILab() {
               <Clock size={14} className="text-[#D4AF37]" /> Case Progression Timeline
             </h2>
             <span className="text-[10px] text-emerald-400 font-mono bg-emerald-950/40 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-              4 Events Synchronized
+              Live AI Connected
             </span>
           </div>
 
@@ -305,21 +319,27 @@ export function AILab() {
               { title: "Arrest & Stop", date: "May 12", status: "Completed" },
               { title: "Initial Hearing", date: "May 20", status: "Completed" },
               { title: "Discovery Cutoff", date: "June 15", status: "Active" },
-              { title: "Pre-Trial Omnibus", date: "July 10", status: "Scheduled" }
+              { title: "Pre-Trial Omnibus", date: "July 10", status: "Scheduled" },
             ].map((event, i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className={`p-3 rounded-xl border transition cursor-pointer ${
-                  event.status === "Active" 
-                    ? "bg-[#174E48]/30 border-[#D4AF37] ring-1 ring-[#D4AF37]/30" 
+                  event.status === "Active"
+                    ? "bg-[#174E48]/30 border-[#D4AF37] ring-1 ring-[#D4AF37]/30"
                     : "bg-white/[0.02] border-white/10 hover:border-white/20"
                 }`}
               >
                 <span className="text-[9px] text-white/40 font-mono block">{event.date}</span>
                 <h4 className="text-xs font-semibold text-white mt-0.5 truncate">{event.title}</h4>
-                <span className={`text-[9px] font-semibold mt-1 inline-block ${
-                  event.status === "Active" ? "text-[#D4AF37]" : event.status === "Completed" ? "text-emerald-400" : "text-white/40"
-                }`}>
+                <span
+                  className={`text-[9px] font-semibold mt-1 inline-block ${
+                    event.status === "Active"
+                      ? "text-[#D4AF37]"
+                      : event.status === "Completed"
+                        ? "text-emerald-400"
+                        : "text-white/40"
+                  }`}
+                >
                   {event.status}
                 </span>
               </div>
@@ -336,21 +356,23 @@ export function AILab() {
       {/* Tabs: AI Simulation vs Team Chat */}
       <div className="flex-1 flex flex-col bg-[#0A0A0A] border border-white/10 rounded-2xl backdrop-blur-xl overflow-hidden shadow-2xl min-h-[420px]">
         <div className="flex border-b border-white/10 bg-black/40">
-          <button 
+          <button
+            type="button"
             onClick={() => setActiveTab("Simulation")}
             className={`px-6 py-3.5 text-xs font-bold tracking-widest transition border-b-2 flex items-center gap-2 cursor-pointer ${
-              activeTab === "Simulation" 
-                ? "border-[#D4AF37] text-[#D4AF37] bg-white/[0.02]" 
+              activeTab === "Simulation"
+                ? "border-[#D4AF37] text-[#D4AF37] bg-white/[0.02]"
                 : "border-transparent text-white/50 hover:text-white"
             }`}
           >
             <ShieldAlert size={14} /> AI FACT SIMULATION
           </button>
-          <button 
+          <button
+            type="button"
             onClick={() => setActiveTab("TeamChat")}
             className={`px-6 py-3.5 text-xs font-bold tracking-widest transition border-b-2 flex items-center gap-2 cursor-pointer ${
-              activeTab === "TeamChat" 
-                ? "border-[#D4AF37] text-[#D4AF37] bg-white/[0.02]" 
+              activeTab === "TeamChat"
+                ? "border-[#D4AF37] text-[#D4AF37] bg-white/[0.02]"
                 : "border-transparent text-white/50 hover:text-white"
             }`}
           >
@@ -370,12 +392,14 @@ export function AILab() {
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder="Describe the stop circumstances or test legal theories (e.g. 'Can we challenge the single lane deviation charge based on rainy road conditions and radar calibration lapse?')..."
                   className="w-full bg-black/50 border border-white/10 rounded-xl p-3.5 text-sm text-white focus:outline-none focus:border-[#D4AF37] transition min-h-[90px] placeholder:text-white/30 font-sans"
+                  disabled={isSimulating}
                 />
-                <div className="mt-3 flex items-center justify-between">
+                <div className="mt-3 flex items-center justify-between flex-wrap gap-2">
                   <span className="text-[11px] text-white/40 font-mono">
-                    Model: <strong className="text-white/70">Gemini 2.5 Flash Grounded</strong>
+                    Model: <strong className="text-white/70">Ollama (local via /ai/lawyer)</strong> · OLLAMA_URL
                   </span>
                   <button
+                    type="button"
                     onClick={handleSimulate}
                     disabled={!prompt.trim() || isSimulating}
                     className="bg-[#174E48] hover:bg-[#1f665e] text-[#D4AF37] disabled:opacity-40 disabled:cursor-not-allowed px-5 py-2.5 rounded-xl text-xs font-bold tracking-widest transition shadow-lg cursor-pointer flex items-center gap-2"
@@ -393,75 +417,63 @@ export function AILab() {
                 </div>
               </div>
 
-              {simulationResult && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 animate-in fade-in duration-300">
-                  <div className="lg:col-span-2 space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="bg-black/40 border border-white/10 rounded-xl p-4 border-l-4 border-l-emerald-500">
-                        <h4 className="text-[11px] font-bold tracking-widest text-emerald-400 mb-2 uppercase">
-                          Established Facts
-                        </h4>
-                        <ul className="list-disc pl-4 space-y-1.5 text-xs text-white/70 font-sans">
-                          {simulationResult.whatWeKnow.map((item: string, i: number) => (
-                            <li key={i}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div className="bg-black/40 border border-white/10 rounded-xl p-4 border-l-4 border-l-rose-500">
-                        <h4 className="text-[11px] font-bold tracking-widest text-rose-400 mb-2 uppercase">
-                          Factual Uncertainties
-                        </h4>
-                        <ul className="list-disc pl-4 space-y-1.5 text-xs text-white/70 font-sans">
-                          {simulationResult.whatWeDontKnow.map((item: string, i: number) => (
-                            <li key={i}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-
-                    <div className="bg-black/40 border border-white/10 rounded-xl p-4 border-l-4 border-l-[#D4AF37]">
-                      <h4 className="text-[11px] font-bold tracking-widest text-[#D4AF37] mb-2 uppercase">
-                        Procedural Next Steps for Litigant
-                      </h4>
-                      <ul className="space-y-1.5 text-xs text-white/80 font-sans">
-                        {simulationResult.questionsForCourt.map((item: string, i: number) => (
-                          <li key={i} className="flex items-start gap-2">
-                            <span className="text-[#D4AF37] font-bold">→</span>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+              {simulationError && (
+                <div
+                  role="alert"
+                  className="bg-rose-950/40 border border-rose-500/40 rounded-xl p-4 flex items-start gap-3 text-rose-200"
+                >
+                  <XCircle size={18} className="shrink-0 mt-0.5 text-rose-400" />
+                  <div>
+                    <p className="text-xs font-bold tracking-widest uppercase text-rose-300 mb-1">Simulation Error</p>
+                    <p className="text-sm font-sans">{simulationError}</p>
+                    <p className="text-[11px] text-rose-300/70 mt-2 font-mono">
+                      Ensure Ollama is running (OLLAMA_URL / OLLAMA_BASE_URL) and the API server is reachable (see .env.example).
+                    </p>
                   </div>
+                </div>
+              )}
 
-                  <div className="lg:col-span-1">
-                    <div className="bg-black/40 border border-white/10 rounded-xl p-4 space-y-3">
+              {simulationResult && (
+                <div className="space-y-4 animate-in fade-in duration-300">
+                  <div className="bg-black/40 border border-white/10 rounded-xl p-5 border-l-4 border-l-[#D4AF37]">
+                    <div className="flex items-center justify-between mb-3">
                       <h4 className="text-[11px] font-bold tracking-widest text-[#D4AF37] uppercase">
-                        Grounded Authorities
+                        Grounded Analysis
                       </h4>
-                      {simulationResult.citations.map((cite: any, i: number) => (
-                        <div key={i} className="bg-white/[0.02] border border-white/10 p-3 rounded-xl">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="font-semibold text-white text-xs">{cite.title}</span>
-                            <span className="text-[9px] text-emerald-400 font-mono bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-500/20">
-                              {cite.badge}
-                            </span>
-                          </div>
-                          <p className="text-[#D4AF37] text-[11px] font-mono">{cite.citation}</p>
-                        </div>
-                      ))}
+                      {simulationResult.modelUsed && (
+                        <span className="text-[10px] font-mono text-white/40">
+                          model: {simulationResult.modelUsed}
+                        </span>
+                      )}
                     </div>
+                    <div className="text-sm text-white/85 font-sans whitespace-pre-wrap leading-relaxed">
+                      {simulationResult.rawText}
+                    </div>
+                    {simulationResult.disclaimer && (
+                      <p className="mt-4 pt-3 border-t border-white/10 text-[11px] text-white/50 font-sans">
+                        {simulationResult.disclaimer}
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
             </div>
           ) : (
-            /* Team Chat Interface with Auto-Scroll */
+            /* Team Chat Interface */
             <div className="flex flex-col h-[380px]">
+              {chatError && (
+                <div
+                  role="alert"
+                  className="mb-3 bg-rose-950/30 border border-rose-500/30 rounded-lg px-3 py-2 flex items-center gap-2 text-rose-200 text-xs"
+                >
+                  <AlertTriangle size={14} className="shrink-0" />
+                  <span>{chatError}</span>
+                </div>
+              )}
+
               <div className="flex-1 overflow-y-auto space-y-3.5 pr-2">
                 {messages.map((msg) => (
-                  <div 
+                  <div
                     key={msg.id}
                     className={`flex gap-3 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
                   >
@@ -470,11 +482,15 @@ export function AILab() {
                         <Bot size={16} />
                       </div>
                     )}
-                    <div className={`max-w-[80%] rounded-2xl p-4 text-xs leading-relaxed font-sans ${
-                      msg.sender === "user"
-                        ? "bg-[#174E48] text-white rounded-tr-none shadow-md"
-                        : "bg-white/[0.04] border border-white/10 text-white/90 rounded-tl-none"
-                    }`}>
+                    <div
+                      className={`max-w-[80%] rounded-2xl p-4 text-xs leading-relaxed font-sans ${
+                        msg.sender === "user"
+                          ? "bg-[#174E48] text-white rounded-tr-none shadow-md"
+                          : msg.isError
+                            ? "bg-rose-950/40 border border-rose-500/30 text-rose-100 rounded-tl-none"
+                            : "bg-white/[0.04] border border-white/10 text-white/90 rounded-tl-none"
+                      }`}
+                    >
                       {msg.sender === "agent" && (
                         <div className="flex items-center justify-between mb-1.5 border-b border-white/10 pb-1">
                           <span className="font-bold text-[#D4AF37] font-mono text-[10px]">
@@ -483,15 +499,21 @@ export function AILab() {
                           <span className="text-[9px] text-white/40 font-mono">{msg.timestamp}</span>
                         </div>
                       )}
-                      <p className="whitespace-pre-wrap">{msg.text}</p>
+                      <p className="whitespace-pre-wrap">{msg.text || (msg.isStreaming ? "…" : "")}</p>
                       {msg.isStreaming && (
-                        <span className="inline-block h-3 w-1.5 bg-[#D4AF37] ml-1 animate-pulse" />
+                        <span className="inline-flex items-center gap-1.5 mt-1 text-[#D4AF37]">
+                          <RefreshCw size={12} className="animate-spin" />
+                          <span className="text-[10px] font-mono">Synthesizing…</span>
+                        </span>
                       )}
 
-                      {msg.citations && msg.citations.length > 0 && (
+                      {msg.citations && msg.citations.length > 0 && !msg.isError && (
                         <div className="mt-2 pt-2 border-t border-white/10 flex flex-wrap gap-1.5">
                           {msg.citations.map((c, i) => (
-                            <span key={i} className="text-[9px] font-mono text-[#D4AF37] bg-black/40 px-2 py-0.5 rounded border border-white/10">
+                            <span
+                              key={i}
+                              className="text-[9px] font-mono text-[#D4AF37] bg-black/40 px-2 py-0.5 rounded border border-white/10"
+                            >
                               § {c.title}: {c.cite}
                             </span>
                           ))}
@@ -508,25 +530,26 @@ export function AILab() {
                 <div ref={chatBottomRef} />
               </div>
 
-              {/* Chat Input Box */}
               <div className="mt-3 pt-3 border-t border-white/10 relative flex items-center gap-2">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleSendMessage();
                   }}
-                  placeholder={`Ask ${selectedAgent.name}...`}
+                  placeholder={`Ask ${selectedAgent.name}…`}
                   disabled={isStreaming}
-                  className="flex-1 bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#D4AF37] transition placeholder:text-white/30 font-sans"
+                  className="flex-1 bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#D4AF37] transition placeholder:text-white/30 font-sans disabled:opacity-50"
                 />
-                <button 
+                <button
+                  type="button"
                   onClick={handleSendMessage}
                   disabled={!chatInput.trim() || isStreaming}
                   className="h-10 px-4 rounded-xl bg-[#174E48] hover:bg-[#1f665e] text-[#D4AF37] disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
                 >
-                  <Send size={14} /> Send
+                  {isStreaming ? <RefreshCw size={14} className="animate-spin" /> : <Send size={14} />}
+                  {isStreaming ? "…" : "Send"}
                 </button>
               </div>
             </div>

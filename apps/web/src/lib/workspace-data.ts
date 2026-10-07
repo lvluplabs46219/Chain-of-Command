@@ -112,7 +112,30 @@ export interface AttorneyListing {
   verifiedSource: "State Bar Public Records" | "Legal Aid Society Roster";
 }
 
-export const INITIAL_MATTERS: Matter[] = [
+/** Placeholder when the workspace has no open matter yet */
+export const EMPTY_MATTER: Matter = {
+  id: "matter-empty",
+  title: "No matter open",
+  caseNumber: "—",
+  courtName: "",
+  jurisdiction: "",
+  judge: "",
+  prosecutor: "",
+  defenseStatus: "Self-Represented (Pro Se)",
+  status: "pending",
+  nextCourtDate: "",
+  nextCourtType: "",
+  speedyTrialDeadline: "",
+  createdAt: "",
+  summary: "Open a new legal matter to begin organizing your case.",
+  charges: [],
+};
+
+/** @deprecated Use SAMPLE_MATTERS for explore mode; default workspace starts empty. */
+export const INITIAL_MATTERS: Matter[] = [];
+
+/** Sample matters for explore-mode only (not loaded on first run). */
+export const SAMPLE_MATTERS: Matter[] = [
   {
     id: "matter-001",
     title: "State of Indiana v. Marcus Vance",
