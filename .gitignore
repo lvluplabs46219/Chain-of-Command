@@ -153,3 +153,6 @@ dist.tar.gz
 Supabase.session.sql
 **/*.session.sql
 DesktopCommanderMCP/
+
+# Nested rename-era leftover (never re-add)
+Aquit-Platform/
