@@ -13,13 +13,13 @@
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
-<script type="text/babel" src="tweaks_panel.jsx"></script>
 <script type="text/babel" src="ui.jsx"></script>
+<script type="text/babel" src="tweaks_panel.jsx"></script>
 <script type="text/babel" src="screens-a.jsx"></script>
 <script type="text/babel" src="screens-b.jsx"></script>
 <script type="text/babel" src="screens-c.jsx"></script>
 <script type="text/babel">
-const TWEAK_DEFAULTS = {"palette":["#F3C152","#8B6CFF","#3DD9EB"],"glow":0.9,"grid":true,"density":"Comfortable","radius":14,"calm":false};
+const TWEAK_DEFAULTS = { palette: ["#F3C152", "#8B6CFF", "#3DD9EB"], glow: 0.9, grid: true, density: "Comfortable", radius: 14, calm: false };
 const PALETTES = {
   "#F3C152": { label: "Verdict", names: ["Verdict Gold", "Chamber Violet", "Router Cyan"] },
   "#C8FF4D": { label: "Mainnet", names: ["Mainnet Lime", "Ledger Indigo", "Node Teal"] },
@@ -31,16 +31,16 @@ const NAV = [
     ["system", "Design System", I.system, "00"],
     ["command", "Command Center", I.command, "01"],
     ["docket", "The Docket", I.docket, "4"],
-    ["chambers", "Chambers", I.chambers, "5 AI"],
+    ["chambers", "Chambers", I.chambers, "6 AI"],
     ["library", "Law Library", I.library],
-    ["invest", "Investigations", I.invest, null, true],
+    ["invest", "Investigations", I.invest],
     ["records", "Record Room", I.records, "23"],
     ["chrono", "Case Timeline", I.chrono],
   ]},
   { group: "Court", items: [
-    ["watch", "Court Watch", I.watch, null, true],
-    ["counsel", "Counsel Directory", I.counsel, null, true],
-    ["tasks", "Motions & Tasks", I.tasks, "7", true],
+    ["watch", "Court Watch", I.watch],
+    ["counsel", "Counsel Directory", I.counsel],
+    ["tasks", "Motions & Tasks", I.tasks, "7"],
   ]},
 ];
 function App() {
@@ -57,7 +57,19 @@ function App() {
     document.body.classList.toggle("dense", t.density === "Compact");
   }, [t]);
   const pal = { c: t.palette, names: (PALETTES[t.palette[0]] || PALETTES["#F3C152"]).names };
-  const screens = { system: <SystemPage pal={pal} />, command: <CommandCenter go={setPage} />, docket: <Docket />, chambers: <Chambers />, library: <Library />, records: <Records />, chrono: <Chronology /> };
+  const screens = {
+    system: <SystemPage pal={pal} />,
+    command: <CommandCenter go={setPage} />,
+    docket: <Docket />,
+    chambers: <Chambers />,
+    library: <Library />,
+    records: <Records />,
+    chrono: <Chronology />,
+    watch: <CourtWatch />,
+    tasks: <TasksScreen />,
+    invest: <Investigations />,
+    counsel: <CounselDirectory />,
+  };
   return (
     <div className="app">
       <aside className="rail">
@@ -68,8 +80,8 @@ function App() {
         {NAV.map(g => (
           <React.Fragment key={g.group}>
             <div className="rail-label">{g.group}</div>
-            {g.items.map(([id, label, ico, sub, dim]) => (
-              <button key={id} className={"nav" + (page === id ? " on" : "") + (dim && !screens[id] ? " dim" : "")} onClick={() => screens[id] && setPage(id)} title={screens[id] ? "" : "Not in this exploration"}>
+            {g.items.map(([id, label, ico, sub]) => (
+              <button key={id} className={"nav" + (page === id ? " on" : "")} onClick={() => setPage(id)}>
                 <Ico d={ico} />{label}{sub && <span className="sub">{sub}</span>}
               </button>
             ))}
