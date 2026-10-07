@@ -1,1 +1,96 @@
-<!doctype html><html><head><title>placeholder</title></head><body>placeholder</body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chain of Command — Legal OS</title>
+<link rel="stylesheet" href="chain-of-command.css" />
+</head>
+<body>
+<div class="atmos"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div><div class="grid"></div><div class="noise"></div></div>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+<script type="text/babel" src="tweaks_panel.jsx"></script>
+<script type="text/babel" src="ui.jsx"></script>
+<script type="text/babel" src="screens-a.jsx"></script>
+<script type="text/babel" src="screens-b.jsx"></script>
+<script type="text/babel" src="screens-c.jsx"></script>
+<script type="text/babel">
+const TWEAK_DEFAULTS = {"palette":["#F3C152","#8B6CFF","#3DD9EB"],"glow":0.9,"grid":true,"density":"Comfortable","radius":14,"calm":false};
+const PALETTES = {
+  "#F3C152": { label: "Verdict", names: ["Verdict Gold", "Chamber Violet", "Router Cyan"] },
+  "#C8FF4D": { label: "Mainnet", names: ["Mainnet Lime", "Ledger Indigo", "Node Teal"] },
+  "#FF7A59": { label: "Ember", names: ["Gavel Ember", "Robe Magenta", "Seal Azure"] },
+  "#E6E9F2": { label: "Platinum", names: ["Platinum", "Quartz Blue", "Mint Signal"] },
+};
+const NAV = [
+  { group: "Case", items: [
+    ["system", "Design System", I.system, "00"],
+    ["command", "Command Center", I.command, "01"],
+    ["docket", "The Docket", I.docket, "4"],
+    ["chambers", "Chambers", I.chambers, "5 AI"],
+    ["library", "Law Library", I.library],
+    ["invest", "Investigations", I.invest, null, true],
+    ["records", "Record Room", I.records, "23"],
+    ["chrono", "Case Timeline", I.chrono],
+  ]},
+  { group: "Court", items: [
+    ["watch", "Court Watch", I.watch, null, true],
+    ["counsel", "Counsel Directory", I.counsel, null, true],
+    ["tasks", "Motions & Tasks", I.tasks, "7", true],
+  ]},
+];
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [page, setPage] = React.useState(() => localStorage.getItem("coc.page") || "command");
+  React.useEffect(() => { localStorage.setItem("coc.page", page); document.querySelector(".view")?.scrollTo(0, 0); }, [page]);
+  React.useEffect(() => {
+    const r = document.documentElement.style;
+    r.setProperty("--a1", t.palette[0]); r.setProperty("--a2", t.palette[1]); r.setProperty("--a3", t.palette[2]);
+    r.setProperty("--glow", t.calm ? 0.25 : t.glow);
+    r.setProperty("--radius", t.radius + "px");
+    document.body.classList.toggle("nogrid", !t.grid);
+    document.body.classList.toggle("calm", t.calm);
+    document.body.classList.toggle("dense", t.density === "Compact");
+  }, [t]);
+  const pal = { c: t.palette, names: (PALETTES[t.palette[0]] || PALETTES["#F3C152"]).names };
+  const screens = { system: <SystemPage pal={pal} />, command: <CommandCenter go={setPage} />, docket: <Docket />, chambers: <Chambers />, library: <Library />, records: <Records />, chrono: <Chronology /> };
+  return (
+    <div className="app">
+      <aside className="rail">
+        <div className="brand">
+          <div className="brand-mark"><span>C</span></div>
+          <div className="brand-name">chain<em>-of-command</em></div>
+        </div>
+        {NAV.map(g => (
+          <React.Fragment key={g.group}>
+            <div className="rail-label">{g.group}</div>
+            {g.items.map(([id, label, ico, sub, dim]) => (
+              <button key={id} className={"nav" + (page === id ? " on" : "") + (dim && !screens[id] ? " dim" : "")} onClick={() => screens[id] && setPage(id)} title={screens[id] ? "" : "Not in this exploration"}>
+                <Ico d={ico} />{label}{sub && <span className="sub">{sub}</span>}
+              </button>
+            ))}
+          </React.Fragment>
+        ))}
+        <div className="rail-foot">
+          <div className="row" style={{ marginBottom: 8 }}>
+            <Ico d={I.lock} s={14} style={{ color: "var(--ok)" }} />
+            <span style={{ fontSize: 12, fontWeight: 500 }}>Vault sealed</span>
+            <span className="pulse" style={{ marginLeft: "auto" }} />
+          </div>
+          <div className="faint" style={{ fontSize: 11 }}>Local-first · Zero retention</div>
+        </div>
+      </aside>
+      <main className="view">{screens[page] || screens.command}</main>
+      {typeof TweaksPanel !== "undefined" && <TweaksPanel t={t} setTweak={setTweak} />}
+    </div>
+  );
+}
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>
