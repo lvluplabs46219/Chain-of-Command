@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { BotIdClient } from "botid/client";
 import "../index.css";
 
@@ -47,6 +48,28 @@ export const metadata: Metadata = {
   },
 };
 
+const FETCH_GUARD_SCRIPT = `(function(){
+  try {
+    if (typeof window !== 'undefined') {
+      var proto = window.Window ? window.Window.prototype : Object.getPrototypeOf(window);
+      var desc = Object.getOwnPropertyDescriptor(window, 'fetch') ||
+                 (proto && Object.getOwnPropertyDescriptor(proto, 'fetch'));
+      if (!desc || !desc.set || !desc.writable) {
+        var _origFetch = window.fetch ? window.fetch.bind(window) : null;
+        var _currentFetch = _origFetch;
+        Object.defineProperty(window, 'fetch', {
+          configurable: true,
+          enumerable: true,
+          get: function() { return _currentFetch; },
+          set: function(fn) { _currentFetch = fn; }
+        });
+      }
+    }
+  } catch (e) {
+    console.warn('[FetchGuard] Warning:', e);
+  }
+})();`;
+
 export default function RootLayout({
   children,
 }: {
@@ -55,31 +78,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="bg-[#111214] text-[#e1e2e5] antialiased min-h-screen">
-        <script
+        <Script
           id="window-fetch-guard"
-          dangerouslySetInnerHTML={{
-            __html: `(function(){
-              try {
-                if (typeof window !== 'undefined') {
-                  var proto = window.Window ? window.Window.prototype : Object.getPrototypeOf(window);
-                  var desc = Object.getOwnPropertyDescriptor(window, 'fetch') ||
-                             (proto && Object.getOwnPropertyDescriptor(proto, 'fetch'));
-                  if (!desc || !desc.set || !desc.writable) {
-                    var _origFetch = window.fetch ? window.fetch.bind(window) : null;
-                    var _currentFetch = _origFetch;
-                    Object.defineProperty(window, 'fetch', {
-                      configurable: true,
-                      enumerable: true,
-                      get: function() { return _currentFetch; },
-                      set: function(fn) { _currentFetch = fn; }
-                    });
-                  }
-                }
-              } catch (e) {
-                console.warn('[FetchGuard] Warning:', e);
-              }
-            })();`,
-          }}
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: FETCH_GUARD_SCRIPT }}
         />
         <BotIdClient protect={protectedRoutes} />
         {/* WCAG Accessible Skip Link */}
