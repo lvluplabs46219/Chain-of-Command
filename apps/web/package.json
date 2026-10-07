@@ -11,7 +11,8 @@
     "start": "next start -p 3000 -H 0.0.0.0",
     "lint": "tsc -p tsconfig.json --noEmit",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "mockups:copy": "node scripts/copy-mockups.mjs"
+    "mockups:copy": "node scripts/copy-mockups.mjs",
+    "mockups:purge": "bash scripts/purge-stitch-uploads.sh"
   },
   "devDependencies": {
     "@hookform/resolvers": "^5.9.1",
