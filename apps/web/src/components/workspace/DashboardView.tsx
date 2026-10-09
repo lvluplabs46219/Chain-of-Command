@@ -44,7 +44,7 @@ export function DashboardView({
   onOpenAddEvidence,
 }: DashboardViewProps) {
   const hasMatter = matter.id !== "matter-empty";
-  const nextDate = matter.nextCourtDate ? new Date(matter.nextCourtDate) : null;
+  const nextDate = matter.nextCourtDate ? new Date(matter.nextCourtDate) : (matter.deadlines?.[0]?.dueDate ? new Date(matter.deadlines[0].dueDate) : null);
   const now = new Date();
   const diffDays =
     nextDate && !Number.isNaN(nextDate.getTime())
@@ -97,14 +97,14 @@ export function DashboardView({
               <span className="text-neutral-600">·</span>
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300 bg-emerald-950/70 border border-emerald-500/40 px-2.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.15)]">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>{matter.defenseStatus}</span>
+                <span>{matter.defenseStatus || "Self-Represented (Pro Se)"}</span>
               </span>
             </div>
             <h1 className="text-3xl md:text-4xl font-serif font-extrabold text-white tracking-tight drop-shadow-sm leading-tight">
               {matter.title}
             </h1>
             <p className="text-xs md:text-sm text-neutral-400 mt-1.5">
-              {matter.courtName} · Presiding: <span className="text-neutral-200 font-medium">{matter.judge}</span> · Prosecutor: <span className="text-neutral-200 font-medium">{matter.prosecutor}</span>
+              {matter.courtName || matter.court || "—"} · Presiding: <span className="text-neutral-200 font-medium">{matter.judge}</span> · Prosecutor: <span className="text-neutral-200 font-medium">{matter.prosecutor}</span>
             </p>
           </div>
 
@@ -148,7 +148,7 @@ export function DashboardView({
               </span>
               <Clock className="w-3.5 h-3.5 text-amber-400" />
             </div>
-            <div className="text-xl font-bold text-white tabular-nums">{matter.speedyTrialDeadline}</div>
+            <div className="text-xl font-bold text-white tabular-nums">{matter.speedyTrialDeadline || (matter.speedyTrialDaysRemaining ? `${matter.speedyTrialDaysRemaining} days remaining` : "—")}</div>
             <div className="text-[11px] text-zinc-500 truncate mt-0.5">Statutory expiration date</div>
 
             <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 w-72 p-3 rounded-lg bg-zinc-950 border border-amber-700/50 shadow-2xl text-[11px] text-zinc-200 pointer-events-none">

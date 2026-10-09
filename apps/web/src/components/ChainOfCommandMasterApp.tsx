@@ -28,7 +28,7 @@ import {
 } from "./workspace/WorkspaceNavigation";
 import { FirstRunWizard, type OnboardingResult } from "./onboarding/FirstRunWizard";
 import { useAuth } from "@/contexts/AuthContext";
-import { SAMPLE_MATTERS } from "@/lib/workspace-data";
+import { SAMPLE_MATTERS, isDemoMatter } from "@/lib/workspace-data";
 import { DashboardView } from "./workspace/DashboardView";
 import { DocketView } from "./workspace/DocketView";
 import { ChambersView } from "./workspace/ChambersView";
@@ -80,7 +80,7 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
           const parsed = JSON.parse(raw) as Matter[];
           if (
             Array.isArray(parsed) &&
-            parsed.some((m) => m.id === "matter-001" && m.title?.includes("Marcus Vance"))
+            parsed.some((m) => m.id === "matter-001" || m.id === "case-01" || (m.title || "").includes("Marcus Vance") || (m as any).isDemo)
           ) {
             localStorage.removeItem("chain_of_command_matters");
           }
@@ -188,35 +188,28 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
       id: `matter-${Date.now()}`,
       title: newMatterTitle.trim(),
       caseNumber: newMatterCaseNumber.trim(),
-      courtName: newMatterCourt.trim() || "Superior Court of California / Indiana",
-      jurisdiction: jurisdiction,
-      judge: newMatterJudge.trim() || "Hon. Presiding Magistrate",
-      prosecutor: "Office of the District Attorney",
+      court: newMatterCourt.trim() || "",
+      courtName: newMatterCourt.trim() || "",
+      jurisdiction: jurisdiction || "",
+      judge: newMatterJudge.trim() || "",
+      prosecutor: "",
+      filingDate: new Date().toISOString().split("T")[0],
+      status: "Active",
+      speedyTrialDaysRemaining: 0,
+      speedyTrialLimit: 70,
+      readingLevel: "Plain English",
       defenseStatus: "Self-Represented (Pro Se)",
-      status: "active",
-      nextCourtDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-      nextCourtType: "Initial Case Management & Discovery Review",
-      speedyTrialDeadline: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      nextCourtDate: "",
+      nextCourtType: "",
+      speedyTrialDeadline: "",
       createdAt: new Date().toISOString().split("T")[0],
-      summary: newMatterSummary.trim() || "Pro se litigation matter opened in Chain of Command.",
-      charges: [
-        {
-          id: `ch-${Date.now()}`,
-          statute: "Penal Code § 100",
-          title: "Preliminary Charged Allegation",
-          level: "Misdemeanor Class A",
-          allegedDate: new Date().toISOString().split("T")[0],
-          statutoryMaxPenalty: "1 year; $1,000 fine",
-          statutoryMinPenalty: "Probation eligible",
-          elements: [
-            {
-              name: "Statutory Allegation",
-              description: "Alleged conduct requiring proof beyond reasonable doubt.",
-              stateProofStatus: "Contested",
-            },
-          ],
-        },
-      ],
+      summary: newMatterSummary.trim() || "",
+      charges: [],
+      timeline: [],
+      authorities: [],
+      evidence: [],
+      deadlines: [],
+      isDemo: false,
     };
 
     const saved = await saveMatter(newM);
@@ -236,6 +229,11 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
   return (
     <div className="min-h-screen bg-[#0C0D10] text-[#E1E2E5] flex flex-col font-sans selection:bg-[#D4AF37]/30">
       {/* Header */}
+      {isDemoMatter(activeMatter) && (
+        <div className="bg-amber-500 text-neutral-950 text-center text-xs font-bold tracking-wide py-1.5 px-3" role="status">
+          DEMO DATA — sample case for exploration only. Not your real matter.
+        </div>
+      )}
       <WorkspaceHeader
         matters={matters}
         activeMatter={activeMatter}
@@ -342,7 +340,7 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
             <span>·</span>
             <span>Pro Se Workspace</span>
             <span>·</span>
-            <span>Zero Hallucination Protocol Active</span>
+            <span>Educational information only · Not legal advice</span>
           </div>
         </div>
       </footer>

@@ -106,11 +106,13 @@ export interface Matter {
   caseNumber: string;
   title: string;
   court: string;
+  /** @deprecated prefer court */
+  courtName?: string;
   jurisdiction: string;
   judge: string;
   prosecutor: string;
   filingDate: string;
-  status: "Active" | "Arraignment Pending" | "Omnibus Set" | "Closed";
+  status: "Active" | "Arraignment Pending" | "Omnibus Set" | "Closed" | "active" | "pending";
   speedyTrialDaysRemaining: number;
   speedyTrialLimit: number;
   readingLevel: "Plain English" | "Standard Legal" | "Detailed Statutory";
@@ -119,26 +121,43 @@ export interface Matter {
   authorities: LegalAuthority[];
   evidence: EvidenceItem[];
   deadlines: CourtDeadline[];
+  /** Optional UI / docket fields */
+  nextCourtDate?: string;
+  nextCourtType?: string;
+  defenseStatus?: string;
+  speedyTrialDeadline?: string;
+  summary?: string;
+  createdAt?: string;
+  /** Explore-mode sample — always show DEMO banner */
+  isDemo?: boolean;
 }
 
-/** Placeholder when the workspace has no open matter yet */
+/** Placeholder when the workspace has no open matter yet (real empty state — no demo data). */
 export const EMPTY_MATTER: Matter = {
   id: "matter-empty",
-  title: "No matter open",
   caseNumber: "—",
-  courtName: "",
+  title: "No matter open",
+  court: "",
   jurisdiction: "",
   judge: "",
   prosecutor: "",
-  defenseStatus: "Self-Represented (Pro Se)",
-  status: "pending",
-  nextCourtDate: "",
-  nextCourtType: "",
-  speedyTrialDeadline: "",
-  createdAt: "",
-  summary: "Open a new legal matter to begin organizing your case.",
+  filingDate: "",
+  status: "Active",
+  speedyTrialDaysRemaining: 0,
+  speedyTrialLimit: 70,
+  readingLevel: "Plain English",
   charges: [],
+  timeline: [],
+  authorities: [],
+  evidence: [],
+  deadlines: [],
 };
+
+/** True when a matter is the explore-mode sample (must show DEMO banner). */
+export function isDemoMatter(m: Matter | null | undefined): boolean {
+  if (!m) return false;
+  return m.id === "case-01" || m.id.startsWith("sample-") || Boolean((m as any).isDemo);
+}
 
 /** @deprecated Use SAMPLE_MATTERS for explore mode; default workspace starts empty. */
 export const INITIAL_MATTERS: Matter[] = [];
@@ -147,6 +166,7 @@ export const INITIAL_MATTERS: Matter[] = [];
 export const SAMPLE_MATTERS: Matter[] = [
   {
     id: "case-01",
+    isDemo: true,
     caseNumber: "CR-49G01-2403-F5-001289",
     title: "State of Indiana v. Marcus Vance",
     court: "Marion County Superior Court, Criminal Division 1",

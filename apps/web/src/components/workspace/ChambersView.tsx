@@ -48,17 +48,18 @@ export function ChambersView({ matter }: ChambersViewProps) {
       agentId: "agent-head",
       agentName: "Head Legal AI",
       timestamp: "10:14 AM",
-      text: `Welcome Marcus. I have reviewed the procedural posture of ${matter.caseNumber}. Our current priority is auditing the legality of the initial traffic stop under Terry v. Ohio and preparing the suppression filing before the October 24 deadline. How can our team assist you today?`,
+      text: (() => {
+        const hasMatter = matter.id !== "matter-empty";
+        const docCount = (matter.evidence?.length ?? 0);
+        const chargeCount = (matter.charges?.length ?? 0);
+        if (!hasMatter) {
+          return "Welcome. No matter is open yet. Create a case in the Docket or finish onboarding so research can be grounded in your filings. I will not invent facts or case numbers.";
+        }
+        return `Welcome. Indexed for this matter (${matter.caseNumber}): ${chargeCount} charge(s), ${docCount} evidence item(s). I have not independently verified court records. Ask a specific question about your filings, deadlines, or research — educational information only, not legal advice.`;
+      })(),
       envelope: {
-        type: "Analysis",
-        citations: [
-          {
-            statuteOrRule: "Ind. Code § 35-36-8-1",
-            summary: "Statutory omnibus and suppression motion deadline rule in Indiana.",
-            confidenceScore: 0.98,
-            provenance: "SOURCE_PUBLIC",
-          },
-        ],
+        type: "Information",
+        citations: [],
       },
     },
   ]);
@@ -78,35 +79,22 @@ export function ChambersView({ matter }: ChambersViewProps) {
     setMessages(newMessages);
     setPromptInput("");
 
-    // Simulate grounded agent response
+    // Honest placeholder until live agent API is wired — no invented case facts
     setTimeout(() => {
-      const agentReply: Message = {
-        id: `msg-${Date.now() + 1}`,
+      const agentMsg: Message = {
+        id: `msg-${Date.now()}-agent`,
         sender: "agent",
         agentId: selectedAgent.id,
         agentName: selectedAgent.name,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        text: `Based on verified Indiana precedent and the BWC-04 footage in your evidence locker: Under Spangler v. State, 607 N.E.2d 720 (Ind. 1993), 'forcible resistance' requires active, aggressive physical tension or force directed against an officer. A startled flinch or passive refusal does not satisfy the statutory elements of Ind. Code § 35-44.1-3-1. We have added this authority to your Motion to Suppress outline.`,
-        envelope: {
-          type: "Analysis",
-          citations: [
-            {
-              statuteOrRule: "Spangler v. State, 607 N.E.2d 720 (Ind. 1993)",
-              summary: "Indiana Supreme Court rule on non-forcible passive resistance.",
-              confidenceScore: 0.96,
-              provenance: "SOURCE_PUBLIC",
-            },
-            {
-              statuteOrRule: "Ind. Code § 35-44.1-3-1",
-              summary: "Statutory elements of Resisting Law Enforcement.",
-              confidenceScore: 0.98,
-              provenance: "SOURCE_PUBLIC",
-            },
-          ],
-        },
+        text:
+          matter.id === "matter-empty"
+            ? "I need an open matter with your filings before I can analyze anything. Open a case in the Docket first."
+            : `Received. Live agent analysis is not fully wired in this build. I will not invent facts, citations, or deadlines. Rephrase with a specific document or question once the research pipeline is connected.`,
+        envelope: { type: "Information", citations: [] },
       };
-      setMessages((prev) => [...prev, agentReply]);
-    }, 600);
+      setMessages((prev) => [...prev, agentMsg]);
+    }, 400);
   };
 
   return (
@@ -185,7 +173,7 @@ export function ChambersView({ matter }: ChambersViewProps) {
                 className={`flex flex-col ${m.sender === "user" ? "items-end" : "items-start"}`}
               >
                 <div className="text-[11px] text-neutral-400 mb-1 px-1">
-                  {m.sender === "user" ? "Marcus (You)" : m.agentName} · {m.timestamp}
+                  {m.sender === "user" ? "You" : m.agentName} · {m.timestamp}
                 </div>
                 {m.envelope ? (
                   <div className="max-w-2xl w-full">

@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     const {
       message = "",
       jurisdiction = "Indiana",
-      agentRole = "Lead Counsel Coordinator",
+      agentRole = "Head Legal AI",
       context = {},
     } = body;
 

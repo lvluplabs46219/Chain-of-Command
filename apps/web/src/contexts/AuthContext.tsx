@@ -39,14 +39,14 @@ export interface AuthContextType {
 }
 
 const DEFAULT_LITIGANT_USER: AuthUser = {
-  id: "usr_pro_se_litigant",
-  name: "Arthur Marlowe",
-  email: "litigant@chainofcommand.law",
+  id: "usr_local",
+  name: "Pro Se Litigant",
+  email: "local@chainofcommand.law",
   role: "pro_se",
-  jurisdiction: "Arizona / Marion County",
-  activeMatterId: "matter-001",
+  jurisdiction: "Self-Represented",
+  activeMatterId: "matter-empty",
   isVerifiedProSe: true,
-  createdAt: "2026-08-10T12:00:00.000Z",
+  createdAt: new Date().toISOString(),
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -87,7 +87,7 @@ function sessionToUser(sessionUser: {
     email: sessionUser.email || "litigant@chainofcommand.law",
     role: ((meta.role as string) as AuthUser["role"]) || "pro_se",
     jurisdiction: (meta.jurisdiction as string) || "Self-Represented",
-    activeMatterId: (meta.active_matter_id as string) || "matter-001",
+    activeMatterId: (meta.active_matter_id as string) || "matter-empty",
     isVerifiedProSe: true,
     createdAt: sessionUser.created_at || new Date().toISOString(),
     photoURL: (meta.avatar_url as string) || (meta.picture as string) || null,
