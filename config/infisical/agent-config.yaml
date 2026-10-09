@@ -1,0 +1,62 @@
+# Chain of Command — Infisical Agent configuration
+# Docs: https://infisical.com/docs/integrations/platforms/infisical-agent
+#
+# Setup:
+#   1. In https://app.infisical.com → Access Control → Machine Identities
+#      create identity "coc-agent" with role that can read secrets in project chain-of-command
+#   2. Add Universal Auth → create Client Secret
+#   3. Write credentials (no trailing newline preferred):
+#        printf '%s' "<CLIENT_ID>"     > ~/.config/coc-infisical/client-id
+#        printf '%s' "<CLIENT_SECRET>" > ~/.config/coc-infisical/client-secret
+#        chmod 600 ~/.config/coc-infisical/client-id ~/.config/coc-infisical/client-secret
+#   4. Set your project ID below if not using slug template, then:
+#        systemctl --user enable --now coc-infisical-agent.service
+#
+# Or one-shot: infisical agent --config config/infisical/agent-config.yaml
+
+infisical:
+  address: "https://app.infisical.com"
+  retry-strategy:
+    max-retries: 5
+    max-delay: "10s"
+    base-delay: "200ms"
+
+auth:
+  type: "universal-auth"
+  config:
+    client-id: "/home/andrew/.config/coc-infisical/client-id"
+    client-secret: "/home/andrew/.config/coc-infisical/client-secret"
+    remove_client_secret_on_read: false
+
+sinks:
+  - type: "file"
+    config:
+      path: "/home/andrew/.local/state/coc/secrets/access-token"
+
+templates:
+  # Full .env for local/dev apps (KEY=VALUE)
+  # Replace PROJECT_SLUG if your Infisical project slug differs from chain-of-command
+  - template-content: |
+      {{- with listSecretsByProjectSlug "chain-of-command" "dev" "/" `{"recursive": true, "expandSecretReferences": true}` }}
+      {{- range . }}
+      {{- if eq .SecretPath "/" }}
+      {{ .Key }}={{ .Value }}
+      {{- else }}
+      {{ .Key }}={{ .Value }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+    destination-path: "/home/andrew/.local/state/coc/secrets/.env"
+    config:
+      polling-interval: 60s
+
+  # Staging environment render (optional)
+  - template-content: |
+      {{- with listSecretsByProjectSlug "chain-of-command" "staging" "/" `{"recursive": true, "expandSecretReferences": true}` }}
+      {{- range . }}
+      {{ .Key }}={{ .Value }}
+      {{- end }}
+      {{- end }}
+    destination-path: "/home/andrew/.local/state/coc/secrets/.env.staging"
+    config:
+      polling-interval: 120s
