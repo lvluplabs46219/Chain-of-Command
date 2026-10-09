@@ -124,7 +124,7 @@ export function NavFeatureCarousel({
             >
               <Link
                 href={item.href}
-                className="flex flex-col px-2 py-1 rounded-md border border-transparent hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                className="flex flex-col px-4 py-3 rounded-md border border-[#D4AF37]/25 bg-[#D4AF37]/5 hover:border-[#D4AF37]/45 hover:bg-[#D4AF37]/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
               >
                 <span className="flex items-center gap-1.5">
                   <span className="text-[11px] font-semibold text-[#D4AF37] truncate">{item.title}</span>

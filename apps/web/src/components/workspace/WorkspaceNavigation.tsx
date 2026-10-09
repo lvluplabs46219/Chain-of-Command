@@ -90,9 +90,9 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
   const { isAuthenticated, user, logout } = useAuth();
 
   return (
-    <div className="bg-[#111215] border-b border-[#222328]">
+    <div className="sticky top-[73px] z-30 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-md supports-[backdrop-filter]:bg-zinc-900/70">
       {/* Featured module carousel */}
-      <div className="px-4 py-1.5 border-b border-[#1a1b20] flex items-center justify-between gap-3 flex-wrap">
+      <div className="px-4 py-2 border-b border-zinc-800/80 flex items-center justify-between gap-3 flex-wrap">
         <NavFeatureCarousel className="flex-1" />
         <div className="flex items-center gap-2 shrink-0">
           {isAuthenticated ? (
@@ -152,10 +152,10 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
               key={tab.id}
               href={href}
               onClick={() => onTabChange(tab.id)}
-              className={`flex items-center gap-2 py-3 px-3.5 text-xs font-medium border-b-2 transition-all shrink-0 ${
+              className={`flex items-center gap-2 py-3 px-4 text-xs font-medium border-b-2 transition-all shrink-0 ${
                 isActive
-                  ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/5 font-semibold"
-                  : "border-transparent text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40"
+                  ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/5 font-semibold opacity-100"
+                  : "border-transparent text-zinc-500 opacity-40 hover:opacity-80 hover:text-zinc-200 hover:bg-zinc-800/40"
               }`}
             >
               <Icon className={`w-3.5 h-3.5 ${isActive ? "text-[#D4AF37]" : "text-neutral-400"}`} />

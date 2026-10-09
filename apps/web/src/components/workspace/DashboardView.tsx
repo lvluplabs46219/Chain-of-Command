@@ -126,64 +126,61 @@ export function DashboardView({
           </div>
         </div>
 
-        {/* 4 Case Metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-5">
-          <div className="bg-[#191A20] border border-[#2A2B33] rounded-lg p-3.5">
-            <div className="flex items-center justify-between text-xs text-neutral-400 font-mono mb-1">
-              <span>NEXT APPEARANCE</span>
+        {/* 4 Case Metrics — bento cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-5">
+          <div className="bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3">
+            <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono uppercase tracking-wider mb-1.5">
+              <span>Next appearance</span>
               <Calendar className="w-3.5 h-3.5 text-[#D4AF37]" />
             </div>
             <div className="text-xl font-bold text-white tabular-nums">
               {diffDays == null ? "—" : diffDays > 0 ? `${diffDays} Days` : "Today"}
             </div>
-            <div className="text-[11px] text-neutral-400 truncate mt-0.5">{matter.nextCourtType}</div>
+            <div className="text-[11px] text-zinc-500 truncate mt-0.5">{matter.nextCourtType}</div>
           </div>
 
-          {/* Metric 2: Speedy Trial Clock with Contextual Statutory Tooltip */}
-          <div className="group relative bg-[#191A20] border border-[#2A2B33] hover:border-blue-500/40 rounded-lg p-3.5 transition-colors cursor-help">
-            <div className="flex items-center justify-between text-xs text-neutral-400 font-mono mb-1">
+          <div className="group relative bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 overflow-hidden cursor-help">
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-amber-700/80" aria-hidden />
+            <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono uppercase tracking-wider mb-1.5">
               <span className="flex items-center gap-1">
-                <span>SPEEDY TRIAL CLOCK</span>
-                <Info className="w-3 h-3 text-blue-400/80 group-hover:text-blue-300" />
+                <span>Speedy trial clock</span>
+                <Info className="w-3 h-3 text-amber-500/80 group-hover:text-amber-400" />
               </span>
-              <Clock className="w-3.5 h-3.5 text-blue-400" />
+              <Clock className="w-3.5 h-3.5 text-amber-400" />
             </div>
             <div className="text-xl font-bold text-white tabular-nums">{matter.speedyTrialDeadline}</div>
-            <div className="text-[11px] text-neutral-400 truncate mt-0.5">Statutory Expiration Date</div>
+            <div className="text-[11px] text-zinc-500 truncate mt-0.5">Statutory expiration date</div>
 
-            {/* Contextual Metric Hover Tooltip */}
-            <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 w-72 p-3 rounded-lg bg-[#0E0F14] border border-blue-500/50 shadow-2xl text-[11px] text-neutral-200 pointer-events-none">
-              <div className="flex items-center gap-1.5 text-blue-400 font-bold font-mono mb-1">
+            <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 w-72 p-3 rounded-lg bg-zinc-950 border border-amber-700/50 shadow-2xl text-[11px] text-zinc-200 pointer-events-none">
+              <div className="flex items-center gap-1.5 text-amber-400 font-bold font-mono mb-1">
                 <Clock className="w-3.5 h-3.5" />
-                <span>Statutory Speedy Trial Calculation</span>
+                <span>Statutory speedy trial</span>
               </div>
-              <p className="text-neutral-300 leading-relaxed mb-1.5">
-                Under <strong>Ind. Crim. R. 4(B)</strong> (70-day speedy trial demand) or <strong>Rule 4(C)</strong> (1-year discharge rule), defendant must be brought to trial within calculated statutory window.
+              <p className="text-zinc-300 leading-relaxed mb-1.5">
+                Under applicable state speedy-trial rules, the defense may demand trial within the calculated statutory window. Confirm with primary sources for your jurisdiction.
               </p>
-              <div className="pt-1.5 border-t border-white/10 flex flex-col gap-0.5 font-mono text-[10px] text-neutral-400">
-                <div>Accrual Date: <span className="text-neutral-200">Jan 15, 2026</span></div>
-                <div>Elapsed: <span className="text-emerald-400 font-semibold">24 Days</span> · Delays: <span className="text-neutral-200">0 Days</span></div>
-                <div className="text-[#D4AF37] mt-0.5">Grounding: Ind. Code § 35-36-8-1</div>
+              <div className="pt-1.5 border-t border-white/10 font-mono text-[10px] text-zinc-500">
+                Deadline on file: <span className="text-zinc-200">{matter.speedyTrialDeadline || "—"}</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#191A20] border border-[#2A2B33] rounded-lg p-3.5">
-            <div className="flex items-center justify-between text-xs text-neutral-400 font-mono mb-1">
-              <span>CONTESTED CHARGES</span>
+          <div className="bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3">
+            <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono uppercase tracking-wider mb-1.5">
+              <span>Contested charges</span>
               <Scale className="w-3.5 h-3.5 text-amber-400" />
             </div>
             <div className="text-xl font-bold text-white tabular-nums">{matter.charges.length} Counts</div>
-            <div className="text-[11px] text-neutral-400 truncate mt-0.5">Primary: {matter.charges[0]?.title}</div>
+            <div className="text-[11px] text-zinc-500 truncate mt-0.5">Primary: {matter.charges[0]?.title}</div>
           </div>
 
-          <div className="bg-[#191A20] border border-[#2A2B33] rounded-lg p-3.5">
-            <div className="flex items-center justify-between text-xs text-neutral-400 font-mono mb-1">
-              <span>EVIDENCE & EXHIBITS</span>
+          <div className="bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3">
+            <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono uppercase tracking-wider mb-1.5">
+              <span>Evidence & exhibits</span>
               <Package className="w-3.5 h-3.5 text-emerald-400" />
             </div>
             <div className="text-xl font-bold text-white tabular-nums">{evidence.length} Logged</div>
-            <div className="text-[11px] text-emerald-400 truncate mt-0.5">{contradictionCount} Contradictions Detected</div>
+            <div className="text-[11px] text-emerald-400/90 truncate mt-0.5">{contradictionCount} contradictions flagged</div>
           </div>
         </div>
       </div>
@@ -200,7 +197,7 @@ export function DashboardView({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
           <button
             onClick={() => onNavigateTab("chambers")}
-            className="text-left bg-[#141519] hover:bg-[#1A1B22] border border-[#252630] hover:border-[#D4AF37]/40 rounded-xl p-4 transition-all group"
+            className="text-left bg-zinc-950 border border-zinc-800 rounded-xl p-4 transition-all duration-200 hover:bg-zinc-800/50 hover:border-[#D4AF37]/40 group"
           >
             <div className="flex items-center justify-between mb-2">
               <span className="p-2 rounded-lg bg-amber-950/40 text-amber-400 border border-amber-800/30">
@@ -209,14 +206,14 @@ export function DashboardView({
               <ArrowRight className="w-4 h-4 text-neutral-500 group-hover:text-[#D4AF37] group-hover:translate-x-0.5 transition-all" />
             </div>
             <h3 className="font-semibold text-white text-sm">Run Charge Explainer</h3>
-            <p className="text-xs text-neutral-400 mt-1 leading-relaxed">
-              Translate statutory elements, Actus Reus, Mens Rea, and penalty maximums into plain 8th-grade English.
+            <p className="text-xs text-zinc-400 mt-1 leading-snug">
+              Plain-language elements, mental state, and max penalties.
             </p>
           </button>
 
           <button
             onClick={() => onNavigateTab("chambers")}
-            className="text-left bg-[#141519] hover:bg-[#1A1B22] border border-[#252630] hover:border-[#D4AF37]/40 rounded-xl p-4 transition-all group"
+            className="text-left bg-zinc-950 border border-zinc-800 rounded-xl p-4 transition-all duration-200 hover:bg-zinc-800/50 hover:border-[#D4AF37]/40 group"
           >
             <div className="flex items-center justify-between mb-2">
               <span className="p-2 rounded-lg bg-rose-950/40 text-rose-400 border border-rose-800/30">
@@ -225,14 +222,14 @@ export function DashboardView({
               <ArrowRight className="w-4 h-4 text-neutral-500 group-hover:text-[#D4AF37] group-hover:translate-x-0.5 transition-all" />
             </div>
             <h3 className="font-semibold text-white text-sm">Check Constitutional Rights</h3>
-            <p className="text-xs text-neutral-400 mt-1 leading-relaxed">
-              Audit for 4th Amendment unlawful search, Miranda violations, and failure to produce Brady material.
+            <p className="text-xs text-zinc-400 mt-1 leading-snug">
+              Fourth, Fifth, and Sixth Amendment checklist against your facts.
             </p>
           </button>
 
           <button
             onClick={onOpenAddTimeline}
-            className="text-left bg-[#141519] hover:bg-[#1A1B22] border border-[#252630] hover:border-[#D4AF37]/40 rounded-xl p-4 transition-all group"
+            className="text-left bg-zinc-950 border border-zinc-800 rounded-xl p-4 transition-all duration-200 hover:bg-zinc-800/50 hover:border-[#D4AF37]/40 group"
           >
             <div className="flex items-center justify-between mb-2">
               <span className="p-2 rounded-lg bg-blue-950/40 text-blue-400 border border-blue-800/30">
@@ -241,14 +238,14 @@ export function DashboardView({
               <ArrowRight className="w-4 h-4 text-neutral-500 group-hover:text-[#D4AF37] group-hover:translate-x-0.5 transition-all" />
             </div>
             <h3 className="font-semibold text-white text-sm">Log Timeline Event</h3>
-            <p className="text-xs text-neutral-400 mt-1 leading-relaxed">
-              Add chronological events from police narratives and 911 dispatch to highlight contradictions.
+            <p className="text-xs text-zinc-400 mt-1 leading-snug">
+              Log events from reports and flags timeline gaps.
             </p>
           </button>
 
           <button
             onClick={() => onNavigateTab("draft_desk")}
-            className="text-left bg-[#141519] hover:bg-[#1A1B22] border border-[#252630] hover:border-[#D4AF37]/40 rounded-xl p-4 transition-all group"
+            className="text-left bg-zinc-950 border border-zinc-800 rounded-xl p-4 transition-all duration-200 hover:bg-zinc-800/50 hover:border-[#D4AF37]/40 group"
           >
             <div className="flex items-center justify-between mb-2">
               <span className="p-2 rounded-lg bg-emerald-950/40 text-emerald-400 border border-emerald-800/30">
@@ -257,14 +254,14 @@ export function DashboardView({
               <ArrowRight className="w-4 h-4 text-neutral-500 group-hover:text-[#D4AF37] group-hover:translate-x-0.5 transition-all" />
             </div>
             <h3 className="font-semibold text-white text-sm">Draft Brady Discovery Demand</h3>
-            <p className="text-xs text-neutral-400 mt-1 leading-relaxed">
-              Generate court-ready formal discovery demand requesting bodycam footage, dispatch audio, and witness notes.
+            <p className="text-xs text-zinc-400 mt-1 leading-snug">
+              Draft a discovery demand labeled for human review.
             </p>
           </button>
 
           <button
             onClick={() => onNavigateTab("court_watch")}
-            className="text-left bg-[#141519] hover:bg-[#1A1B22] border border-[#252630] hover:border-[#D4AF37]/40 rounded-xl p-4 transition-all group"
+            className="text-left bg-zinc-950 border border-zinc-800 rounded-xl p-4 transition-all duration-200 hover:bg-zinc-800/50 hover:border-[#D4AF37]/40 group"
           >
             <div className="flex items-center justify-between mb-2">
               <span className="p-2 rounded-lg bg-purple-950/40 text-purple-400 border border-purple-800/30">
@@ -273,14 +270,14 @@ export function DashboardView({
               <ArrowRight className="w-4 h-4 text-neutral-500 group-hover:text-[#D4AF37] group-hover:translate-x-0.5 transition-all" />
             </div>
             <h3 className="font-semibold text-white text-sm">Court Appearance Prep Kit</h3>
-            <p className="text-xs text-neutral-400 mt-1 leading-relaxed">
-              1-page hearing preparation checklist, addressing the judge as "Your Honor", and ADA accommodations.
+            <p className="text-xs text-zinc-400 mt-1 leading-snug">
+              One-page hearing checklist and courtroom basics.
             </p>
           </button>
 
           <button
             onClick={() => onNavigateTab("library")}
-            className="text-left bg-[#141519] hover:bg-[#1A1B22] border border-[#252630] hover:border-[#D4AF37]/40 rounded-xl p-4 transition-all group"
+            className="text-left bg-zinc-950 border border-zinc-800 rounded-xl p-4 transition-all duration-200 hover:bg-zinc-800/50 hover:border-[#D4AF37]/40 group"
           >
             <div className="flex items-center justify-between mb-2">
               <span className="p-2 rounded-lg bg-cyan-950/40 text-cyan-400 border border-cyan-800/30">
@@ -289,8 +286,8 @@ export function DashboardView({
               <ArrowRight className="w-4 h-4 text-neutral-500 group-hover:text-[#D4AF37] group-hover:translate-x-0.5 transition-all" />
             </div>
             <h3 className="font-semibold text-white text-sm">Search Grounded Precedents</h3>
-            <p className="text-xs text-neutral-400 mt-1 leading-relaxed">
-              Query landmark rulings (Terry v. Ohio, Miranda, Brady) with verified holdings and zero hallucinations.
+            <p className="text-xs text-zinc-400 mt-1 leading-snug">
+              Search verified authorities with citations required.
             </p>
           </button>
         </div>
