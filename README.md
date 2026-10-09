@@ -4,6 +4,22 @@ AI-powered legal self-representation workspace and case intelligence platform fo
 
 This monorepo contains the core platform: frontend workspace, API server, RAG engine, court connectors, multi-agent runtime, and security models.
 
+
+## Documentation
+
+| Doc | Purpose |
+|-----|---------|
+| [docs/OPERATIONS.md](docs/OPERATIONS.md) | Dev, deploy, safety rules |
+| [docs/INFISICAL_SETUP.md](docs/INFISICAL_SETUP.md) | Machine identity + agent secrets |
+| [docs/ONBOARDING.md](docs/ONBOARDING.md) | First-run wizard and reset |
+| [docs/AI_GATEWAY.md](docs/AI_GATEWAY.md) | Chambers → Gemini/Ollama/templates |
+| [docs/DATA_MODEL.md](docs/DATA_MODEL.md) | Matters, demo vs real, empty state |
+| [docs/SESSION_2026-10-09.md](docs/SESSION_2026-10-09.md) | What shipped this session |
+| [docs/CHAIN_OF_COMMAND_ARCHITECTURE.md](docs/CHAIN_OF_COMMAND_ARCHITECTURE.md) | Verification architecture |
+| [AGENTS.md](AGENTS.md) | Product build principles + agent team |
+| [agent/multi-agent/README.md](agent/multi-agent/README.md) | Local multi-agent runtime |
+| [SECURITY.md](SECURITY.md) | Security policy |
+
 ## Repository Structure
 
 ```
