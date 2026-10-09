@@ -8,7 +8,9 @@
   "scripts": {
     "dev": "next dev apps/web -p 3000 -H 0.0.0.0",
     "build": "next build apps/web",
-    "start": "next start apps/web -p 3000 -H 0.0.0.0"
+    "start": "next start apps/web -p 3000 -H 0.0.0.0",
+    "secrets:agent": "infisical agent --config config/infisical/agent-config.yaml",
+    "secrets:agent:root": "infisical agent --config agent-config.yaml"
   },
   "dependencies": {
     "next": "^15.1.4",

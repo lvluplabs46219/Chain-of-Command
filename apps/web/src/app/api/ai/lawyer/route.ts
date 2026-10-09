@@ -130,7 +130,42 @@ This information is provided for educational and procedural purposes only and do
       }
     }
 
-    // Fallback if model did not return text or API key not configured
+    // Prefer local Ollama when Gemini is unavailable (project primary LLM)
+    let usedLiveModel = Boolean(generatedText);
+    if (!generatedText) {
+      const ollamaBase = (process.env.OLLAMA_URL || process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434").replace(/\/+$/, "");
+      const ollamaModel = process.env.OLLAMA_MODEL || process.env.YHWH_MODEL || "llama3.2";
+      try {
+        const ollamaRes = await fetch(`${ollamaBase}/api/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: ollamaModel,
+            stream: false,
+            messages: [
+              {
+                role: "system",
+                content: `You are ${agentRole} in Chain of Command, an educational pro se legal workspace. Jurisdiction: ${jurisdiction}. Case: ${context.caseTitle || "n/a"} (${context.caseNumber || "n/a"}). Rules: never claim to file or contact courts; never say "In my legal opinion"; cite sources when stating law; if unsure say so; educational only not legal advice; 8th-grade reading level.`,
+              },
+              { role: "user", content: String(message) },
+            ],
+          }),
+        });
+        if (ollamaRes.ok) {
+          const odata = await ollamaRes.json();
+          const content = odata?.message?.content;
+          if (typeof content === "string" && content.trim()) {
+            generatedText = content.trim();
+            usedLiveModel = true;
+          }
+        }
+      } catch (ollamaErr) {
+        console.warn("[Ollama] unavailable:", ollamaErr);
+      }
+    }
+
+    // Template fallback only if no live model answered
+    let usedTemplateFallback = false;
     if (!generatedText) {
       const fallback = generateGroundedFallback(
         message,
@@ -141,6 +176,7 @@ This information is provided for educational and procedural purposes only and do
       );
       generatedText = fallback.text;
       citations = fallback.citations;
+      usedTemplateFallback = true;
     }
 
     // Security Gate 2: Enforce Mandatory Blocklist Phrase
@@ -172,12 +208,15 @@ This information is provided for educational and procedural purposes only and do
       citations,
       agentRole,
       runId: `run-${Date.now()}`,
-      verified: true,
+      verified: usedLiveModel && !usedTemplateFallback,
       labeling: "Information",
       grounding: {
-        status: "grounded",
+        status: usedTemplateFallback ? "template_fallback" : usedLiveModel ? "model" : "ungrounded",
         jurisdiction,
         citationsCount: citations.length,
+        note: usedTemplateFallback
+          ? "No live model available; educational template only — verify all citations."
+          : undefined,
       },
       disclaimer: "This information is provided for educational and procedural purposes only and does not constitute legal advice.",
       humanReviewRequired: true,

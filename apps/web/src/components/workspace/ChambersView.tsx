@@ -64,7 +64,7 @@ export function ChambersView({ matter }: ChambersViewProps) {
     },
   ]);
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!promptInput.trim()) return;
 
@@ -79,8 +79,47 @@ export function ChambersView({ matter }: ChambersViewProps) {
     setMessages(newMessages);
     setPromptInput("");
 
-    // Honest placeholder until live agent API is wired — no invented case facts
-    setTimeout(() => {
+    const thinkingId = `msg-${Date.now()}-thinking`;
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: thinkingId,
+        sender: "agent",
+        agentId: selectedAgent.id,
+        agentName: selectedAgent.name,
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        text: "Working…",
+        envelope: { type: "Information", citations: [] },
+      },
+    ]);
+
+    try {
+      const res = await fetch("/api/ai/lawyer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: userMsg.text,
+          jurisdiction: matter.jurisdiction || "Indiana",
+          agentRole: selectedAgent.name || selectedAgent.role,
+          context: {
+            caseTitle: matter.title,
+            caseNumber: matter.caseNumber,
+            courtName: matter.courtName || matter.court,
+            matterId: matter.id,
+            chargeCount: matter.charges?.length ?? 0,
+            evidenceCount: matter.evidence?.length ?? 0,
+          },
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      const citations = Array.isArray(data.citations)
+        ? data.citations.map((c: string) => ({
+            statuteOrRule: c,
+            summary: "",
+            confidenceScore: data.verified ? 0.7 : 0.3,
+            provenance: data.verified ? "SOURCE_PUBLIC" : "SOURCE_USER",
+          }))
+        : [];
       const agentMsg: Message = {
         id: `msg-${Date.now()}-agent`,
         sender: "agent",
@@ -88,13 +127,28 @@ export function ChambersView({ matter }: ChambersViewProps) {
         agentName: selectedAgent.name,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         text:
-          matter.id === "matter-empty"
-            ? "I need an open matter with your filings before I can analyze anything. Open a case in the Docket first."
-            : `Received. Live agent analysis is not fully wired in this build. I will not invent facts, citations, or deadlines. Rephrase with a specific document or question once the research pipeline is connected.`,
-        envelope: { type: "Information", citations: [] },
+          data.text ||
+          data.error ||
+          "No response from the model gateway. Check Ollama or API keys, then try again.",
+        envelope: {
+          type: data.labeling === "Analysis" ? "Analysis" : "Information",
+          citations,
+        },
       };
-      setMessages((prev) => [...prev, agentMsg]);
-    }, 400);
+      setMessages((prev) => prev.filter((m) => m.id !== thinkingId).concat(agentMsg));
+    } catch {
+      setMessages((prev) =>
+        prev.filter((m) => m.id !== thinkingId).concat({
+          id: `msg-${Date.now()}-err`,
+          sender: "agent",
+          agentId: selectedAgent.id,
+          agentName: selectedAgent.name,
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          text: "Could not reach the AI gateway. Confirm the app is running and try again.",
+          envelope: { type: "Information", citations: [] },
+        }),
+      );
+    }
   };
 
   return (
