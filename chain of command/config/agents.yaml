@@ -1,0 +1,42 @@
+agents:
+  research_agent:
+    name: research_agent
+    description: "Specialized in legal research, statutory interpretation, case law analysis, and authority verification."
+    capabilities:
+      - research
+      - legal_research
+      - case_search
+      - statute_analysis
+      - document_analysis
+    permissions:
+      - READ_DOCUMENTS
+      - ACCESS_CASE_DATA
+      - LEGAL_RESEARCH
+      - DELEGATE_LLM
+    max_sensitivity: case_data
+    preferred_model: anthropic
+    config:
+      max_sources: 10
+      search_depth: comprehensive
+      verify_citations: true
+
+  code_agent:
+    name: code_agent
+    description: "Specialized in secure code generation, redaction algorithms, and procedural automation."
+    capabilities:
+      - code_generation
+      - code_review
+      - debugging
+      - redaction
+    permissions:
+      - EXECUTE_CODE
+      - READ_DOCUMENTS
+      - DELEGATE_LLM
+    max_sensitivity: internal
+    preferred_model: openai
+    config:
+      languages:
+        - python
+        - typescript
+        - sql
+      strict_linting: true

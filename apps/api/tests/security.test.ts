@@ -72,6 +72,27 @@ async function runTests() {
   assert(!csp.includes("'unsafe-inline'"), "CSP should not include 'unsafe-inline'");
   assert(csp.includes("default-src 'self'"), "CSP should include default-src 'self'");
 
+  // SEC-8 & SEC-9 Demo Lockout in Production
+  const originalNodeEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = 'production';
+
+  // Demo tokens must be strictly rejected in production
+  res = await fetch(`http://localhost:${port}/api/directory`, {
+    headers: { 'Authorization': 'Bearer demo-token-bypass-attempt' }
+  });
+  assert(res.status === 401, 'Demo token must return 401 in production (Demo Lockout)');
+
+  // Demo provider on AI route must be rejected in production
+  res = await fetch(`http://localhost:${port}/api/ai/agents/lead-counsel/runs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ input: 'Test procedural query', provider: 'demo' })
+  });
+  assert(res.status === 401 || res.status === 400, 'Unauthenticated or demo AI run request must be rejected in production');
+
+  // Restore NODE_ENV
+  process.env.NODE_ENV = originalNodeEnv;
+
   console.log('✅ All security verification tests passed!');
   server.close();
   process.exit(0);

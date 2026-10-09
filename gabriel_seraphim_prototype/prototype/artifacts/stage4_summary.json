@@ -1,0 +1,7 @@
+{
+  "status": "patched",
+  "patch_file": "/home/andrew/Development/Repos/Aquit-Platform/gabriel_seraphim_prototype/prototype/artifacts/proposed_patch.diff",
+  "seraphim_clean": true,
+  "sandbox_passed": true,
+  "fixed_sources": "/home/andrew/Development/Repos/Aquit-Platform/gabriel_seraphim_prototype/prototype/artifacts/fixed_sample_app"
+}

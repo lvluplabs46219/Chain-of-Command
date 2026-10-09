@@ -1,0 +1,18 @@
+{
+  "message_id": "488be8c3-6467-454f-83d0-43d4da4c967b",
+  "instruction": "can you organize my ~/Downloads folder?",
+  "model_id": "Qwen/Qwen3-VL-30B-A3B-Instruct",
+  "timestamp": "2026-08-26T02:47:53.170000Z",
+  "steps": [],
+  "traceMetadata": {
+    "traceId": "488be8c3-6467-454f-83d0-43d4da4c967b",
+    "inputTokensUsed": 0,
+    "outputTokensUsed": 0,
+    "duration": 0.0,
+    "numberOfSteps": 0,
+    "maxSteps": 30,
+    "completed": true,
+    "final_state": "error",
+    "user_evaluation": "not_evaluated"
+  }
+}

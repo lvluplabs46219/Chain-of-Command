@@ -13,8 +13,9 @@ function verifyWebhookSignature(rawBody: string, secret: string, signatureHeader
   }
 
   const expectedSig = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+  const cleanHeader = signatureHeader.startsWith('sha256=') ? signatureHeader.slice(7) : signatureHeader;
 
-  const sigBuffer = Buffer.from(signatureHeader, 'utf8');
+  const sigBuffer = Buffer.from(cleanHeader, 'utf8');
   const expectedBuffer = Buffer.from(expectedSig, 'utf8');
 
   if (sigBuffer.length !== expectedBuffer.length) {
@@ -43,6 +44,9 @@ function getRawBody(req: Request): string {
 
 // Middleware to capture raw body for HMAC verification
 function captureRawBody(req: Request, res: Response, next: Function) {
+  if (req.readableEnded || (req as any).rawBody !== undefined) {
+    return next();
+  }
   let rawBody = '';
   
   req.on('data', (chunk) => {
@@ -103,20 +107,25 @@ function ensureWebhookSecret(secret: string | undefined, endpointName: string): 
 
 webhooksRouter.post("/webhooks/courtlistener", async (req: Request, res: Response) => {
   try {
+    const signatureHeader = (req.headers['x-hub-signature-256'] || req.headers['x-webhook-signature']) as string | undefined;
+
+    if (!signatureHeader) {
+      return res.status(401).json({ error: "UNAUTHORIZED", message: "Missing webhook signature" });
+    }
+
     const secret = process.env.COURTLISTENER_WEBHOOK_SECRET;
     const validatedSecret = ensureWebhookSecret(secret, 'CourtListener');
     
     // FAIL CLOSED: If no secret in production, reject
     if (validatedSecret === null) {
-      return res.status(403).json({ error: "Webhook secret not configured" });
+      return res.status(401).json({ error: "UNAUTHORIZED", message: "Webhook secret not configured" });
     }
     
     const rawBody = getRawBody(req);
-    const signatureHeader = req.headers['x-webhook-signature'] as string | undefined;
-    
+
     if (!verifyWebhookSignature(rawBody, validatedSecret, signatureHeader)) {
       console.warn('CourtListener webhook: Invalid HMAC signature');
-      return res.status(403).json({ error: "Invalid webhook signature" });
+      return res.status(401).json({ error: "UNAUTHORIZED", message: "Invalid webhook signature" });
     }
     
     const { matterId, eventDescription, eventDate } = req.body;
@@ -154,11 +163,15 @@ webhooksRouter.post("/webhooks/doxpop", async (req: Request, res: Response) => {
     }
     
     const rawBody = getRawBody(req);
-    const signatureHeader = req.headers['x-webhook-signature'] as string | undefined;
-    
+    const signatureHeader = (req.headers['x-hub-signature-256'] || req.headers['x-webhook-signature']) as string | undefined;
+
+    if (!signatureHeader) {
+      return res.status(401).json({ error: "UNAUTHORIZED", message: "Missing webhook signature" });
+    }
+
     if (!verifyWebhookSignature(rawBody, validatedSecret, signatureHeader)) {
       console.warn('Doxpop webhook: Invalid HMAC signature');
-      return res.status(403).json({ error: "Invalid webhook signature" });
+      return res.status(401).json({ error: "UNAUTHORIZED", message: "Invalid webhook signature" });
     }
     
     const { matterId, eventDescription, eventDate } = req.body;

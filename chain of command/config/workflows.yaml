@@ -1,0 +1,29 @@
+workflows:
+  legal_research_workflow:
+    name: "Legal Research & Citation Synthesis"
+    description: "Multi-step workflow querying precedent and statutes for pro se defense"
+    sensitivity: case_data
+    steps:
+      - name: precedent_lookup
+        agent: research_agent
+        action: legal_research
+        parameters:
+          query: "{{context.case_number}}"
+          depth: comprehensive
+      - name: output_formatting
+        agent: task_bot
+        action: format_output
+        parameters:
+          format: json
+
+  code_generation_workflow:
+    name: "Redaction Automation Code Generation"
+    description: "Synthesize utility code for document redaction with privacy constraints"
+    sensitivity: internal
+    steps:
+      - name: generate_redaction_script
+        agent: code_agent
+        action: generate_code
+        parameters:
+          requirements: "Create a function to redact sensitive information..."
+          language: python

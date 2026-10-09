@@ -28,11 +28,7 @@ export class CourtListenerClient {
   private baseUrl = 'https://www.courtlistener.com/api/rest/v4';
 
   constructor(apiToken?: string) {
-    this.apiToken =
-      apiToken ||
-      process.env.COURTLISTENER_API_TOKEN ||
-      process.env.COURT_LISTENER_API_KEY ||
-      '';
+    this.apiToken = apiToken || process.env.COURTLISTENER_API_TOKEN || '';
     if (!this.apiToken && process.env.NODE_ENV === 'production') {
       console.warn('CourtListener API token is missing. Calls may be rate-limited.');
     }

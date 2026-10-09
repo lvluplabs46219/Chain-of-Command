@@ -1,0 +1,8 @@
+{
+  "name": "Chain of Command",
+  "description": "AI-powered legal self-representation workspace and case intelligence platform for pro se litigants.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,271 +1,167 @@
 "use client";
 
 import React, { useState } from "react";
+import { Gavel, ShieldCheck, AlertCircle, Scale, FileText, CheckCircle2, Info } from "lucide-react";
 import { Matter, Charge } from "@/lib/workspace-data";
-import {
-  Plus,
-  Scale,
-  Calendar,
-  AlertCircle,
-  FileText,
-  UserCheck,
-  CheckCircle2,
-  Clock,
-  Shield,
-} from "lucide-react";
+import { ResultEnvelope } from "./ResultEnvelope";
 
 interface DocketViewProps {
-  matters: Matter[];
-  activeMatter: Matter;
-  onSelectMatter: (matter: Matter) => void;
-  onSaveMatter: (matter: Matter) => void;
-  onOpenNewMatterModal: () => void;
+  matter: Matter;
 }
 
-export function DocketView({
-  matters,
-  activeMatter,
-  onSelectMatter,
-  onSaveMatter,
-  onOpenNewMatterModal,
-}: DocketViewProps) {
-  const [activeChargeIndex, setActiveChargeIndex] = useState<number>(0);
-  const [showAddChargeModal, setShowAddChargeModal] = useState<boolean>(false);
-  const [newStatute, setNewStatute] = useState<string>("");
-  const [newTitle, setNewTitle] = useState<string>("");
-  const [newMaxPenalty, setNewMaxPenalty] = useState<string>("");
+export function DocketView({ matter }: DocketViewProps) {
+  const [selectedChargeId, setSelectedChargeId] = useState<string>(
+    matter.charges[0]?.id || ""
+  );
 
-  const currentCharge = activeMatter.charges[activeChargeIndex] || activeMatter.charges[0];
-
-  const handleAddCharge = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newStatute.trim() || !newTitle.trim()) return;
-
-    const newCh: Charge = {
-      id: `ch-${Date.now()}`,
-      statute: newStatute.trim(),
-      title: newTitle.trim(),
-      level: "Misdemeanor Class A",
-      allegedDate: new Date().toISOString().split("T")[0],
-      statutoryMaxPenalty: newMaxPenalty.trim() || "1 year jail; $1,000 fine",
-      statutoryMinPenalty: "Probation eligible",
-      elements: [
-        {
-          name: "Prohibited Unlawful Act",
-          description: "Committed overt act as alleged in information/indictment.",
-          stateProofStatus: "Contested",
-        },
-        {
-          name: "Requisite Criminal Intent",
-          description: "Acted with statutory Mens Rea.",
-          stateProofStatus: "Insufficient Evidence",
-        },
-      ],
-    };
-
-    const updated = {
-      ...activeMatter,
-      charges: [...activeMatter.charges, newCh],
-    };
-
-    onSaveMatter(updated);
-    setNewStatute("");
-    setNewTitle("");
-    setNewMaxPenalty("");
-    setShowAddChargeModal(false);
-  };
+  const selectedCharge =
+    matter.charges.find((c) => c.id === selectedChargeId) || matter.charges[0];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 border-b border-[#23242B] pb-4">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#272830]">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-mono text-[#D4AF37] uppercase tracking-wider">The Docket</span>
-            <span className="text-neutral-500">·</span>
-            <span className="text-xs text-neutral-400">Case Matter Registry</span>
-          </div>
-          <h1 className="text-2xl font-serif font-bold text-white tracking-tight">{activeMatter.title}</h1>
-          <p className="text-xs text-neutral-400 mt-0.5">
-            {activeMatter.courtName} · Case Number: <span className="font-mono text-neutral-200">{activeMatter.caseNumber}</span>
+          <span className="text-xs font-mono uppercase text-[#D4AF37] font-semibold">
+            Docket & Charging Document Analysis
+          </span>
+          <h1 className="text-2xl font-bold text-white mt-1">
+            Charges, Statutory Elements & Sentencing Ranges
+          </h1>
+          <p className="text-xs sm:text-sm text-neutral-400 mt-1">
+            Matter: {matter.caseNumber} · Reading Level: {matter.readingLevel}
           </p>
         </div>
-
-        <button
-          onClick={onOpenNewMatterModal}
-          className="px-3.5 py-2 text-xs font-semibold text-neutral-950 bg-[#D4AF37] hover:bg-[#c49f27] rounded-lg flex items-center gap-1.5 transition-colors"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Open New Case Matter</span>
-        </button>
       </div>
 
-      {/* Case Details Card */}
-      <div className="bg-[#141519] border border-[#272830] rounded-xl p-5">
-        <h2 className="text-xs font-mono text-neutral-400 uppercase tracking-wider mb-3">Case Facts & Procedural Summary</h2>
-        <p className="text-xs text-neutral-300 leading-relaxed bg-[#191A20] p-4 rounded-lg border border-[#2A2B33]">
-          {activeMatter.summary}
-        </p>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-[#23242B] text-xs">
-          <div>
-            <span className="text-neutral-500 font-mono text-[10px] uppercase block">Presiding Judge</span>
-            <span className="text-white font-medium">{activeMatter.judge}</span>
-          </div>
-          <div>
-            <span className="text-neutral-500 font-mono text-[10px] uppercase block">Prosecuting Agency</span>
-            <span className="text-white font-medium">{activeMatter.prosecutor}</span>
-          </div>
-          <div>
-            <span className="text-neutral-500 font-mono text-[10px] uppercase block">Representation</span>
-            <span className="text-emerald-400 font-medium">{activeMatter.defenseStatus}</span>
-          </div>
-          <div>
-            <span className="text-neutral-500 font-mono text-[10px] uppercase block">Speedy Trial Cutoff</span>
-            <span className="text-white font-medium font-mono">{activeMatter.speedyTrialDeadline}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Charges & Statutory Elements Section */}
-      <div className="bg-[#141519] border border-[#272830] rounded-xl p-5">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="font-semibold text-white text-sm">Formal Charges & Statutory Elements</h3>
-            <p className="text-xs text-neutral-400">Deconstructed elements the State must prove beyond a reasonable doubt</p>
-          </div>
+      {/* Charge Selector Bar */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        {matter.charges.map((c) => (
           <button
-            onClick={() => setShowAddChargeModal(true)}
-            className="px-3 py-1.5 text-xs text-white bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-md flex items-center gap-1.5 transition-colors"
+            key={c.id}
+            onClick={() => setSelectedChargeId(c.id)}
+            className={`px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border ${
+              selectedCharge?.id === c.id
+                ? "bg-[#D4AF37] text-neutral-950 border-[#D4AF37] shadow-lg shadow-[#D4AF37]/10"
+                : "bg-[#161720] border-[#2A2C38] text-neutral-300 hover:bg-[#1E202B]"
+            }`}
           >
-            <Plus className="w-3 h-3 text-[#D4AF37]" />
-            <span>Add Count</span>
+            Count {c.countNumber}: {c.title} ({c.tier})
           </button>
-        </div>
+        ))}
+      </div>
 
-        {/* Charge Selector Tabs */}
-        <div className="flex items-center gap-2 border-b border-[#23242B] pb-3 mb-4 overflow-x-auto">
-          {activeMatter.charges.map((ch, idx) => (
-            <button
-              key={ch.id}
-              onClick={() => setActiveChargeIndex(idx)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                activeChargeIndex === idx
-                  ? "bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/30"
-                  : "bg-neutral-800/60 text-neutral-400 hover:text-white border border-transparent"
-              }`}
-            >
-              <span>Count {idx + 1}: {ch.title}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Selected Charge Breakdown */}
-        {currentCharge && (
-          <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-[#191A20] rounded-lg border border-[#2A2B33]">
-              <div>
-                <span className="text-xs font-mono text-[#D4AF37] uppercase">{currentCharge.statute}</span>
-                <h4 className="text-base font-semibold text-white mt-0.5">{currentCharge.title}</h4>
-                <div className="text-[11px] text-neutral-400 font-mono mt-0.5">Classification: {currentCharge.level}</div>
-              </div>
-              <div className="text-right sm:border-l sm:border-[#2D2E37] sm:pl-4">
-                <div className="text-[10px] font-mono text-neutral-500 uppercase">Max Statutory Exposure</div>
-                <div className="text-xs font-semibold text-rose-300">{currentCharge.statutoryMaxPenalty}</div>
-                <div className="text-[11px] text-neutral-400 font-mono">Min: {currentCharge.statutoryMinPenalty}</div>
-              </div>
-            </div>
-
-            {/* Elements Checklist */}
-            <div className="space-y-2.5">
-              <div className="text-xs font-mono text-neutral-400 uppercase tracking-wider">
-                Statutory Elements to Contest ({currentCharge.elements.length})
-              </div>
-
-              {currentCharge.elements.map((elem, i) => (
-                <div key={i} className="p-3.5 bg-[#17181D] border border-[#262730] rounded-lg">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-semibold text-white text-xs">{elem.name}</span>
-                    <span
-                      className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
-                        elem.stateProofStatus === "Refuted by Exhibit"
-                          ? "bg-emerald-950/40 text-emerald-400 border-emerald-800/40"
-                          : elem.stateProofStatus === "Insufficient Evidence"
-                          ? "bg-amber-950/40 text-amber-400 border-amber-800/40"
-                          : "bg-blue-950/40 text-blue-400 border-blue-800/40"
-                      }`}
-                    >
-                      {elem.stateProofStatus}
+      {selectedCharge ? (
+        <div className="space-y-6">
+          <ResultEnvelope
+            envelopeType="Analysis"
+            title={`Deconstruction of Count ${selectedCharge.countNumber}: ${selectedCharge.title}`}
+            agentName="Charge Explainer AI"
+            timestamp="Grounding Verified"
+            citations={[
+              {
+                statuteOrRule: selectedCharge.statuteCitation,
+                summary: `Controlling Indiana Criminal Code defining ${selectedCharge.title}`,
+                confidenceScore: 0.98,
+                provenance: "SOURCE_PUBLIC",
+                sourceUrl: "https://iga.in.gov",
+              },
+            ]}
+          >
+            <div className="space-y-5">
+              {/* Charge Summary Box */}
+              <div className="bg-[#181A24] border border-[#2B2E3D] rounded-xl p-4 sm:p-5 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold px-2.5 py-1 rounded bg-[#D4AF37]/20 text-[#E6C65A]">
+                      {selectedCharge.statuteCitation}
+                    </span>
+                    <span className="text-xs font-mono px-2 py-0.5 rounded bg-neutral-800 text-neutral-300">
+                      Tier: {selectedCharge.tier}
                     </span>
                   </div>
-                  <p className="text-xs text-neutral-400 leading-relaxed">{elem.description}</p>
+                  <div className="text-xs text-neutral-400">
+                    Jurisdiction: <span className="text-white font-medium">{selectedCharge.jurisdiction}</span>
+                  </div>
                 </div>
-              ))}
+
+                <p className="text-xs sm:text-sm text-neutral-200 leading-relaxed">
+                  {selectedCharge.plainEnglishSummary}
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-[#262836] text-xs">
+                  <div>
+                    <span className="text-neutral-400">Statutory Penalty Limits:</span>
+                    <div className="font-bold text-white mt-0.5">{selectedCharge.statutoryRange}</div>
+                  </div>
+                  <div>
+                    <span className="text-neutral-400">Advisory Sentencing Benchmark:</span>
+                    <div className="font-bold text-amber-400 mt-0.5">{selectedCharge.advisorySentence}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Statutory Elements Breakdown */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
+                  <span>Individual Statutory Elements (State Must Prove Every Element Beyond Reasonable Doubt)</span>
+                </h3>
+
+                <div className="space-y-4">
+                  {selectedCharge.elements.map((el, i) => (
+                    <div
+                      key={el.id}
+                      className="bg-[#15161E] border border-[#282A37] rounded-xl p-4 sm:p-5 space-y-3"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] font-bold text-xs flex items-center justify-center font-mono">
+                            {i + 1}
+                          </span>
+                          <h4 className="font-bold text-white text-sm">{el.name}</h4>
+                        </div>
+                        <span
+                          className={`text-[10px] uppercase font-mono px-2 py-0.5 rounded font-bold ${
+                            el.type === "Actus Reus"
+                              ? "bg-rose-950/40 text-rose-300 border border-rose-800/40"
+                              : el.type === "Mens Rea"
+                              ? "bg-purple-950/40 text-purple-300 border border-purple-800/40"
+                              : "bg-blue-950/40 text-blue-300 border border-blue-800/40"
+                          }`}
+                        >
+                          {el.type}
+                        </span>
+                      </div>
+
+                      <div className="bg-[#0F1015] rounded-lg p-3 font-mono text-[11px] text-amber-200/90 border border-[#1E202A]">
+                        &quot;{el.statutoryLanguage}&quot;
+                      </div>
+
+                      <div className="text-xs text-neutral-300 leading-relaxed">
+                        <strong className="text-white">Plain English Explanation: </strong>
+                        {el.plainEnglishExplanation}
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-[#20222F] text-xs">
+                        <div className="p-3 bg-[#181A22] rounded-lg border border-[#262836]">
+                          <span className="text-neutral-400 font-semibold block mb-1">Prosecution Burden:</span>
+                          <p className="text-neutral-300">{el.prosecutionBurden}</p>
+                        </div>
+                        <div className="p-3 bg-emerald-950/20 rounded-lg border border-emerald-800/30">
+                          <span className="text-emerald-400 font-semibold block mb-1">Defense Scrutiny & Precedent:</span>
+                          <p className="text-emerald-200/90">{el.defenseAngle}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
-
-      {/* Add Count Modal */}
-      {showAddChargeModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#141519] border border-[#2B2B35] rounded-xl max-w-md w-full p-6 text-neutral-200 shadow-2xl">
-            <h3 className="text-base font-semibold text-white mb-1">Add Formal Charge / Count</h3>
-            <p className="text-xs text-neutral-400 mb-4">Enter statutory information from the charging information or indictment.</p>
-
-            <form onSubmit={handleAddCharge} className="space-y-3 text-xs">
-              <div>
-                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Statutory Code</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Ind. Code § 35-43-4-2 or Cal. Penal Code § 484"
-                  value={newStatute}
-                  onChange={(e) => setNewStatute(e.target.value)}
-                  className="w-full bg-[#101114] border border-[#2A2B35] rounded-md px-3 py-2 text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Charge Title</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Grand Theft or Battery Resulting in Injury"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full bg-[#101114] border border-[#2A2B35] rounded-md px-3 py-2 text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Maximum Statutory Penalty</label>
-                <input
-                  type="text"
-                  placeholder="e.g. 2.5 years imprisonment; $10,000 fine"
-                  value={newMaxPenalty}
-                  onChange={(e) => setNewMaxPenalty(e.target.value)}
-                  className="w-full bg-[#101114] border border-[#2A2B35] rounded-md px-3 py-2 text-white"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-3 border-t border-[#23242B] mt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowAddChargeModal(false)}
-                  className="px-3.5 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-md text-xs"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold rounded-md text-xs"
-                >
-                  Add Charge
-                </button>
-              </div>
-            </form>
-          </div>
+          </ResultEnvelope>
+        </div>
+      ) : (
+        <div className="p-8 text-center text-neutral-400 bg-[#14151C] border border-[#242633] rounded-xl">
+          No criminal charges entered for this civil matter.
         </div>
       )}
     </div>

@@ -3,60 +3,30 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "apps/*",
-    "packages/*",
-    "agent/*"
+    "apps/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=apps/web",
-    "build": "npm run build --workspace=apps/web",
-    "start": "tsx apps/api/src/index.ts",
-    "lint": "npm run lint --workspace=apps/web",
-    "typecheck:libs": "tsc --build",
-    "typecheck": "tsc --build",
-    "db:migrate": "python3 scripts/apply_all_migrations.py",
-    "db:push": "npm run push --workspace=packages/db",
-    "ingest": "tsx scripts/src/ingest_courtlistener.ts",
-    "ingest:docket": "tsx scripts/ingest_courtlistener_docket.ts",
-    "harvard:preview": "python3 scripts/harvard_cases.py --action preview --limit 5",
-    "harvard:ingest": "python3 scripts/harvard_cases.py --action ingest --limit 10",
-    "prepare": "true",
-    "test": "tsx scripts/ts/test_compliance_and_security.ts",
-    "patcher": "tsx scripts/ts/acquit-patcher.ts"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.3",
-    "typescript": "~5.9.3"
+    "dev": "next dev apps/web -p 3000 -H 0.0.0.0",
+    "build": "next build apps/web",
+    "start": "next start apps/web -p 3000 -H 0.0.0.0"
   },
   "dependencies": {
-    "@google/genai": "^2.27.0",
-    "@replit/connectors-sdk": "^0.4.3",
-    "@sentry/node": "^11.4.0",
-    "@sentry/profiling-node": "^11.4.0",
-    "@supabase/ssr": "^0.12.7",
-    "@supabase/supabase-js": "^2.117.2",
-    "@upstash/ratelimit": "^2.2.0",
-    "@upstash/redis": "^1.39.0",
-    "@vercel/analytics": "^2.0.1",
-    "botid": "^1.5.11",
-    "cors": "^2.8.6",
-    "dotenv": "^18.0.5",
-    "embla-carousel-autoplay": "^8.6.0",
-    "embla-carousel-react": "^8.6.0",
-    "express": "^5.2.1",
-    "express-rate-limit": "^8.7.0",
-    "firebase": "^12.19.0",
-    "firebase-admin": "14.5.0",
-    "googleapis": "^182.0.0",
-    "helmet": "^8.3.0",
-    "multer": "^2.4.0",
-    "next": "^16.3.8",
-    "pg": "^8.23.1",
-    "react-router-dom": "^7.18.4",
-    "tar-stream": "^3.2.2",
-    "workflow": "^5.0.1"
+    "next": "^15.1.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "lucide-react": "^1.16.0",
+    "motion": "^12.4.7",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.0.1",
+    "botid": "^1.5.11"
   },
-  "engines": {
-    "node": ">=20 <23"
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "typescript": "^5.7.3",
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/postcss": "^4.0.0",
+    "postcss": "^8.5.1"
   }
 }
