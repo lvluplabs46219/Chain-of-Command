@@ -24,12 +24,18 @@ export interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  loginAsLitigant: (name?: string, email?: string) => Promise<void>;
+  /** True until the user completes (or explicitly skips) first-run onboarding. */
+  isFirstRun: boolean;
+  loginAsLitigant: (name?: string, email?: string, jurisdiction?: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   loginWithToken: (token: string, userDetails?: Partial<AuthUser>) => Promise<void>;
   logout: () => void;
   updateUser: (updates: Partial<AuthUser>) => void;
   switchRole: (role: "pro_se" | "attorney" | "observer") => void;
+  /** Mark first-run onboarding complete for this browser profile. */
+  completeFirstRun: () => void;
+  /** Dev/test: clear onboarding flag so the wizard shows again. */
+  resetFirstRun: () => void;
 }
 
 const DEFAULT_LITIGANT_USER: AuthUser = {
@@ -45,6 +51,7 @@ const DEFAULT_LITIGANT_USER: AuthUser = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const USER_STORAGE_KEY = "acquit_auth_user";
+const ONBOARDING_STORAGE_KEY = "coc_onboarding_completed";
 
 function isDemoToken(token: string): boolean {
   return (
@@ -91,12 +98,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFirstRun, setIsFirstRun] = useState(true);
 
   useEffect(() => {
     let unsub: (() => void) | undefined;
     try {
       const existingToken = getAuthToken();
       const savedUserStr = localStorage.getItem(USER_STORAGE_KEY);
+      const onboardingDone = localStorage.getItem(ONBOARDING_STORAGE_KEY) === "1";
+      setIsFirstRun(!onboardingDone);
 
       if (existingToken) {
         if (isDemoToken(existingToken) && !allowDemoAuth()) {
@@ -172,7 +182,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginAsLitigant = async (
     name = "Arthur Marlowe",
-    email = "litigant@chainofcommand.law"
+    email = "litigant@chainofcommand.law",
+    jurisdiction = "Self-Represented"
   ) => {
     if (!allowDemoAuth()) {
       throw new Error(
@@ -185,7 +196,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ? crypto.randomUUID()
         : String(Date.now())
     }`;
-    const newUser: AuthUser = { ...DEFAULT_LITIGANT_USER, name, email };
+    const newUser: AuthUser = { ...DEFAULT_LITIGANT_USER, name, email, jurisdiction };
     setAuthToken(newToken);
     setTokenState(newToken);
     setUser(newUser);
@@ -229,17 +240,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     updateUser({ role });
   };
 
+  const completeFirstRun = () => {
+    try {
+      localStorage.setItem(ONBOARDING_STORAGE_KEY, "1");
+    } catch {
+      /* ignore */
+    }
+    setIsFirstRun(false);
+  };
+
+  const resetFirstRun = () => {
+    try {
+      localStorage.removeItem(ONBOARDING_STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+    setIsFirstRun(true);
+  };
+
   const value: AuthContextType = {
     user,
     token,
     isAuthenticated: Boolean(token && user),
     isLoading,
+    isFirstRun,
     loginAsLitigant,
     loginWithGoogle,
     loginWithToken,
     logout,
     updateUser,
     switchRole,
+    completeFirstRun,
+    resetFirstRun,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

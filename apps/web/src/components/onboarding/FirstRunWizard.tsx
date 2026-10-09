@@ -71,6 +71,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
   const [courtName, setCourtName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [acknowledgedBoundaries, setAcknowledgedBoundaries] = useState(false);
 
   const finish = async (opts: { withMatter: boolean; loadSample: boolean }) => {
     setError(null);
@@ -165,10 +166,25 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
                 </li>
               </ul>
 
+              <label className="flex items-start gap-3 text-sm text-neutral-300 cursor-pointer rounded-lg border border-[#2A2B35] p-3 hover:border-[#D4AF37]/30">
+                <input
+                  type="checkbox"
+                  checked={acknowledgedBoundaries}
+                  onChange={(e) => setAcknowledgedBoundaries(e.target.checked)}
+                  className="mt-1 rounded border-[#2A2B35]"
+                />
+                <span>
+                  I understand this is <strong className="text-white">not a law firm</strong>, does not create an
+                  attorney-client relationship, and will not file anything with a court without my explicit action.
+                  If I am in crisis I can call or text <strong className="text-white">988</strong>.
+                </span>
+              </label>
+
               <button
                 type="button"
+                disabled={!acknowledgedBoundaries}
                 onClick={() => setStep(1)}
-                className="w-full py-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-sm flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Get started
                 <ArrowRight className="w-4 h-4" />
