@@ -5,8 +5,7 @@
 
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import * as schema from "../../../../packages/database/schema/sic-audit";
-import * as chainSchema from "../../../../packages/database/schema/chain-of-command";
+import * as workspaceSchema from "@workspace/db";
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
@@ -27,7 +26,7 @@ const pool = new Pool({
 });
 
 const db = drizzle(pool, {
-  schema: { ...schema, ...chainSchema },
+  schema: workspaceSchema,
 });
 
 export { db, pool };

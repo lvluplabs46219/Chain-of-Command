@@ -182,9 +182,15 @@ export class AcquitAgentRuntime {
     yield { type: "retrieval.completed", citationCount: citations.length };
 
     if (request.policy.mustUseRagForLegalClaims && citations.length === 0) {
+      // Soft fail: do not invent authorities; ask user to attach sources / run research agent.
       yield {
         type: "run.completed",
-        response: blockedResponse(request, "A verified, source-backed evidence pack is required before answering material legal claims.")
+        response: blockedResponse(
+          request,
+          "No verified authorities were attached to this run. " +
+            "Attach statutes, rules, or case materials (or use the Legal Research agent with a jurisdiction) " +
+            "before material legal claims can be answered. I will not invent citations."
+        )
       };
       return;
     }

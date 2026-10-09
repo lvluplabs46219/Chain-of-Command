@@ -479,3 +479,6 @@ export function createDefaultGateway(): ModelGateway {
   gateway.register(new GeminiModelAdapter());
   return gateway;
 }
+
+/** Singleton gateway used by agent runtime and task workers. */
+export const modelGateway = createDefaultGateway();

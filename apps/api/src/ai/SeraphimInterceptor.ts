@@ -22,6 +22,15 @@ export interface WorkerResult {
   guardrail_status?: 'PASSED' | 'FAILED';
   result: Record<string, any>;
   sanitized?: boolean;
+  // Extended fields for execution tracking
+  output?: string;
+  tokens_used?: number;
+  execution_time?: number;
+  metadata?: {
+    retries: number;
+    max_retries: number;
+    [key: string]: any;
+  };
 }
 
 export class SeraphimInterceptorError extends Error {

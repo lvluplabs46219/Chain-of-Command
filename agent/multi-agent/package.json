@@ -15,11 +15,11 @@
     "watch": "node dist/cli/watch-github.js"
   },
   "dependencies": {
-    "better-sqlite3": "^11.3.0"
+    "better-sqlite3": "^11.10.0"
   },
   "devDependencies": {
-    "typescript": "^5.6.0",
+    "@types/better-sqlite3": "^7.6.0",
     "@types/node": "^22.10.0",
-    "@types/better-sqlite3": "^7.6.0"
+    "typescript": "^5.6.0"
   }
 }

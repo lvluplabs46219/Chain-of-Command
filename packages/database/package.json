@@ -1,8 +1,14 @@
 {
-  "name": "@acquit/database",
+  "name": "@workspace/database",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "main": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./schema/sic-audit": "../db/src/schema/sic-audit.ts",
+    "./schema/chain-of-command": "../db/src/schema/chain-of-command.ts"
+  },
   "dependencies": {
     "drizzle-orm": "^0.45.2"
   }

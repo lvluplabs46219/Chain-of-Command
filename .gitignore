@@ -156,3 +156,23 @@ DesktopCommanderMCP/
 
 # Nested rename-era leftover (never re-add)
 Aquit-Platform/
+
+# Agent runtime outputs and backups (do not commit generated artifacts)
+.agents/outputs/
+.agents/backups/
+*.png
+!docs/**/*.png
+!apps/web/public/**/*.png
+
+# Build / cache
+.next/
+dist/
+.turbo/
+.cache/
+*.tsbuildinfo
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/

@@ -17,7 +17,7 @@ import {
   type NewChainEvent,
   type NewChainMetadata,
   type NewChainVerificationLog,
-} from '../../../../packages/database/schema/chain-of-command';
+} from '@workspace/db';
 import {
   ChainOfCommand,
   type ChainEvent,
