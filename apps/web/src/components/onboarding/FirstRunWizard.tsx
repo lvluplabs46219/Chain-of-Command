@@ -236,13 +236,15 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
               </div>
 
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-wider text-neutral-400 mb-1.5 flex items-center gap-1.5">
+                <label htmlFor="jurisdiction-select" className="block text-[10px] font-mono uppercase tracking-wider text-neutral-400 mb-1.5 flex items-center gap-1.5">
                   <MapPin className="w-3 h-3" /> Primary jurisdiction
                 </label>
                 <select
+                  id="jurisdiction-select"
                   value={jurisdiction}
                   onChange={(e) => setJurisdiction(e.target.value)}
                   className="w-full bg-[#101114] border border-[#2A2B35] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#D4AF37]"
+                  aria-label="Primary jurisdiction"
                 >
                   {JURISDICTIONS.map((j) => (
                     <option key={j} value={j}>

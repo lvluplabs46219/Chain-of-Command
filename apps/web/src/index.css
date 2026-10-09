@@ -12,3 +12,25 @@ body {
   margin: 0;
   padding: 0;
 }
+
+
+/* Performance & a11y: avoid non-composited animation cost */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Prefer transform/opacity for any decorative pulse */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-pulse {
+    animation: coc-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+@keyframes coc-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

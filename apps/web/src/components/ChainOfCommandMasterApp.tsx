@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import {
   Matter,
@@ -29,17 +30,53 @@ import {
 import { FirstRunWizard, type OnboardingResult } from "./onboarding/FirstRunWizard";
 import { useAuth } from "@/contexts/AuthContext";
 import { SAMPLE_MATTERS, isDemoMatter } from "@/lib/workspace-data";
-import { DashboardView } from "./workspace/DashboardView";
-import { DocketView } from "./workspace/DocketView";
-import { ChambersView } from "./workspace/ChambersView";
-import { LibraryView } from "./workspace/LibraryView";
-import { InvestigationsView } from "./workspace/InvestigationsView";
-import { TimelineView } from "./workspace/TimelineView";
-import { DraftDeskView } from "./workspace/DraftDeskView";
-import { CourtWatchView } from "./workspace/CourtWatchView";
-import { DirectoryView } from "./workspace/DirectoryView";
-import { TasksDeadlinesView } from "./workspace/TasksDeadlinesView";
-import { DesignArchiveView } from "./workspace/DesignArchiveView";
+const viewFallback = () => (
+  <div className="p-8 text-center text-sm text-neutral-500">Loading module…</div>
+);
+const DashboardView = dynamic(
+  () => import("./workspace/DashboardView").then((m) => ({ default: m.DashboardView })),
+  { loading: viewFallback },
+);
+const DocketView = dynamic(
+  () => import("./workspace/DocketView").then((m) => ({ default: m.DocketView })),
+  { loading: viewFallback },
+);
+const ChambersView = dynamic(
+  () => import("./workspace/ChambersView").then((m) => ({ default: m.ChambersView })),
+  { loading: viewFallback },
+);
+const LibraryView = dynamic(
+  () => import("./workspace/LibraryView").then((m) => ({ default: m.LibraryView })),
+  { loading: viewFallback },
+);
+const InvestigationsView = dynamic(
+  () => import("./workspace/InvestigationsView").then((m) => ({ default: m.InvestigationsView })),
+  { loading: viewFallback },
+);
+const TimelineView = dynamic(
+  () => import("./workspace/TimelineView").then((m) => ({ default: m.TimelineView })),
+  { loading: viewFallback },
+);
+const DraftDeskView = dynamic(
+  () => import("./workspace/DraftDeskView").then((m) => ({ default: m.DraftDeskView })),
+  { loading: viewFallback },
+);
+const CourtWatchView = dynamic(
+  () => import("./workspace/CourtWatchView").then((m) => ({ default: m.CourtWatchView })),
+  { loading: viewFallback },
+);
+const DirectoryView = dynamic(
+  () => import("./workspace/DirectoryView").then((m) => ({ default: m.DirectoryView })),
+  { loading: viewFallback },
+);
+const TasksDeadlinesView = dynamic(
+  () => import("./workspace/TasksDeadlinesView").then((m) => ({ default: m.TasksDeadlinesView })),
+  { loading: viewFallback },
+);
+const DesignArchiveView = dynamic(
+  () => import("./workspace/DesignArchiveView").then((m) => ({ default: m.DesignArchiveView })),
+  { loading: viewFallback },
+);
 import { Plus } from "lucide-react";
 
 interface ChainOfCommandMasterAppProps {

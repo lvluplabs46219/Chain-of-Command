@@ -46,7 +46,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        <Script src="/fetch-guard.js" strategy="beforeInteractive" />
+        <Script src="/fetch-guard.js" strategy="afterInteractive" />
       </head>
       <body className="bg-[#111214] text-[#e1e2e5] antialiased min-h-screen">
         <BotIdClient protect={protectedRoutes} />
