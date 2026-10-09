@@ -10,17 +10,44 @@ export type AgentName =
   | "metatron"
   | "seraphim"
   | "external"
-  | "watcher";
+  | "watcher"
+  // Specialized legal agent personas (routed through the hierarchy)
+  | "head_counsel"
+  | "paralegal"
+  | "rights_checker"
+  | "timeline_spotter"
+  | "charge_explainer"
+  | "research_counsel"
+  | "court_prep"
+  | "document_analyst";
+
 export type SenderName = Exclude<AgentName, "external" | "watcher">;
 
 export type TaskKind =
+  // Core runtime
   | "llm.reason"          // YHWH / Metatron
   | "file.scaffold"       // Raphael: write a file (payload: {path, content})
   | "shell.exec"          // Raphael: run a shell command (payload: {cmd, cwd, timeoutMs})
   | "db.migrate"          // Raphael: run a DB migration command
   | "workspace.maintain"  // Raphael: lint/format/build maintenance
   | "notify"              // Gabriel
-  | "deliver_payload";    // Gabriel
+  | "deliver_payload"     // Gabriel
+  // Divine-style coding workflow (diagnose → patch → verify → approve)
+  | "code.diagnose"       // Seraphim-style: scan failures / errors
+  | "code.patch"          // Gabriel-style: generate patch
+  | "code.verify"         // Michael-style: sandbox / test verification
+  | "code.approve"        // YHWH-style: policy gate before commit
+  // Legal-specific workflow tasks (Raphael handlers)
+  | "legal.charge_explain"
+  | "legal.brady_demand"
+  | "legal.court_prep_kit"
+  | "legal.timeline_build"
+  | "legal.contradiction_scan"
+  | "legal.deadline_check"
+  | "legal.motion_draft"
+  | "legal.document_analyze"
+  | "legal.evidence_organize"
+  | "legal.rights_check";
 
 export interface TaskNode {
   id: string;
@@ -73,4 +100,16 @@ export const envelope = <T>(
 export const log = (level: "info" | "warn" | "error", agent: AgentName, event: string, data: Record<string, unknown> = {}) => {
   const line = JSON.stringify({ ts: new Date().toISOString(), level, agent, event, ...data });
   if (level === "error") console.error(line); else console.log(line);
+};
+
+/** Map specialized legal personas onto runtime layers */
+export const LEGAL_AGENT_ROUTING: Record<string, AgentName> = {
+  head_counsel: "michael",
+  paralegal: "raphael",
+  rights_checker: "raphael",
+  timeline_spotter: "raphael",
+  charge_explainer: "metatron",
+  research_counsel: "seraphim",
+  court_prep: "raphael",
+  document_analyst: "raphael",
 };

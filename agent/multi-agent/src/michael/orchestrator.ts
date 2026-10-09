@@ -13,6 +13,15 @@ import * as yhwh from "../yhwh/core.js";
 
 const LLM_KINDS = new Set(["llm.reason"]);
 const GABRIEL_KINDS = new Set(["notify", "deliver_payload"]);
+// Raphael handles both classic ops and legal + Divine code-repair tasks
+const RAPHAEL_KINDS = new Set([
+  "file.scaffold", "shell.exec", "db.migrate", "workspace.maintain",
+  "legal.charge_explain", "legal.brady_demand", "legal.court_prep_kit",
+  "legal.timeline_build", "legal.contradiction_scan", "legal.deadline_check",
+  "legal.motion_draft", "legal.document_analyze", "legal.evidence_organize",
+  "legal.rights_check",
+  "code.diagnose", "code.patch", "code.verify", "code.approve",
+]);
 const MAX_UPSTREAM_CHARS = 6000;
 
 export class Michael {
