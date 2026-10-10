@@ -620,3 +620,226 @@ export const INITIAL_ATTORNEYS: AttorneyListing[] = [
     officeCity: "Noblesville, IN",
   },
 ];
+
+// Specialist Agent type and roster
+export type SpecialistAgent = AIAgent & {
+  description?: string;
+  disclaimerRequired?: boolean;
+  mustCiteMaterialClaims?: boolean;
+};
+
+export const SPECIALIST_AGENTS_ROSTER: SpecialistAgent[] = AI_TEAM_ROSTER.map((agent) => ({
+  ...agent,
+  description: agent.specialty,
+  disclaimerRequired: true,
+  mustCiteMaterialClaims: true,
+}));
+
+// TimelineRecord type and initial records
+export interface TimelineRecord {
+  id: string;
+  matterId?: string;
+  title: string;
+  category: string;
+  date: string;
+  time?: string;
+  description: string;
+  officialRecordRef?: string;
+  isContradiction?: boolean;
+  notes?: string;
+  sources?: string[];
+}
+
+export const INITIAL_TIMELINE_RECORDS: TimelineRecord[] = (SAMPLE_MATTERS[0]?.timeline || []).map((t) => ({
+  id: t.id,
+  matterId: SAMPLE_MATTERS[0]?.id || "matter-1",
+  title: t.title,
+  category: t.category,
+  date: t.date,
+  time: t.time,
+  description: t.description,
+  officialRecordRef: t.officialRecordRef,
+  isContradiction: t.isContradiction,
+  notes: t.notes,
+  sources: t.sources,
+}));
+
+// EvidenceRecord type and initial records
+export interface EvidenceRecord {
+  id: string;
+  matterId?: string;
+  exhibitNumber?: string;
+  title: string;
+  type: string;
+  source?: string;
+  dateAcquired: string;
+  custodian?: string;
+  chainOfCustodyStatus?: string;
+  chainOfCustody?: string;
+  relevantCharge?: string;
+  relevanceToCharges?: string;
+  summary: string;
+  storageHash?: string;
+  status?: string;
+  tags?: string[];
+  isExculpatory?: boolean;
+}
+
+export const INITIAL_EVIDENCE_RECORDS: EvidenceRecord[] = [
+  {
+    id: "ev-1",
+    matterId: "matter-1",
+    exhibitNumber: "Exhibit A",
+    title: "Officer BWC Video — Arriving Unit #402",
+    type: "Body-Worn Camera",
+    source: "Police Department Discovery Production",
+    dateAcquired: "2026-02-04",
+    custodian: "Marion County Clerk Evidence Vault",
+    chainOfCustodyStatus: "Verified Intact",
+    relevantCharge: "Count 1: Resisting Law Enforcement",
+    relevanceToCharges: "Count 1: Resisting Law Enforcement",
+    summary: "Body-worn camera footage showing initial approach and verbal instructions. Contradicts narrative regarding physical compliance.",
+    storageHash: "sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+    status: "Reviewed",
+    tags: ["Video", "Exculpatory", "BWC"],
+    isExculpatory: true,
+  },
+  {
+    id: "ev-2",
+    matterId: "matter-1",
+    exhibitNumber: "Exhibit B",
+    title: "Point-of-Sale Register Receipt #9401",
+    type: "Store Receipt",
+    source: "Defense Investigation (Subpoena Duces Tecum)",
+    dateAcquired: "2026-02-08",
+    custodian: "Defendant Pro Se File",
+    chainOfCustodyStatus: "Verified Intact",
+    relevantCharge: "Count 2: Conversion / Alleged Trespass",
+    relevanceToCharges: "Count 2: Conversion / Alleged Trespass",
+    summary: "Time-stamped retail register receipt proving lawful transaction and lack of criminal intent or unlawful presence.",
+    storageHash: "sha256:4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+    status: "Reviewed",
+    tags: ["Receipt", "Defense", "Alibi"],
+    isExculpatory: true,
+  },
+  {
+    id: "ev-3",
+    matterId: "matter-1",
+    exhibitNumber: "Exhibit C",
+    title: "CAD Dispatch Audio & Run Log #26-0182",
+    type: "CAD Dispatch Log",
+    source: "Public Records Request (APRA / FOIA)",
+    dateAcquired: "2026-02-12",
+    custodian: "County Communications Center",
+    chainOfCustodyStatus: "Verified Intact",
+    relevantCharge: "All Counts",
+    relevanceToCharges: "All Counts",
+    summary: "911 caller audio recording and radio transmission log demonstrating discrepancy in suspect description and reason for initial stop.",
+    storageHash: "sha256:ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+    status: "Contradiction Flagged",
+    tags: ["Audio", "CAD", "Dispatch"],
+    isExculpatory: true,
+  },
+];
+
+// LegalPrecedent type and landmark precedents
+export interface LegalPrecedent {
+  id: string;
+  title: string;
+  citation: string;
+  year: number | string;
+  court: string;
+  category: string;
+  holding: string;
+  jurisdiction: string;
+  significance: string;
+  keyRule: string;
+}
+
+export const LANDMARK_LEGAL_PRECEDENTS: LegalPrecedent[] = [
+  {
+    id: "prec-1",
+    title: "Terry v. Ohio",
+    citation: "392 U.S. 1 (1968)",
+    year: 1968,
+    court: "U.S. Supreme Court",
+    category: "Fourth Amendment",
+    holding: "Police may stop and briefly detain a person only if they have reasonable, articulable suspicion of criminal activity.",
+    jurisdiction: "Federal Constitutional (Binding Nationwide)",
+    significance: "Foundational limit on warrantless investigatory stops and weapons frisks.",
+    keyRule: "Reasonable articulable suspicion standard; mere hunch is legally insufficient.",
+  },
+  {
+    id: "prec-2",
+    title: "Brady v. Maryland",
+    citation: "373 U.S. 83 (1963)",
+    year: 1963,
+    court: "U.S. Supreme Court",
+    category: "Due Process & Discovery",
+    holding: "The prosecution must disclose all evidence favorable to an accused upon request where the evidence is material to guilt or punishment.",
+    jurisdiction: "Federal Constitutional (Binding Nationwide)",
+    significance: "Suppression by the prosecution of favorable evidence violates Fourteenth Amendment Due Process.",
+    keyRule: "Affirmative constitutional duty to produce exculpatory and impeachment material.",
+  },
+  {
+    id: "prec-3",
+    title: "Faretta v. California",
+    citation: "422 U.S. 806 (1975)",
+    year: 1975,
+    court: "U.S. Supreme Court",
+    category: "Self-Representation (Pro Se)",
+    holding: "A criminal defendant has a Sixth Amendment constitutional right to conduct their own defense and represent themselves without counsel.",
+    jurisdiction: "Federal Constitutional (Binding Nationwide)",
+    significance: "Protects the constitutional autonomy of pro se defendants to make defense decisions.",
+    keyRule: "Right of self-representation requires a knowing and intelligent waiver of counsel.",
+  },
+  {
+    id: "prec-4",
+    title: "Mapp v. Ohio",
+    citation: "367 U.S. 643 (1961)",
+    year: 1961,
+    court: "U.S. Supreme Court",
+    category: "Exclusionary Rule",
+    holding: "Evidence obtained in violation of the Fourth Amendment is inadmissible in state and federal court criminal prosecutions.",
+    jurisdiction: "Federal Constitutional (Binding Nationwide)",
+    significance: "Enforces Fourth Amendment protections by barring illegally seized evidence from trial.",
+    keyRule: "Exclusionary rule applies to state criminal trials via Fourteenth Amendment Due Process.",
+  },
+  {
+    id: "prec-5",
+    title: "Giglio v. United States",
+    citation: "405 U.S. 150 (1972)",
+    year: 1972,
+    court: "U.S. Supreme Court",
+    category: "Impeachment & Discovery",
+    holding: "Government must disclose promises of leniency or deals made to prosecution witnesses, as witness credibility is material.",
+    jurisdiction: "Federal Constitutional (Binding Nationwide)",
+    significance: "Extends Brady rule to witness impeachment and credibility evidence.",
+    keyRule: "Prosecution must turn over officer misconduct and witness deal records.",
+  },
+  {
+    id: "prec-6",
+    title: "In re Winship",
+    citation: "397 U.S. 358 (1970)",
+    year: 1970,
+    court: "U.S. Supreme Court",
+    category: "Burden of Proof",
+    holding: "The Due Process Clause requires proof beyond a reasonable doubt of every fact necessary to constitute the crime charged.",
+    jurisdiction: "Federal Constitutional (Binding Nationwide)",
+    significance: "Guarantees prosecution carries the non-shifting burden for every statutory element.",
+    keyRule: "Beyond a reasonable doubt applies to all essential elements of charged offenses.",
+  },
+  {
+    id: "prec-7",
+    title: "Rodriguez v. United States",
+    citation: "575 U.S. 348 (2015)",
+    year: 2015,
+    court: "U.S. Supreme Court",
+    category: "Fourth Amendment",
+    holding: "A police stop may not be prolonged beyond the time reasonably required to complete the mission of the stop.",
+    jurisdiction: "Federal Constitutional (Binding Nationwide)",
+    significance: "Traffic and investigatory stops cannot be extended without independent reasonable suspicion.",
+    keyRule: "Unjustified extension of detention invalidates subsequent searches.",
+  },
+];
+

@@ -15,18 +15,22 @@ import { Matter, TimelineEvent } from "@/lib/workspace-data";
 import { ResultEnvelope } from "./ResultEnvelope";
 
 interface TimelineViewProps {
-  matter: Matter;
+  matter?: Matter;
+  timeline?: TimelineEvent[];
+  onSaveTimelineRecord?: (rec: TimelineEvent) => void;
+  matterId?: string;
 }
 
-export function TimelineView({ matter }: TimelineViewProps) {
+export function TimelineView({ matter, timeline, onSaveTimelineRecord, matterId }: TimelineViewProps) {
   const [filterCategory, setFilterCategory] = useState<string>("All");
 
   const categories = ["All", "Arrest", "Booking", "Appearance", "Discovery", "Motion"];
 
+  const allEvents = (matter?.timeline && matter.timeline.length > 0 ? matter.timeline : timeline) || [];
   const filteredEvents =
     filterCategory === "All"
-      ? matter.timeline
-      : matter.timeline.filter((e) => e.category === filterCategory);
+      ? allEvents
+      : allEvents.filter((e) => e.category === filterCategory);
 
   return (
     <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">

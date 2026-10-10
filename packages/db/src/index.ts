@@ -302,7 +302,3 @@ try {
 }
 
 export { pool, db };
-
-// Audit / chain-of-command schemas (consolidated from packages/database)
-export * from "./schema/chain-of-command";
-export * from "./schema/sic-audit";

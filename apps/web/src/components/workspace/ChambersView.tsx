@@ -18,6 +18,8 @@ import { ResultEnvelope } from "./ResultEnvelope";
 
 interface ChambersViewProps {
   matter: Matter;
+  agents?: AIAgent[];
+  onUpdateAgent?: (agent: AIAgent) => void;
 }
 
 interface Message {

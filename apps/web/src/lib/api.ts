@@ -24,8 +24,6 @@ export function getApiBaseUrl(): string {
   if (typeof window !== "undefined") {
     const nextApi = process.env.NEXT_PUBLIC_API_URL;
     if (nextApi) return nextApi;
-    const envApi = (import.meta as any)?.env?.VITE_API_URL;
-    if (envApi) return envApi;
   }
   return "/api";
 }

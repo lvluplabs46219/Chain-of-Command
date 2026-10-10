@@ -1,4 +1,4 @@
-import { withBotId } from 'botid/next/config';
+// Next.js configuration
 
 /** @type {import('next').NextConfig} */
 function getApiDestination() {
@@ -27,12 +27,15 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: getApiDestination(),
-      },
-    ];
+    if (process.env.API_URL?.trim()) {
+      return [
+        {
+          source: '/api/external/:path*',
+          destination: getApiDestination(),
+        },
+      ];
+    }
+    return [];
   },
   async headers() {
     return [
@@ -75,6 +78,6 @@ const nextConfig = {
   },
 };
 
-export default withBotId(nextConfig);
+export default nextConfig;
 
 

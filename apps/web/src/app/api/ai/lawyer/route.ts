@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 
+export const dynamic = "force-dynamic";
+
 /**
  * Universal Mandatory Universal Header & Footer per GEMINI.md and Section 22
  */
