@@ -51,6 +51,12 @@ const DEFAULT_FEATURES: NavFeatureItem[] = [
     title: "Court Watch",
     subtitle: "Hearings & docket activity",
   },
+  {
+    href: "/archive",
+    title: "Design Archive",
+    subtitle: "UI blueprint & screen map",
+    badge: "Ref",
+  },
 ];
 
 interface NavFeatureCarouselProps {
@@ -96,7 +102,7 @@ export function NavFeatureCarousel({
 
   return (
     <div
-      className={`relative flex items-center gap-1 min-w-0 ${className}`}
+      className={`relative flex items-center gap-1.5 min-w-0 ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onKeyDown={onKeyDown}
@@ -108,12 +114,14 @@ export function NavFeatureCarousel({
         type="button"
         onClick={scrollPrev}
         aria-label="Previous featured item"
-        className="shrink-0 p-1 rounded border border-white/10 text-neutral-400 hover:text-[#D4AF37] hover:border-[#D4AF37]/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+        className="shrink-0 p-1.5 min-w-[32px] min-h-[32px] rounded-md border border-white/15 text-neutral-300 hover:text-[#D4AF37] hover:border-[#D4AF37]/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] flex items-center justify-center"
       >
-        <ChevronLeft className="w-3.5 h-3.5" />
+        <ChevronLeft className="w-4 h-4" aria-hidden />
+        <span className="sr-only">Previous</span>
       </button>
 
-      <div className="overflow-hidden flex-1 min-w-0 max-w-[280px] sm:max-w-[360px] md:max-w-[420px]" ref={emblaRef}>
+      {/* Wider track so full titles (e.g. Design Archive) never ellipsis */}
+      <div className="overflow-hidden flex-1 min-w-0 max-w-[320px] sm:max-w-[400px] md:max-w-[480px]" ref={emblaRef}>
         <div className="flex">
           {items.map((item) => (
             <div
@@ -124,17 +132,21 @@ export function NavFeatureCarousel({
             >
               <Link
                 href={item.href}
-                className="flex flex-col px-4 py-3 rounded-md border border-[#D4AF37]/25 bg-[#D4AF37]/5 hover:border-[#D4AF37]/45 hover:bg-[#D4AF37]/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                className="flex flex-col px-4 py-3 rounded-md border border-[#D4AF37]/30 bg-[#D4AF37]/5 hover:border-[#D4AF37]/55 hover:bg-[#D4AF37]/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
               >
-                <span className="flex items-center gap-1.5">
-                  <span className="text-[11px] font-semibold text-[#D4AF37] truncate">{item.title}</span>
+                <span className="flex items-center gap-1.5 min-w-0">
+                  <span className="text-[12px] font-semibold text-[#D4AF37] whitespace-nowrap">
+                    {item.title}
+                  </span>
                   {item.badge && (
-                    <span className="text-[9px] font-mono uppercase tracking-wider text-emerald-400/90 bg-emerald-950/40 border border-emerald-500/20 px-1 rounded">
+                    <span className="text-[9px] font-mono uppercase tracking-wider text-emerald-300 bg-emerald-950/50 border border-emerald-500/30 px-1 rounded shrink-0">
                       {item.badge}
                     </span>
                   )}
                 </span>
-                <span className="text-[10px] text-neutral-500 truncate">{item.subtitle}</span>
+                <span className="text-[11px] text-neutral-400 whitespace-nowrap overflow-hidden text-ellipsis">
+                  {item.subtitle}
+                </span>
               </Link>
             </div>
           ))}
@@ -145,9 +157,10 @@ export function NavFeatureCarousel({
         type="button"
         onClick={scrollNext}
         aria-label="Next featured item"
-        className="shrink-0 p-1 rounded border border-white/10 text-neutral-400 hover:text-[#D4AF37] hover:border-[#D4AF37]/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+        className="shrink-0 p-1.5 min-w-[32px] min-h-[32px] rounded-md border border-white/15 text-neutral-300 hover:text-[#D4AF37] hover:border-[#D4AF37]/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] flex items-center justify-center"
       >
-        <ChevronRight className="w-3.5 h-3.5" />
+        <ChevronRight className="w-4 h-4" aria-hidden />
+        <span className="sr-only">Next</span>
       </button>
     </div>
   );
