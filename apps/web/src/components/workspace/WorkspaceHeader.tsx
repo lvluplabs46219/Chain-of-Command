@@ -51,17 +51,18 @@ export function WorkspaceHeader({
       <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-md supports-[backdrop-filter]:bg-zinc-900/70">
         {/* Utility tray — global safety + disclaimer only */}
         <div className="flex items-center justify-end gap-2 px-4 sm:px-6 py-1.5 border-b border-zinc-800/80 bg-zinc-950/40">
-          <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-amber-500/80">
+          <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-amber-500/90">
             <Info className="w-3 h-3" />
             Pro se workspace — not legal advice
           </span>
+          {/* Crisis lifeline: supportive teal, never alarm-red (avoids error-state association) */}
           <button
             type="button"
             onClick={() => setCrisisModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-950/50 border border-red-800/50 hover:bg-red-900/50 text-red-300 text-[11px] font-medium transition-colors"
-            title="Crisis & Safety Protocol"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-teal-950/40 border border-teal-600/40 hover:bg-teal-900/50 hover:border-teal-500/60 text-teal-200 text-[11px] font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
+            title="Crisis & safety resources (988)"
           >
-            <PhoneCall className="w-3.5 h-3.5 text-red-400" />
+            <PhoneCall className="w-3.5 h-3.5 text-teal-300" />
             <span>Crisis Help (988)</span>
           </button>
         </div>
@@ -82,7 +83,7 @@ export function WorkspaceHeader({
                     Legal OS
                   </span>
                 </div>
-                <p className="text-[11px] text-zinc-500 hidden sm:block">
+                <p className="text-[11px] text-zinc-400 hidden sm:block">
                   Case operating workspace for self-represented litigants
                 </p>
               </div>
@@ -101,7 +102,7 @@ export function WorkspaceHeader({
                   <div className="font-semibold text-white max-w-[180px] sm:max-w-[240px] truncate">
                     {activeMatter.title}
                   </div>
-                  <div className="text-[10px] text-zinc-500 font-mono truncate">
+                  <div className="text-[10px] text-zinc-400 font-mono truncate">
                     {activeMatter.caseNumber}
                     {jurisdiction ? ` · ${jurisdiction}` : ""}
                   </div>
@@ -165,7 +166,7 @@ export function WorkspaceHeader({
               <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-950 border border-amber-900/40 text-xs">
                 <Clock className="w-3.5 h-3.5 text-amber-400" />
                 <div>
-                  <span className="text-zinc-500">Speedy trial: </span>
+                  <span className="text-zinc-400">Speedy trial: </span>
                   <span className="font-mono font-semibold text-amber-300">
                     {speedyDays} / {speedyLimit}d
                   </span>
@@ -173,7 +174,7 @@ export function WorkspaceHeader({
               </div>
             )}
             {onChangeJurisdiction && jurisdiction !== undefined && (
-              <span className="hidden xl:inline text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
+              <span className="hidden xl:inline text-[10px] font-mono text-zinc-400 uppercase tracking-wider">
                 {jurisdiction || "Jurisdiction unset"}
               </span>
             )}
@@ -183,8 +184,8 @@ export function WorkspaceHeader({
 
       {crisisModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-zinc-950 border border-red-800/60 rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-2xl">
-            <div className="flex items-center gap-3 text-red-400">
+          <div className="bg-zinc-950 border border-teal-700/50 rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-teal-300">
               <ShieldAlert className="w-6 h-6 shrink-0" />
               <h3 className="text-lg font-bold text-white">Emergency & crisis safety resources</h3>
             </div>
@@ -193,11 +194,11 @@ export function WorkspaceHeader({
               violence, reach out to dedicated confidential hotlines:
             </p>
             <div className="space-y-3">
-              <div className="p-3 bg-red-950/30 border border-red-800/40 rounded-xl">
+              <div className="p-3 bg-teal-950/30 border border-teal-700/40 rounded-xl">
                 <div className="font-semibold text-white text-sm">National Suicide & Crisis Lifeline</div>
                 <p className="text-xs text-zinc-400 mt-0.5">Call or text 988 (24/7, free & confidential)</p>
               </div>
-              <div className="p-3 bg-red-950/30 border border-red-800/40 rounded-xl">
+              <div className="p-3 bg-teal-950/30 border border-teal-700/40 rounded-xl">
                 <div className="font-semibold text-white text-sm">National Domestic Violence Hotline</div>
                 <p className="text-xs text-zinc-400 mt-0.5">
                   Call 1-800-799-SAFE (7233) or text "START" to 88788
