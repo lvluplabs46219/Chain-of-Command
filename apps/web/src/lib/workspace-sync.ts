@@ -40,7 +40,7 @@ export async function loadMatters(): Promise<Matter[]> {
   return getLocal<Matter[]>("matters", INITIAL_MATTERS);
 }
 
-export async function saveMatter(matter: Matter): Promise<void> {
+export async function saveMatter(matter: Matter): Promise<Matter> {
   const current = getLocal<Matter[]>("matters", INITIAL_MATTERS);
   const index = current.findIndex((m) => m.id === matter.id);
   if (index >= 0) {
@@ -49,6 +49,7 @@ export async function saveMatter(matter: Matter): Promise<void> {
     current.push(matter);
   }
   setLocal("matters", current);
+  return matter;
 }
 
 export function loadAgents(): SpecialistAgent[] {

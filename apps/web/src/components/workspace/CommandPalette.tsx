@@ -52,10 +52,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
         onClose();
       } else if (e.key === 'ArrowDown') {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev + 1) % filteredNodes.length);
+        if (filteredNodes.length > 0) setSelectedIndex((prev) => (prev + 1) % filteredNodes.length);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev - 1 + filteredNodes.length) % filteredNodes.length);
+        if (filteredNodes.length > 0) setSelectedIndex((prev) => (prev - 1 + filteredNodes.length) % filteredNodes.length);
       } else if (e.key === 'Enter') {
         e.preventDefault();
         if (filteredNodes[selectedIndex]) {

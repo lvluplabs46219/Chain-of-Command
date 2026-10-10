@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import {
   Matter,
@@ -28,18 +29,62 @@ import {
 } from "./workspace/WorkspaceNavigation";
 import { FirstRunWizard, type OnboardingResult } from "./onboarding/FirstRunWizard";
 import { useAuth } from "@/contexts/AuthContext";
-import { SAMPLE_MATTERS } from "@/lib/workspace-data";
-import { DashboardView } from "./workspace/DashboardView";
-import { DocketView } from "./workspace/DocketView";
-import { ChambersView } from "./workspace/ChambersView";
-import { LibraryView } from "./workspace/LibraryView";
-import { InvestigationsView } from "./workspace/InvestigationsView";
-import { TimelineView } from "./workspace/TimelineView";
-import { DraftDeskView } from "./workspace/DraftDeskView";
-import { CourtWatchView } from "./workspace/CourtWatchView";
-import { DirectoryView } from "./workspace/DirectoryView";
-import { TasksDeadlinesView } from "./workspace/TasksDeadlinesView";
-import { SupportView } from "./workspace/SupportView";
+import { isDemoMatter } from "@/lib/workspace-data";
+const viewFallback = () => (
+  <div className="p-8 text-center text-sm text-neutral-500">Loading module…</div>
+);
+const DashboardView = dynamic(
+  () => import("./workspace/DashboardView").then((m) => ({ default: m.DashboardView })),
+  { loading: viewFallback },
+);
+const DocketView = dynamic(
+  () => import("./workspace/DocketView").then((m) => ({ default: m.DocketView })),
+  { loading: viewFallback },
+);
+const ChambersView = dynamic(
+  () => import("./workspace/ChambersView").then((m) => ({ default: m.ChambersView })),
+  { loading: viewFallback },
+);
+const LibraryView = dynamic(
+  () => import("./workspace/LibraryView").then((m) => ({ default: m.LibraryView })),
+  { loading: viewFallback },
+);
+const InvestigationsView = dynamic(
+  () => import("./workspace/InvestigationsView").then((m) => ({ default: m.InvestigationsView })),
+  { loading: viewFallback },
+);
+const TimelineView = dynamic(
+  () => import("./workspace/TimelineView").then((m) => ({ default: m.TimelineView })),
+  { loading: viewFallback },
+);
+const DraftDeskView = dynamic(
+  () => import("./workspace/DraftDeskView").then((m) => ({ default: m.DraftDeskView })),
+  { loading: viewFallback },
+);
+const CourtWatchView = dynamic(
+  () => import("./workspace/CourtWatchView").then((m) => ({ default: m.CourtWatchView })),
+  { loading: viewFallback },
+);
+const DirectoryView = dynamic(
+  () => import("./workspace/DirectoryView").then((m) => ({ default: m.DirectoryView })),
+  { loading: viewFallback },
+);
+const TasksDeadlinesView = dynamic(
+  () => import("./workspace/TasksDeadlinesView").then((m) => ({ default: m.TasksDeadlinesView })),
+  { loading: viewFallback },
+);
+const SupportView = dynamic(
+  () => import("./workspace/SupportView").then((m) => ({ default: m.SupportView })),
+  { loading: viewFallback },
+);
+const AuditView = dynamic(
+  () => import("./workspace/AuditView").then((m) => ({ default: m.AuditView })),
+  { loading: viewFallback },
+);
+const ExternalActionModal = dynamic(
+  () => import("./workspace/ExternalActionModal").then((m) => ({ default: m.ExternalActionModal })),
+  { ssr: false }
+);
 import { Plus } from "lucide-react";
 
 interface ChainOfCommandMasterAppProps {
@@ -65,6 +110,7 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
 
   // New Matter Modal
   const [showNewMatterModal, setShowNewMatterModal] = useState<boolean>(false);
+  const [externalAction, setExternalAction] = useState<{ title: string; court: string; summary: string } | null>(null);
   const [newMatterTitle, setNewMatterTitle] = useState<string>("");
   const [newMatterCaseNumber, setNewMatterCaseNumber] = useState<string>("");
   const [newMatterCourt, setNewMatterCourt] = useState<string>("");
@@ -80,7 +126,7 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
           const parsed = JSON.parse(raw) as Matter[];
           if (
             Array.isArray(parsed) &&
-            parsed.some((m) => m.id === "matter-001" && m.title?.includes("Marcus Vance"))
+            parsed.some((m) => m.id === "matter-001" || m.id === "case-01" || (m.title || "").includes("Marcus Vance") || (m as any).isDemo)
           ) {
             localStorage.removeItem("chain_of_command_matters");
           }
@@ -89,8 +135,8 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
         /* ignore */
       }
 
-      const loaded = await loadMatters();
-      if (loaded && loaded.length > 0) {
+      const loaded = (await loadMatters()).filter((m) => !isDemoMatter(m));
+      if (loaded.length > 0) {
         setMatters(loaded);
         setActiveMatter(loaded[0]);
         setJurisdiction(loaded[0].jurisdiction || "");
@@ -120,13 +166,8 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
   const handleOnboardingComplete = async (result: OnboardingResult) => {
     completeFirstRun();
     setJurisdiction(result.jurisdiction);
-    if (result.loadSample) {
-      setMatters(SAMPLE_MATTERS);
-      setActiveMatter(SAMPLE_MATTERS[0]);
-      for (const m of SAMPLE_MATTERS) {
-        await saveMatter(m);
-      }
-    } else if (result.matter) {
+    // Never seed demo/fake cases — only the matter the user created (or empty)
+    if (result.matter) {
       const saved = await saveMatter(result.matter);
       setMatters([saved]);
       setActiveMatter(saved);
@@ -188,35 +229,28 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
       id: `matter-${Date.now()}`,
       title: newMatterTitle.trim(),
       caseNumber: newMatterCaseNumber.trim(),
-      courtName: newMatterCourt.trim() || "Superior Court of California / Indiana",
-      jurisdiction: jurisdiction,
-      judge: newMatterJudge.trim() || "Hon. Presiding Magistrate",
-      prosecutor: "Office of the District Attorney",
+      court: newMatterCourt.trim() || "",
+      courtName: newMatterCourt.trim() || "",
+      jurisdiction: jurisdiction || "",
+      judge: newMatterJudge.trim() || "",
+      prosecutor: "",
+      filingDate: new Date().toISOString().split("T")[0],
+      status: "Active",
+      speedyTrialDaysRemaining: 0,
+      speedyTrialLimit: 70,
+      readingLevel: "Plain English",
       defenseStatus: "Self-Represented (Pro Se)",
-      status: "active",
-      nextCourtDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-      nextCourtType: "Initial Case Management & Discovery Review",
-      speedyTrialDeadline: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      nextCourtDate: "",
+      nextCourtType: "",
+      speedyTrialDeadline: "",
       createdAt: new Date().toISOString().split("T")[0],
-      summary: newMatterSummary.trim() || "Pro se litigation matter opened in Chain of Command.",
-      charges: [
-        {
-          id: `ch-${Date.now()}`,
-          statute: "Penal Code § 100",
-          title: "Preliminary Charged Allegation",
-          level: "Misdemeanor Class A",
-          allegedDate: new Date().toISOString().split("T")[0],
-          statutoryMaxPenalty: "1 year; $1,000 fine",
-          statutoryMinPenalty: "Probation eligible",
-          elements: [
-            {
-              name: "Statutory Allegation",
-              description: "Alleged conduct requiring proof beyond reasonable doubt.",
-              stateProofStatus: "Contested",
-            },
-          ],
-        },
-      ],
+      summary: newMatterSummary.trim() || "",
+      charges: [],
+      timeline: [],
+      authorities: [],
+      evidence: [],
+      deadlines: [],
+      isDemo: false,
     };
 
     const saved = await saveMatter(newM);
@@ -236,6 +270,11 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
   return (
     <div className="min-h-screen bg-[#0C0D10] text-[#E1E2E5] flex flex-col font-sans selection:bg-[#D4AF37]/30">
       {/* Header */}
+      {isDemoMatter(activeMatter) && (
+        <div className="bg-amber-500 text-neutral-950 text-center text-xs font-bold tracking-wide py-1.5 px-3" role="status">
+          DEMO DATA — sample case for exploration only. Not your real matter.
+        </div>
+      )}
       <WorkspaceHeader
         matters={matters}
         activeMatter={activeMatter}
@@ -280,15 +319,7 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
           />
         )}
 
-        {activeTab === "docket" && (
-          <DocketView
-            matters={matters}
-            activeMatter={activeMatter}
-            onSelectMatter={handleSelectMatter}
-            onSaveMatter={handleSaveMatter}
-            onOpenNewMatterModal={() => setShowNewMatterModal(true)}
-          />
-        )}
+        {activeTab === "docket" && <DocketView matter={activeMatter} />}
 
         {activeTab === "chambers" && (
           <ChambersView
@@ -310,15 +341,14 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
           />
         )}
 
-        {activeTab === "timeline" && (
-          <TimelineView
-            timeline={timeline}
-            onSaveTimelineRecord={handleSaveTimeline}
-            matterId={activeMatter.id}
+        {activeTab === "timeline" && <TimelineView matter={activeMatter} />}
+
+        {activeTab === "draft_desk" && (
+          <DraftDeskView
+            matter={activeMatter}
+            onOpenActionModal={(title, court, summary) => setExternalAction({ title, court, summary })}
           />
         )}
-
-        {activeTab === "draft_desk" && <DraftDeskView matter={activeMatter} />}
 
         {activeTab === "court_watch" && <CourtWatchView matter={activeMatter} />}
 
@@ -326,7 +356,7 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
 
         {activeTab === "tasks" && <TasksDeadlinesView matter={activeMatter} />}
 
-        {activeTab === "audit" && <TasksDeadlinesView matter={activeMatter} />}
+        {activeTab === "audit" && <AuditView matter={activeMatter} />}
 
         {activeTab === "support" && <SupportView />}
       </section>
@@ -342,10 +372,21 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
             <span>·</span>
             <span>Pro Se Workspace</span>
             <span>·</span>
-            <span>Zero Hallucination Protocol Active</span>
+            <span>Educational information only · Not legal advice</span>
           </div>
         </div>
       </footer>
+
+      {/* External action authorization modal (Draft Desk) */}
+      {externalAction && (
+        <ExternalActionModal
+          isOpen
+          onClose={() => setExternalAction(null)}
+          actionTitle={externalAction.title}
+          targetCourt={externalAction.court}
+          payloadSummary={externalAction.summary}
+        />
+      )}
 
       {/* Open New Legal Matter Modal */}
       {showNewMatterModal && (
