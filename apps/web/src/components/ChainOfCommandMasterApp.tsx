@@ -39,7 +39,7 @@ import { DraftDeskView } from "./workspace/DraftDeskView";
 import { CourtWatchView } from "./workspace/CourtWatchView";
 import { DirectoryView } from "./workspace/DirectoryView";
 import { TasksDeadlinesView } from "./workspace/TasksDeadlinesView";
-import { DesignArchiveView } from "./workspace/DesignArchiveView";
+import { SupportView } from "./workspace/SupportView";
 import { Plus } from "lucide-react";
 
 interface ChainOfCommandMasterAppProps {
@@ -328,7 +328,7 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
 
         {activeTab === "audit" && <TasksDeadlinesView matter={activeMatter} />}
 
-        {activeTab === "archive" && <DesignArchiveView />}
+        {activeTab === "support" && <SupportView />}
       </section>
 
       {/* Universal Mandatory Legal Footer Disclaimer (GEMINI.md Rule 5.B) */}

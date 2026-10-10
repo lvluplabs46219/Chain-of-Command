@@ -13,11 +13,10 @@ import {
   UserCheck,
   CalendarCheck2,
   Shield,
-  Layers,
+  LifeBuoy,
   ArrowRight,
   CornerDownLeft,
   X,
-  Sparkles,
 } from "lucide-react";
 import { WorkspaceTab } from "./WorkspaceNavigation";
 
@@ -141,12 +140,12 @@ export function CommandPaletteModal({
       icon: Shield,
     },
     {
-      id: "archive",
-      tabId: "archive",
-      title: "Design Archive",
-      subtitle: "Stitch OS design system, high-fidelity mockups, and UI prototypes",
+      id: "support",
+      tabId: "support",
+      title: "Support & Crisis Resources",
+      subtitle: "988 crisis lifeline, safety planning, court self-help centers, and legal aid referrals",
       badge: "NODE 12",
-      icon: Layers,
+      icon: LifeBuoy,
     },
   ], []);
 
@@ -228,18 +227,19 @@ export function CommandPaletteModal({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Jump to any workspace category (e.g. 'Docket', 'AI Team', 'Timeline')..."
-            className="w-full bg-transparent text-white placeholder-neutral-500 text-sm md:text-base outline-none font-mono"
+            className="w-full bg-transparent text-white placeholder-neutral-400 text-sm md:text-base outline-none font-mono"
           />
           {query ? (
             <button
               type="button"
               onClick={() => setQuery("")}
-              className="p-1 text-neutral-400 hover:text-white"
+              className="p-1 text-neutral-300 hover:text-white"
+              aria-label="Clear search"
             >
               <X className="w-4 h-4" />
             </button>
           ) : (
-            <kbd className="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono text-neutral-400 bg-neutral-800/80 px-2 py-0.5 rounded border border-neutral-700">
+            <kbd className="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono text-neutral-300 bg-neutral-800/80 px-2 py-0.5 rounded border border-neutral-700">
               ESC TO CLOSE
             </kbd>
           )}
@@ -248,10 +248,10 @@ export function CommandPaletteModal({
         {/* Results List */}
         <div ref={listRef} className="overflow-y-auto p-2 space-y-1 flex-1 hide-scrollbar">
           {filtered.length === 0 ? (
-            <div className="py-12 text-center text-neutral-400 font-mono text-sm">
-              <Search className="w-8 h-8 text-neutral-600 mx-auto mb-2" />
+            <div className="py-12 text-center text-neutral-300 font-mono text-sm">
+              <Search className="w-8 h-8 text-neutral-400 mx-auto mb-2" />
               <p>No matching workspace categories found.</p>
-              <p className="text-xs text-neutral-500 mt-1">Try searching for "docket", "agents", "rules", or "evidence"</p>
+              <p className="text-xs text-neutral-400 mt-1">Try searching for "docket", "agents", "rules", or "evidence"</p>
             </div>
           ) : (
             filtered.map((item, idx) => {
@@ -278,7 +278,7 @@ export function CommandPaletteModal({
                       className={`p-2 rounded-lg shrink-0 ${
                         isSelected
                           ? "bg-[#D4AF37] text-black shadow-[0_0_12px_#D4AF37]"
-                          : "bg-[#1E212E] text-neutral-400"
+                          : "bg-[#1E212E] text-neutral-300"
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -290,13 +290,13 @@ export function CommandPaletteModal({
                           className={`text-[9px] px-1.5 py-0.5 rounded border uppercase tracking-wider ${
                             isSelected
                               ? "bg-[#D4AF37]/20 border-[#D4AF37]/60 text-[#EFE6D0]"
-                              : "bg-white/5 border-white/10 text-neutral-400"
+                              : "bg-white/5 border-white/10 text-neutral-300"
                           }`}
                         >
                           {item.badge}
                         </span>
                       </div>
-                      <p className="text-xs text-neutral-400 truncate mt-0.5 font-sans">{item.subtitle}</p>
+                      <p className="text-xs text-neutral-300 truncate mt-0.5 font-sans">{item.subtitle}</p>
                     </div>
                   </div>
 
@@ -307,7 +307,7 @@ export function CommandPaletteModal({
                         <CornerDownLeft className="w-3.5 h-3.5" />
                       </span>
                     ) : (
-                      <ArrowRight className="w-4 h-4 text-neutral-600" />
+                      <ArrowRight className="w-4 h-4 text-neutral-400" />
                     )}
                   </div>
                 </button>
@@ -317,19 +317,19 @@ export function CommandPaletteModal({
         </div>
 
         {/* Footer Navigation Hints */}
-        <div className="px-4 py-2.5 bg-[#0C0D12] border-t border-[#222430] flex items-center justify-between text-[11px] font-mono text-neutral-400">
+        <div className="px-4 py-2.5 bg-[#0C0D12] border-t border-[#222430] flex items-center justify-between text-[11px] font-mono text-neutral-300">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-neutral-800 rounded border border-neutral-700 text-neutral-300">↑</kbd>
-              <kbd className="px-1.5 py-0.5 bg-neutral-800 rounded border border-neutral-700 text-neutral-300">↓</kbd>
+              <kbd className="px-1.5 py-0.5 bg-neutral-800 rounded border border-neutral-700 text-neutral-200">↑</kbd>
+              <kbd className="px-1.5 py-0.5 bg-neutral-800 rounded border border-neutral-700 text-neutral-200">↓</kbd>
               <span className="ml-1">Navigate</span>
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-neutral-800 rounded border border-neutral-700 text-neutral-300">↵</kbd>
+              <kbd className="px-1.5 py-0.5 bg-neutral-800 rounded border border-neutral-700 text-neutral-200">↵</kbd>
               <span className="ml-1">Open Node</span>
             </span>
           </div>
-          <span className="text-[#D4AF37] font-medium hidden sm:inline">12 WORKSPACE NODES INDEXED</span>
+          <span className="text-[#E6C65A] font-medium hidden sm:inline">12 WORKSPACE NODES INDEXED</span>
         </div>
       </div>
     </div>

@@ -22,6 +22,8 @@ function getApiDestination() {
 const nextConfig = {
   output: process.env.VERCEL ? undefined : 'standalone',
   reactStrictMode: true,
+  // Hide the Next.js/Vercel dev toolbar overlay in preview deployments (developer-only UI)
+  devIndicators: false,
   allowedDevOrigins: ['*.run.app', '*.us-east1.run.app', '*.cloudrun.app', 'localhost:3000', '127.0.0.1:3000'],
   typescript: {
     ignoreBuildErrors: true,

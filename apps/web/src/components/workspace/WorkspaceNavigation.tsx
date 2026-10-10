@@ -15,11 +15,10 @@ import {
   UserCheck,
   CalendarCheck2,
   Shield,
-  Layers,
+  LifeBuoy,
   LogIn,
   User,
 } from "lucide-react";
-import { NavFeatureCarousel } from "./NavFeatureCarousel";
 import { useAuth } from "@/contexts/AuthContext";
 
 export type WorkspaceTab =
@@ -34,7 +33,7 @@ export type WorkspaceTab =
   | "directory"
   | "tasks"
   | "audit"
-  | "archive";
+  | "support";
 
 interface WorkspaceNavigationProps {
   activeTab: WorkspaceTab;
@@ -54,7 +53,7 @@ export const TAB_ROUTES: Record<WorkspaceTab, string> = {
   directory: "/directory",
   tasks: "/tasks",
   audit: "/audit",
-  archive: "/archive",
+  support: "/support",
 };
 
 export function pathToTab(pathname: string): WorkspaceTab | null {
@@ -82,7 +81,7 @@ const TABS: {
   { id: "directory", label: "Counsel Directory", icon: UserCheck },
   { id: "tasks", label: "Tasks", icon: CalendarCheck2 },
   { id: "audit", label: "Audit", icon: Shield },
-  { id: "archive", label: "Archive", icon: Layers },
+  { id: "support", label: "Support & Help", icon: LifeBuoy },
 ];
 
 export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigationProps) {
@@ -91,50 +90,47 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
 
   return (
     <div className="sticky top-[73px] z-30 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-md supports-[backdrop-filter]:bg-zinc-900/70">
-      {/* Featured module carousel */}
-      <div className="px-4 py-2 border-b border-zinc-800/80 flex items-center justify-between gap-3 flex-wrap">
-        <NavFeatureCarousel className="flex-1" />
-        <div className="flex items-center gap-2 shrink-0">
-          {isAuthenticated ? (
-            <>
-              <Link
-                href="/profile"
-                className="flex items-center gap-1.5 text-[11px] text-neutral-300 hover:text-white px-2 py-1 rounded border border-white/10 hover:border-white/25 transition-colors"
-                title="Profile"
-              >
-                <User className="w-3.5 h-3.5" />
-                <span className="hidden md:inline max-w-[120px] truncate">{user?.name || "Profile"}</span>
-              </Link>
-              <button
-                type="button"
-                onClick={() => logout()}
-                className="flex items-center gap-1.5 text-[11px] text-neutral-400 hover:text-rose-300 px-2 py-1 rounded border border-transparent hover:border-rose-500/30 transition-colors"
-              >
-                <LogIn className="w-3.5 h-3.5 rotate-180" />
-                <span className="hidden sm:inline">Log out</span>
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="flex items-center gap-1.5 text-[11px] text-neutral-400 hover:text-[#D4AF37] px-2 py-1 rounded border border-transparent hover:border-[#D4AF37]/30 transition-colors"
-              >
-                <LogIn className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Login</span>
-              </Link>
-              <Link
-                href="/signup"
-                className="flex items-center gap-1.5 text-[11px] font-semibold text-neutral-950 bg-[#D4AF37] hover:bg-[#c49f27] px-2.5 py-1 rounded transition-colors"
-              >
-                Sign up
-              </Link>
-            </>
-          )}
-        </div>
+      {/* Account controls strip — single utility row, no duplicate navigation */}
+      <div className="px-4 py-2 border-b border-zinc-800/80 flex items-center justify-end gap-2 shrink-0">
+        {isAuthenticated ? (
+          <>
+            <Link
+              href="/profile"
+              className="flex items-center gap-1.5 text-[11px] text-neutral-300 hover:text-white px-2 py-1 rounded border border-white/10 hover:border-white/25 transition-colors"
+              title="Profile"
+            >
+              <User className="w-3.5 h-3.5" />
+              <span className="hidden md:inline max-w-[120px] truncate">{user?.name || "Profile"}</span>
+            </Link>
+            <button
+              type="button"
+              onClick={() => logout()}
+              className="flex items-center gap-1.5 text-[11px] text-neutral-400 hover:text-rose-300 px-2 py-1 rounded border border-transparent hover:border-rose-500/30 transition-colors"
+            >
+              <LogIn className="w-3.5 h-3.5 rotate-180" />
+              <span className="hidden sm:inline">Log out</span>
+            </button>
+          </>
+        ) : (
+          <>
+            <Link
+              href="/login"
+              className="flex items-center gap-1.5 text-[11px] text-neutral-400 hover:text-[#D4AF37] px-2 py-1 rounded border border-transparent hover:border-[#D4AF37]/30 transition-colors"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Login</span>
+            </Link>
+            <Link
+              href="/signup"
+              className="flex items-center gap-1.5 text-[11px] font-semibold text-neutral-950 bg-[#D4AF37] hover:bg-[#c49f27] px-2.5 py-1 rounded transition-colors"
+            >
+              Sign up
+            </Link>
+          </>
+        )}
       </div>
 
-      {/* Primary module tabs — real routes */}
+      {/* Primary module tabs — the single persistent navigation surface */}
       <nav
         className="px-4 overflow-x-auto whitespace-nowrap hide-scrollbar flex items-center gap-1"
         aria-label="Workspace modules"
@@ -152,10 +148,11 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
               key={tab.id}
               href={href}
               onClick={() => onTabChange(tab.id)}
+              aria-current={isActive ? "page" : undefined}
               className={`flex items-center gap-2 py-3 px-4 text-xs font-medium border-b-2 transition-all shrink-0 ${
                 isActive
                   ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/5 font-semibold opacity-100"
-                  : "border-transparent text-zinc-500 opacity-40 hover:opacity-80 hover:text-zinc-200 hover:bg-zinc-800/40"
+                  : "border-transparent text-zinc-400 opacity-70 hover:opacity-100 hover:text-zinc-200 hover:bg-zinc-800/40"
               }`}
             >
               <Icon className={`w-3.5 h-3.5 ${isActive ? "text-[#D4AF37]" : "text-neutral-400"}`} />
