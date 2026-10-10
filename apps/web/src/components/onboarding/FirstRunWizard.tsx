@@ -33,7 +33,6 @@ export type OnboardingResult = {
   email: string;
   jurisdiction: string;
   matter: Matter | null;
-  loadSample: boolean;
 };
 
 interface FirstRunWizardProps {
@@ -75,7 +74,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
   const [busy, setBusy] = useState(false);
   const [acknowledgedBoundaries, setAcknowledgedBoundaries] = useState(false);
 
-  const finish = async (opts: { withMatter: boolean; loadSample: boolean }) => {
+  const finish = async (opts: { withMatter: boolean }) => {
     setError(null);
     if (name.trim().length < 2) {
       setError("Enter your name (at least 2 characters).");
@@ -95,7 +94,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
     try {
       await loginAsLitigant(name.trim(), safeEmail, jurisdiction);
       const matter =
-        opts.withMatter && !opts.loadSample
+        opts.withMatter
           ? buildEmptyMatter(matterTitle, caseNumber, courtName, jurisdiction)
           : null;
       onComplete({
@@ -103,8 +102,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
         email: safeEmail,
         jurisdiction,
         matter,
-        loadSample: opts.loadSample,
-      });
+              });
     } catch {
       setError("Could not start your session. Please try again.");
     } finally {
@@ -164,7 +162,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
                 </li>
                 <li className="flex gap-3 items-start">
                   <BookOpen className="w-4 h-4 text-sky-400 mt-0.5 shrink-0" />
-                  <span>Next you will open your first matter or explore a sample case.</span>
+                  <span>Next you will open your first matter and create your first matter.</span>
                 </li>
               </ul>
 
@@ -292,7 +290,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
                 <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4AF37] mb-2">Your matter</p>
                 <h2 className="text-xl font-serif font-semibold text-white">Open a case file</h2>
                 <p className="text-xs text-neutral-400 mt-1">
-                  Start blank, or load a sample criminal matter to learn the tools.
+                  Create your real matter. The workspace starts empty — no demo case data.
                 </p>
               </div>
 
@@ -344,7 +342,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
                 <button
                   type="button"
                   disabled={busy}
-                  onClick={() => finish({ withMatter: true, loadSample: false })}
+                  onClick={() => finish({ withMatter: true })}
                   className="w-full py-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <FolderPlus className="w-4 h-4" />
@@ -353,16 +351,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
                 <button
                   type="button"
                   disabled={busy}
-                  onClick={() => finish({ withMatter: false, loadSample: true })}
-                  className="w-full py-2.5 rounded-xl border border-[#2A2B35] hover:border-[#D4AF37]/40 text-neutral-200 text-sm flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  <BookOpen className="w-4 h-4 text-[#D4AF37]" />
-                  Explore with a sample case instead
-                </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => finish({ withMatter: false, loadSample: false })}
+                  onClick={() => finish({ withMatter: false })}
                   className="w-full py-2 text-xs text-neutral-500 hover:text-neutral-300 flex items-center justify-center gap-1.5"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />

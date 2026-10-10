@@ -100,10 +100,10 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
               <Link
                 href="/profile"
                 className="flex items-center gap-1.5 text-[11px] text-neutral-300 hover:text-white px-2 py-1 rounded border border-white/10 hover:border-white/25 transition-colors"
-                title="Profile"
+                title="Matter Profile"
               >
                 <User className="w-3.5 h-3.5" />
-                <span className="hidden md:inline max-w-[120px] truncate">{user?.name || "Profile"}</span>
+                <span className="hidden md:inline max-w-[120px] truncate">{user?.name || "Matter Profile"}</span>
               </Link>
               <button
                 type="button"

@@ -29,7 +29,7 @@ import {
 } from "./workspace/WorkspaceNavigation";
 import { FirstRunWizard, type OnboardingResult } from "./onboarding/FirstRunWizard";
 import { useAuth } from "@/contexts/AuthContext";
-import { SAMPLE_MATTERS, isDemoMatter } from "@/lib/workspace-data";
+import { isDemoMatter } from "@/lib/workspace-data";
 const viewFallback = () => (
   <div className="p-8 text-center text-sm text-neutral-500">Loading module…</div>
 );
@@ -126,8 +126,8 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
         /* ignore */
       }
 
-      const loaded = await loadMatters();
-      if (loaded && loaded.length > 0) {
+      const loaded = (await loadMatters()).filter((m) => !isDemoMatter(m));
+      if (loaded.length > 0) {
         setMatters(loaded);
         setActiveMatter(loaded[0]);
         setJurisdiction(loaded[0].jurisdiction || "");
@@ -157,13 +157,8 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
   const handleOnboardingComplete = async (result: OnboardingResult) => {
     completeFirstRun();
     setJurisdiction(result.jurisdiction);
-    if (result.loadSample) {
-      setMatters(SAMPLE_MATTERS);
-      setActiveMatter(SAMPLE_MATTERS[0]);
-      for (const m of SAMPLE_MATTERS) {
-        await saveMatter(m);
-      }
-    } else if (result.matter) {
+    // Never seed demo/fake cases — only the matter the user created (or empty)
+    if (result.matter) {
       const saved = await saveMatter(result.matter);
       setMatters([saved]);
       setActiveMatter(saved);
