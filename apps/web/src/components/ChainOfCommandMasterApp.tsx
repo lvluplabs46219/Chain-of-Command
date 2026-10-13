@@ -30,6 +30,7 @@ import {
 import { FirstRunWizard, type OnboardingResult } from "./onboarding/FirstRunWizard";
 import { useAuth } from "@/contexts/AuthContext";
 import { isDemoMatter } from "@/lib/workspace-data";
+
 const viewFallback = () => (
   <div className="p-8 text-center text-sm text-neutral-500">Loading module…</div>
 );
@@ -77,7 +78,6 @@ const DesignArchiveView = dynamic(
   () => import("./workspace/DesignArchiveView").then((m) => ({ default: m.DesignArchiveView })),
   { loading: viewFallback },
 );
-import { Plus } from "lucide-react";
 
 interface ChainOfCommandMasterAppProps {
   initialTab?: WorkspaceTab;
@@ -85,7 +85,8 @@ interface ChainOfCommandMasterAppProps {
 
 export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCommandMasterAppProps) {
   const pathname = usePathname();
-  const { isAuthenticated, isLoading: authLoading, isFirstRun, completeFirstRun } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, isFirstRun, completeFirstRun, updateUser } =
+    useAuth();
   const [matters, setMatters] = useState<Matter[]>([]);
   const [activeMatter, setActiveMatter] = useState<Matter>(EMPTY_MATTER);
   const [agents, setAgents] = useState<SpecialistAgent[]>(SPECIALIST_AGENTS_ROSTER);
@@ -100,7 +101,6 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
     if (fromPath) setActiveTab(fromPath);
   }, [pathname]);
 
-  // New Matter Modal
   const [showNewMatterModal, setShowNewMatterModal] = useState<boolean>(false);
   const [newMatterTitle, setNewMatterTitle] = useState<string>("");
   const [newMatterCaseNumber, setNewMatterCaseNumber] = useState<string>("");
@@ -117,7 +117,13 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
           const parsed = JSON.parse(raw) as Matter[];
           if (
             Array.isArray(parsed) &&
-            parsed.some((m) => m.id === "matter-001" || m.id === "case-01" || (m.title || "").includes("Marcus Vance") || (m as any).isDemo)
+            parsed.some(
+              (m) =>
+                m.id === "matter-001" ||
+                m.id === "case-01" ||
+                (m.title || "").includes("Marcus Vance") ||
+                (m as { isDemo?: boolean }).isDemo
+            )
           ) {
             localStorage.removeItem("chain_of_command_matters");
           }
@@ -157,6 +163,12 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
   const handleOnboardingComplete = async (result: OnboardingResult) => {
     completeFirstRun();
     setJurisdiction(result.jurisdiction);
+    updateUser({
+      name: result.name,
+      email: result.email,
+      jurisdiction: result.jurisdiction,
+      activeMatterId: result.matter?.id || "matter-empty",
+    });
     // Never seed demo/fake cases — only the matter the user created (or empty)
     if (result.matter) {
       const saved = await saveMatter(result.matter);
@@ -176,7 +188,14 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
     );
   }
 
-  if (isFirstRun || !isAuthenticated) {
+  // First-run wizard for anyone who has not completed onboarding
+  // (works for both unauthenticated local path and authenticated OAuth users)
+  if (isFirstRun) {
+    return <FirstRunWizard onComplete={handleOnboardingComplete} />;
+  }
+
+  // After onboarding is done, require auth (or demo session)
+  if (!isAuthenticated) {
     return <FirstRunWizard onComplete={handleOnboardingComplete} />;
   }
 
@@ -260,9 +279,11 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
 
   return (
     <div className="min-h-screen bg-[#0C0D10] text-[#E1E2E5] flex flex-col font-sans selection:bg-[#D4AF37]/30">
-      {/* Header */}
       {isDemoMatter(activeMatter) && (
-        <div className="bg-amber-500 text-neutral-950 text-center text-xs font-bold tracking-wide py-1.5 px-3" role="status">
+        <div
+          className="bg-amber-500 text-neutral-950 text-center text-xs font-bold tracking-wide py-1.5 px-3"
+          role="status"
+        >
           DEMO DATA — sample case for exploration only. Not your real matter.
         </div>
       )}
@@ -275,7 +296,6 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
         onChangeJurisdiction={setJurisdiction}
       />
 
-      {/* Navigation */}
       <WorkspaceNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
       {isEmptyWorkspace && (
@@ -296,7 +316,6 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
         </div>
       )}
 
-      {/* Main Content Area */}
       <section aria-label="Active Case Workspace" className="flex-1">
         {activeTab === "dashboard" && (
           <DashboardView
@@ -321,16 +340,10 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
         )}
 
         {activeTab === "chambers" && (
-          <ChambersView
-            agents={agents}
-            matter={activeMatter}
-            onUpdateAgent={handleUpdateAgent}
-          />
+          <ChambersView agents={agents} matter={activeMatter} onUpdateAgent={handleUpdateAgent} />
         )}
 
-        {activeTab === "library" && (
-          <LibraryView evidence={evidence} matter={activeMatter} />
-        )}
+        {activeTab === "library" && <LibraryView evidence={evidence} matter={activeMatter} />}
 
         {activeTab === "investigations" && (
           <InvestigationsView
@@ -361,11 +374,12 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
         {activeTab === "archive" && <DesignArchiveView />}
       </section>
 
-      {/* Universal Mandatory Legal Footer Disclaimer (GEMINI.md Rule 5.B) */}
       <footer className="border-t border-[#1F2026] bg-[#0A0B0E] py-4 px-6 text-center text-xs text-neutral-500 font-sans mt-auto">
         <div className="max-w-4xl mx-auto">
           <p className="leading-relaxed">
-            This information is provided for educational and procedural purposes only and does not constitute legal advice. No attorney-client relationship is formed. Consult a licensed attorney for case-specific representation.
+            This information is provided for educational and procedural purposes only and does not
+            constitute legal advice. No attorney-client relationship is formed. Consult a licensed
+            attorney for case-specific representation.
           </p>
           <div className="flex items-center justify-center gap-3 mt-2 text-[11px] text-neutral-600 font-mono">
             <span>Chain of Command Legal OS</span>
@@ -377,16 +391,19 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
         </div>
       </footer>
 
-      {/* Open New Legal Matter Modal */}
       {showNewMatterModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[#141519] border border-[#2A2B35] rounded-xl max-w-lg w-full p-6 text-neutral-200 shadow-2xl">
             <h3 className="text-base font-semibold text-white mb-1">Open New Legal Matter Workspace</h3>
-            <p className="text-xs text-neutral-400 mb-4">Initialize a dedicated case folder for self-representation.</p>
+            <p className="text-xs text-neutral-400 mb-4">
+              Initialize a dedicated case folder for self-representation.
+            </p>
 
             <form onSubmit={handleCreateNewMatter} className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Case Caption / Title</label>
+                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">
+                  Case Caption / Title
+                </label>
                 <input
                   type="text"
                   required
@@ -399,7 +416,9 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Case Number</label>
+                  <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">
+                    Case Number
+                  </label>
                   <input
                     type="text"
                     required
@@ -410,7 +429,9 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
                   />
                 </div>
                 <div>
-                  <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Presiding Judge</label>
+                  <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">
+                    Presiding Judge
+                  </label>
                   <input
                     type="text"
                     placeholder="e.g. Hon. Arthur Miller"
@@ -422,7 +443,9 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
               </div>
 
               <div>
-                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Court Name</label>
+                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">
+                  Court Name
+                </label>
                 <input
                   type="text"
                   placeholder="e.g. Superior Court of California, County of Los Angeles"
@@ -433,7 +456,9 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
               </div>
 
               <div>
-                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Case Summary / Allegations</label>
+                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">
+                  Case Summary / Allegations
+                </label>
                 <textarea
                   rows={2}
                   placeholder="Summary of factual dispute, charges, or defense posture..."
