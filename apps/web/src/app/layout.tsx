@@ -3,6 +3,7 @@ import Script from "next/script";
 import { BotIdClient } from "botid/client";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Providers } from "@/components/Providers";
 import "../index.css";
 
 export const viewport: Viewport = {
@@ -56,14 +57,16 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <main
-          id="main-content"
-          role="main"
-          tabIndex={-1}
-          className="min-h-screen flex flex-col focus:outline-none"
-        >
-          {children}
-        </main>
+        <Providers>
+          <main
+            id="main-content"
+            role="main"
+            tabIndex={-1}
+            className="min-h-screen flex flex-col focus:outline-none"
+          >
+            {children}
+          </main>
+        </Providers>
         <Analytics />
         <SpeedInsights />
       </body>

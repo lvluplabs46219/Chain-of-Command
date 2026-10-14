@@ -49,6 +49,23 @@ const DEFAULT_LITIGANT_USER: AuthUser = {
   createdAt: new Date().toISOString(),
 };
 
+/** Safe defaults for SSR / static prerender when AuthProvider is not yet mounted. */
+const SSR_FALLBACK: AuthContextType = {
+  user: null,
+  token: null,
+  isAuthenticated: false,
+  isLoading: true,
+  isFirstRun: true,
+  loginAsLitigant: async () => {},
+  loginWithGoogle: async () => {},
+  loginWithToken: async () => {},
+  logout: () => {},
+  updateUser: () => {},
+  switchRole: () => {},
+  completeFirstRun: () => {},
+  resetFirstRun: () => {},
+};
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const USER_STORAGE_KEY = "acquit_auth_user";
 const ONBOARDING_STORAGE_KEY = "coc_onboarding_completed";
@@ -123,17 +140,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const supabase = getSupabaseClient();
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session?.user && session.access_token) {
-          const supaUser = sessionToUser(session.user);
-          setAuthToken(session.access_token);
-          setTokenState(session.access_token);
-          setUser(supaUser);
-          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(supaUser));
-        }
-      }).catch((err) => {
-        console.warn("[Auth] Supabase session check:", err);
-      });
+      supabase.auth
+        .getSession()
+        .then(({ data: { session } }) => {
+          if (session?.user && session.access_token) {
+            const supaUser = sessionToUser(session.user);
+            setAuthToken(session.access_token);
+            setTokenState(session.access_token);
+            setUser(supaUser);
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(supaUser));
+          }
+        })
+        .catch((err) => {
+          console.warn("[Auth] Supabase session check:", err);
+        });
 
       const { data: authListener } = supabase.auth.onAuthStateChange(
         (_event, session) => {
@@ -280,6 +300,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (!context) {
+    // During SSR / static prerender the provider may not be in the tree yet.
+    // Return a safe loading fallback so Next.js can finish the build.
+    // On the client the real AuthProvider will supply the live context.
+    if (typeof window === "undefined") {
+      return SSR_FALLBACK;
+    }
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
