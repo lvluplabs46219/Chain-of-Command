@@ -1,19 +1,20 @@
 // YHWH — Core Reasoning Engine
 // Provider cascade (auto):
-//   1. Lemonade Server   → http://127.0.0.1:13305  (local GPU/NPU)
+//   1. Lemonade Server   → http://127.0.0.1:13305  (installed local models)
 //   2. Ollama Cloud      → https://ollama.com      (per-agent free-tier models)
 //   3. Ollama local      → http://127.0.0.1:11434
 //
 // Force one: LLM_PROVIDER=lemonade|ollama-cloud|ollama
 import { Directive, ExecutionTree, log } from "../protocol/types.js";
 import { AgentSlot, cloudModelFor } from "./models.js";
+import { lemonadeModelFor } from "./lemonade-models.js";
 
 type Provider = "lemonade" | "ollama-cloud" | "ollama";
 
 export type CompleteOpts = {
   json?: boolean;
   timeoutMs?: number;
-  /** Which agent is calling — selects Ollama Cloud model */
+  /** Which agent is calling — selects Lemonade + Ollama Cloud model */
   agent?: AgentSlot;
 };
 
@@ -27,9 +28,6 @@ function ollamaCloudBase(): string {
   return (process.env.OLLAMA_CLOUD_URL ?? "https://ollama.com").replace(/\/$/, "");
 }
 
-function lemonadeModel(): string {
-  return process.env.LEMONADE_MODEL ?? process.env.YHWH_MODEL ?? "Qwen2.5-7B-Instruct-GGUF";
-}
 function localOllamaModel(): string {
   return process.env.OLLAMA_MODEL ?? process.env.YHWH_MODEL ?? "qwen2.5:7b";
 }
@@ -53,8 +51,9 @@ async function completeLemonade(
   prompt: string,
   system?: string,
   opts: CompleteOpts = {},
-): Promise<string> {
+): Promise<{ text: string; model: string }> {
   const base = lemonadeBase();
+  const model = lemonadeModelFor(opts.agent ?? "yhwh");
   const urls = [`${base}/api/v1/chat/completions`, `${base}/v1/chat/completions`];
   const messages = buildMessages(prompt, system);
   let lastErr: Error | null = null;
@@ -62,7 +61,7 @@ async function completeLemonade(
   for (const url of urls) {
     try {
       const body: Record<string, unknown> = {
-        model: lemonadeModel(),
+        model,
         messages,
         stream: false,
         temperature: 0.2,
@@ -79,18 +78,18 @@ async function completeLemonade(
         signal: AbortSignal.timeout(opts.timeoutMs ?? 120_000),
       });
       if (!res.ok) {
-        lastErr = new Error(`Lemonade ${res.status}: ${(await res.text().catch(() => "")).slice(0, 300)}`);
+        lastErr = new Error(`Lemonade ${res.status} model=${model}: ${(await res.text().catch(() => "")).slice(0, 300)}`);
         continue;
       }
       const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
       const content = json.choices?.[0]?.message?.content;
-      if (typeof content === "string" && content.length) return content;
-      lastErr = new Error("Lemonade returned empty content");
+      if (typeof content === "string" && content.length) return { text: content, model };
+      lastErr = new Error(`Lemonade empty content model=${model}`);
     } catch (e) {
       lastErr = e instanceof Error ? e : new Error(String(e));
     }
   }
-  throw lastErr ?? new Error("Lemonade unreachable");
+  throw lastErr ?? new Error("Lemonade unreachable — is `lemonade-server serve` running?");
 }
 
 async function completeOllamaCloud(
@@ -186,7 +185,7 @@ async function completeOllamaLocal(
   return json.response;
 }
 
-/** Raw completion with provider cascade. Pass `agent` to select that agent's cloud model. */
+/** Raw completion with provider cascade. Pass `agent` to select that agent's models. */
 export async function complete(
   prompt: string,
   system?: string,
@@ -199,9 +198,9 @@ export async function complete(
   for (const p of order) {
     try {
       if (p === "lemonade") {
-        const out = await completeLemonade(prompt, system, opts);
-        log("info", "yhwh", "complete_ok", { provider: "lemonade", agent, model: lemonadeModel() });
-        return out;
+        const { text, model } = await completeLemonade(prompt, system, opts);
+        log("info", "yhwh", "complete_ok", { provider: "lemonade", agent, model });
+        return text;
       }
       if (p === "ollama-cloud") {
         const { text, model } = await completeOllamaCloud(prompt, system, opts);
@@ -219,7 +218,7 @@ export async function complete(
 
   throw new Error(
     `YHWH: no LLM available for agent=${agent} (tried ${order.join(" → ")}). ` +
-      `Start Lemonade, set OLLAMA_API_KEY, or run local Ollama. ` +
+      `Start Lemonade (lemonade-server serve), set OLLAMA_API_KEY, or run local Ollama. ` +
       `Last error: ${lastErr?.message ?? "unknown"}`,
   );
 }
