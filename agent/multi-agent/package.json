@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node --env-file-if-exists=.env dist/index.js",
+    "gateway": "node --env-file-if-exists=.env dist/gateway/openai-http.js",
     "worker": "node dist/cli/worker-cli.js",
     "send": "node dist/cli/send.js",
     "watch:github": "node dist/cli/watch-github.js",
