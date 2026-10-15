@@ -1,81 +1,103 @@
 # Multi-Agent Runtime (Chain of Command)
 
-Implementation of the multi-agent architecture blueprint. Six cooperating layers
-running locally on Ubuntu — no sudo, all secrets via environment variables.
+Build-time agent workers (not the in-app legal AI personas). Six cooperating layers:
 
 ```
-YHWH (Ollama/Lemonade local LLM)
+YHWH (Lemonade / Ollama Cloud / local Ollama)
   └── Michael (orchestrator, UDS daemon, state machine)
-        ├── Gabriel (messenger agents: events/notifications)
-        ├── Raphael  (task bot workers: file/DB/maintenance + legal workflows + code repair)
+        ├── Gabriel (messenger: events/notifications)
+        ├── Raphael  (task workers: file/shell + legal workflows + code repair)
         └── Metatron (model gateway)
-              └── Seraphim (Google Vertex AI external pool)
+              └── Seraphim (Google Vertex AI external pool — optional)
 ```
 
-## Specialized Legal Agent Personas
+## LLM setup (required)
 
-These names are first-class in the protocol and route through the hierarchy:
+YHWH tries providers in this order unless you force one with `LLM_PROVIDER`:
 
-- head_counsel → Michael (strategy & planning)
-- paralegal → Raphael (drafting, organization, deadlines)
-- rights_checker → Raphael (constitutional / procedural rights flags)
-- timeline_spotter → Raphael (chronology + contradiction detection)
-- charge_explainer → Metatron (plain-language charge analysis)
-- research_counsel → Seraphim (statute / case law retrieval + citation)
-- court_prep → Raphael (appearance kits, questions, checklists)
-- document_analyst → Raphael (evidence / filing analysis)
+| Priority | Provider | When |
+|----------|----------|------|
+| 1 | **Lemonade Server** | Local GPU/NPU at `http://127.0.0.1:13305` |
+| 2 | **Ollama Cloud** | Free-tier models via `OLLAMA_API_KEY` |
+| 3 | **Ollama local** | Daemon at `http://127.0.0.1:11434` |
 
-## Legal Task Kinds (Raphael)
+### Option A — Lemonade Server (recommended local)
 
-- legal.charge_explain
-- legal.brady_demand
-- legal.court_prep_kit
-- legal.timeline_build
-- legal.contradiction_scan
-- legal.deadline_check
-- legal.motion_draft
-- legal.document_analyze
-- legal.evidence_organize
-- legal.rights_check
+1. Install: https://lemonade-server.ai  
+2. Pull a coding model, e.g. `lemonade-server pull Qwen2.5-7B-Instruct-GGUF`  
+3. Start: `lemonade-server serve`  
+4. In `.env` leave `LLM_PROVIDER` empty (auto) or set `LLM_PROVIDER=lemonade`
 
-## Divine Code-Repair Pipeline (merged)
+### Option B — Ollama Cloud free models
 
-Synced from divine-agent-architecture:
+1. Create an account at https://ollama.com  
+2. Create an API key: https://ollama.com/settings/keys  
+3. Put it in `.env`:
 
-```
-code.diagnose  →  code.patch  →  code.verify  →  code.approve
-(Seraphim)        (Gabriel)       (Michael)       (YHWH)
+```bash
+OLLAMA_API_KEY=your_key_here
+OLLAMA_CLOUD_MODEL=gpt-oss:20b   # free-tier friendly
+# or: gpt-oss:120b | gemma4:31b | nemotron-3-nano
 ```
 
-These task kinds are registered on Raphael and orchestrated by Michael as a DAG.
+4. Optional force: `LLM_PROVIDER=ollama-cloud`
 
-## Layout
+No local install needed for cloud-only use.
 
-- src/protocol/types.ts — Shared message envelope + task types
-- src/transport/uds.ts — Unix Domain Socket JSON transport
-- src/state/store.ts — SQLite state cache + optional Supabase sync
-- src/yhwh/core.ts — Local LLM reasoning engine
-- src/michael/orchestrator.ts — Orchestrator core (state machine + DAG)
-- src/gabriel/messenger.ts — Messenger specialists
-- src/raphael/worker.ts — Task bot (legal + code-repair + builtins)
-- src/metatron/gateway.ts — Model gateway
-- src/seraphim/vertex.ts — Vertex AI external pool
-- src/index.ts — Daemon entrypoint
+### Option C — Local Ollama
 
-## Run
+```bash
+ollama pull qwen2.5:7b
+# ensure ollama serve is running
+LLM_PROVIDER=ollama
+```
+
+## Run the workers
 
 ```bash
 cd agent/multi-agent
 cp .env.example .env
+# edit .env — at minimum set OLLAMA_API_KEY if using cloud
 npm install
 npm run build
-npm start
-npm run worker
-npm run send -- "summarize docs"
+npm start          # Michael daemon on /tmp/coc-michael.sock
+
+# another terminal — send a build directive
+npm run send -- "run the test suite and fix any failures"
+npm run worker    # optional dedicated worker process
 ```
+
+## Specialized legal personas (routed through this hierarchy)
+
+- head_counsel → Michael  
+- paralegal / rights_checker / timeline_spotter / court_prep / document_analyst → Raphael  
+- charge_explainer → Metatron  
+- research_counsel → Seraphim  
+
+## Divine code-repair pipeline
+
+```
+code.diagnose → code.patch → code.verify → code.approve
+(Seraphim)      (Gabriel)     (Michael)     (YHWH)
+```
+
+Registered on Raphael; Michael runs them as a DAG.
+
+## Layout
+
+- `src/protocol/types.ts` — message envelope + task types  
+- `src/transport/uds.ts` — Unix Domain Socket JSON transport  
+- `src/state/store.ts` — SQLite state + optional Supabase sync  
+- `src/yhwh/core.ts` — local/cloud LLM reasoning (Lemonade + Ollama Cloud)  
+- `src/michael/orchestrator.ts` — state machine + DAG  
+- `src/gabriel/messenger.ts` — events  
+- `src/raphael/worker.ts` — task bots  
+- `src/metatron/gateway.ts` — model router  
+- `src/seraphim/vertex.ts` — Vertex AI pool  
+- `src/index.ts` — daemon entrypoint  
 
 ## Protocols
 
-- Transport: UDS (/tmp/coc-michael.sock) with newline-delimited JSON
-- State: SQLite (~/.local/state/coc/state.db) synced to Supabase when configured
-- Fallback: Metatron cascades to YHWH on Seraphim timeout / rate limit
+- Transport: UDS (`/tmp/coc-michael.sock`) newline-delimited JSON  
+- State: SQLite (`~/.local/state/coc/state.db`)  
+- Fallback: Metatron cascades Seraphim → YHWH on timeout/rate limit  
