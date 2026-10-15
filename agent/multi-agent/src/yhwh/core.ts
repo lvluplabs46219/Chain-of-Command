@@ -1,25 +1,136 @@
-// YHWH — Core Reasoning Engine (local inference via Ollama / Lemonade).
+// YHWH — Core Reasoning Engine (local inference via Lemonade Server or Ollama).
 // Parses ambiguous intent and outputs structured execution trees.
+//
+// Provider order:
+//   1. Lemonade Server  →  http://127.0.0.1:13305  (OpenAI-compatible)
+//   2. Ollama           →  http://127.0.0.1:11434  (/api/generate)
+//
+// Set LLM_PROVIDER=lemonade|ollama to force one, or leave unset for auto.
 import { Directive, ExecutionTree, log } from "../protocol/types.js";
 
-const ollamaUrl = (): string => process.env.OLLAMA_URL ?? "http://127.0.0.1:11434";
-const model = (): string => process.env.YHWH_MODEL ?? "qwen2.5:7b";
+type Provider = "lemonade" | "ollama";
 
-/** Raw completion against the local provider. */
+function lemonadeBase(): string {
+  return (process.env.LEMONADE_URL ?? "http://127.0.0.1:13305").replace(/\/$/, "");
+}
+function ollamaBase(): string {
+  return (process.env.OLLAMA_URL ?? "http://127.0.0.1:11434").replace(/\/$/, "");
+}
+function model(): string {
+  return process.env.YHWH_MODEL ?? process.env.LEMONADE_MODEL ?? "Qwen2.5-7B-Instruct-GGUF";
+}
+
+function preferredProvider(): Provider {
+  const forced = (process.env.LLM_PROVIDER ?? "").toLowerCase();
+  if (forced === "lemonade" || forced === "ollama") return forced;
+  // Default: Lemonade first (local GPU/NPU server), Ollama second.
+  return "lemonade";
+}
+
+/** OpenAI-compatible chat completion (Lemonade Server). */
+async function completeLemonade(
+  prompt: string,
+  system?: string,
+  opts: { json?: boolean; timeoutMs?: number } = {},
+): Promise<string> {
+  const base = lemonadeBase();
+  // Lemonade serves both /api/v1 and /v1 depending on version
+  const urls = [`${base}/api/v1/chat/completions`, `${base}/v1/chat/completions`];
+  const messages: { role: string; content: string }[] = [];
+  if (system) messages.push({ role: "system", content: system });
+  messages.push({ role: "user", content: prompt });
+
+  let lastErr: Error | null = null;
+  for (const url of urls) {
+    try {
+      const body: Record<string, unknown> = {
+        model: model(),
+        messages,
+        stream: false,
+        temperature: 0.2,
+      };
+      if (opts.json) body.response_format = { type: "json_object" };
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer lemonade",
+        },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(opts.timeoutMs ?? 120_000),
+      });
+      if (!res.ok) {
+        lastErr = new Error(`Lemonade ${res.status}: ${(await res.text().catch(() => "")).slice(0, 300)}`);
+        continue;
+      }
+      const json = (await res.json()) as {
+        choices?: { message?: { content?: string } }[];
+      };
+      const content = json.choices?.[0]?.message?.content;
+      if (typeof content === "string") return content;
+      lastErr = new Error("Lemonade returned empty content");
+    } catch (e) {
+      lastErr = e instanceof Error ? e : new Error(String(e));
+    }
+  }
+  throw lastErr ?? new Error("Lemonade unreachable");
+}
+
+/** Ollama native /api/generate. */
+async function completeOllama(
+  prompt: string,
+  system?: string,
+  opts: { json?: boolean; timeoutMs?: number } = {},
+): Promise<string> {
+  const res = await fetch(`${ollamaBase()}/api/generate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: process.env.OLLAMA_MODEL ?? process.env.YHWH_MODEL ?? "qwen2.5:7b",
+      prompt,
+      system,
+      stream: false,
+      ...(opts.json ? { format: "json" } : {}),
+    }),
+    signal: AbortSignal.timeout(opts.timeoutMs ?? 120_000),
+  });
+  if (!res.ok) {
+    throw new Error(`Ollama ${res.status}: ${(await res.text().catch(() => "")).slice(0, 300)}`);
+  }
+  const json = (await res.json()) as { response: string };
+  return json.response;
+}
+
+/** Raw completion against the local provider (Lemonade preferred, Ollama fallback). */
 export async function complete(
   prompt: string,
   system?: string,
   opts: { json?: boolean; timeoutMs?: number } = {},
 ): Promise<string> {
-  const res = await fetch(`${ollamaUrl()}/api/generate`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model: model(), prompt, system, stream: false, ...(opts.json ? { format: "json" } : {}) }),
-    signal: AbortSignal.timeout(opts.timeoutMs ?? 120_000),
-  });
-  if (!res.ok) throw new Error(`YHWH provider error: ${res.status} ${(await res.text().catch(() => "")).slice(0, 300)}`);
-  const json = (await res.json()) as { response: string };
-  return json.response;
+  const order: Provider[] =
+    preferredProvider() === "lemonade" ? ["lemonade", "ollama"] : ["ollama", "lemonade"];
+
+  let lastErr: Error | null = null;
+  for (const p of order) {
+    try {
+      if (p === "lemonade") {
+        const out = await completeLemonade(prompt, system, opts);
+        log("info", "yhwh", "complete_ok", { provider: "lemonade", model: model() });
+        return out;
+      }
+      const out = await completeOllama(prompt, system, opts);
+      log("info", "yhwh", "complete_ok", { provider: "ollama" });
+      return out;
+    } catch (e) {
+      lastErr = e instanceof Error ? e : new Error(String(e));
+      log("warn", "yhwh", "provider_failed", { provider: p, error: String(e) });
+    }
+  }
+  throw new Error(
+    `YHWH: no local LLM available (tried Lemonade @ ${lemonadeBase()}, Ollama @ ${ollamaBase()}). ` +
+      `Start Lemonade Server or Ollama. Last error: ${lastErr?.message ?? "unknown"}`,
+  );
 }
 
 /** Extract the first balanced JSON object from raw model output. */
