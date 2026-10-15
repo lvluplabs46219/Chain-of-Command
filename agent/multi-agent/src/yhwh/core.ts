@@ -1,50 +1,68 @@
-// YHWH — Core Reasoning Engine (local inference via Lemonade Server or Ollama).
-// Parses ambiguous intent and outputs structured execution trees.
+// YHWH — Core Reasoning Engine
+// Provider cascade (auto):
+//   1. Lemonade Server   → http://127.0.0.1:13305  (local GPU/NPU)
+//   2. Ollama Cloud      → https://ollama.com      (free-tier models, needs OLLAMA_API_KEY)
+//   3. Ollama local      → http://127.0.0.1:11434
 //
-// Provider order:
-//   1. Lemonade Server  →  http://127.0.0.1:13305  (OpenAI-compatible)
-//   2. Ollama           →  http://127.0.0.1:11434  (/api/generate)
-//
-// Set LLM_PROVIDER=lemonade|ollama to force one, or leave unset for auto.
+// Force one: LLM_PROVIDER=lemonade|ollama-cloud|ollama
 import { Directive, ExecutionTree, log } from "../protocol/types.js";
 
-type Provider = "lemonade" | "ollama";
+type Provider = "lemonade" | "ollama-cloud" | "ollama";
 
 function lemonadeBase(): string {
   return (process.env.LEMONADE_URL ?? "http://127.0.0.1:13305").replace(/\/$/, "");
 }
-function ollamaBase(): string {
+function ollamaLocalBase(): string {
   return (process.env.OLLAMA_URL ?? "http://127.0.0.1:11434").replace(/\/$/, "");
 }
-function model(): string {
-  return process.env.YHWH_MODEL ?? process.env.LEMONADE_MODEL ?? "Qwen2.5-7B-Instruct-GGUF";
+function ollamaCloudBase(): string {
+  return (process.env.OLLAMA_CLOUD_URL ?? "https://ollama.com").replace(/\/$/, "");
 }
 
-function preferredProvider(): Provider {
-  const forced = (process.env.LLM_PROVIDER ?? "").toLowerCase();
-  if (forced === "lemonade" || forced === "ollama") return forced;
-  // Default: Lemonade first (local GPU/NPU server), Ollama second.
-  return "lemonade";
+/** Local Lemonade model id */
+function lemonadeModel(): string {
+  return process.env.LEMONADE_MODEL ?? process.env.YHWH_MODEL ?? "Qwen2.5-7B-Instruct-GGUF";
+}
+/** Ollama Cloud free-tier friendly defaults */
+function cloudModel(): string {
+  // Free-tier starters commonly available: gpt-oss:20b, gpt-oss:120b, gemma4:31b, nemotron-3-nano
+  return process.env.OLLAMA_CLOUD_MODEL ?? "gpt-oss:20b";
+}
+function localOllamaModel(): string {
+  return process.env.OLLAMA_MODEL ?? process.env.YHWH_MODEL ?? "qwen2.5:7b";
 }
 
-/** OpenAI-compatible chat completion (Lemonade Server). */
+function providerOrder(): Provider[] {
+  const forced = (process.env.LLM_PROVIDER ?? "").toLowerCase().trim();
+  if (forced === "lemonade") return ["lemonade"];
+  if (forced === "ollama-cloud" || forced === "cloud") return ["ollama-cloud"];
+  if (forced === "ollama" || forced === "ollama-local") return ["ollama"];
+  // Auto: local Lemonade → cloud free models → local Ollama
+  return ["lemonade", "ollama-cloud", "ollama"];
+}
+
+function buildMessages(prompt: string, system?: string): { role: string; content: string }[] {
+  const messages: { role: string; content: string }[] = [];
+  if (system) messages.push({ role: "system", content: system });
+  messages.push({ role: "user", content: prompt });
+  return messages;
+}
+
+/** Lemonade Server — OpenAI-compatible local inference */
 async function completeLemonade(
   prompt: string,
   system?: string,
   opts: { json?: boolean; timeoutMs?: number } = {},
 ): Promise<string> {
   const base = lemonadeBase();
-  // Lemonade serves both /api/v1 and /v1 depending on version
   const urls = [`${base}/api/v1/chat/completions`, `${base}/v1/chat/completions`];
-  const messages: { role: string; content: string }[] = [];
-  if (system) messages.push({ role: "system", content: system });
-  messages.push({ role: "user", content: prompt });
-
+  const messages = buildMessages(prompt, system);
   let lastErr: Error | null = null;
+
   for (const url of urls) {
     try {
       const body: Record<string, unknown> = {
-        model: model(),
+        model: lemonadeModel(),
         messages,
         stream: false,
         temperature: 0.2,
@@ -64,11 +82,9 @@ async function completeLemonade(
         lastErr = new Error(`Lemonade ${res.status}: ${(await res.text().catch(() => "")).slice(0, 300)}`);
         continue;
       }
-      const json = (await res.json()) as {
-        choices?: { message?: { content?: string } }[];
-      };
+      const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
       const content = json.choices?.[0]?.message?.content;
-      if (typeof content === "string") return content;
+      if (typeof content === "string" && content.length) return content;
       lastErr = new Error("Lemonade returned empty content");
     } catch (e) {
       lastErr = e instanceof Error ? e : new Error(String(e));
@@ -77,17 +93,88 @@ async function completeLemonade(
   throw lastErr ?? new Error("Lemonade unreachable");
 }
 
-/** Ollama native /api/generate. */
-async function completeOllama(
+/** Ollama Cloud — https://ollama.com (free tier + API key) */
+async function completeOllamaCloud(
   prompt: string,
   system?: string,
   opts: { json?: boolean; timeoutMs?: number } = {},
 ): Promise<string> {
-  const res = await fetch(`${ollamaBase()}/api/generate`, {
+  const key = process.env.OLLAMA_API_KEY;
+  if (!key) throw new Error("OLLAMA_API_KEY not set — create one at https://ollama.com/settings/keys");
+
+  const base = ollamaCloudBase();
+  const model = cloudModel();
+  const messages = buildMessages(prompt, system);
+
+  // Prefer OpenAI-compatible endpoint; fall back to native /api/chat
+  const attempts: { url: string; body: Record<string, unknown>; parse: (j: unknown) => string | null }[] = [
+    {
+      url: `${base}/v1/chat/completions`,
+      body: {
+        model,
+        messages,
+        stream: false,
+        temperature: 0.2,
+        ...(opts.json ? { response_format: { type: "json_object" } } : {}),
+      },
+      parse: (j) => {
+        const x = j as { choices?: { message?: { content?: string } }[] };
+        return x.choices?.[0]?.message?.content ?? null;
+      },
+    },
+    {
+      url: `${base}/api/chat`,
+      body: {
+        model,
+        messages,
+        stream: false,
+        ...(opts.json ? { format: "json" } : {}),
+      },
+      parse: (j) => {
+        const x = j as { message?: { content?: string } };
+        return x.message?.content ?? null;
+      },
+    },
+  ];
+
+  let lastErr: Error | null = null;
+  for (const a of attempts) {
+    try {
+      const res = await fetch(a.url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${key}`,
+        },
+        body: JSON.stringify(a.body),
+        signal: AbortSignal.timeout(opts.timeoutMs ?? 120_000),
+      });
+      if (!res.ok) {
+        lastErr = new Error(`Ollama Cloud ${res.status}: ${(await res.text().catch(() => "")).slice(0, 300)}`);
+        continue;
+      }
+      const json = await res.json();
+      const content = a.parse(json);
+      if (typeof content === "string" && content.length) return content;
+      lastErr = new Error("Ollama Cloud returned empty content");
+    } catch (e) {
+      lastErr = e instanceof Error ? e : new Error(String(e));
+    }
+  }
+  throw lastErr ?? new Error("Ollama Cloud unreachable");
+}
+
+/** Local Ollama daemon */
+async function completeOllamaLocal(
+  prompt: string,
+  system?: string,
+  opts: { json?: boolean; timeoutMs?: number } = {},
+): Promise<string> {
+  const res = await fetch(`${ollamaLocalBase()}/api/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: process.env.OLLAMA_MODEL ?? process.env.YHWH_MODEL ?? "qwen2.5:7b",
+      model: localOllamaModel(),
       prompt,
       system,
       stream: false,
@@ -96,44 +183,48 @@ async function completeOllama(
     signal: AbortSignal.timeout(opts.timeoutMs ?? 120_000),
   });
   if (!res.ok) {
-    throw new Error(`Ollama ${res.status}: ${(await res.text().catch(() => "")).slice(0, 300)}`);
+    throw new Error(`Ollama local ${res.status}: ${(await res.text().catch(() => "")).slice(0, 300)}`);
   }
   const json = (await res.json()) as { response: string };
   return json.response;
 }
 
-/** Raw completion against the local provider (Lemonade preferred, Ollama fallback). */
+/** Raw completion with provider cascade. */
 export async function complete(
   prompt: string,
   system?: string,
   opts: { json?: boolean; timeoutMs?: number } = {},
 ): Promise<string> {
-  const order: Provider[] =
-    preferredProvider() === "lemonade" ? ["lemonade", "ollama"] : ["ollama", "lemonade"];
-
+  const order = providerOrder();
   let lastErr: Error | null = null;
+
   for (const p of order) {
     try {
+      let out: string;
       if (p === "lemonade") {
-        const out = await completeLemonade(prompt, system, opts);
-        log("info", "yhwh", "complete_ok", { provider: "lemonade", model: model() });
-        return out;
+        out = await completeLemonade(prompt, system, opts);
+        log("info", "yhwh", "complete_ok", { provider: "lemonade", model: lemonadeModel() });
+      } else if (p === "ollama-cloud") {
+        out = await completeOllamaCloud(prompt, system, opts);
+        log("info", "yhwh", "complete_ok", { provider: "ollama-cloud", model: cloudModel() });
+      } else {
+        out = await completeOllamaLocal(prompt, system, opts);
+        log("info", "yhwh", "complete_ok", { provider: "ollama-local", model: localOllamaModel() });
       }
-      const out = await completeOllama(prompt, system, opts);
-      log("info", "yhwh", "complete_ok", { provider: "ollama" });
       return out;
     } catch (e) {
       lastErr = e instanceof Error ? e : new Error(String(e));
       log("warn", "yhwh", "provider_failed", { provider: p, error: String(e) });
     }
   }
+
   throw new Error(
-    `YHWH: no local LLM available (tried Lemonade @ ${lemonadeBase()}, Ollama @ ${ollamaBase()}). ` +
-      `Start Lemonade Server or Ollama. Last error: ${lastErr?.message ?? "unknown"}`,
+    `YHWH: no LLM available (tried ${order.join(" → ")}). ` +
+      `Start Lemonade, set OLLAMA_API_KEY for cloud free models, or run local Ollama. ` +
+      `Last error: ${lastErr?.message ?? "unknown"}`,
   );
 }
 
-/** Extract the first balanced JSON object from raw model output. */
 function extractJson(raw: string): string {
   const s = raw.replace(/```(?:json)?/g, "");
   const start = s.indexOf("{");
@@ -149,7 +240,6 @@ function extractJson(raw: string): string {
   return s.slice(start);
 }
 
-/** High-level directive -> structured execution tree (DAG). */
 export async function plan(directive: Directive): Promise<ExecutionTree> {
   const system = [
     "You are YHWH, a planning kernel that decomposes directives into executable task DAGs.",
@@ -182,7 +272,6 @@ export async function plan(directive: Directive): Promise<ExecutionTree> {
     log("info", "yhwh", "plan_generated", { nodes: tree.nodes.length, rootId: tree.rootId });
     return tree;
   } catch (e) {
-    // Graceful degradation: single local-reasoning task.
     log("warn", "yhwh", "plan_parse_failed_fallback_single_node", { error: String(e) });
     return {
       rootId: "t1",
