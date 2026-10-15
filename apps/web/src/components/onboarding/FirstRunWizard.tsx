@@ -77,7 +77,7 @@ function buildEmptyMatter(
 }
 
 export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
-  const { user, isAuthenticated, loginAsLitigant, updateUser } = useAuth();
+  const { user, isAuthenticated, loginWithGoogle, updateUser } = useAuth();
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -89,7 +89,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
   const [busy, setBusy] = useState(false);
   const [acknowledgedBoundaries, setAcknowledgedBoundaries] = useState(false);
 
-  // Prefill from existing session when user already signed in (OAuth / email)
+  // Prefill from existing session when user already signed in (OAuth)
   useEffect(() => {
     if (user) {
       if (user.name && user.name !== "Pro Se Litigant") setName(user.name);
@@ -102,6 +102,24 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
 
   const finish = async (opts: { withMatter: boolean }) => {
     setError(null);
+
+    // Everyone must sign in with Google (Supabase Auth)
+    if (!isAuthenticated || !user) {
+      setError("Sign in with Google to continue.");
+      setBusy(true);
+      try {
+        await loginWithGoogle();
+        // OAuth redirects away; on return the session will be present
+      } catch (err) {
+        const msg =
+          err instanceof Error ? err.message : "Google sign-in failed. Please try again.";
+        setError(msg);
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
+
     if (name.trim().length < 2) {
       setError("Enter your name (at least 2 characters).");
       setStep(1);
@@ -109,6 +127,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
     }
     const safeEmail =
       email.trim() ||
+      user.email ||
       `${name.trim().toLowerCase().replace(/\s+/g, ".")}@local.chainofcommand`;
     if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       setError("Enter a valid email or leave it blank for now.");
@@ -118,17 +137,11 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
 
     setBusy(true);
     try {
-      if (isAuthenticated && user) {
-        // Already signed in (Supabase / token) — just update profile metadata
-        updateUser({
-          name: name.trim(),
-          email: safeEmail,
-          jurisdiction,
-        });
-      } else {
-        // Dev / local first-run path
-        await loginAsLitigant(name.trim(), safeEmail, jurisdiction);
-      }
+      updateUser({
+        name: name.trim(),
+        email: safeEmail,
+        jurisdiction,
+      });
 
       const matter = opts.withMatter
         ? buildEmptyMatter(matterTitle, caseNumber, courtName, jurisdiction)
@@ -194,7 +207,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
               <ul className="space-y-3 text-sm text-neutral-300">
                 <li className="flex gap-3 items-start">
                   <Shield className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
-                  <span>Your data stays under your control. Cloud auth is optional.</span>
+                  <span>Sign in with Google to secure your workspace.</span>
                 </li>
                 <li className="flex gap-3 items-start">
                   <Sparkles className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
@@ -202,7 +215,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
                 </li>
                 <li className="flex gap-3 items-start">
                   <BookOpen className="w-4 h-4 text-sky-400 mt-0.5 shrink-0" />
-                  <span>Next: set your profile, then open your first matter (or start empty).</span>
+                  <span>Next: sign in, set your profile, then open your first matter.</span>
                 </li>
               </ul>
 
@@ -220,15 +233,56 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
                 </span>
               </label>
 
-              <button
-                type="button"
-                disabled={!acknowledgedBoundaries}
-                onClick={() => setStep(1)}
-                className="w-full py-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Get started
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              {!isAuthenticated ? (
+                <button
+                  type="button"
+                  disabled={!acknowledgedBoundaries || busy}
+                  onClick={async () => {
+                    setError(null);
+                    setBusy(true);
+                    try {
+                      await loginWithGoogle();
+                    } catch (err) {
+                      setError(
+                        err instanceof Error
+                          ? err.message
+                          : "Google sign-in failed. Please try again."
+                      );
+                    } finally {
+                      setBusy(false);
+                    }
+                  }}
+                  className="w-full py-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {busy ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      Continue with Google
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled={!acknowledgedBoundaries}
+                  onClick={() => setStep(1)}
+                  className="w-full py-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Get started
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+
+              {error && (
+                <p
+                  role="alert"
+                  className="text-xs text-rose-300 bg-rose-950/40 border border-rose-500/30 rounded-lg px-3 py-2"
+                >
+                  {error}
+                </p>
+              )}
 
               <p className="text-center text-xs text-neutral-500 pt-1">
                 Returning user?{" "}
@@ -264,7 +318,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
 
               <div>
                 <label className="block text-[10px] font-mono uppercase tracking-wider text-neutral-400 mb-1.5">
-                  Email (optional)
+                  Email (from Google)
                 </label>
                 <input
                   type="email"
