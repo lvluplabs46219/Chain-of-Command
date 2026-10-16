@@ -337,6 +337,7 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
             onNavigateTab={setActiveTab}
             onOpenAddTimeline={() => setActiveTab("timeline")}
             onOpenAddEvidence={() => setActiveTab("investigations")}
+            onOpenNewMatter={() => setShowNewMatterModal(true)}
           />
         )}
 

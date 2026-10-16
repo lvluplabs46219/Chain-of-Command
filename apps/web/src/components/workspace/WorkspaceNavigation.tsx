@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -18,6 +18,8 @@ import {
   Layers,
   LogIn,
   User,
+  MoreHorizontal,
+  ChevronDown,
 } from "lucide-react";
 import { NavFeatureCarousel } from "./NavFeatureCarousel";
 import { useAuth } from "@/contexts/AuthContext";
@@ -66,7 +68,7 @@ export function pathToTab(pathname: string): WorkspaceTab | null {
   return entry ? (entry[0] as WorkspaceTab) : null;
 }
 
-const TABS: {
+const PRIMARY_TABS: {
   id: WorkspaceTab;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -74,20 +76,55 @@ const TABS: {
   { id: "dashboard", label: "Command Center", icon: LayoutDashboard },
   { id: "docket", label: "The Docket", icon: Gavel },
   { id: "chambers", label: "Chambers", icon: Users },
-  { id: "library", label: "Law Library", icon: BookOpen },
-  { id: "investigations", label: "Investigations", icon: Search },
   { id: "timeline", label: "Timeline", icon: Clock },
   { id: "draft_desk", label: "Draft Desk", icon: FileSignature },
+  { id: "tasks", label: "Tasks", icon: CalendarCheck2 },
+];
+
+const MORE_TABS: {
+  id: WorkspaceTab;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}[] = [
+  { id: "library", label: "Law Library", icon: BookOpen },
+  { id: "investigations", label: "Investigations", icon: Search },
   { id: "court_watch", label: "Court Watch", icon: Eye },
   { id: "directory", label: "Counsel Directory", icon: UserCheck },
-  { id: "tasks", label: "Tasks", icon: CalendarCheck2 },
   { id: "audit", label: "Audit", icon: Shield },
   { id: "archive", label: "Archive", icon: Layers },
 ];
 
+function tabActive(
+  tabId: WorkspaceTab,
+  activeTab: WorkspaceTab,
+  pathname: string | null
+): boolean {
+  const href = TAB_ROUTES[tabId];
+  return (
+    activeTab === tabId ||
+    pathname === href ||
+    (href !== "/" && !!pathname?.startsWith(href))
+  );
+}
+
 export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigationProps) {
   const pathname = usePathname();
   const { isAuthenticated, user, logout } = useAuth();
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
+
+  const moreIsActive = MORE_TABS.some((t) => tabActive(t.id, activeTab, pathname));
+
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setMoreOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [moreOpen]);
 
   return (
     <div className="sticky top-[73px] z-30 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-md supports-[backdrop-filter]:bg-zinc-900/70">
@@ -97,10 +134,10 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
         <div className="flex items-center gap-2 shrink-0">
           <Link
             href="/vericue"
-            className="flex items-center gap-1.5 text-[11px] font-bold text-rose-300 hover:text-white px-2.5 py-1 rounded-md border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 transition-all shadow-xs"
-            title="VeriCue AI — Candy Forensic Telemetry Console"
+            className="flex items-center gap-1.5 text-[11px] font-bold text-sky-300 hover:text-white px-2.5 py-1 rounded-md border border-sky-500/35 bg-sky-500/10 hover:bg-sky-500/20 transition-all shadow-xs"
+            title="VeriCue AI — Forensic Telemetry Console"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
             <span>VeriCue AI</span>
           </Link>
           {isAuthenticated ? (
@@ -142,18 +179,15 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
         </div>
       </div>
 
-      {/* Primary module tabs — real routes */}
+      {/* Primary module tabs + More */}
       <nav
         className="px-4 overflow-x-auto whitespace-nowrap hide-scrollbar flex items-center gap-1"
         aria-label="Workspace modules"
       >
-        {TABS.map((tab) => {
+        {PRIMARY_TABS.map((tab) => {
           const Icon = tab.icon;
           const href = TAB_ROUTES[tab.id];
-          const isActive =
-            activeTab === tab.id ||
-            (pathname === href) ||
-            (href !== "/" && pathname?.startsWith(href));
+          const isActive = tabActive(tab.id, activeTab, pathname);
 
           return (
             <Link
@@ -171,6 +205,55 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
             </Link>
           );
         })}
+
+        <div className="relative shrink-0" ref={moreRef}>
+          <button
+            type="button"
+            onClick={() => setMoreOpen((v) => !v)}
+            aria-expanded={moreOpen}
+            aria-haspopup="menu"
+            className={`flex items-center gap-1.5 py-3 px-4 text-xs border-b-2 transition-all ${
+              moreIsActive || moreOpen
+                ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/5 font-semibold"
+                : "border-transparent text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/40 font-medium"
+            }`}
+          >
+            <MoreHorizontal className="w-3.5 h-3.5" />
+            <span>More</span>
+            <ChevronDown className={`w-3 h-3 transition-transform ${moreOpen ? "rotate-180" : ""}`} />
+          </button>
+          {moreOpen && (
+            <div
+              role="menu"
+              className="absolute left-0 top-full mt-0 w-56 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl py-1 z-50"
+            >
+              {MORE_TABS.map((tab) => {
+                const Icon = tab.icon;
+                const href = TAB_ROUTES[tab.id];
+                const isActive = tabActive(tab.id, activeTab, pathname);
+                return (
+                  <Link
+                    key={tab.id}
+                    role="menuitem"
+                    href={href}
+                    onClick={() => {
+                      onTabChange(tab.id);
+                      setMoreOpen(false);
+                    }}
+                    className={`flex items-center gap-2 px-3 py-2.5 text-xs transition-colors ${
+                      isActive
+                        ? "bg-[#D4AF37]/10 text-[#D4AF37] font-semibold"
+                        : "text-zinc-300 hover:bg-zinc-900 hover:text-white"
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5 shrink-0" />
+                    <span>{tab.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </nav>
     </div>
   );

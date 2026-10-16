@@ -97,12 +97,14 @@ export function WorkspaceHeader({
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-[#D4AF37]/50 text-xs font-medium text-zinc-200 transition-colors max-w-full"
               >
                 <span className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0" />
-                <div className="text-left min-w-0">
-                  <div className="font-semibold text-white max-w-[180px] sm:max-w-[240px] truncate">
-                    {activeMatter.title}
+                <div className="text-left min-w-0 leading-tight">
+                  <div className="font-semibold text-white text-xs max-w-[180px] sm:max-w-[240px] truncate leading-5">
+                    {activeMatter.title || "No matter open"}
                   </div>
-                  <div className="text-[10px] text-zinc-300 font-mono tracking-wide truncate">
-                    {activeMatter.caseNumber}
+                  <div className="text-[10px] text-zinc-400 font-mono tracking-wide truncate leading-4 mt-0.5">
+                    {(activeMatter.caseNumber && activeMatter.caseNumber !== "—")
+                      ? activeMatter.caseNumber
+                      : "No case number"}
                     {jurisdiction ? ` · ${jurisdiction}` : ""}
                   </div>
                 </div>
@@ -165,9 +167,9 @@ export function WorkspaceHeader({
               <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-950 border border-amber-900/40 text-xs">
                 <Clock className="w-3.5 h-3.5 text-amber-400" />
                 <div>
-                  <span className="text-zinc-500">Speedy trial: </span>
-                  <span className="font-mono font-semibold text-amber-300">
-                    {speedyDays} / {speedyLimit}d
+                  <span className="text-zinc-500" title="Days elapsed of the statutory speedy-trial window">Speedy trial: </span>
+                  <span className="font-mono font-semibold text-amber-300" title={`Day ${speedyDays} of ${speedyLimit} in the speedy-trial window`}>
+                    Day {speedyDays} of {speedyLimit}
                   </span>
                 </div>
               </div>
