@@ -1,7 +1,6 @@
 /**
  * Chain of Command — Auth context (Supabase-only for API credentials).
  * ADR-001: Firebase is not an API identity provider.
- * All users sign in through Google (Supabase Auth).
  */
 
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from "react";
@@ -48,23 +47,6 @@ const DEFAULT_LITIGANT_USER: AuthUser = {
   activeMatterId: "matter-empty",
   isVerifiedProSe: true,
   createdAt: new Date().toISOString(),
-};
-
-/** Safe defaults for SSR / static prerender when AuthProvider is not yet mounted. */
-const SSR_FALLBACK: AuthContextType = {
-  user: null,
-  token: null,
-  isAuthenticated: false,
-  isLoading: true,
-  isFirstRun: true,
-  loginAsLitigant: async () => {},
-  loginWithGoogle: async () => {},
-  loginWithToken: async () => {},
-  logout: () => {},
-  updateUser: () => {},
-  switchRole: () => {},
-  completeFirstRun: () => {},
-  resetFirstRun: () => {},
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -141,20 +123,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const supabase = getSupabaseClient();
-      supabase.auth
-        .getSession()
-        .then(({ data: { session } }) => {
-          if (session?.user && session.access_token) {
-            const supaUser = sessionToUser(session.user);
-            setAuthToken(session.access_token);
-            setTokenState(session.access_token);
-            setUser(supaUser);
-            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(supaUser));
-          }
-        })
-        .catch((err) => {
-          console.warn("[Auth] Supabase session check:", err);
-        });
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user && session.access_token) {
+          const supaUser = sessionToUser(session.user);
+          setAuthToken(session.access_token);
+          setTokenState(session.access_token);
+          setUser(supaUser);
+          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(supaUser));
+        }
+      }).catch((err) => {
+        console.warn("[Auth] Supabase session check:", err);
+      });
 
       const { data: authListener } = supabase.auth.onAuthStateChange(
         (_event, session) => {
@@ -208,7 +187,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   ) => {
     if (!allowDemoAuth()) {
       throw new Error(
-        "Demo pro se sessions are disabled. Sign in with Google (Supabase Auth)."
+        "Demo pro se sessions are disabled. Sign in with Supabase Auth (ADR-001)."
       );
     }
     setIsLoading(true);
@@ -301,12 +280,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (!context) {
-    // During SSR / static prerender the provider may not be in the tree yet.
-    // Return a safe loading fallback so Next.js can finish the build.
-    // On the client the real AuthProvider will supply the live context.
-    if (typeof window === "undefined") {
-      return SSR_FALLBACK;
-    }
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
@@ -319,7 +292,8 @@ export function WorkspaceGuard({
   children: ReactNode;
   requiredRole?: "pro_se" | "attorney";
 }) {
-  const { isAuthenticated, isLoading, user, loginWithGoogle } = useAuth();
+  const { isAuthenticated, isLoading, user, loginAsLitigant, loginWithGoogle } =
+    useAuth();
 
   if (isLoading) {
     return (
@@ -338,7 +312,7 @@ export function WorkspaceGuard({
         <div className="max-w-md w-full border border-[#2a2a2a] bg-[#141313] p-8 rounded-xl shadow-2xl text-center">
           <h2 className="text-xl font-serif text-[#f3ede8]">Protected Legal Workspace</h2>
           <p className="mt-2 text-xs text-[#cfc5be] leading-5">
-            Sign in with Google to continue. Demo sessions are disabled.
+            Sign in with Supabase Auth. Demo sessions are development-only (ADR-001).
           </p>
           <div className="mt-6 flex flex-col gap-3">
             <button
@@ -346,7 +320,14 @@ export function WorkspaceGuard({
               onClick={() => loginWithGoogle().catch(() => {})}
               className="w-full bg-[#d4af37] hover:bg-[#c29d2b] text-[#141313] py-2.5 px-4 rounded text-xs font-bold"
             >
-              Sign In with Google
+              Sign In with Google (Supabase)
+            </button>
+            <button
+              type="button"
+              onClick={() => loginAsLitigant().catch((e) => alert(String(e.message || e)))}
+              className="w-full bg-[#201f1f] hover:bg-[#2a2a2a] text-[#cfc5be] border border-[#363535] py-2 px-4 rounded text-xs"
+            >
+              Enter Pro Se Demo Session (dev)
             </button>
           </div>
           <p className="mt-4 text-[10px] font-mono text-[#8e857e]">

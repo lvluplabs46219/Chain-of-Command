@@ -9,29 +9,28 @@
     "prebuild": "rm -rf apps/web/node_modules/next && ln -s ../../node_modules/next apps/web/node_modules/next",
     "dev": "next dev apps/web -p 3000 -H 0.0.0.0",
     "build": "NODE_ENV=production NODE_OPTIONS='--max-old-space-size=1536' next build apps/web --no-lint",
-    "lint": "echo 'Lint check completed' && exit 0",
+    "lint": "next lint apps/web",
     "start": "next start apps/web -p 3000 -H 0.0.0.0",
     "secrets:agent": "infisical agent --config config/infisical/agent-config.yaml",
     "secrets:agent:root": "infisical agent --config agent-config.yaml"
   },
   "dependencies": {
-    "ai": "^7.0.138",
-    "botid": "^1.5.11",
-    "clsx": "^2.1.1",
-    "lucide-react": "^1.16.0",
-    "motion": "^12.4.7",
     "next": "^15.1.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.0.1"
+    "lucide-react": "^1.16.0",
+    "motion": "^12.4.7",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.0.1",
+    "botid": "^1.5.11"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.10.7",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
-    "postcss": "^8.5.1",
+    "typescript": "^5.7.3",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5.7.3"
+    "@tailwindcss/postcss": "^4.0.0",
+    "postcss": "^8.5.1"
   }
 }

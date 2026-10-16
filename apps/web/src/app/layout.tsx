@@ -24,18 +24,18 @@ const protectedRoutes = [
 export const metadata: Metadata = {
   title: "Chain of Command",
   description:
-    "AI-powered legal self-representation workspace and case intelligence platform.",
+    "AI-powered legal self-representation workspace and case intelligence platform for pro se litigants.",
   openGraph: {
     title: "Chain of Command",
     description:
-      "AI-powered legal self-representation workspace and case intelligence platform.",
+      "AI-powered legal self-representation workspace and case intelligence platform for pro se litigants.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Chain of Command",
     description:
-      "AI-powered legal self-representation workspace and case intelligence platform.",
+      "AI-powered legal self-representation workspace and case intelligence platform for pro se litigants.",
   },
 };
 
@@ -47,6 +47,16 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        />
         <Script src="/fetch-guard.js" strategy="afterInteractive" />
       </head>
       <body className="bg-[#111214] text-[#e1e2e5] antialiased min-h-screen">
@@ -57,16 +67,14 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <Providers>
-          <main
-            id="main-content"
-            role="main"
-            tabIndex={-1}
-            className="min-h-screen flex flex-col focus:outline-none"
-          >
-            {children}
-          </main>
-        </Providers>
+        <main
+          id="main-content"
+          role="main"
+          tabIndex={-1}
+          className="min-h-screen flex flex-col focus:outline-none"
+        >
+          <Providers>{children}</Providers>
+        </main>
         <Analytics />
         <SpeedInsights />
       </body>

@@ -71,7 +71,7 @@ export function VeriCueMasterApp({ initialTab = "home" }: VeriCueMasterAppProps)
   const [activeTab, setActiveTab] = useState<VeriCueTab>(initialTab);
   const [sessions, setSessions] = useState<SessionAnalysis[]>(SAMPLE_SESSIONS);
   const [selectedSessionId, setSelectedSessionId] = useState<string>(SAMPLE_SESSIONS[0].id);
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Check consent gate and saved theme preference in localStorage
@@ -84,8 +84,6 @@ export function VeriCueMasterApp({ initialTab = "home" }: VeriCueMasterAppProps)
       const savedTheme = localStorage.getItem("vericue_theme_v2");
       if (savedTheme === "dark" || savedTheme === "light") {
         setTheme(savedTheme);
-      } else {
-        setTheme("dark");
       }
     }
   }, []);
@@ -151,7 +149,7 @@ export function VeriCueMasterApp({ initialTab = "home" }: VeriCueMasterAppProps)
         <aside
           className={`fixed inset-y-0 left-0 z-40 w-64 flex flex-col justify-between transition-transform duration-200 border-r ${
             isDark
-              ? "bg-[#0c1324] border-[#151b2d]"
+              ? "bg-[#0A0F1D] border-[#1E2638]"
               : "bg-[#FFF0F5] border-pink-200/90 shadow-xs"
           } ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
         >
@@ -168,7 +166,7 @@ export function VeriCueMasterApp({ initialTab = "home" }: VeriCueMasterAppProps)
                   className="flex items-center gap-2.5 cursor-pointer group"
                 >
                   {/* Stylized VeriCue Logo Prism */}
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 via-pink-500 to-rose-400 flex items-center justify-center text-white font-black text-base shadow-md shadow-rose-500/30 group-hover:scale-105 transition-transform">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 via-pink-500 to-rose-400 flex items-center justify-center text-white font-black text-base shadow-md shadow-rose-500/25 group-hover:scale-105 transition-transform">
                     V
                   </div>
 
@@ -181,8 +179,8 @@ export function VeriCueMasterApp({ initialTab = "home" }: VeriCueMasterAppProps)
                       >
                         VeriCue AI
                       </span>
-                      {/* Glowing CANDY Pill Badge */}
-                      <span className="text-[9px] font-mono font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-[0_0_10px_rgba(244,63,94,0.45)]">
+                      {/* CANDY Pill Badge */}
+                      <span className="text-[9px] font-mono font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-xs">
                         CANDY
                       </span>
                     </div>
@@ -483,7 +481,7 @@ export function VeriCueMasterApp({ initialTab = "home" }: VeriCueMasterAppProps)
           {/* Bottom Sidebar: Telemetry Integrity Progress Bar */}
           <div
             className={`p-4 border-t ${
-              isDark ? "border-[#151b2d] bg-[#080d1a]" : "border-pink-200/80 bg-white"
+              isDark ? "border-[#1E2638] bg-[#070B14]" : "border-pink-200/80 bg-white"
             }`}
           >
             <div className="space-y-1.5">
@@ -491,20 +489,20 @@ export function VeriCueMasterApp({ initialTab = "home" }: VeriCueMasterAppProps)
                 <span className="font-semibold text-slate-600 dark:text-slate-300">
                   Telemetry Integrity
                 </span>
-                <span className="font-bold text-emerald-400">99.8%</span>
+                <span className="font-bold text-emerald-500">99.8%</span>
               </div>
 
               {/* Pink-to-Emerald Gradient Progress Bar */}
-              <div className="h-1.5 w-full rounded-full bg-slate-200 dark:bg-slate-800/80 overflow-hidden">
+              <div className="h-1.5 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-rose-500 via-pink-400 to-emerald-400 shadow-[0_0_8px_rgba(244,63,94,0.35)]"
+                  className="h-full rounded-full bg-gradient-to-r from-rose-500 via-pink-400 to-emerald-400"
                   style={{ width: "99.8%" }}
                 />
               </div>
 
               <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-0.5">
                 <span>SHA-256 Ledger: Live</span>
-                <span className="text-emerald-400 font-semibold">0 Errors</span>
+                <span className="text-emerald-500 font-semibold">0 Errors</span>
               </div>
             </div>
           </div>
@@ -518,7 +516,7 @@ export function VeriCueMasterApp({ initialTab = "home" }: VeriCueMasterAppProps)
           <header
             className={`sticky top-0 z-30 border-b backdrop-blur-md transition-colors ${
               isDark
-                ? "bg-[#0c1324]/90 border-[#151b2d]"
+                ? "bg-[#0A0F1D]/90 border-[#1E2638]"
                 : "bg-white/90 border-pink-200/90 shadow-2xs"
             }`}
           >

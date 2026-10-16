@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   Scale,
@@ -12,7 +12,6 @@ import {
   Shield,
   BookOpen,
   CheckCircle2,
-  Loader2,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import type { Matter } from "@/lib/workspace-data";
@@ -34,25 +33,18 @@ export type OnboardingResult = {
   email: string;
   jurisdiction: string;
   matter: Matter | null;
-  readingLevel?: "Plain English" | "Standard Legal" | "Detailed Statutory";
 };
 
 interface FirstRunWizardProps {
   onComplete: (result: OnboardingResult) => void;
 }
 
-function buildEmptyMatter(
-  title: string,
-  caseNumber: string,
-  court: string,
-  jurisdiction: string
-): Matter {
+function buildEmptyMatter(title: string, caseNumber: string, court: string, jurisdiction: string): Matter {
   return {
     id: `matter-${Date.now()}`,
     title: title.trim() || "My first matter",
     caseNumber: caseNumber.trim() || "TBD",
     court: court.trim() || "Court TBD",
-    courtName: court.trim() || "Court TBD",
     jurisdiction,
     judge: "",
     prosecutor: "",
@@ -61,23 +53,16 @@ function buildEmptyMatter(
     speedyTrialDaysRemaining: 0,
     speedyTrialLimit: 70,
     readingLevel: "Plain English",
-    defenseStatus: "Self-Represented (Pro Se)",
-    nextCourtDate: "",
-    nextCourtType: "",
-    speedyTrialDeadline: "",
-    createdAt: new Date().toISOString().slice(0, 10),
-    summary: "",
     charges: [],
     timeline: [],
     authorities: [],
     evidence: [],
     deadlines: [],
-    isDemo: false,
   };
 }
 
 export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
-  const { user, isAuthenticated, loginWithGoogle, updateUser } = useAuth();
+  const { loginAsLitigant } = useAuth();
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -89,37 +74,8 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
   const [busy, setBusy] = useState(false);
   const [acknowledgedBoundaries, setAcknowledgedBoundaries] = useState(false);
 
-  // Prefill from existing session when user already signed in (OAuth)
-  useEffect(() => {
-    if (user) {
-      if (user.name && user.name !== "Pro Se Litigant") setName(user.name);
-      if (user.email && !user.email.includes("@local.")) setEmail(user.email);
-      if (user.jurisdiction && user.jurisdiction !== "Self-Represented") {
-        setJurisdiction(user.jurisdiction);
-      }
-    }
-  }, [user]);
-
   const finish = async (opts: { withMatter: boolean }) => {
     setError(null);
-
-    // Everyone must sign in with Google (Supabase Auth)
-    if (!isAuthenticated || !user) {
-      setError("Sign in with Google to continue.");
-      setBusy(true);
-      try {
-        await loginWithGoogle();
-        // OAuth redirects away; on return the session will be present
-      } catch (err) {
-        const msg =
-          err instanceof Error ? err.message : "Google sign-in failed. Please try again.";
-        setError(msg);
-      } finally {
-        setBusy(false);
-      }
-      return;
-    }
-
     if (name.trim().length < 2) {
       setError("Enter your name (at least 2 characters).");
       setStep(1);
@@ -127,7 +83,6 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
     }
     const safeEmail =
       email.trim() ||
-      user.email ||
       `${name.trim().toLowerCase().replace(/\s+/g, ".")}@local.chainofcommand`;
     if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       setError("Enter a valid email or leave it blank for now.");
@@ -137,27 +92,19 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
 
     setBusy(true);
     try {
-      updateUser({
-        name: name.trim(),
-        email: safeEmail,
-        jurisdiction,
-      });
-
-      const matter = opts.withMatter
-        ? buildEmptyMatter(matterTitle, caseNumber, courtName, jurisdiction)
-        : null;
-
+      await loginAsLitigant(name.trim(), safeEmail, jurisdiction);
+      const matter =
+        opts.withMatter
+          ? buildEmptyMatter(matterTitle, caseNumber, courtName, jurisdiction)
+          : null;
       onComplete({
         name: name.trim(),
         email: safeEmail,
         jurisdiction,
         matter,
-        readingLevel: "Plain English",
-      });
-    } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Could not start your session. Please try again.";
-      setError(msg);
+              });
+    } catch {
+      setError("Could not start your session. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -207,15 +154,15 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
               <ul className="space-y-3 text-sm text-neutral-300">
                 <li className="flex gap-3 items-start">
                   <Shield className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
-                  <span>Sign in with Google to secure your workspace.</span>
+                  <span>Sessions stay on this device until you connect cloud auth.</span>
                 </li>
                 <li className="flex gap-3 items-start">
                   <Sparkles className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
-                  <span>AI is educational only — never files or acts for you.</span>
+                  <span>AI runs locally via Ollama when available — educational information only.</span>
                 </li>
                 <li className="flex gap-3 items-start">
                   <BookOpen className="w-4 h-4 text-sky-400 mt-0.5 shrink-0" />
-                  <span>Next: sign in, set your profile, then open your first matter.</span>
+                  <span>Next you will open your first matter and create your first matter.</span>
                 </li>
               </ul>
 
@@ -233,56 +180,15 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
                 </span>
               </label>
 
-              {!isAuthenticated ? (
-                <button
-                  type="button"
-                  disabled={!acknowledgedBoundaries || busy}
-                  onClick={async () => {
-                    setError(null);
-                    setBusy(true);
-                    try {
-                      await loginWithGoogle();
-                    } catch (err) {
-                      setError(
-                        err instanceof Error
-                          ? err.message
-                          : "Google sign-in failed. Please try again."
-                      );
-                    } finally {
-                      setBusy(false);
-                    }
-                  }}
-                  className="w-full py-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  {busy ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <>
-                      Continue with Google
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  disabled={!acknowledgedBoundaries}
-                  onClick={() => setStep(1)}
-                  className="w-full py-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  Get started
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              )}
-
-              {error && (
-                <p
-                  role="alert"
-                  className="text-xs text-rose-300 bg-rose-950/40 border border-rose-500/30 rounded-lg px-3 py-2"
-                >
-                  {error}
-                </p>
-              )}
+              <button
+                type="button"
+                disabled={!acknowledgedBoundaries}
+                onClick={() => setStep(1)}
+                className="w-full py-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Get started
+                <ArrowRight className="w-4 h-4" />
+              </button>
 
               <p className="text-center text-xs text-neutral-500 pt-1">
                 Returning user?{" "}
@@ -298,9 +204,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
               <div>
                 <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4AF37] mb-2">About you</p>
                 <h2 className="text-xl font-serif font-semibold text-white">Set up your profile</h2>
-                <p className="text-xs text-neutral-400 mt-1">
-                  Used only in this workspace. Nothing is filed with a court.
-                </p>
+                <p className="text-xs text-neutral-400 mt-1">Used only in this workspace. Nothing is filed with a court.</p>
               </div>
 
               <div>
@@ -318,7 +222,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
 
               <div>
                 <label className="block text-[10px] font-mono uppercase tracking-wider text-neutral-400 mb-1.5">
-                  Email (from Google)
+                  Email (optional)
                 </label>
                 <input
                   type="email"
@@ -330,10 +234,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
               </div>
 
               <div>
-                <label
-                  htmlFor="jurisdiction-select"
-                  className="block text-[10px] font-mono uppercase tracking-wider text-neutral-400 mb-1.5 flex items-center gap-1.5"
-                >
+                <label htmlFor="jurisdiction-select" className="block text-[10px] font-mono uppercase tracking-wider text-neutral-400 mb-1.5 flex items-center gap-1.5">
                   <MapPin className="w-3 h-3" /> Primary jurisdiction
                 </label>
                 <select
@@ -352,10 +253,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
               </div>
 
               {error && (
-                <p
-                  role="alert"
-                  className="text-xs text-rose-300 bg-rose-950/40 border border-rose-500/30 rounded-lg px-3 py-2"
-                >
+                <p role="alert" className="text-xs text-rose-300 bg-rose-950/40 border border-rose-500/30 rounded-lg px-3 py-2">
                   {error}
                 </p>
               )}
@@ -435,10 +333,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
               </div>
 
               {error && (
-                <p
-                  role="alert"
-                  className="text-xs text-rose-300 bg-rose-950/40 border border-rose-500/30 rounded-lg px-3 py-2"
-                >
+                <p role="alert" className="text-xs text-rose-300 bg-rose-950/40 border border-rose-500/30 rounded-lg px-3 py-2">
                   {error}
                 </p>
               )}
@@ -450,18 +345,14 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
                   onClick={() => finish({ withMatter: true })}
                   className="w-full py-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  {busy ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <FolderPlus className="w-4 h-4" />
-                  )}
+                  <FolderPlus className="w-4 h-4" />
                   Open my matter & enter workspace
                 </button>
                 <button
                   type="button"
                   disabled={busy}
                   onClick={() => finish({ withMatter: false })}
-                  className="w-full py-2 text-xs text-neutral-500 hover:text-neutral-300 flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  className="w-full py-2 text-xs text-neutral-500 hover:text-neutral-300 flex items-center justify-center gap-1.5"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   Skip for now — empty workspace

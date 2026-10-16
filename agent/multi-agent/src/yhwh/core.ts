@@ -1,240 +1,28 @@
-// YHWH — Core Reasoning Engine
-// Default: Ollama Cloud free-tier models (per-agent).
-// Optional fallbacks: local Ollama, then Lemonade (only if LLM_PROVIDER includes them).
-//
-// LLM_PROVIDER=
-//   ollama-cloud  (default) — agents on cloud free models
-//   ollama        — local Ollama only
-//   lemonade      — Lemonade Server only (NOT the agent assignment path)
-//   auto          — cloud → local ollama → lemonade
+// YHWH — Core Reasoning Engine (local inference via Ollama / Lemonade).
+// Parses ambiguous intent and outputs structured execution trees.
 import { Directive, ExecutionTree, log } from "../protocol/types.js";
-import { AgentSlot, cloudModelFor } from "./models.js";
 
-type Provider = "ollama-cloud" | "ollama" | "lemonade";
+const ollamaUrl = (): string => process.env.OLLAMA_URL ?? "http://127.0.0.1:11434";
+const model = (): string => process.env.YHWH_MODEL ?? "qwen2.5:7b";
 
-export type CompleteOpts = {
-  json?: boolean;
-  timeoutMs?: number;
-  /** Agent slot → selects that agent's Ollama Cloud model */
-  agent?: AgentSlot;
-};
-
-function lemonadeBase(): string {
-  return (process.env.LEMONADE_URL ?? "http://127.0.0.1:13305").replace(/\/$/, "");
-}
-function ollamaLocalBase(): string {
-  return (process.env.OLLAMA_URL ?? "http://127.0.0.1:11434").replace(/\/$/, "");
-}
-function ollamaCloudBase(): string {
-  return (process.env.OLLAMA_CLOUD_URL ?? "https://ollama.com").replace(/\/$/, "");
-}
-
-function localOllamaModel(): string {
-  return process.env.OLLAMA_MODEL ?? "qwen2.5:7b";
-}
-
-function lemonadeModel(): string {
-  return process.env.LEMONADE_MODEL ?? "DeepSeek-Qwen3-8B-GGUF";
-}
-
-/** Default is Ollama Cloud — agents are NOT Lemonade agents. */
-function providerOrder(): Provider[] {
-  const forced = (process.env.LLM_PROVIDER ?? "ollama-cloud").toLowerCase().trim();
-  if (forced === "lemonade") return ["lemonade"];
-  if (forced === "ollama" || forced === "ollama-local") return ["ollama"];
-  if (forced === "auto") return ["ollama-cloud", "ollama", "lemonade"];
-  // ollama-cloud (default) and anything else → cloud only
-  return ["ollama-cloud"];
-}
-
-function buildMessages(prompt: string, system?: string): { role: string; content: string }[] {
-  const messages: { role: string; content: string }[] = [];
-  if (system) messages.push({ role: "system", content: system });
-  messages.push({ role: "user", content: prompt });
-  return messages;
-}
-
-async function completeOllamaCloud(
+/** Raw completion against the local provider. */
+export async function complete(
   prompt: string,
   system?: string,
-  opts: CompleteOpts = {},
-): Promise<{ text: string; model: string }> {
-  const key = process.env.OLLAMA_API_KEY;
-  if (!key) {
-    throw new Error(
-      "OLLAMA_API_KEY not set. Agents use Ollama Cloud free models — create a key at https://ollama.com/settings/keys",
-    );
-  }
-
-  const base = ollamaCloudBase();
-  const model = cloudModelFor(opts.agent ?? "yhwh");
-  const messages = buildMessages(prompt, system);
-
-  const attempts: { url: string; body: Record<string, unknown>; parse: (j: unknown) => string | null }[] = [
-    {
-      url: `${base}/v1/chat/completions`,
-      body: {
-        model,
-        messages,
-        stream: false,
-        temperature: 0.2,
-        ...(opts.json ? { response_format: { type: "json_object" } } : {}),
-      },
-      parse: (j) => {
-        const x = j as { choices?: { message?: { content?: string } }[] };
-        return x.choices?.[0]?.message?.content ?? null;
-      },
-    },
-    {
-      url: `${base}/api/chat`,
-      body: {
-        model,
-        messages,
-        stream: false,
-        ...(opts.json ? { format: "json" } : {}),
-      },
-      parse: (j) => {
-        const x = j as { message?: { content?: string } };
-        return x.message?.content ?? null;
-      },
-    },
-  ];
-
-  let lastErr: Error | null = null;
-  for (const a of attempts) {
-    try {
-      const res = await fetch(a.url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${key}`,
-        },
-        body: JSON.stringify(a.body),
-        signal: AbortSignal.timeout(opts.timeoutMs ?? 180_000),
-      });
-      if (!res.ok) {
-        lastErr = new Error(
-          `Ollama Cloud ${res.status} model=${model}: ${(await res.text().catch(() => "")).slice(0, 300)}`,
-        );
-        continue;
-      }
-      const json = await res.json();
-      const content = a.parse(json);
-      if (typeof content === "string" && content.length) return { text: content, model };
-      lastErr = new Error(`Ollama Cloud empty content model=${model}`);
-    } catch (e) {
-      lastErr = e instanceof Error ? e : new Error(String(e));
-    }
-  }
-  throw lastErr ?? new Error("Ollama Cloud unreachable");
-}
-
-async function completeOllamaLocal(
-  prompt: string,
-  system?: string,
-  opts: CompleteOpts = {},
+  opts: { json?: boolean; timeoutMs?: number } = {},
 ): Promise<string> {
-  const res = await fetch(`${ollamaLocalBase()}/api/generate`, {
+  const res = await fetch(`${ollamaUrl()}/api/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: localOllamaModel(),
-      prompt,
-      system,
-      stream: false,
-      ...(opts.json ? { format: "json" } : {}),
-    }),
+    body: JSON.stringify({ model: model(), prompt, system, stream: false, ...(opts.json ? { format: "json" } : {}) }),
     signal: AbortSignal.timeout(opts.timeoutMs ?? 120_000),
   });
-  if (!res.ok) {
-    throw new Error(`Ollama local ${res.status}: ${(await res.text().catch(() => "")).slice(0, 300)}`);
-  }
+  if (!res.ok) throw new Error(`YHWH provider error: ${res.status} ${(await res.text().catch(() => "")).slice(0, 300)}`);
   const json = (await res.json()) as { response: string };
   return json.response;
 }
 
-/** Optional Lemonade path — only when LLM_PROVIDER=lemonade or auto. Not used for agent model assignment. */
-async function completeLemonade(
-  prompt: string,
-  system?: string,
-  opts: CompleteOpts = {},
-): Promise<string> {
-  const base = lemonadeBase();
-  const model = lemonadeModel();
-  const urls = [`${base}/api/v1/chat/completions`, `${base}/v1/chat/completions`];
-  const messages = buildMessages(prompt, system);
-  let lastErr: Error | null = null;
-
-  for (const url of urls) {
-    try {
-      const body: Record<string, unknown> = {
-        model,
-        messages,
-        stream: false,
-        temperature: 0.2,
-      };
-      if (opts.json) body.response_format = { type: "json_object" };
-
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer lemonade",
-        },
-        body: JSON.stringify(body),
-        signal: AbortSignal.timeout(opts.timeoutMs ?? 120_000),
-      });
-      if (!res.ok) {
-        lastErr = new Error(`Lemonade ${res.status}: ${(await res.text().catch(() => "")).slice(0, 300)}`);
-        continue;
-      }
-      const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-      const content = json.choices?.[0]?.message?.content;
-      if (typeof content === "string" && content.length) return content;
-      lastErr = new Error("Lemonade empty content");
-    } catch (e) {
-      lastErr = e instanceof Error ? e : new Error(String(e));
-    }
-  }
-  throw lastErr ?? new Error("Lemonade unreachable");
-}
-
-export async function complete(
-  prompt: string,
-  system?: string,
-  opts: CompleteOpts = {},
-): Promise<string> {
-  const order = providerOrder();
-  const agent = opts.agent ?? "yhwh";
-  let lastErr: Error | null = null;
-
-  for (const p of order) {
-    try {
-      if (p === "ollama-cloud") {
-        const { text, model } = await completeOllamaCloud(prompt, system, opts);
-        log("info", "yhwh", "complete_ok", { provider: "ollama-cloud", agent, model });
-        return text;
-      }
-      if (p === "ollama") {
-        const out = await completeOllamaLocal(prompt, system, opts);
-        log("info", "yhwh", "complete_ok", { provider: "ollama-local", agent, model: localOllamaModel() });
-        return out;
-      }
-      const out = await completeLemonade(prompt, system, opts);
-      log("info", "yhwh", "complete_ok", { provider: "lemonade", agent, model: lemonadeModel() });
-      return out;
-    } catch (e) {
-      lastErr = e instanceof Error ? e : new Error(String(e));
-      log("warn", "yhwh", "provider_failed", { provider: p, agent, error: String(e) });
-    }
-  }
-
-  throw new Error(
-    `YHWH: no LLM for agent=${agent} (tried ${order.join(" → ")}). ` +
-      `Set OLLAMA_API_KEY for cloud free models. Last error: ${lastErr?.message ?? "unknown"}`,
-  );
-}
-
+/** Extract the first balanced JSON object from raw model output. */
 function extractJson(raw: string): string {
   const s = raw.replace(/```(?:json)?/g, "");
   const start = s.indexOf("{");
@@ -250,6 +38,7 @@ function extractJson(raw: string): string {
   return s.slice(start);
 }
 
+/** High-level directive -> structured execution tree (DAG). */
 export async function plan(directive: Directive): Promise<ExecutionTree> {
   const system = [
     "You are YHWH, a planning kernel that decomposes directives into executable task DAGs.",
@@ -275,13 +64,14 @@ export async function plan(directive: Directive): Promise<ExecutionTree> {
     const raw = await complete(
       `Directive: ${directive.text}\nContext: ${JSON.stringify(directive.context ?? {})}`,
       system,
-      { json: true, agent: "yhwh" },
+      { json: true },
     );
     const tree = JSON.parse(extractJson(raw)) as ExecutionTree;
     if (!tree.rootId || !Array.isArray(tree.nodes) || tree.nodes.length === 0) throw new Error("missing fields");
     log("info", "yhwh", "plan_generated", { nodes: tree.nodes.length, rootId: tree.rootId });
     return tree;
   } catch (e) {
+    // Graceful degradation: single local-reasoning task.
     log("warn", "yhwh", "plan_parse_failed_fallback_single_node", { error: String(e) });
     return {
       rootId: "t1",

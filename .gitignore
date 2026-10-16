@@ -128,17 +128,9 @@ dist
 
 # IDEs and Editors
 .idea/
+.vscode/
 *.swp
 *.swo
-
-# VS Code - ignore user workspace files but keep project settings
-.vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/folders.json
-!.vscode/.gitignore
 
 # AI / Sandbox
 .replit
@@ -185,7 +177,3 @@ Thumbs.db
 *.swp
 .idea/
 .env.runtime
-
-# Editor and formatting config (these are shared)
-!.editorconfig
-!.prettierrc

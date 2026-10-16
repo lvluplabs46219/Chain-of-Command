@@ -1,0 +1,198 @@
+{
+  "version": "1.0.0",
+  "description": "Agent synchronization configuration for Aquit-Platform - manages genspark, google, vibe, and all other AI agents",
+  "last_updated": "2026-08-30T00:00:00Z",
+  "agents": {
+    "vibe": {
+      "type": "mistral",
+      "config_path": "~/.vibe/config.toml",
+      "status": "active",
+      "skills": {
+        "project_skills": [
+          {
+            "name": "supabase",
+            "path": ".agents/skills/supabase/SKILL.md",
+            "source": "supabase/agent-skills",
+            "enabled": true
+          },
+          {
+            "name": "supabase-postgres-best-practices",
+            "path": ".agents/skills/supabase-postgres-best-practices/SKILL.md",
+            "source": "supabase/agent-skills",
+            "enabled": true
+          },
+          {
+            "name": "workflow-init",
+            "path": ".agents/skills/workflow-init/SKILL.md",
+            "source": "vercel/workflow",
+            "enabled": true
+          }
+        ],
+        "mcp_servers": [
+          {
+            "name": "stitch",
+            "type": "http",
+            "url": "https://stitch.googleapis.com/mcp",
+            "description": "Google services via MCP",
+            "headers": {
+              "X-Goog-Api-Key": "AQ.Ab8RN6L96CR5ey_d6FEMkeq44nwMzMEKVzlli3KkNmxO-p9CEw"
+            },
+            "enabled": true
+          }
+        ]
+      },
+      "tools": {
+        "bash": {
+          "allowlist": [
+            "/home/andrew/.config/Code/*",
+            "/home/andrew/.vibe/*",
+            "/home/andrew/Development/Tools/AI/Engines/computer-use-agent/cua2-core/*"
+          ],
+          "commands": ["git", "ls", "find", "grep", "cat", "echo", "python3"]
+        }
+      }
+    },
+    "genspark": {
+      "type": "genspark",
+      "cli_config": "~/.genspark-tool-cli/config.json",
+      "status": "active",
+      "api_key": "gsk-eyJjb2dlbl9pZCI6ImEyYTMxN2VmLWMzMGEtNGMzZC1hMTMwLWRhODhhZjc1MTUwMi...",
+      "base_url": "https://www.genspark.ai",
+      "vscode_extension": {
+        "id": "genspark.genspark-1.0.0",
+        "version": "1.0.0",
+        "enabled": true
+      },
+      "git_branch": "genspark_ai_developer",
+      "features": [
+        "code_generation",
+        "team_collaboration",
+        "ai_assistance"
+      ]
+    },
+    "google": {
+      "type": "google",
+      "services": [
+        {
+          "name": "stitch_api",
+          "type": "mcp",
+          "url": "https://stitch.googleapis.com/mcp",
+          "api_key": "AQ.Ab8RN6L96CR5ey_d6FEMkeq44nwMzMEKVzlli3KkNmxO-p9CEw",
+          "enabled": true
+        }
+      ],
+      "chrome_extensions": [
+        {
+          "name": "genspark",
+          "extension_id": "hmdkfngkncmbgiehonfebecighedjiak",
+          "version": "1.1.23",
+          "enabled": true
+        }
+      ],
+      "status": "active"
+    },
+    "supabase": {
+      "type": "supabase",
+      "config_path": "supabase/config.toml",
+      "status": "active",
+      "project_id": "Aquit-Platform",
+      "components": {
+        "api": {
+          "enabled": true,
+          "port": 54321,
+          "schemas": ["public", "graphql_public"]
+        },
+        "db": {
+          "enabled": true,
+          "port": 54322,
+          "major_version": 17
+        },
+        "studio": {
+          "enabled": true,
+          "port": 54323
+        },
+        "realtime": {
+          "enabled": true
+        },
+        "storage": {
+          "enabled": true
+        },
+        "auth": {
+          "enabled": true
+        }
+      }
+    },
+    "cua": {
+      "type": "computer-use-agent",
+      "config_path": "/home/andrew/Development/Tools/AI/Engines/computer-use-agent/cua2-core/src/cua2_core/.env",
+      "root_path": "/home/andrew/Development/Tools/AI/Engines/computer-use-agent/cua2-core",
+      "status": "active",
+      "sandbox_enabled": false,
+      "no_sandbox": true,
+      "direct_system_access": true,
+      "port": 8001,
+      "host": "0.0.0.0",
+      "debug": true,
+      "log_level": "DEBUG",
+      "agent_timeout": 300,
+      "max_concurrent_tasks": 10,
+      "hf_token": "hf_RkYXbqhpzuACGnLGMBJYQeTBKvdPwJxXkSVW",
+      "features": [
+        "direct_bash_execution",
+        "file_system_access",
+        "no_isolation",
+        "full_system_access"
+      ],
+      "requirements": [
+        "python3",
+        "pip install -r requirements.txt"
+      ],
+      "run_command": "uv run uvicorn cua2_core.app:app --host 0.0.0.0 --port 8001 --reload"
+    }
+  },
+  "sync_settings": {
+    "auto_sync": true,
+    "sync_interval": "5m",
+    "conflict_resolution": "manual",
+    "backup_enabled": true,
+    "backup_path": ".agents/backups/",
+    "notifications": {
+      "email": false,
+      "desktop": true,
+      "log_file": ".agents/logs/sync.log"
+    }
+  },
+  "skills_registry": {
+    "sources": [
+      {
+        "name": "supabase/agent-skills",
+        "type": "github",
+        "skills": ["supabase", "supabase-postgres-best-practices"]
+      },
+      {
+        "name": "vercel/workflow",
+        "type": "github",
+        "skills": ["workflow-init"]
+      }
+    ],
+    "lock_file": "skills-lock.json"
+  },
+  "directories": {
+    "agents_root": ".agents/",
+    "project_agents": "agent/",
+    "outputs": ".agents/outputs/",
+    "skills": ".agents/skills/",
+    "cua": ".agents/cua/",
+    "cue": ".agents/cue/"
+  },
+  "metadata": {
+    "created_by": "andrew",
+    "repository": "Aquit-Platform",
+    "total_skills": 3,
+    "total_mcp_servers": 1,
+    "total_extensions": 2,
+    "total_agents": 5,
+    "cua_no_sandbox": true,
+    "last_updated": "2026-08-30T00:00:00Z"
+  }
+}

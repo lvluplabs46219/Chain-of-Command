@@ -130,14 +130,14 @@ export function HomeDashboard({
       <div
         className={`rounded-2xl p-6 sm:p-7 border transition-all relative overflow-hidden ${
           isDark
-            ? "bg-[#0c1324] border-[#151b2d] shadow-xl shadow-black/40"
+            ? "bg-[#0B101E] border-[#1E2638] shadow-xl shadow-rose-950/10"
             : "bg-gradient-to-br from-white via-[#FFF7FA] to-[#FFF0F5] border-pink-200/80 shadow-md shadow-pink-500/5"
         }`}
       >
         {/* Ambient subtle glow background */}
         <div
           className={`absolute -top-20 -right-20 w-80 h-80 rounded-full blur-3xl pointer-events-none ${
-            isDark ? "bg-rose-500/15" : "bg-pink-300/20"
+            isDark ? "bg-rose-500/10" : "bg-pink-300/20"
           }`}
         />
 
@@ -188,13 +188,13 @@ export function HomeDashboard({
           <div
             className={`rounded-xl p-4 border shrink-0 lg:max-w-md w-full transition-all ${
               isDark
-                ? "bg-[#080d1a] border-[#151b2d] shadow-lg"
+                ? "bg-[#0E1527] border-[#222E46] shadow-lg"
                 : "bg-white border-pink-200/90 shadow-sm"
             }`}
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
                 <span
                   className={`text-xs font-semibold uppercase tracking-wider font-mono ${
                     isDark ? "text-slate-200" : "text-slate-800"
@@ -212,7 +212,7 @@ export function HomeDashboard({
             <div
               className={`p-2.5 rounded-lg border font-mono text-xs flex items-center justify-between gap-2 mb-2.5 ${
                 isDark
-                  ? "bg-[#050811] border-[#151b2d] text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.06)]"
+                  ? "bg-[#080C17] border-slate-800 text-rose-300"
                   : "bg-pink-50/60 border-pink-200/70 text-rose-800"
               }`}
             >
@@ -260,7 +260,7 @@ export function HomeDashboard({
           onClick={() => onNavigateTab("new_analysis")}
           className={`group rounded-2xl p-6 border transition-all duration-200 cursor-pointer flex flex-col justify-between ${
             isDark
-              ? "bg-[#0c1324] border-[#151b2d] hover:border-rose-500/50 hover:bg-[#10182c] shadow-lg shadow-black/50 hover:shadow-[0_0_24px_rgba(244,63,94,0.15)]"
+              ? "bg-[#0D1424] border-[#1F293D] hover:border-rose-500/50 hover:bg-[#121A2E] shadow-lg shadow-black/40 hover:shadow-rose-950/20"
               : "bg-white border-pink-200/80 hover:border-rose-400 hover:bg-[#FFF9FB] shadow-md shadow-pink-500/5 hover:shadow-lg hover:shadow-pink-500/10"
           }`}
         >
@@ -269,16 +269,16 @@ export function HomeDashboard({
               <span
                 className={`p-3 rounded-xl border flex items-center justify-center transition-all ${
                   isDark
-                    ? "bg-rose-500/15 border-rose-500/30 text-rose-300 group-hover:bg-rose-500/25 group-hover:scale-105 shadow-[0_0_10px_rgba(244,63,94,0.2)]"
+                    ? "bg-rose-500/10 border-rose-500/30 text-rose-400 group-hover:bg-rose-500/20 group-hover:scale-105"
                     : "bg-pink-100 border-pink-200 text-rose-600 group-hover:bg-pink-200/80 group-hover:scale-105"
                 }`}
               >
-                <Upload className="w-5 h-5 text-rose-400" />
+                <Upload className="w-5 h-5" />
               </span>
               <span
                 className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full border font-bold ${
                   isDark
-                    ? "bg-[#080d1a] border-[#151b2d] text-slate-300"
+                    ? "bg-slate-900 border-slate-700 text-slate-300"
                     : "bg-pink-50 border-pink-200 text-rose-700"
                 }`}
               >
@@ -289,7 +289,7 @@ export function HomeDashboard({
             <div>
               <h2
                 className={`text-base font-bold transition-colors ${
-                  isDark ? "text-slate-100 group-hover:text-rose-300" : "text-slate-900 group-hover:text-rose-600"
+                  isDark ? "text-white group-hover:text-rose-300" : "text-slate-900 group-hover:text-rose-600"
                 }`}
               >
                 New Media Analysis
@@ -307,19 +307,19 @@ export function HomeDashboard({
             <div
               className={`p-2.5 rounded-lg border text-[11px] font-mono flex items-center justify-between ${
                 isDark
-                  ? "bg-[#080d1a] border-[#151b2d] text-slate-300"
+                  ? "bg-[#090E1B] border-slate-800 text-slate-300"
                   : "bg-pink-50/70 border-pink-100 text-slate-700"
               }`}
             >
               <span>Pipeline: 10 Stages</span>
-              <span className="font-semibold text-rose-400">18 Multimodal Cues</span>
+              <span className="font-semibold text-rose-500">18 Multimodal Cues</span>
             </div>
           </div>
 
           <div
             className={`pt-4 mt-4 border-t flex items-center justify-between text-xs font-semibold transition-colors ${
               isDark
-                ? "border-[#151b2d] text-rose-400 group-hover:text-rose-300"
+                ? "border-slate-800 text-rose-400 group-hover:text-rose-300"
                 : "border-pink-100 text-rose-600 group-hover:text-rose-700"
             }`}
           >
@@ -333,7 +333,7 @@ export function HomeDashboard({
           onClick={() => onNavigateTab("live_mode")}
           className={`group rounded-2xl p-6 border transition-all duration-200 cursor-pointer flex flex-col justify-between relative overflow-hidden ${
             isDark
-              ? "bg-[#0c1324] border-[#151b2d] hover:border-rose-500/50 hover:bg-[#10182c] shadow-lg shadow-black/50 hover:shadow-[0_0_24px_rgba(244,63,94,0.22)]"
+              ? "bg-[#0D1424] border-[#1F293D] hover:border-rose-500/50 hover:bg-[#121A2E] shadow-lg shadow-black/40 hover:shadow-rose-950/20"
               : "bg-white border-pink-200/80 hover:border-rose-400 hover:bg-[#FFF9FB] shadow-md shadow-pink-500/5 hover:shadow-lg hover:shadow-pink-500/10"
           }`}
         >
@@ -343,14 +343,14 @@ export function HomeDashboard({
               <span
                 className={`p-3 rounded-xl border flex items-center justify-center transition-all ${
                   isDark
-                    ? "bg-rose-500/20 border-rose-500/40 text-rose-300 group-hover:bg-rose-500/30 group-hover:scale-105 shadow-[0_0_12px_rgba(244,63,94,0.3)]"
+                    ? "bg-rose-500/15 border-rose-500/30 text-rose-300 group-hover:bg-rose-500/25 group-hover:scale-105"
                     : "bg-rose-50 border-rose-200 text-rose-600 group-hover:bg-rose-100 group-hover:scale-105"
                 }`}
               >
-                <Radio className="w-5 h-5 text-rose-400 animate-pulse" />
+                <Radio className="w-5 h-5 text-rose-500 animate-pulse" />
               </span>
-              <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/40 text-rose-300 font-bold flex items-center gap-1.5 shadow-[0_0_8px_rgba(244,63,94,0.2)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping shadow-[0_0_6px_rgba(244,63,94,0.7)]" />
+              <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-500 dark:text-rose-400 font-bold flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
                 <span>&lt;800MS BUDGET</span>
               </span>
             </div>
@@ -358,7 +358,7 @@ export function HomeDashboard({
             <div>
               <h2
                 className={`text-base font-bold transition-colors ${
-                  isDark ? "text-slate-100 group-hover:text-rose-300" : "text-slate-900 group-hover:text-rose-600"
+                  isDark ? "text-white group-hover:text-rose-300" : "text-slate-900 group-hover:text-rose-600"
                 }`}
               >
                 Launch Live Conversation Mode
@@ -376,19 +376,19 @@ export function HomeDashboard({
             <div
               className={`p-2.5 rounded-lg border text-[11px] font-mono flex items-center justify-between ${
                 isDark
-                  ? "bg-[#080d1a] border-[#151b2d] text-slate-300"
+                  ? "bg-[#090E1B] border-slate-800 text-slate-300"
                   : "bg-pink-50/70 border-pink-100 text-slate-700"
               }`}
             >
               <span>Latency: ~410ms</span>
-              <span className="font-semibold text-emerald-400">Zero &quot;LIAR&quot; Labels</span>
+              <span className="font-semibold text-emerald-500">Zero &quot;LIAR&quot; Labels</span>
             </div>
           </div>
 
           <div
             className={`pt-4 mt-4 border-t flex items-center justify-between text-xs font-semibold transition-colors ${
               isDark
-                ? "border-[#151b2d] text-rose-400 group-hover:text-rose-300"
+                ? "border-slate-800 text-rose-400 group-hover:text-rose-300"
                 : "border-pink-100 text-rose-600 group-hover:text-rose-700"
             }`}
           >
@@ -402,7 +402,7 @@ export function HomeDashboard({
           onClick={() => onNavigateTab("smart_glasses")}
           className={`group rounded-2xl p-6 border transition-all duration-200 cursor-pointer flex flex-col justify-between ${
             isDark
-              ? "bg-[#0c1324] border-[#151b2d] hover:border-cyan-500/50 hover:bg-[#10182c] shadow-lg shadow-black/50 hover:shadow-[0_0_24px_rgba(6,182,212,0.18)]"
+              ? "bg-[#0D1424] border-[#1F293D] hover:border-cyan-500/50 hover:bg-[#121A2E] shadow-lg shadow-black/40 hover:shadow-cyan-950/20"
               : "bg-white border-pink-200/80 hover:border-cyan-400 hover:bg-[#FFF9FB] shadow-md shadow-pink-500/5 hover:shadow-lg hover:shadow-cyan-500/10"
           }`}
         >
@@ -411,16 +411,16 @@ export function HomeDashboard({
               <span
                 className={`p-3 rounded-xl border flex items-center justify-center transition-all ${
                   isDark
-                    ? "bg-cyan-500/15 border-cyan-500/35 text-cyan-300 group-hover:bg-cyan-500/25 group-hover:scale-105 shadow-[0_0_10px_rgba(6,182,212,0.2)]"
+                    ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 group-hover:bg-cyan-500/20 group-hover:scale-105"
                     : "bg-cyan-50 border-cyan-200 text-cyan-600 group-hover:bg-cyan-100 group-hover:scale-105"
                 }`}
               >
-                <Glasses className="w-5 h-5 text-cyan-400" />
+                <Glasses className="w-5 h-5" />
               </span>
               <span
                 className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full border font-bold ${
                   isDark
-                    ? "bg-[#080d1a] border-[#151b2d] text-cyan-300"
+                    ? "bg-slate-900 border-slate-700 text-slate-300"
                     : "bg-pink-50 border-pink-200 text-slate-700"
                 }`}
               >
@@ -431,7 +431,7 @@ export function HomeDashboard({
             <div>
               <h2
                 className={`text-base font-bold transition-colors ${
-                  isDark ? "text-slate-100 group-hover:text-cyan-300" : "text-slate-900 group-hover:text-cyan-600"
+                  isDark ? "text-white group-hover:text-cyan-300" : "text-slate-900 group-hover:text-cyan-600"
                 }`}
               >
                 Connect Smart Glasses HUD
@@ -449,19 +449,19 @@ export function HomeDashboard({
             <div
               className={`p-2.5 rounded-lg border text-[11px] font-mono flex items-center justify-between ${
                 isDark
-                  ? "bg-[#080d1a] border-[#151b2d] text-slate-300"
+                  ? "bg-[#090E1B] border-slate-800 text-slate-300"
                   : "bg-pink-50/70 border-pink-100 text-slate-700"
               }`}
             >
               <span>Scoring: Per-Answer</span>
-              <span className="font-semibold text-cyan-400">HUD Visor Ready</span>
+              <span className="font-semibold text-cyan-500">HUD Visor Ready</span>
             </div>
           </div>
 
           <div
             className={`pt-4 mt-4 border-t flex items-center justify-between text-xs font-semibold transition-colors ${
               isDark
-                ? "border-[#151b2d] text-cyan-400 group-hover:text-cyan-300"
+                ? "border-slate-800 text-cyan-400 group-hover:text-cyan-300"
                 : "border-pink-100 text-cyan-600 group-hover:text-cyan-700"
             }`}
           >
@@ -479,30 +479,30 @@ export function HomeDashboard({
         <div
           className={`rounded-xl p-4 border transition-all ${
             isDark
-              ? "bg-[#0c1324] border-[#151b2d] shadow-sm"
+              ? "bg-[#0C1222] border-[#1E2638] shadow-sm"
               : "bg-white border-pink-200/70 shadow-xs"
           }`}
         >
           <div className="flex items-center justify-between text-[11px] font-mono uppercase mb-2">
             <span className="text-slate-500 dark:text-slate-400 font-semibold flex items-center gap-1.5">
-              <Cpu className="w-3.5 h-3.5 text-rose-400" />
+              <Cpu className="w-3.5 h-3.5 text-rose-500" />
               <span>Local Ollama Runtime</span>
             </span>
-            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/30">
               AIR-GAPPED
             </span>
           </div>
 
           <div className="flex items-baseline gap-2 mb-1">
-            <span className="text-lg font-bold font-mono text-slate-900 dark:text-slate-100">
+            <span className="text-lg font-bold font-mono text-slate-900 dark:text-white">
               Llama-3-70B-Q4
             </span>
-            <span className="text-xs font-mono text-emerald-400 font-semibold">42.4 tok/s</span>
+            <span className="text-xs font-mono text-emerald-500 font-semibold">42.4 tok/s</span>
           </div>
 
-          <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-[#151b2d]">
+          <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80">
             <span>GPU Temp: 54°C</span>
-            <span className="text-emerald-400">0ms Cloud Egress</span>
+            <span>0ms Cloud Egress</span>
           </div>
         </div>
 
@@ -510,22 +510,22 @@ export function HomeDashboard({
         <div
           className={`rounded-xl p-4 border transition-all ${
             isDark
-              ? "bg-[#0c1324] border-[#151b2d] shadow-sm"
+              ? "bg-[#0C1222] border-[#1E2638] shadow-sm"
               : "bg-white border-pink-200/70 shadow-xs"
           }`}
         >
           <div className="flex items-center justify-between text-[11px] font-mono uppercase mb-2">
             <span className="text-slate-500 dark:text-slate-400 font-semibold flex items-center gap-1.5">
-              <BarChart2 className="w-3.5 h-3.5 text-amber-400" />
+              <BarChart2 className="w-3.5 h-3.5 text-amber-500" />
               <span>Calibration Baseline</span>
             </span>
-            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/30">
               ISOTONIC
             </span>
           </div>
 
           <div className="flex items-baseline gap-2 mb-1">
-            <span className="text-lg font-bold font-mono text-slate-900 dark:text-slate-100">
+            <span className="text-lg font-bold font-mono text-slate-900 dark:text-white">
               Brier: 0.114
             </span>
             <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
@@ -533,7 +533,7 @@ export function HomeDashboard({
             </span>
           </div>
 
-          <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-[#151b2d]">
+          <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80">
             <span>Mobile FPR: 8.9%</span>
             <span>Calibrated Dec 2026</span>
           </div>
@@ -543,28 +543,28 @@ export function HomeDashboard({
         <div
           className={`rounded-xl p-4 border transition-all ${
             isDark
-              ? "bg-[#0c1324] border-[#151b2d] shadow-sm"
+              ? "bg-[#0C1222] border-[#1E2638] shadow-sm"
               : "bg-white border-pink-200/70 shadow-xs"
           }`}
         >
           <div className="flex items-center justify-between text-[11px] font-mono uppercase mb-2">
             <span className="text-slate-500 dark:text-slate-400 font-semibold flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-purple-400" />
+              <ShieldCheck className="w-3.5 h-3.5 text-purple-500" />
               <span>Workspace Governance</span>
             </span>
-            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-500/15 text-purple-400 border border-purple-500/30">
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-500/10 text-purple-500 border border-purple-500/30">
               SOC-2 TYPE II
             </span>
           </div>
 
           <div className="flex items-baseline gap-2 mb-1">
-            <span className="text-lg font-bold font-mono text-slate-900 dark:text-slate-100">
+            <span className="text-lg font-bold font-mono text-slate-900 dark:text-white">
               3 SIU Units
             </span>
-            <span className="text-xs font-mono text-purple-400 font-semibold">Audited</span>
+            <span className="text-xs font-mono text-purple-500 font-semibold">Audited</span>
           </div>
 
-          <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-[#151b2d]">
+          <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80">
             <span>Human Gate: Enforced</span>
             <span>ISO-27001 Compliant</span>
           </div>
@@ -577,16 +577,16 @@ export function HomeDashboard({
       <div
         className={`rounded-2xl p-6 border transition-all space-y-4 ${
           isDark
-            ? "bg-[#0c1324] border-[#151b2d] shadow-xl shadow-black/40"
+            ? "bg-[#0B101E] border-[#1E2638] shadow-xl"
             : "bg-white border-pink-200/80 shadow-sm"
         }`}
       >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-[#151b2d]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
           <div>
             <div className="flex items-center gap-2">
               <h2
                 className={`text-base font-bold tracking-tight ${
-                  isDark ? "text-slate-100" : "text-slate-900"
+                  isDark ? "text-white" : "text-slate-900"
                 }`}
               >
                 Recent Forensic Analysis Sessions
@@ -594,7 +594,7 @@ export function HomeDashboard({
               <span
                 className={`text-xs font-mono font-semibold px-2 py-0.5 rounded-full ${
                   isDark
-                    ? "bg-[#080d1a] text-rose-300 border border-[#151b2d]"
+                    ? "bg-slate-800 text-rose-300 border border-slate-700"
                     : "bg-pink-100 text-rose-700 border border-pink-200"
                 }`}
               >
@@ -613,7 +613,7 @@ export function HomeDashboard({
           {/* Interactive Category Filter Tabs */}
           <div
             className={`flex items-center gap-1 p-1 rounded-lg border text-xs font-medium self-start sm:self-auto ${
-              isDark ? "bg-[#080d1a] border-[#151b2d]" : "bg-pink-50/60 border-pink-200/70"
+              isDark ? "bg-[#070B14] border-slate-800" : "bg-pink-50/60 border-pink-200/70"
             }`}
           >
             <button
@@ -621,9 +621,9 @@ export function HomeDashboard({
               className={`px-3 py-1 rounded-md transition-colors cursor-pointer ${
                 selectedFilter === "all"
                   ? isDark
-                    ? "bg-rose-500/20 text-rose-300 font-semibold border border-rose-500/30"
+                    ? "bg-rose-500/20 text-rose-300 font-semibold"
                     : "bg-white text-rose-700 font-bold shadow-2xs border border-pink-200/80"
-                  : "text-slate-400 hover:text-slate-200"
+                  : "text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
               }`}
             >
               All
@@ -633,9 +633,9 @@ export function HomeDashboard({
               className={`px-3 py-1 rounded-md transition-colors cursor-pointer ${
                 selectedFilter === "elevated"
                   ? isDark
-                    ? "bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30"
+                    ? "bg-amber-500/20 text-amber-300 font-semibold"
                     : "bg-white text-amber-700 font-bold shadow-2xs border border-pink-200/80"
-                  : "text-slate-400 hover:text-slate-200"
+                  : "text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
               }`}
             >
               Elevated Risk
@@ -645,9 +645,9 @@ export function HomeDashboard({
               className={`px-3 py-1 rounded-md transition-colors cursor-pointer ${
                 selectedFilter === "low"
                   ? isDark
-                    ? "bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30"
+                    ? "bg-emerald-500/20 text-emerald-300 font-semibold"
                     : "bg-white text-emerald-700 font-bold shadow-2xs border border-pink-200/80"
-                  : "text-slate-400 hover:text-slate-200"
+                  : "text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
               }`}
             >
               Low Risk
@@ -657,9 +657,9 @@ export function HomeDashboard({
               className={`px-3 py-1 rounded-md transition-colors cursor-pointer ${
                 selectedFilter === "pending"
                   ? isDark
-                    ? "bg-purple-500/20 text-purple-300 font-semibold border border-purple-500/30"
+                    ? "bg-purple-500/20 text-purple-300 font-semibold"
                     : "bg-white text-purple-700 font-bold shadow-2xs border border-pink-200/80"
-                  : "text-slate-400 hover:text-slate-200"
+                  : "text-slate-500 hover:text-slate-900 dark:hover:text-slate-200"
               }`}
             >
               Needs Review
@@ -680,7 +680,7 @@ export function HomeDashboard({
                 onClick={() => onSelectSession(session.id)}
                 className={`rounded-xl p-4 sm:p-5 border transition-all duration-200 cursor-pointer flex flex-col lg:flex-row lg:items-center justify-between gap-5 group ${
                   isDark
-                    ? "bg-[#080d1a] border-[#151b2d] hover:border-rose-500/40 hover:bg-[#0c1324] shadow-xs"
+                    ? "bg-[#0D1424] border-[#1F293D] hover:border-rose-500/40 hover:bg-[#11192C]"
                     : "bg-[#FFFDFE] border-pink-200/70 hover:border-pink-300 hover:bg-[#FFF8FA] shadow-xs hover:shadow-md"
                 }`}
               >
@@ -831,16 +831,16 @@ export function HomeDashboard({
       <div
         className={`rounded-2xl p-6 border transition-all space-y-4 ${
           isDark
-            ? "bg-[#0c1324] border-[#151b2d] shadow-xl shadow-black/40"
+            ? "bg-[#0B101E] border-[#1E2638] shadow-xl"
             : "bg-white border-pink-200/80 shadow-sm"
         }`}
       >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-[#151b2d]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2.5">
             <div
               className={`p-2 rounded-lg border ${
                 isDark
-                  ? "bg-rose-500/15 border-rose-500/30 text-rose-300 shadow-[0_0_8px_rgba(244,63,94,0.15)]"
+                  ? "bg-rose-500/10 border-rose-500/30 text-rose-400"
                   : "bg-pink-100 border-pink-200 text-rose-600"
               }`}
             >
@@ -849,7 +849,7 @@ export function HomeDashboard({
             <div>
               <h2
                 className={`text-base font-bold tracking-tight ${
-                  isDark ? "text-slate-100" : "text-slate-900"
+                  isDark ? "text-white" : "text-slate-900"
                 }`}
               >
                 Append-Only Cryptographic Audit Manifest
@@ -865,7 +865,7 @@ export function HomeDashboard({
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono text-emerald-400 font-semibold flex items-center gap-1">
+            <span className="text-[11px] font-mono text-emerald-500 font-semibold flex items-center gap-1">
               <Check className="w-3.5 h-3.5" />
               <span>Merkle Tree Verified</span>
             </span>
@@ -879,7 +879,7 @@ export function HomeDashboard({
               <tr
                 className={`border-b text-[10px] uppercase tracking-wider ${
                   isDark
-                    ? "border-[#151b2d] text-slate-400 bg-[#080d1a]"
+                    ? "border-slate-800 text-slate-400 bg-[#070B14]"
                     : "border-pink-100 text-slate-500 bg-pink-50/50"
                 }`}
               >
@@ -892,17 +892,17 @@ export function HomeDashboard({
                 <th className="py-2.5 px-3 text-right">Verification</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-[#151b2d]">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
               {AUDIT_BLOCKS.map((block) => (
                 <tr
                   key={block.index}
                   className={`transition-colors ${
-                    isDark ? "hover:bg-[#10182c]/60" : "hover:bg-pink-50/40"
+                    isDark ? "hover:bg-slate-900/40" : "hover:bg-pink-50/40"
                   }`}
                 >
-                  <td className="py-3 px-3 font-bold text-rose-400">#{block.index}</td>
+                  <td className="py-3 px-3 font-bold text-rose-500">#{block.index}</td>
                   <td className="py-3 px-3 text-slate-500 dark:text-slate-400">{block.timestamp}</td>
-                  <td className="py-3 px-3 font-semibold text-slate-900 dark:text-slate-100">
+                  <td className="py-3 px-3 font-semibold text-slate-900 dark:text-white">
                     {block.event}
                   </td>
                   <td className="py-3 px-3 text-slate-600 dark:text-slate-300">{block.subject}</td>
@@ -910,7 +910,7 @@ export function HomeDashboard({
                     <span
                       className={`px-1.5 py-0.5 rounded text-[10px] border ${
                         isDark
-                          ? "bg-[#080d1a] border-[#151b2d] text-slate-300"
+                          ? "bg-slate-800 border-slate-700 text-slate-300"
                           : "bg-white border-pink-200 text-slate-700"
                       }`}
                     >
@@ -938,7 +938,7 @@ export function HomeDashboard({
       <div
         className={`rounded-2xl p-5 border transition-all flex flex-col md:flex-row items-center justify-between gap-4 ${
           isDark
-            ? "bg-[#0c1324] border-[#151b2d] text-slate-300 shadow-lg shadow-black/30"
+            ? "bg-[#0B101E] border-[#1E2638] text-slate-300"
             : "bg-gradient-to-r from-pink-50 via-white to-pink-50 border-pink-200 text-slate-700 shadow-xs"
         }`}
       >
