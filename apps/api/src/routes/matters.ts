@@ -7,6 +7,7 @@ import {
   deadlinesTable,
 } from "@workspace/db";
 import { AuthenticatedRequest, verifySession } from "../middleware/verifySession";
+import { requirePermission } from "../middleware/authContext";
 import { resolveAppUserId, isUuid } from "../lib/resolveAppUser";
 import { logAudit } from "../lib/auditLog";
 import type { AuthedRequest } from "../middleware/authContext";
@@ -123,7 +124,7 @@ mattersRouter.get("/matters", async (req: AuthenticatedRequest, res: Response) =
 // ---------------------------------------------------------------------------
 // CREATE
 // ---------------------------------------------------------------------------
-mattersRouter.post("/matters", async (req: AuthenticatedRequest, res: Response) => {
+mattersRouter.post("/matters", requirePermission({ resource: "case", action: "write" }), async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user?.id) {
       return res.status(401).json({ success: false, error: "Unauthorized" });
@@ -219,7 +220,7 @@ mattersRouter.get("/matters/:matterId", async (req: AuthenticatedRequest, res: R
 // ---------------------------------------------------------------------------
 // PATCH
 // ---------------------------------------------------------------------------
-mattersRouter.patch("/matters/:matterId", async (req: AuthenticatedRequest, res: Response) => {
+mattersRouter.patch("/matters/:matterId", requirePermission({ resource: "case", action: "write" }), async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user?.id) {
       return res.status(401).json({ success: false, error: "Unauthorized" });

@@ -10,6 +10,7 @@ import {
   auditLogsTable,
 } from "@workspace/db";
 import { verifySession, type AuthenticatedRequest } from "../middleware/verifySession";
+import { requirePermission } from "../middleware/authContext";
 import { resolveAppUserId } from "../lib/resolveAppUser";
 import {
   assertAllowedMime,
@@ -95,6 +96,7 @@ async function writeAudit(params: {
 // Real Supabase signed upload URL (ownership required)
 documentsRouter.post(
   "/documents/signed-upload-url",
+  requirePermission({ resource: "document", action: "write" }),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       if (!req.user?.id) return res.status(401).json({ error: "Unauthorized" });
@@ -157,6 +159,7 @@ documentsRouter.post(
 
 documentsRouter.post(
   "/documents/upload",
+  requirePermission({ resource: "document", action: "write" }),
   uploadLimiter,
   upload.single("document") as any,
   async (req, res) => {

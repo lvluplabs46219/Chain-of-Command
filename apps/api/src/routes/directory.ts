@@ -1,3 +1,4 @@
+import { requirePermission } from "../middleware/authContext";
 import { Router, type IRouter, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
 
@@ -236,7 +237,7 @@ const referralLimiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
-router.post("/directory/referrals", referralLimiter, (req: Request, res: Response) => {
+router.post("/directory/referrals", referralLimiter, requirePermission({ resource: "case", action: "write" }), (req: Request, res: Response) => {
   const { lawyerId, referralContext } = req.body;
   
   if (!lawyerId || !referralContext) {

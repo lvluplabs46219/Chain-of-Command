@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import crypto from 'crypto';
 import { AuthenticatedRequest } from '../middleware/verifySession';
+import { requirePermission } from '../middleware/authContext';
 
 const filingRouter = Router();
 
@@ -36,7 +37,7 @@ function invalidateNonce(nonce: string): void {
   activeNonces.delete(nonce);
 }
 
-filingRouter.post('/filing/verify-gate', async (req: AuthenticatedRequest, res: Response) => {
+filingRouter.post('/filing/verify-gate', requirePermission({ resource: 'external_action', action: 'approve' }), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const body: VerifyGateRequest = req.body;
     const { documentId, userId, consentTimestamp, receivedSignature, matterId } = body;
@@ -128,7 +129,7 @@ filingRouter.post('/filing/verify-gate', async (req: AuthenticatedRequest, res: 
 });
 
 // Also alias /filings/verify-gate for full REST flexibility
-filingRouter.post('/filings/verify-gate', async (req: Request, res: Response) => {
+filingRouter.post('/filings/verify-gate', requirePermission({ resource: 'external_action', action: 'approve' }), async (req: Request, res: Response) => {
   return res.redirect(307, '/api/filing/verify-gate');
 });
 

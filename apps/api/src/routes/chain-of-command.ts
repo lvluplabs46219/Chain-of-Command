@@ -7,6 +7,7 @@
  */
 
 import { Router } from 'express';
+import { requirePermission } from '../middleware/authContext';
 import { z } from 'zod';
 import { SupabaseChainOfCommand, createCaseChain, createResourceChain } from '../lib/chain-of-command-server';
 import {
@@ -151,7 +152,7 @@ router.get('/events/:id', async (req, res) => {
  * 
  * This is a server-only endpoint. The browser cannot authoritatively generate the chain.
  */
-router.post('/events', async (req, res) => {
+router.post('/events', requirePermission({ resource: 'case', action: 'write' }), async (req, res) => {
   try {
     // Parse request body
     const body = CreateChainEventSchema.parse(req.body);
@@ -195,7 +196,7 @@ router.post('/events', async (req, res) => {
  * POST /api/chain-of-command/events/genesis
  * Create a genesis (first) event in a new chain
  */
-router.post('/events/genesis', async (req, res) => {
+router.post('/events/genesis', requirePermission({ resource: 'admin', action: 'configure' }), async (req, res) => {
   try {
     const body = CreateGenesisEventSchema.parse(req.body);
     
@@ -235,7 +236,7 @@ router.post('/events/genesis', async (req, res) => {
  * POST /api/chain-of-command/batch
  * Create multiple chain events in a batch
  */
-router.post('/batch', async (req, res) => {
+router.post('/batch', requirePermission({ resource: 'case', action: 'write' }), async (req, res) => {
   try {
     const { events } = z.object({
       events: z.array(CreateChainEventSchema),
@@ -368,7 +369,7 @@ router.get('/chains/:chainId/metadata', async (req, res) => {
  * POST /api/chain-of-command/verify
  * Verify a chain for integrity
  */
-router.post('/verify', async (req, res) => {
+router.post('/verify', requirePermission({ resource: 'case', action: 'read' }), async (req, res) => {
   try {
     const body = VerifyChainSchema.parse(req.body);
     const requestedBy = (req as any).user?.id || 'anonymous';

@@ -1,3 +1,4 @@
+import { requirePermission } from "../middleware/authContext";
 import { Router, Request, Response } from "express";
 import { handleUserSignup } from "../workflows/userSignup";
 import { michaelOrchestrator, TaskNode } from "../ai/MichaelOrchestrator";
@@ -44,7 +45,7 @@ workflowRouter.get("/workflow/status", (req: Request, res: Response) => {
 /**
  * Trigger User Onboarding Durable Workflow
  */
-workflowRouter.post("/workflow/signup", async (req: Request, res: Response) => {
+workflowRouter.post("/workflow/signup", requirePermission({ resource: "case", action: "write" }), async (req: Request, res: Response) => {
   if (!requireUser(req, res)) return;
   const { email } = req.body;
   if (!email || typeof email !== "string" || !email.includes("@")) {
@@ -69,7 +70,7 @@ workflowRouter.post("/workflow/signup", async (req: Request, res: Response) => {
 /**
  * Dispatch Multi-Agent Legal Workflow DAG
  */
-workflowRouter.post("/workflow/dag/dispatch", async (req: Request, res: Response) => {
+workflowRouter.post("/workflow/dag/dispatch", requirePermission({ resource: "agent", action: "write" }), async (req: Request, res: Response) => {
   if (!requireUser(req, res)) return;
   const { matterId, objective, selectedAgents } = req.body;
   const executionId = "exec_" + crypto.randomBytes(8).toString("hex");

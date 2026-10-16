@@ -4,7 +4,8 @@ import { acquitAgentRuntime, LEGAL_DISCLAIMER, type AgentEvent, type AgentPolicy
 import type { ModelProvider } from "../ai/model-gateway";
 import { Redis } from "@upstash/redis";
 import crypto from "crypto";
-import { AuthenticatedRequest } from "../middleware/verifySession";
+import { AuthenticatedRequest } from "../middleware/verifySession"
+import { requirePermission } from "../middleware/authContext";
 import { michaelOrchestrator, type TaskNode } from "../ai/MichaelOrchestrator";
 import type { DispatchTask } from "../ai/SeraphimInterceptor";
 
@@ -352,7 +353,7 @@ router.get("/ai/agents", (_req: Request, res: Response) => {
   return res.json({ agents: list });
 });
 
-router.post("/ai/agents/:agentId/runs", (req: AuthenticatedRequest, res: Response) => {
+router.post("/ai/agents/:agentId/runs", requirePermission({ resource: "agent", action: "write" }), (req: AuthenticatedRequest, res: Response) => {
   const user = req.user;
 
   if (!user || !user.id) {
@@ -483,7 +484,7 @@ const OrchestrateRequest = z.object({
   matterId: z.string().optional(),
 });
 
-router.post("/ai/orchestrate", async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.post("/ai/orchestrate", requirePermission({ resource: "agent", action: "write" }), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const user = req.user;
   if (!user?.id) {
     res.status(401).json({ message: "Unauthorized" });

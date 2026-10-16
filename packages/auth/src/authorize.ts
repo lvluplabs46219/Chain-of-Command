@@ -20,16 +20,19 @@ const CASE_ROLE_RANK: Record<CaseRole, number> = {
  * Deny by default.
  */
 export function authorize(ctx: AuthContext, check: PermissionCheck): void {
-  // External actions always require fresh MFA
+  // External actions always require fresh MFA, then tenant member+
   if (check.resource === 'external_action') {
     if (!ctx.mfaVerifiedAt) {
       throw new AppError('APPROVAL_REQUIRED', 'Fresh MFA required for external legal actions');
     }
     const ageMs = Date.now() - new Date(ctx.mfaVerifiedAt).getTime();
     if (ageMs > 5 * 60 * 1000) {
-      // 5 minute freshness window
       throw new AppError('APPROVAL_REQUIRED', 'MFA re-verification required (expired)');
     }
+    if (TENANT_ROLE_RANK[ctx.tenantRole] < TENANT_ROLE_RANK.member) {
+      throw new AppError('FORBIDDEN', 'Member role required for external actions');
+    }
+    return;
   }
 
   if (check.resource === 'admin') {
