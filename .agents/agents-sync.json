@@ -26,6 +26,12 @@
             "path": ".agents/skills/workflow-init/SKILL.md",
             "source": "vercel/workflow",
             "enabled": true
+          },
+          {
+            "name": "todo-tracker",
+            "path": ".agents/skills/todo-tracker/SKILL.md",
+            "source": "local",
+            "enabled": true
           }
         ],
         "mcp_servers": [
@@ -48,7 +54,15 @@
             "/home/andrew/.vibe/*",
             "/home/andrew/Development/Tools/AI/Engines/computer-use-agent/cua2-core/*"
           ],
-          "commands": ["git", "ls", "find", "grep", "cat", "echo", "python3"]
+          "commands": [
+            "git",
+            "ls",
+            "find",
+            "grep",
+            "cat",
+            "echo",
+            "python3"
+          ]
         }
       }
     },
@@ -68,7 +82,17 @@
         "code_generation",
         "team_collaboration",
         "ai_assistance"
-      ]
+      ],
+      "skills": {
+        "project_skills": [
+          {
+            "name": "todo-tracker",
+            "path": ".agents/skills/todo-tracker/SKILL.md",
+            "source": "local",
+            "enabled": true
+          }
+        ]
+      }
     },
     "google": {
       "type": "google",
@@ -89,7 +113,17 @@
           "enabled": true
         }
       ],
-      "status": "active"
+      "status": "active",
+      "skills": {
+        "project_skills": [
+          {
+            "name": "todo-tracker",
+            "path": ".agents/skills/todo-tracker/SKILL.md",
+            "source": "local",
+            "enabled": true
+          }
+        ]
+      }
     },
     "supabase": {
       "type": "supabase",
@@ -100,7 +134,10 @@
         "api": {
           "enabled": true,
           "port": 54321,
-          "schemas": ["public", "graphql_public"]
+          "schemas": [
+            "public",
+            "graphql_public"
+          ]
         },
         "db": {
           "enabled": true,
@@ -120,6 +157,16 @@
         "auth": {
           "enabled": true
         }
+      },
+      "skills": {
+        "project_skills": [
+          {
+            "name": "todo-tracker",
+            "path": ".agents/skills/todo-tracker/SKILL.md",
+            "source": "local",
+            "enabled": true
+          }
+        ]
       }
     },
     "cua": {
@@ -147,7 +194,17 @@
         "python3",
         "pip install -r requirements.txt"
       ],
-      "run_command": "uv run uvicorn cua2_core.app:app --host 0.0.0.0 --port 8001 --reload"
+      "run_command": "uv run uvicorn cua2_core.app:app --host 0.0.0.0 --port 8001 --reload",
+      "skills": {
+        "project_skills": [
+          {
+            "name": "todo-tracker",
+            "path": ".agents/skills/todo-tracker/SKILL.md",
+            "source": "local",
+            "enabled": true
+          }
+        ]
+      }
     }
   },
   "sync_settings": {
@@ -167,12 +224,17 @@
       {
         "name": "supabase/agent-skills",
         "type": "github",
-        "skills": ["supabase", "supabase-postgres-best-practices"]
+        "skills": [
+          "supabase",
+          "supabase-postgres-best-practices"
+        ]
       },
       {
         "name": "vercel/workflow",
         "type": "github",
-        "skills": ["workflow-init"]
+        "skills": [
+          "workflow-init"
+        ]
       }
     ],
     "lock_file": "skills-lock.json"

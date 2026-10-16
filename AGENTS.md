@@ -1,3 +1,12 @@
+# CHAIN OF COMMAND — AGENT OPERATING INSTRUCTIONS
+
+> **MANDATORY WORK SOURCE**  
+> All work must be driven by `docs/Chain_of_Command_Todo_Tracker.csv`.  
+> Use the skill `.agents/skills/todo-tracker/SKILL.md`.  
+> Run `python3 scripts/next-todo.py "Phase 0"` to get the next task.  
+> Claim → Plan → Implement → Test → Update tracker status.  
+> Never invent work outside the tracker.
+
 # CHAIN OF COMMAND — GOOGLE AI STUDIO MASTER BUILD INSTRUCTIONS
 
 ## 1. ROLE
