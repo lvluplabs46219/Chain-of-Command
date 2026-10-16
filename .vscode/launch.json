@@ -1,0 +1,108 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Next.js: Debug Web App",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}/apps/web",
+      "console": "integratedTerminal",
+      "port": 9229,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Next.js: Attach to Web App",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "cwd": "${workspaceFolder}/apps/web",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Express: Debug API Server",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}/apps/api",
+      "console": "integratedTerminal",
+      "port": 9229,
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Express: Attach to API Server",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "cwd": "${workspaceFolder}/apps/api",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Debug Current File (Node)",
+      "type": "node",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Debug TypeScript File",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "args": ["-r", "ts-node/register", "${file}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Debug Jest Tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "test"],
+      "cwd": "${workspaceFolder}/apps/api",
+      "console": "integratedTerminal",
+      "port": 9229,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Debug: Full Stack (Web + API)",
+      "type": "node",
+      "request": "launch",
+      "compounds": [
+        {
+          "name": "Next.js: Debug Web App",
+          "type": "node",
+          "request": "launch",
+          "runtimeExecutable": "npm",
+          "runtimeArgs": ["run", "dev"],
+          "cwd": "${workspaceFolder}/apps/web",
+          "console": "integratedTerminal",
+          "port": 9230,
+          "skipFiles": ["<node_internals>/**"]
+        },
+        {
+          "name": "Express: Debug API Server",
+          "type": "node",
+          "request": "launch",
+          "runtimeExecutable": "npm",
+          "runtimeArgs": ["run", "dev"],
+          "cwd": "${workspaceFolder}/apps/api",
+          "console": "integratedTerminal",
+          "port": 9231,
+          "env": {
+            "NODE_ENV": "development"
+          },
+          "skipFiles": ["<node_internals>/**"]
+        }
+      ]
+    }
+  ]
+}

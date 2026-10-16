@@ -1,0 +1,121 @@
+{
+  "recommendations": [
+    // Essential
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    
+    // TypeScript & JavaScript
+    "vscode.typescript-next",
+    "dsznajder.es7-react-js-snippets",
+    
+    // Next.js
+    "nextjs.nextjs",
+    
+    // Tailwind CSS
+    "bradlc.vscode-tailwindcss",
+    
+    // PostCSS
+    "csstools.postcss",
+    
+    // Git
+    "eamodio.gitlens",
+    "donjayamanne.githistory",
+    
+    // Icons
+    "pkief.material-icon-theme",
+    
+    // Code Quality
+    "christian-kohler.npm-intellisense",
+    "christian-kohler.path-intellisense",
+    
+    // Database
+    "cweijan.vscode-postgresql-client2",
+    
+    // Docker
+    "ms-azuretools.vscode-docker",
+    
+    // Environment Variables
+    "mikestead.dotenv",
+    
+    // Markdown
+    "davidanson.vscode-markdownlint",
+    
+    // JSON
+    "quicktype.quicktype",
+    
+    // YAML
+    "redhat.vscode-yaml",
+    
+    // GraphQL
+    "prisma.vscode-graphql",
+    
+    // Testing
+    "jestrunner.jestrunner",
+    
+    // AI Tools
+    "anthropic.claude-code",
+    "continue.continue",
+    
+    // Debugging
+    "msjsdiag.debugger-for-chrome",
+    
+    // Code Navigation
+    "alefragnani.Bookmarks",
+    
+    // File Management
+    "stevencl.addDocComment",
+    
+    // Code Spell Check
+    "ewind.code-spell-checker",
+    
+    // TODO Highlight
+    "wayou.vscode-todo-highlight",
+    
+    // Bracket Pair Color
+    "coenraads.bracket-pair-colorizer-2",
+    
+    // Indent Rainbow
+    "oderwat.indent-rainbow",
+    
+    // Better Comments
+    "aaron-bond.better-comments",
+    
+    // Code Runner
+    "formulahendry.code-runner",
+    
+    // REST Client
+    "humao.rest-client",
+    
+    // Thunder Client (Alternative to Postman)
+    "rangav.vscode-thunder-client",
+    
+    // SQL Tools
+    "mtxr.sqltools",
+    "mtxr.sqltools-driver-pg",
+    
+    // Prettier
+    "esbenp.prettier-vscode",
+    
+    // EditorConfig
+    "editorconfig.editorconfig",
+    
+    // Import Cost
+    "wix.vscode-import-cost",
+    
+    // Turbopack
+    "vercel.vscode-turbo",
+    
+    // Prisma
+    "prisma.prisma",
+    
+    // Firebase
+    "jsynowiec.vscode-firebase",
+    
+    // Supabase
+    "supabase.supabase",
+    
+    // Workflow
+    "vercel.vscode-vercel"
+  ],
+  "unwantedRecommendations": []
+}
