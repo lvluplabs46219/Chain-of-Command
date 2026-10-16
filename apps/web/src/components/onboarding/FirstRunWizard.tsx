@@ -14,7 +14,6 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { bootstrapWorkspaceSession } from "@/app/actions/bootstrap-session";
 import type { Matter } from "@/lib/workspace-data";
 
 const JURISDICTIONS = [
@@ -63,7 +62,7 @@ function buildEmptyMatter(title: string, caseNumber: string, court: string, juri
 }
 
 export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
-  const { loginAsLitigant, loginWithToken } = useAuth();
+  const { loginWithGoogle, loginWithToken, isAuthenticated } = useAuth();
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -74,6 +73,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [acknowledgedBoundaries, setAcknowledgedBoundaries] = useState(false);
+
 
 
   const finish = async (opts: { withMatter: boolean }) => {
@@ -93,63 +93,38 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
     }
 
     setBusy(true);
-    const complete = async (token: string, userId?: string) => {
-      await loginWithToken(token, {
-        id: userId || `usr_${Date.now()}`,
-        name: name.trim(),
-        email: safeEmail,
-        jurisdiction,
-      });
+    try {
       const matter = opts.withMatter
         ? buildEmptyMatter(matterTitle, caseNumber, courtName, jurisdiction)
         : null;
-      onComplete({
+
+      // Persist onboarding choices through the OAuth redirect
+      const pending = {
         name: name.trim(),
         email: safeEmail,
         jurisdiction,
         matter,
-      });
-    };
-
-    try {
-      const result = await bootstrapWorkspaceSession({
-        displayName: name.trim(),
-      });
-
-      if (result?.ok === true) {
-        await complete(result.accessToken, result.userId);
-        return;
-      }
-
-      // Cloud bootstrap failed (Anonymous disabled, etc.) — still enter local workspace
-      console.warn(
-        "[FirstRunWizard] bootstrap:",
-        result && "error" in result ? result.error : result
-      );
-      const localToken =
-        typeof crypto !== "undefined" && crypto.randomUUID
-          ? `local-session-${crypto.randomUUID()}`
-          : `local-session-${Date.now()}`;
-      await complete(localToken);
-    } catch (err) {
-      console.warn("[FirstRunWizard] session error:", err);
+      };
       try {
-        const localToken =
-          typeof crypto !== "undefined" && crypto.randomUUID
-            ? `local-session-${crypto.randomUUID()}`
-            : `local-session-${Date.now()}`;
-        await complete(localToken);
+        sessionStorage.setItem("coc_pending_onboarding", JSON.stringify(pending));
       } catch {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Could not start your session. Please try again."
-        );
+        /* ignore */
       }
-    } finally {
+
+      // Google sign-in (Supabase OAuth) — not anonymous
+      await loginWithGoogle();
+      // Browser navigates to Google; on return AuthContext restores the session
+    } catch (err) {
+      console.warn("[FirstRunWizard] Google sign-in failed:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Google sign-in failed. Enable the Google provider in Supabase Auth → Providers."
+      );
       setBusy(false);
     }
   };
+
 
 
   return (
@@ -388,7 +363,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
                   className="w-full py-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <FolderPlus className="w-4 h-4" />
-                  Open my matter & enter workspace
+                  Continue with Google & open matter
                 </button>
                 <button
                   type="button"
@@ -397,7 +372,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
                   className="w-full py-2 text-xs text-neutral-500 hover:text-neutral-300 flex items-center justify-center gap-1.5"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  Skip for now — empty workspace
+                  Continue with Google — empty workspace
                 </button>
                 <button
                   type="button"

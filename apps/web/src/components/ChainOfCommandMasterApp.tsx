@@ -168,6 +168,36 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
     }
   };
 
+
+  // Complete first-run after Google OAuth return
+  useEffect(() => {
+    if (authLoading || !isAuthenticated || !isFirstRun) return;
+    try {
+      const raw = sessionStorage.getItem("coc_pending_onboarding");
+      if (!raw) {
+        // Signed in but no pending wizard payload — mark first-run done
+        completeFirstRun();
+        return;
+      }
+      const pending = JSON.parse(raw) as {
+        name: string;
+        email: string;
+        jurisdiction: string;
+        matter: Matter | null;
+      };
+      sessionStorage.removeItem("coc_pending_onboarding");
+      void handleOnboardingComplete({
+        name: pending.name,
+        email: pending.email,
+        jurisdiction: pending.jurisdiction,
+        matter: pending.matter,
+      });
+    } catch (e) {
+      console.warn("[onboarding] pending restore failed", e);
+      completeFirstRun();
+    }
+  }, [authLoading, isAuthenticated, isFirstRun]);
+
   if (authLoading || !dataReady) {
     return (
       <div className="min-h-screen bg-[#0C0D10] flex items-center justify-center text-neutral-400 text-sm">
