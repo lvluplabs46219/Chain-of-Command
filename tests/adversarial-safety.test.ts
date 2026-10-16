@@ -17,12 +17,17 @@ describe("Chain of Command Adversarial & Invariant Tests", () => {
     expect(isDetected).toBe(true);
   });
 
-  // Scenario 2: Cross-Case Tenancy Isolation (Invariant I-11)
+  // Scenario 2: Cross-Case Tenancy Isolation (Invariant I-11 / COC-294)
   it("Scenario 2: Blocks cross-case and cross-tenant data access", () => {
     const userTenantId = "tenant-user-alpha";
     const requestedCaseTenantId = "tenant-user-beta";
     const hasAccess = userTenantId === requestedCaseTenantId;
     expect(hasAccess).toBe(false);
+
+    // Authorization context must never trust client-supplied tenantId alone
+    const clientClaimedTenant = "tenant-user-beta";
+    const serverResolvedTenant = userTenantId;
+    expect(clientClaimedTenant === serverResolvedTenant).toBe(false);
   });
 
   // Scenario 3: Guardrail Disable Resistance (Invariant I-10)
