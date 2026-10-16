@@ -45,24 +45,24 @@ export async function verifySession(
 
   if (!authHeader?.startsWith("Bearer ")) {
     res.status(401).json({
-      error: "UNAUTHORIZED",
-      message: "Missing or malformed authorization header.",
+      error: { code: "UNAUTHENTICATED", message: "Missing or malformed authorization header." },
     });
     return;
   }
 
   const token = authHeader.split(" ")[1];
   if (!token) {
-    res.status(401).json({ error: "UNAUTHORIZED", message: "Empty bearer token." });
+    res.status(401).json({ error: { code: "UNAUTHENTICATED", message: "Empty bearer token." } });
     return;
   }
 
   if (isDemoStyleToken(token)) {
     if (!allowDemoAuth()) {
       res.status(401).json({
-        error: "UNAUTHORIZED",
-        message:
-          "Demo session tokens are disabled. Sign in with Supabase Auth (see ADR-001).",
+        error: {
+          code: "UNAUTHENTICATED",
+          message: "Demo session tokens are disabled. Sign in with Supabase Auth (see ADR-001).",
+        },
       });
       return;
     }
@@ -95,9 +95,10 @@ export async function verifySession(
 
     if (error || !user) {
       res.status(401).json({
-        error: "UNAUTHORIZED",
-        message:
-          "Invalid or expired session token. API accepts Supabase JWTs only (not Firebase ID tokens).",
+        error: {
+          code: "UNAUTHENTICATED",
+          message: "Invalid or expired session token. API accepts Supabase JWTs only (not Firebase ID tokens).",
+        },
       });
       return;
     }

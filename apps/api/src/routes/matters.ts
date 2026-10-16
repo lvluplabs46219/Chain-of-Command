@@ -8,6 +8,8 @@ import {
 } from "@workspace/db";
 import { AuthenticatedRequest, verifySession } from "../middleware/verifySession";
 import { resolveAppUserId, isUuid } from "../lib/resolveAppUser";
+import { logAudit } from "../lib/auditLog";
+import type { AuthedRequest } from "../middleware/authContext";
 
 export const mattersRouter = Router();
 mattersRouter.use(verifySession);
@@ -163,6 +165,24 @@ mattersRouter.post("/matters", async (req: AuthenticatedRequest, res: Response) 
     if (!inserted) {
       return res.status(500).json({ success: false, error: "Matter insert returned no row" });
     }
+
+    // COC-294: audit significant state change
+    const tenantId =
+      (req as AuthedRequest).auth?.tenantId ||
+      (req.headers["x-tenant-id"] as string) ||
+      "unknown";
+    await logAudit({
+      tenantId,
+      actorType: "user",
+      actorId: resolved.userId,
+      action: "case.create",
+      targetType: "matter",
+      targetId: inserted.id,
+      caseId: inserted.id,
+      result: "success",
+      traceId: (req as AuthedRequest).auth?.traceId,
+      metadata: { title: inserted.title },
+    }).catch((e) => console.error("[matters] audit write failed", e));
 
     return res.status(201).json({ success: true, matter: mapMatterRow(inserted) });
   } catch (err) {

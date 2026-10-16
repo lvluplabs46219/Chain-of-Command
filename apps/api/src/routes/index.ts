@@ -12,6 +12,7 @@ import { workflowRouter } from "./workflow";
 import auditRouter from "./audit";
 import chainOfCommandRouter from "./chain-of-command";
 import { verifySession } from "../middleware/verifySession";
+import { attachAuthContext } from "../middleware/authContext";
 
 const router: IRouter = Router();
 
@@ -21,6 +22,7 @@ router.use(webhooksRouter); // authenticated via HMAC secrets, not session
 
 // Everything below requires a verified session
 router.use(verifySession as any);
+router.use(attachAuthContext as any);
 
 // Workflow DAG / signup / execution lookup — previously public; must be authenticated
 router.use(workflowRouter);
