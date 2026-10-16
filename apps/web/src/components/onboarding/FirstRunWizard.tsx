@@ -75,6 +75,7 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
   const [busy, setBusy] = useState(false);
   const [acknowledgedBoundaries, setAcknowledgedBoundaries] = useState(false);
 
+
   const finish = async (opts: { withMatter: boolean }) => {
     setError(null);
     if (name.trim().length < 2) {
@@ -92,71 +93,64 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
     }
 
     setBusy(true);
-    try {
-      // Production path: Supabase anonymous session + service-role tenant bootstrap
-      const result = await bootstrapWorkspaceSession({
-        displayName: name.trim(),
-        redirectTo: undefined, // do not redirect; wizard completes client-side
+    const complete = async (token: string, userId?: string) => {
+      await loginWithToken(token, {
+        id: userId || `usr_${Date.now()}`,
+        name: name.trim(),
+        email: safeEmail,
+        jurisdiction,
       });
-
-      if (result && result.ok === false) {
-        console.warn("[FirstRunWizard] bootstrap failed:", result.error);
-        try {
-          await loginAsLitigant(name.trim(), safeEmail, jurisdiction);
-        } catch {
-          setError(
-            result.error ||
-              "Could not start your session. Enable Anonymous auth in Supabase and set SERVICE_ROLE_KEY."
-          );
-          return;
-        }
-      } else if (result && result.ok === true) {
-        // Mirror server session into client auth state
-        await loginWithToken(result.accessToken, {
-          id: result.userId,
-          name: name.trim(),
-          email: safeEmail,
-          jurisdiction,
-          activeMatterId: result.matterId,
-        });
-      }
-
-      const matter =
-        opts.withMatter
-          ? buildEmptyMatter(matterTitle, caseNumber, courtName, jurisdiction)
-          : null;
+      const matter = opts.withMatter
+        ? buildEmptyMatter(matterTitle, caseNumber, courtName, jurisdiction)
+        : null;
       onComplete({
         name: name.trim(),
         email: safeEmail,
         jurisdiction,
         matter,
       });
-    } catch (err) {
-      // NEXT_REDIRECT from server action is success — should not reach client often
-      const digest = err && typeof err === "object" && "digest" in err ? String((err as { digest?: string }).digest) : "";
-      if (digest.startsWith("NEXT_REDIRECT")) {
+    };
+
+    try {
+      const result = await bootstrapWorkspaceSession({
+        displayName: name.trim(),
+      });
+
+      if (result?.ok === true) {
+        await complete(result.accessToken, result.userId);
         return;
       }
+
+      // Cloud bootstrap failed (Anonymous disabled, etc.) — still enter local workspace
+      console.warn(
+        "[FirstRunWizard] bootstrap:",
+        result && "error" in result ? result.error : result
+      );
+      const localToken =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? `local-session-${crypto.randomUUID()}`
+          : `local-session-${Date.now()}`;
+      await complete(localToken);
+    } catch (err) {
       console.warn("[FirstRunWizard] session error:", err);
       try {
-        await loginAsLitigant(name.trim(), safeEmail, jurisdiction);
-        const matter =
-          opts.withMatter
-            ? buildEmptyMatter(matterTitle, caseNumber, courtName, jurisdiction)
-            : null;
-        onComplete({
-          name: name.trim(),
-          email: safeEmail,
-          jurisdiction,
-          matter,
-        });
+        const localToken =
+          typeof crypto !== "undefined" && crypto.randomUUID
+            ? `local-session-${crypto.randomUUID()}`
+            : `local-session-${Date.now()}`;
+        await complete(localToken);
       } catch {
-        setError("Could not start your session. Please try again.");
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Could not start your session. Please try again."
+        );
       }
     } finally {
       setBusy(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-[#0C0D10] text-[#E1E2E5] flex items-center justify-center p-4 sm:p-6">
