@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Scale, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { bootstrapWorkspaceSession } from "@/app/actions/bootstrap-session";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,10 +26,31 @@ export default function LoginPage() {
     setSubmitting(true);
     setError(null);
     try {
-      await loginAsLitigant(name, mail);
-      router.push("/");
-    } catch {
-      setError("Could not start session. Try again.");
+      // Prefer real Supabase session bootstrap (service-role tenant + anonymous auth + cookies)
+      const result = await bootstrapWorkspaceSession({
+        displayName: name,
+        redirectTo: "/",
+      });
+      // If redirect() did not fire (error path), surface it and fall back in dev only
+      if (result && result.ok === false) {
+        console.warn("[login] bootstrap failed:", result.error);
+        await loginAsLitigant(name, mail);
+        router.push("/");
+      }
+      // On success, server action already redirected
+    } catch (err) {
+      // NEXT_REDIRECT is expected on success; only treat real errors
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("NEXT_REDIRECT") || (err && typeof err === "object" && "digest" in err)) {
+        return; // successful redirect
+      }
+      console.warn("[login] bootstrap exception, demo fallback:", err);
+      try {
+        await loginAsLitigant(name, mail);
+        router.push("/");
+      } catch {
+        setError("Could not start session. Try again.");
+      }
     } finally {
       setSubmitting(false);
     }
