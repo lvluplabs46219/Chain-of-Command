@@ -14,22 +14,23 @@ const COOKIE_OPTS = {
 };
 
 export type BootstrapResult =
-  | { ok: true; tenantId: string; matterId: string; userId: string }
+  | { ok: true; tenantId: string; matterId: string; userId: string; accessToken: string }
   | { ok: false; error: string };
 
 /**
  * COC-294 bootstrap path:
- * 1. Service-role client inserts initial tenant (+ optional matter)
- * 2. Anon auth client runs signInAnonymously()
- * 3. Access + refresh tokens are written to httpOnly cookies
- * 4. Caller redirects to /
+ * 1. Anon auth client runs signInAnonymously()
+ * 2. Service-role client inserts initial tenant (+ optional matter) — best-effort
+ * 3. Access + refresh tokens written to httpOnly cookies
+ * 4. Optional redirect when redirectTo is provided
  */
 export async function bootstrapWorkspaceSession(opts?: {
   displayName?: string;
+  /** If set, redirect after cookies are written. Omit to return result to the client. */
   redirectTo?: string;
 }): Promise<BootstrapResult> {
   const displayName = opts?.displayName?.trim() || "Pro Se Litigant";
-  const redirectTo = opts?.redirectTo || "/";
+  const redirectTo = opts?.redirectTo; // undefined = no redirect
 
   try {
     // --- 1. Establish anonymous session first so we have a user id ---
@@ -46,67 +47,79 @@ export async function bootstrapWorkspaceSession(opts?: {
       });
 
     if (signError || !signData.session || !signData.user) {
+      const hint =
+        signError?.message?.includes("disabled") ||
+        signError?.message?.toLowerCase().includes("anonymous")
+          ? " Enable Anonymous sign-ins in Supabase Auth → Providers."
+          : "";
       return {
         ok: false,
-        error: signError?.message || "Anonymous sign-in failed",
+        error: (signError?.message || "Anonymous sign-in failed") + hint,
       };
     }
 
     const { session, user } = signData;
     const userId = user.id;
 
-    // --- 2. Service-role bootstrap: tenant + matter bound to this user ---
-    const admin = getSupabaseAdmin();
-
-    const slug = `tenant-${userId.slice(0, 8)}`;
-    const { data: tenant, error: tenantErr } = await admin
-      .from("tenants")
-      .upsert(
-        {
-          name: `${displayName}'s Workspace`,
-          slug,
-        },
-        { onConflict: "slug" }
-      )
-      .select("id")
-      .single();
-
-    if (tenantErr || !tenant) {
-      // tenants table may not exist yet in some envs — surface clearly
-      return {
-        ok: false,
-        error: tenantErr?.message || "Failed to create tenant (run Phase 0 migration)",
-      };
-    }
-
-    const tenantId = tenant.id as string;
-
-    // Best-effort: ensure a profile / users row and an initial matter.
-    // Tables may differ by migration state; ignore non-fatal errors.
-    await admin.from("users").upsert(
-      {
-        auth_id: userId,
-        email: user.email || `${userId}@anon.local`,
-        full_name: displayName,
-        tenant_id: tenantId,
-      },
-      { onConflict: "auth_id" }
-    ).then(() => undefined).catch(() => undefined);
-
+    // --- 2. Service-role bootstrap: tenant + matter (best-effort) ---
+    let tenantId = `local-${userId.slice(0, 8)}`;
     let matterId = "matter-empty";
-    const { data: matter } = await admin
-      .from("matters")
-      .insert({
-        title: "My Case",
-        status: "open",
-        tenant_id: tenantId,
-        user_id: userId, // may map differently depending on schema
-      })
-      .select("id")
-      .maybeSingle();
 
-    if (matter?.id) {
-      matterId = matter.id as string;
+    try {
+      const admin = getSupabaseAdmin();
+      const slug = `tenant-${userId.slice(0, 8)}`;
+      const { data: tenant, error: tenantErr } = await admin
+        .from("tenants")
+        .upsert(
+          {
+            name: `${displayName}'s Workspace`,
+            slug,
+          },
+          { onConflict: "slug" }
+        )
+        .select("id")
+        .single();
+
+      if (!tenantErr && tenant?.id) {
+        tenantId = tenant.id as string;
+
+        await admin
+          .from("users")
+          .upsert(
+            {
+              auth_id: userId,
+              email: user.email || `${userId}@anon.local`,
+              full_name: displayName,
+              tenant_id: tenantId,
+            },
+            { onConflict: "auth_id" }
+          )
+          .then(() => undefined)
+          .catch(() => undefined);
+
+        const { data: matter } = await admin
+          .from("matters")
+          .insert({
+            title: "My Case",
+            status: "open",
+            tenant_id: tenantId,
+            user_id: userId,
+          })
+          .select("id")
+          .maybeSingle();
+
+        if (matter?.id) {
+          matterId = matter.id as string;
+        }
+      } else if (tenantErr) {
+        console.warn(
+          "[bootstrap] tenant upsert skipped (run Phase 0 migration):",
+          tenantErr.message
+        );
+      }
+    } catch (adminErr) {
+      // Missing SERVICE_ROLE_KEY or network — session cookies still useful
+      console.warn("[bootstrap] admin path skipped:", adminErr);
     }
 
     // --- 3. Attach session tokens to response cookies ---
@@ -116,14 +129,22 @@ export async function bootstrapWorkspaceSession(opts?: {
       ...COOKIE_OPTS,
       maxAge: 60 * 60 * 24 * 30,
     });
-    // Also set the standard Supabase project cookie name pattern if needed by middleware
     cookieStore.set("coc-tenant-id", tenantId, COOKIE_OPTS);
     cookieStore.set("coc-matter-id", matterId, COOKIE_OPTS);
 
-    // --- 4. Redirect into workspace ---
-    redirect(redirectTo);
+    // --- 4. Optional redirect ---
+    if (redirectTo) {
+      redirect(redirectTo);
+    }
+
+    return {
+      ok: true,
+      tenantId,
+      matterId,
+      userId,
+      accessToken: session.access_token,
+    };
   } catch (err) {
-    // redirect() throws a special NEXT_REDIRECT error — rethrow it
     if (
       err &&
       typeof err === "object" &&

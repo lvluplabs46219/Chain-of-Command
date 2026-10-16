@@ -14,6 +14,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { bootstrapWorkspaceSession } from "@/app/actions/bootstrap-session";
 import type { Matter } from "@/lib/workspace-data";
 
 const JURISDICTIONS = [
@@ -62,7 +63,7 @@ function buildEmptyMatter(title: string, caseNumber: string, court: string, juri
 }
 
 export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
-  const { loginAsLitigant } = useAuth();
+  const { loginAsLitigant, loginWithToken } = useAuth();
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -92,7 +93,34 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
 
     setBusy(true);
     try {
-      await loginAsLitigant(name.trim(), safeEmail, jurisdiction);
+      // Production path: Supabase anonymous session + service-role tenant bootstrap
+      const result = await bootstrapWorkspaceSession({
+        displayName: name.trim(),
+        redirectTo: undefined, // do not redirect; wizard completes client-side
+      });
+
+      if (result && result.ok === false) {
+        console.warn("[FirstRunWizard] bootstrap failed:", result.error);
+        try {
+          await loginAsLitigant(name.trim(), safeEmail, jurisdiction);
+        } catch {
+          setError(
+            result.error ||
+              "Could not start your session. Enable Anonymous auth in Supabase and set SERVICE_ROLE_KEY."
+          );
+          return;
+        }
+      } else if (result && result.ok === true) {
+        // Mirror server session into client auth state
+        await loginWithToken(result.accessToken, {
+          id: result.userId,
+          name: name.trim(),
+          email: safeEmail,
+          jurisdiction,
+          activeMatterId: result.matterId,
+        });
+      }
+
       const matter =
         opts.withMatter
           ? buildEmptyMatter(matterTitle, caseNumber, courtName, jurisdiction)
@@ -102,9 +130,29 @@ export function FirstRunWizard({ onComplete }: FirstRunWizardProps) {
         email: safeEmail,
         jurisdiction,
         matter,
-              });
-    } catch {
-      setError("Could not start your session. Please try again.");
+      });
+    } catch (err) {
+      // NEXT_REDIRECT from server action is success — should not reach client often
+      const digest = err && typeof err === "object" && "digest" in err ? String((err as { digest?: string }).digest) : "";
+      if (digest.startsWith("NEXT_REDIRECT")) {
+        return;
+      }
+      console.warn("[FirstRunWizard] session error:", err);
+      try {
+        await loginAsLitigant(name.trim(), safeEmail, jurisdiction);
+        const matter =
+          opts.withMatter
+            ? buildEmptyMatter(matterTitle, caseNumber, courtName, jurisdiction)
+            : null;
+        onComplete({
+          name: name.trim(),
+          email: safeEmail,
+          jurisdiction,
+          matter,
+        });
+      } catch {
+        setError("Could not start your session. Please try again.");
+      }
     } finally {
       setBusy(false);
     }
