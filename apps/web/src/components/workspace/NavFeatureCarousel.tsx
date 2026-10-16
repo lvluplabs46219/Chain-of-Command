@@ -15,6 +15,12 @@ export type NavFeatureItem = {
 
 const DEFAULT_FEATURES: NavFeatureItem[] = [
   {
+    href: "/vericue",
+    title: "VeriCue AI",
+    subtitle: "Candy Forensic Telemetry Console",
+    badge: "CANDY",
+  },
+  {
     href: "/chambers",
     title: "Chambers",
     subtitle: "AI legal team conference room",
@@ -129,12 +135,12 @@ export function NavFeatureCarousel({
                 <span className="flex items-center gap-1.5">
                   <span className="text-[11px] font-semibold text-[#D4AF37] truncate">{item.title}</span>
                   {item.badge && (
-                    <span className="text-[9px] font-mono uppercase tracking-wider text-emerald-400/90 bg-emerald-950/40 border border-emerald-500/20 px-1 rounded">
+                    <span className="text-[9px] font-mono uppercase tracking-wider text-zinc-200 bg-zinc-900 border border-zinc-700 px-1 rounded font-semibold">
                       {item.badge}
                     </span>
                   )}
                 </span>
-                <span className="text-[10px] text-neutral-500 truncate">{item.subtitle}</span>
+                <span className="text-[10px] text-zinc-300 truncate font-medium">{item.subtitle}</span>
               </Link>
             </div>
           ))}

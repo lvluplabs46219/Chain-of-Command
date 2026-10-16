@@ -26,6 +26,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  experimental: {
+    cpus: 1,
+  },
   async rewrites() {
     if (process.env.API_URL?.trim()) {
       return [

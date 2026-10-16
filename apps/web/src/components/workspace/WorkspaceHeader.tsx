@@ -78,11 +78,11 @@ export function WorkspaceHeader({
                   <span className="font-bold text-sm tracking-wide text-white uppercase font-mono">
                     Chain of Command
                   </span>
-                  <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700">
+                  <span className="text-[10px] uppercase font-mono tracking-wider px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
                     Legal OS
                   </span>
                 </div>
-                <p className="text-[11px] text-zinc-500 hidden sm:block">
+                <p className="text-[11px] text-zinc-300 font-medium hidden sm:block">
                   Case operating workspace for self-represented litigants
                 </p>
               </div>
@@ -94,19 +94,19 @@ export function WorkspaceHeader({
               <button
                 type="button"
                 onClick={() => setMatterDropdownOpen(!matterDropdownOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-[#D4AF37]/40 text-xs font-medium text-zinc-200 transition-colors max-w-full"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-[#D4AF37]/50 text-xs font-medium text-zinc-200 transition-colors max-w-full"
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                <span className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0" />
                 <div className="text-left min-w-0">
                   <div className="font-semibold text-white max-w-[180px] sm:max-w-[240px] truncate">
                     {activeMatter.title}
                   </div>
-                  <div className="text-[10px] text-zinc-500 font-mono truncate">
+                  <div className="text-[10px] text-zinc-300 font-mono tracking-wide truncate">
                     {activeMatter.caseNumber}
                     {jurisdiction ? ` · ${jurisdiction}` : ""}
                   </div>
                 </div>
-                <ChevronDown className="w-3.5 h-3.5 text-zinc-500 ml-1 shrink-0" />
+                <ChevronDown className="w-3.5 h-3.5 text-zinc-400 ml-1 shrink-0" />
               </button>
 
               {matterDropdownOpen && (

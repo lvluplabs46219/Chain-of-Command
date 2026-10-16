@@ -25,7 +25,7 @@ export default function WorkspaceLayout() {
     };
 
     window.addEventListener('keydown', handleGlobalKeys);
-    return () => window.removeEventListener('keydown', handleBehavior);
+    return () => window.removeEventListener('keydown', handleGlobalKeys);
   }, []);
 
   return (

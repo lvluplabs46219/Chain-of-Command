@@ -95,6 +95,14 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
       <div className="px-4 py-2 border-b border-zinc-800/80 flex items-center justify-between gap-3 flex-wrap">
         <NavFeatureCarousel className="flex-1" />
         <div className="flex items-center gap-2 shrink-0">
+          <Link
+            href="/vericue"
+            className="flex items-center gap-1.5 text-[11px] font-bold text-rose-300 hover:text-white px-2.5 py-1 rounded-md border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 transition-all shadow-xs"
+            title="VeriCue AI — Candy Forensic Telemetry Console"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+            <span>VeriCue AI</span>
+          </Link>
           {isAuthenticated ? (
             <>
               <Link
@@ -152,10 +160,10 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
               key={tab.id}
               href={href}
               onClick={() => onTabChange(tab.id)}
-              className={`flex items-center gap-2 py-3 px-4 text-xs font-medium border-b-2 transition-all shrink-0 ${
+              className={`flex items-center gap-2 py-3 px-4 text-xs border-b-2 transition-all shrink-0 ${
                 isActive
-                  ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/5 font-semibold opacity-100"
-                  : "border-transparent text-zinc-500 opacity-40 hover:opacity-80 hover:text-zinc-200 hover:bg-zinc-800/40"
+                  ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/5 font-semibold"
+                  : "border-transparent text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/40 font-medium"
               }`}
             >
               <Icon className={`w-3.5 h-3.5 ${isActive ? "text-[#D4AF37]" : "text-neutral-400"}`} />
