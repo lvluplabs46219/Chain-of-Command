@@ -102,6 +102,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let unsub: (() => void) | undefined;
+    let cancelled = false;
+
+    const finishLoading = () => {
+      if (!cancelled) setIsLoading(false);
+    };
+
     try {
       const existingToken = getAuthToken();
       const savedUserStr = localStorage.getItem(USER_STORAGE_KEY);
@@ -115,7 +121,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           setTokenState(existingToken);
           if (savedUserStr) {
-            setUser(JSON.parse(savedUserStr));
+            try {
+              setUser(JSON.parse(savedUserStr));
+            } catch {
+              localStorage.removeItem(USER_STORAGE_KEY);
+            }
           } else if (allowDemoAuth() && isDemoToken(existingToken)) {
             setUser(DEFAULT_LITIGANT_USER);
           }
@@ -123,17 +133,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const supabase = getSupabaseClient();
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session?.user && session.access_token) {
-          const supaUser = sessionToUser(session.user);
-          setAuthToken(session.access_token);
-          setTokenState(session.access_token);
-          setUser(supaUser);
-          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(supaUser));
-        }
-      }).catch((err) => {
-        console.warn("[Auth] Supabase session check:", err);
-      });
+      supabase.auth
+        .getSession()
+        .then(({ data: { session } }) => {
+          if (cancelled) return;
+          if (session?.user && session.access_token) {
+            const supaUser = sessionToUser(session.user);
+            setAuthToken(session.access_token);
+            setTokenState(session.access_token);
+            setUser(supaUser);
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(supaUser));
+          }
+        })
+        .catch((err) => {
+          console.warn("[Auth] Supabase session check:", err);
+        })
+        .finally(finishLoading);
 
       const { data: authListener } = supabase.auth.onAuthStateChange(
         (_event, session) => {
@@ -154,10 +169,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       unsub = () => authListener?.subscription?.unsubscribe();
     } catch (e) {
       console.warn("[Auth] init warning:", e);
-    } finally {
-      setIsLoading(false);
+      finishLoading();
     }
-    return () => unsub?.();
+    return () => {
+      cancelled = true;
+      unsub?.();
+    };
   }, []);
 
   const loginWithGoogle = async () => {

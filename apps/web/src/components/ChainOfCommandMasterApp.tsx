@@ -10,6 +10,8 @@ import {
   SPECIALIST_AGENTS_ROSTER,
   TimelineRecord,
   EvidenceRecord,
+  normalizeMatter,
+  isDemoMatter,
 } from "@/lib/workspace-data";
 import {
   loadMatters,
@@ -29,7 +31,6 @@ import {
 } from "./workspace/WorkspaceNavigation";
 import { FirstRunWizard, type OnboardingResult } from "./onboarding/FirstRunWizard";
 import { useAuth } from "@/contexts/AuthContext";
-import { isDemoMatter } from "@/lib/workspace-data";
 const viewFallback = () => (
   <div className="p-8 text-center text-sm text-neutral-500">Loading module…</div>
 );
@@ -126,7 +127,7 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
         /* ignore */
       }
 
-      const loaded = (await loadMatters()).filter((m) => !isDemoMatter(m));
+      const loaded = (await loadMatters()).filter((m) => !isDemoMatter(m)).map((m) => normalizeMatter(m));
       if (loaded.length > 0) {
         setMatters(loaded);
         setActiveMatter(loaded[0]);
@@ -159,9 +160,9 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
     setJurisdiction(result.jurisdiction);
     // Never seed demo/fake cases — only the matter the user created (or empty)
     if (result.matter) {
-      const saved = await saveMatter(result.matter);
+      const saved = await saveMatter(normalizeMatter(result.matter));
       setMatters([saved]);
-      setActiveMatter(saved);
+      setActiveMatter(normalizeMatter(saved));
     } else {
       setMatters([]);
       setActiveMatter(EMPTY_MATTER);
@@ -218,8 +219,8 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
   };
 
   const handleSaveMatter = async (updated: Matter) => {
-    const saved = await saveMatter(updated);
-    setActiveMatter(saved);
+    const saved = await saveMatter(normalizeMatter(updated));
+    setActiveMatter(normalizeMatter(saved));
     setMatters((prev) => {
       const without = prev.filter((m) => m.id !== updated.id && m.id !== saved.id);
       return [saved, ...without];

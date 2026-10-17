@@ -159,6 +159,34 @@ export function isDemoMatter(m: Matter | null | undefined): boolean {
   return m.id === "case-01" || m.id.startsWith("sample-") || Boolean((m as any).isDemo);
 }
 
+/** Coerce API/partial matter payloads into a safe Matter (never null nested arrays). */
+export function normalizeMatter(raw: Partial<Matter> | null | undefined, fallbackId = "matter-empty"): Matter {
+  const base = { ...EMPTY_MATTER, id: fallbackId };
+  if (!raw || typeof raw !== "object") return base;
+  return {
+    ...base,
+    ...raw,
+    id: raw.id || base.id,
+    caseNumber: raw.caseNumber ?? base.caseNumber,
+    title: raw.title ?? base.title,
+    court: raw.court ?? raw.courtName ?? base.court,
+    jurisdiction: raw.jurisdiction ?? base.jurisdiction,
+    judge: raw.judge ?? "",
+    prosecutor: raw.prosecutor ?? "",
+    filingDate: raw.filingDate ?? raw.createdAt ?? "",
+    status: (raw.status as Matter["status"]) || base.status,
+    speedyTrialDaysRemaining: Number(raw.speedyTrialDaysRemaining ?? 0),
+    speedyTrialLimit: Number(raw.speedyTrialLimit ?? 70),
+    readingLevel: raw.readingLevel || base.readingLevel,
+    charges: Array.isArray(raw.charges) ? raw.charges : [],
+    timeline: Array.isArray(raw.timeline) ? raw.timeline : [],
+    authorities: Array.isArray(raw.authorities) ? raw.authorities : [],
+    evidence: Array.isArray(raw.evidence) ? raw.evidence : [],
+    deadlines: Array.isArray(raw.deadlines) ? raw.deadlines : [],
+  };
+}
+
+
 /** @deprecated Use SAMPLE_MATTERS for explore mode; default workspace starts empty. */
 export const INITIAL_MATTERS: Matter[] = [];
 

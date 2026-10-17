@@ -134,7 +134,7 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
         <div className="flex items-center gap-2 shrink-0">
           <Link
             href="/vericue"
-            className="flex items-center gap-1.5 text-[11px] font-bold text-sky-300 hover:text-white px-2.5 py-1 rounded-md border border-sky-500/35 bg-sky-500/10 hover:bg-sky-500/20 transition-all shadow-xs"
+            className="candy-badge candy-badge-ai flex items-center gap-1.5 text-[11px] font-bold hover:opacity-90 transition-all"
             title="VeriCue AI — Forensic Telemetry Console"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />

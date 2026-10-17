@@ -1,3 +1,4 @@
+import { formatDateClient } from "@/lib/format-date";
 /**
  * ChainTracker - FedEx-style Tracking UI Component
  * 
@@ -176,7 +177,7 @@ function formatDate(timestamp: string): string {
 }
 
 function formatDateShort(timestamp: string): string {
-  return new Date(timestamp).toLocaleDateString();
+  return formatDateClient(timestamp);
 }
 
 function formatTimeShort(timestamp: string): string {

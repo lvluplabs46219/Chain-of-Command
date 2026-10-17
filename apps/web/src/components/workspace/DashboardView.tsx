@@ -56,7 +56,7 @@ export function DashboardView({
       ? Math.ceil((nextDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
       : null;
 
-  const contradictionCount = timeline.filter((t) => t.isContradiction).length;
+  const contradictionCount = (timeline ?? []).filter((t) => t?.isContradiction).length;
 
   // Direct corner hotkey keyboard triggers (1-6) when not typing in form inputs
   useEffect(() => {
