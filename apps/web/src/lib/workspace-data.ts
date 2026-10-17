@@ -66,7 +66,10 @@ export interface AIAgent {
   name: string;
   role: string;
   specialty: string;
+  /** Internal model id — never show raw to litigants */
   model: string;
+  /** Optional explicit UI mode label */
+  modeLabel?: string;
   systemDirective: string;
   capabilities: string[];
   status: "Active" | "Standby" | "Consulting";
@@ -494,6 +497,16 @@ export const SAMPLE_MATTERS: Matter[] = [
     ],
   },
 ];
+
+
+/** Human-readable operating mode for UI (never show raw model ids to litigants). */
+export function agentModeLabel(agent: Pick<AIAgent, "model" | "modeLabel" | "name">): string {
+  if (agent.modeLabel) return agent.modeLabel;
+  const m = (agent.model || "").toLowerCase();
+  if (m.includes("pro") || m.includes("70b") || m.includes("large")) return "Deep Review";
+  if (m.includes("flash") || m.includes("mini") || m.includes("small")) return "Fast Track";
+  return "Standard";
+}
 
 export const AI_TEAM_ROSTER: AIAgent[] = [
   {

@@ -163,12 +163,16 @@ export function WorkspaceHeader({
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            {speedyLimit != null && speedyLimit > 0 && speedyDays != null && (
-              <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-950 border border-amber-900/40 text-xs">
+            {speedyLimit != null &&
+              speedyLimit > 0 &&
+              speedyDays != null &&
+              activeMatter.id !== "matter-empty" &&
+              Boolean(jurisdiction && jurisdiction.trim()) && (
+              <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-950 border border-amber-900/40 text-xs" title="Only shown when a matter and jurisdiction are set. Confirm against your court rules.">
                 <Clock className="w-3.5 h-3.5 text-amber-400" />
                 <div>
-                  <span className="text-zinc-500" title="Days elapsed of the statutory speedy-trial window">Speedy trial: </span>
-                  <span className="font-mono font-semibold text-amber-300" title={`Day ${speedyDays} of ${speedyLimit} in the speedy-trial window`}>
+                  <span className="text-zinc-500">Speedy trial window: </span>
+                  <span className="font-mono font-semibold text-amber-300">
                     Day {speedyDays} of {speedyLimit}
                   </span>
                 </div>

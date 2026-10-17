@@ -1,20 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Users,
-  Send,
-  Sparkles,
-  Bot,
-  Shield,
-  BookOpen,
-  HelpCircle,
-  Clock,
-  CheckCircle2,
-  AlertTriangle,
-} from "lucide-react";
-import { AIAgent, AI_TEAM_ROSTER, Matter } from "@/lib/workspace-data";
+import { Send, Bot, Shield, Lock, FolderOpen } from "lucide-react";
+import { AIAgent, AI_TEAM_ROSTER, Matter, agentModeLabel } from "@/lib/workspace-data";
 import { ResultEnvelope } from "./ResultEnvelope";
+import Link from "next/link";
 
 interface ChambersViewProps {
   matter: Matter;
@@ -40,6 +30,22 @@ interface Message {
   };
 }
 
+function buildWelcome(matter: Matter): string {
+  const hasMatter = matter.id !== "matter-empty";
+  const docCount = matter.evidence?.length ?? 0;
+  const chargeCount = matter.charges?.length ?? 0;
+  if (!hasMatter) {
+    return "Welcome. No matter is open yet. Open a case in The Docket so questions can use your workspace filings. Educational information only — not legal advice.";
+  }
+  return (
+    `Working on **${matter.title}**` +
+    (matter.caseNumber && matter.caseNumber !== "—" ? ` · ${matter.caseNumber}` : "") +
+    `. Workspace index: ${chargeCount} charge(s), ${docCount} evidence item(s). ` +
+    "Privacy-isolated mode: analysis uses only what you store here (not a live court feed). " +
+    "Paste docket facts or ask a specific educational question."
+  );
+}
+
 export function ChambersView({ matter }: ChambersViewProps) {
   const [selectedAgent, setSelectedAgent] = useState<AIAgent>(AI_TEAM_ROSTER[0]);
   const [promptInput, setPromptInput] = useState("");
@@ -49,20 +55,9 @@ export function ChambersView({ matter }: ChambersViewProps) {
       sender: "agent",
       agentId: "agent-head",
       agentName: "Head Legal AI",
-      timestamp: "10:14 AM",
-      text: (() => {
-        const hasMatter = matter.id !== "matter-empty";
-        const docCount = (matter.evidence?.length ?? 0);
-        const chargeCount = (matter.charges?.length ?? 0);
-        if (!hasMatter) {
-          return "Welcome. No matter is open yet. Create a case in the Docket or finish onboarding so research can be grounded in your filings. I will not invent facts or case numbers.";
-        }
-        return `Welcome. Workspace matter ${matter.caseNumber} (${matter.title}). Indexed here: ${chargeCount} charge(s), ${docCount} evidence item(s). Live Indiana myCase is not connected — I only see what is stored in this app. Paste docket facts or ask a specific educational question. Not legal advice.`;
-      })(),
-      envelope: {
-        type: "Information",
-        citations: [],
-      },
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      text: buildWelcome(matter),
+      envelope: { type: "Information", citations: [] },
     },
   ]);
 
@@ -77,8 +72,7 @@ export function ChambersView({ matter }: ChambersViewProps) {
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
 
-    const newMessages = [...messages, userMsg];
-    setMessages(newMessages);
+    setMessages((prev) => [...prev, userMsg]);
     setPromptInput("");
 
     const thinkingId = `msg-${Date.now()}-thinking`;
@@ -119,7 +113,7 @@ export function ChambersView({ matter }: ChambersViewProps) {
             statuteOrRule: c,
             summary: "",
             confidenceScore: data.verified ? 0.7 : 0.3,
-            provenance: data.verified ? "SOURCE_PUBLIC" : "SOURCE_USER",
+            provenance: data.verified ? ("SOURCE_PUBLIC" as const) : ("SOURCE_COURT" as const),
           }))
         : [];
       const agentMsg: Message = {
@@ -131,7 +125,7 @@ export function ChambersView({ matter }: ChambersViewProps) {
         text:
           data.text ||
           data.error ||
-          "No response from the model gateway. Check Ollama or API keys, then try again.",
+          "No response from the model gateway. Try again in a moment.",
         envelope: {
           type: data.labeling === "Analysis" ? "Analysis" : "Information",
           citations,
@@ -153,94 +147,132 @@ export function ChambersView({ matter }: ChambersViewProps) {
     }
   };
 
+  const emptyLocker = (matter.evidence?.length ?? 0) === 0 && (matter.charges?.length ?? 0) === 0;
+
   return (
-    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
-      <div className="pb-4 border-b border-[#272830]">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-4">
+      <div className="pb-3 border-b border-[#272830]">
         <span className="text-xs font-mono uppercase text-[#D4AF37] font-semibold">
           AI Legal Team Chambers
         </span>
-        <h1 className="text-2xl font-bold text-white mt-1">Multi-Agent Case Collaboration</h1>
+        <h1 className="text-2xl font-bold text-white mt-1">Ask your case team</h1>
         <p className="text-xs sm:text-sm text-neutral-400 mt-1">
-          Specialized agents operating with defined capabilities, groundings, and pro se safety guardrails.
+          Educational answers only. Not a law firm. Not legal advice.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left: Agent Roster */}
-        <div className="space-y-3 lg:col-span-1">
-          <h2 className="text-xs font-mono uppercase text-neutral-400 font-bold px-1">
-            Agent Roster ({AI_TEAM_ROSTER.length})
-          </h2>
-          <div className="space-y-2">
-            {AI_TEAM_ROSTER.map((agent) => (
-              <button
-                key={agent.id}
-                onClick={() => setSelectedAgent(agent)}
-                className={`w-full text-left p-3 rounded-xl border transition-all ${
-                  selectedAgent.id === agent.id
-                    ? "bg-[#1C1E2A] border-[#D4AF37]/50 shadow-md shadow-[#D4AF37]/5"
-                    : "bg-[#14151C] border-[#252735] hover:bg-[#181A24]"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="font-bold text-white text-xs">{agent.name}</div>
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-neutral-800 text-neutral-400">
-                    {agent.model}
-                  </span>
-                </div>
-                <div className="text-[11px] text-[#D4AF37] mt-0.5">{agent.role}</div>
-                <p className="text-[10px] text-neutral-400 mt-1 line-clamp-1">{agent.specialty}</p>
-              </button>
-            ))}
+      {/* Privacy status — deliberate isolation, not a broken connection */}
+      <div className="flex flex-wrap items-center gap-2 text-xs rounded-xl border border-sky-500/25 bg-sky-950/20 px-3 py-2 text-sky-100/90">
+        <Lock className="w-3.5 h-3.5 text-sky-300 shrink-0" />
+        <span>
+          <strong className="font-semibold text-sky-200">Privacy-isolated mode.</strong>{" "}
+          Analysis uses only workspace uploads and notes — not a live court network feed.
+        </span>
+      </div>
+
+      {emptyLocker && matter.id !== "matter-empty" && (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#2A2B35] bg-[#141519] px-3 py-2.5 text-xs text-neutral-300">
+          <span className="flex items-center gap-2">
+            <FolderOpen className="w-3.5 h-3.5 text-[#D4AF37]" />
+            No charges or evidence indexed yet for this matter.
+          </span>
+          <Link
+            href="/investigations"
+            className="px-3 py-1.5 rounded-full bg-[#D4AF37] text-neutral-950 font-semibold hover:bg-[#c49f27]"
+          >
+            Add evidence
+          </Link>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 min-h-[640px]">
+        {/* Agent roster */}
+        <div className="space-y-2 lg:col-span-1">
+          <h2 className="text-xs font-mono uppercase text-neutral-400 font-bold px-1">Your team</h2>
+          <div className="space-y-1.5">
+            {AI_TEAM_ROSTER.map((agent) => {
+              const active = selectedAgent.id === agent.id;
+              const mode = agentModeLabel(agent);
+              return (
+                <button
+                  key={agent.id}
+                  type="button"
+                  onClick={() => setSelectedAgent(agent)}
+                  className={`w-full text-left p-3 rounded-xl border transition-all ${
+                    active
+                      ? "bg-[#1C1E2A] border-[#D4AF37]/50 shadow-md shadow-[#D4AF37]/5"
+                      : "bg-[#14151C] border-[#252735] hover:bg-[#181A24]"
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="font-bold text-white text-xs">{agent.name}</div>
+                    <span
+                      className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border ${
+                        mode === "Deep Review"
+                          ? "border-violet-500/40 text-violet-200 bg-violet-950/40"
+                          : "border-emerald-500/40 text-emerald-200 bg-emerald-950/30"
+                      }`}
+                    >
+                      {mode}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-[#D4AF37] mt-0.5">{agent.role}</div>
+                  <p className="text-[10px] text-neutral-400 mt-1 line-clamp-2">{agent.specialty}</p>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Right 3 Cols: Active Consultation Space */}
-        <div className="lg:col-span-3 flex flex-col h-[700px] bg-[#14151C] border border-[#272938] rounded-2xl overflow-hidden shadow-xl">
-          {/* Active Agent Banner */}
-          <div className="p-4 bg-[#181923] border-b border-[#252736] flex items-center justify-between">
-            <div className="flex items-center gap-3">
+        {/* Chat column: messages + pinned input */}
+        <div className="lg:col-span-3 flex flex-col h-[min(70vh,720px)] bg-[#14151C] border border-[#272938] rounded-2xl overflow-hidden shadow-xl">
+          <div className="p-3 sm:p-4 bg-[#181923] border-b border-[#252736] flex items-center justify-between gap-2">
+            <div className="flex items-center gap-3 min-w-0">
               <div
-                className={`w-9 h-9 rounded-xl border flex items-center justify-center font-bold text-xs ${selectedAgent.avatarBg}`}
+                className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${selectedAgent.avatarBg}`}
               >
                 <Bot className="w-4 h-4" />
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-bold text-white text-sm">{selectedAgent.name}</h3>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950/40 text-emerald-300 border border-emerald-800/40">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-bold text-white text-sm truncate">{selectedAgent.name}</h3>
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-950/40 text-emerald-300 border border-emerald-800/40">
                     Ready
                   </span>
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-white/10 text-neutral-300">
+                    {agentModeLabel(selectedAgent)}
+                  </span>
                 </div>
-                <p className="text-xs text-neutral-400">{selectedAgent.specialty}</p>
+                <p className="text-xs text-neutral-400 truncate">{selectedAgent.specialty}</p>
               </div>
             </div>
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-neutral-400 font-mono">
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-neutral-400">
               <Shield className="w-3.5 h-3.5 text-[#D4AF37]" />
-              <span>Grounded Mode: Active</span>
+              <span>Educational mode</span>
             </div>
           </div>
 
-          {/* Messages Flow */}
-          <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
+          <div className="flex-1 p-4 sm:p-5 overflow-y-auto space-y-4">
             {messages.map((m) => (
               <div
                 key={m.id}
                 className={`flex flex-col ${m.sender === "user" ? "items-end" : "items-start"}`}
               >
-                <div className="text-[11px] text-neutral-400 mb-1 px-1">
-                  {m.sender === "user" ? "You" : m.agentName} · {m.timestamp}
+                <div className="text-[11px] text-neutral-500 mb-1 px-1">
+                  {m.sender === "user" ? "You" : m.agentName}
+                  {m.timestamp ? ` · ${m.timestamp}` : ""}
                 </div>
-                {m.envelope ? (
+                {m.envelope && m.sender === "agent" ? (
                   <div className="max-w-2xl w-full">
                     <ResultEnvelope
                       envelopeType={m.envelope.type}
-                      title={`Analysis from ${m.agentName}`}
+                      title={m.agentName || "AI"}
                       agentName={m.agentName || "AI"}
                       timestamp={m.timestamp}
                       citations={m.envelope.citations}
+                      compactDisclaimer
                     >
-                      <p className="text-xs sm:text-sm leading-relaxed">{m.text}</p>
+                      <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">{m.text}</p>
                     </ResultEnvelope>
                   </div>
                 ) : (
@@ -258,25 +290,26 @@ export function ChambersView({ matter }: ChambersViewProps) {
             ))}
           </div>
 
-          {/* Prompt Input Form */}
+          {/* Persistent primary action bar */}
           <form
             onSubmit={handleSendMessage}
-            className="p-4 bg-[#181923] border-t border-[#252736] flex items-center gap-3"
+            className="p-3 sm:p-4 bg-[#12131a] border-t border-[#252736] flex items-stretch gap-2 shrink-0"
           >
             <input
               type="text"
               value={promptInput}
               onChange={(e) => setPromptInput(e.target.value)}
-              placeholder={`Ask ${selectedAgent.name} about legal citations, timeline inconsistencies, or hearing prep...`}
-              className="flex-1 bg-[#101117] border border-[#2B2E3D] rounded-xl px-4 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-[#D4AF37]"
+              placeholder="Paste docket facts or ask an educational question…"
+              className="flex-1 min-h-[44px] bg-[#0c0d12] border border-[#2B2E3D] rounded-full px-4 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#D4AF37]"
+              aria-label="Message to selected agent"
             />
             <button
               type="submit"
               disabled={!promptInput.trim()}
-              className="px-4 py-2.5 bg-[#D4AF37] hover:bg-[#c49f27] disabled:opacity-40 disabled:cursor-not-allowed text-neutral-950 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors"
+              className="px-5 min-h-[44px] rounded-full bg-[#D4AF37] hover:bg-[#c49f27] disabled:opacity-40 disabled:cursor-not-allowed text-neutral-950 font-bold text-sm flex items-center gap-2 transition-colors shadow-[0_4px_16px_rgba(212,175,55,0.2)]"
             >
-              <Send className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Send Query</span>
+              <Send className="w-4 h-4" />
+              <span>Send</span>
             </button>
           </form>
         </div>

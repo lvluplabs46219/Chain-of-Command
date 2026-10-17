@@ -116,7 +116,7 @@ Self-representation rights are discussed in Faretta v. California, 422 U.S. 806 
 
 Case Ref: ${caseNumber || "Pro Se Record"} | Title: ${caseTitle || "Pro Se Case Workspace"} | Jurisdiction: ${jurisdiction}
 
-Chain of Command does **not** currently scrape or API-connect to Indiana myCase. Answers are educational only and use only the matter fields stored here (title, case number, jurisdiction).
+Chain of Command runs in privacy-isolated mode and does not pull a live court feed. Answers are educational only and use only the matter fields stored here (title, case number, jurisdiction).
 
 1. Import or type real docket facts (hearings, parties, orders) into Timeline / Docket.
 2. Ask a specific question about a rule, deadline, or document type.
@@ -273,7 +273,7 @@ This information is provided for educational and procedural purposes only and do
         jurisdiction,
         citationsCount: usedTemplateFallback ? 0 : citations.length,
         note: usedTemplateFallback
-          ? "No live court feed and no model response — educational template only. Indiana myCase is not connected."
+          ? "No live court feed and no model response — educational template only. no live court feed (privacy-isolated)."
           : "Model response only; citations are not auto-verified against the docket.",
         myCaseConnected: false,
       },

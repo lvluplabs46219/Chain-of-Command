@@ -29,6 +29,8 @@ interface ResultEnvelopeProps {
   timestamp: string;
   citations: CitationItem[];
   requiresHumanReview?: boolean;
+  /** Softer banner — prefer global footer for full legal text */
+  compactDisclaimer?: boolean;
   children: React.ReactNode;
 }
 
@@ -39,6 +41,7 @@ export function ResultEnvelope({
   timestamp,
   citations,
   requiresHumanReview = true,
+  compactDisclaimer = false,
   children,
 }: ResultEnvelopeProps) {
   const [showSources, setShowSources] = useState(false);
@@ -55,14 +58,26 @@ export function ResultEnvelope({
     <div className="bg-[#141519] border border-[#272830] rounded-xl overflow-hidden shadow-xl mb-6">
       {/* Universal Mandatory Header Warning */}
       {requiresHumanReview && (
-        <div className="bg-amber-950/40 border-b border-amber-800/40 px-4 py-2 flex items-center justify-between text-xs text-amber-300">
-          <div className="flex items-center gap-2 font-mono uppercase tracking-wide">
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            <span>[PREPARED FOR SELF-REPRESENTED LITIGANT - NOT LEGAL ADVICE - REQUIRES INDEPENDENT HUMAN REVIEW]</span>
+        <div
+          className={
+            compactDisclaimer
+              ? "px-4 py-1.5 text-[11px] text-amber-200/80 border-b border-white/5"
+              : "bg-amber-950/30 border-b border-amber-800/30 px-4 py-2 flex items-center justify-between text-xs text-amber-200/90"
+          }
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-400/80 shrink-0" />
+            <span>
+              {compactDisclaimer
+                ? "Educational information · not legal advice · human review required"
+                : "Prepared for self-represented litigants — not legal advice — requires independent human review"}
+            </span>
           </div>
-          <span className="hidden md:inline-block text-[11px] text-amber-400/80">
-            No Attorney-Client Privilege
-          </span>
+          {!compactDisclaimer && (
+            <span className="hidden md:inline-block text-[11px] text-amber-400/70">
+              No attorney-client relationship
+            </span>
+          )}
         </div>
       )}
 
@@ -92,7 +107,7 @@ export function ResultEnvelope({
           <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
           <span>
             {citations.length === 0
-              ? "0 docket-linked sources (myCase not connected)"
+              ? "Privacy-isolated · 0 court-feed sources"
               : `${citations.length} cited source${citations.length === 1 ? "" : "s"} (verify primary text)`}
           </span>
           {showSources ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}

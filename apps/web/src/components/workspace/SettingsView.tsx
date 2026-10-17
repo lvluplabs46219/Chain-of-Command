@@ -15,6 +15,7 @@ import {
   Eye,
   RefreshCw,
 } from "lucide-react";
+import { agentModeLabel } from "@/lib/workspace-data";
 
 interface SettingsViewProps {
   readingLevel: "Plain English" | "Standard Legal" | "Detailed Statutory";
@@ -144,7 +145,7 @@ export function SettingsView({ readingLevel, onSetReadingLevel }: SettingsViewPr
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-white">{log.agent}</span>
                     <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-neutral-800 text-neutral-300">
-                      {log.model}
+                      {agentModeLabel({ model: log.model, name: log.agent || "" })}
                     </span>
                   </div>
                   <span className="text-[11px] text-neutral-400">{log.timestamp}</span>
