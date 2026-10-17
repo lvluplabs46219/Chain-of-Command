@@ -1,9 +1,9 @@
 ID,Section,Phase,Task,Owner,Status,Notes
-COC-001,§0 How to use this prompt,Phase 0,Read the entire master implementation prompt before writing a line of code,All engineers,Not started,
+COC-001,§0 How to use this prompt,Phase 0,Read the entire master implementation prompt before writing a line of code,All engineers,In progress,[gabriel-seraphim-worker 2026-10-17T02:27Z] claimed
 COC-002,§0 How to use this prompt,All phases,Run the 8-step execution loop (Orient-Recon-Plan-Confirm-Implement-Test-Record-Report) for every unit of work,All engineers,Not started,
-COC-012,§1 Prime directive,Phase 0,Honor the prime directive: increase effective access to legal information and self-representation without misrepresenting the system,Legal/Compliance,Not started,
-COC-013,§1 Operating contract,Phase 0,Make the operating contract visible in the product not merely in source code,Frontend,Not started,
-COC-028,§2 Invariant I-1,Phase 0,AI assistance is not an attorney-client relationship - enforce via onboarding acknowledgement and notices,Legal/Compliance,Not started,
+COC-012,§1 Prime directive,Phase 0,Honor the prime directive: increase effective access to legal information and self-representation without misrepresenting the system,Legal/Compliance,In progress,[gabriel-seraphim-worker 2026-10-17T02:28Z] claimed; [2026-10-17T02:32Z] plan+audit written to docs/agent_runs/COC-012/ (Status stays In progress until human verifies §1.2 DoD)
+COC-013,§1 Operating contract,Phase 0,Make the operating contract visible in the product not merely in source code,Frontend,In progress,[gabriel-seraphim-worker 2026-10-17T02:48Z] claimed
+COC-028,§2 Invariant I-1,Phase 0,AI assistance is not an attorney-client relationship - enforce via onboarding acknowledgement and notices,Legal/Compliance,In progress,[gabriel-seraphim-worker 2026-10-17T02:48Z] claimed
 COC-029,§2 Invariant I-2,Phase 0,AI analysis is not legal representation - enforce via output labeling + persistent case-level notice,Legal/Compliance,Not started,
 COC-030,§2 Invariant I-3,Phase 0,AI draft is not a filed document - state machine forbids transition to FILED without human action,Platform,Not started,
 COC-035,§2 Invariant I-8,Phase 0,A user request is not authorization for an external legal action - explicit per-action human confirmation,Security Eng,Not started,

@@ -1,0 +1,9 @@
+{
+  "ID": "COC-001",
+  "Section": "\u00a70 How to use this prompt",
+  "Phase": "Phase 0",
+  "Task": "Read the entire master implementation prompt before writing a line of code",
+  "Owner": "All engineers",
+  "Status": "Not started",
+  "Notes": ""
+}

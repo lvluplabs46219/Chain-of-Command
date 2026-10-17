@@ -1,0 +1,41 @@
+{
+  "orient": "Add a self\u2011help legal resources page and API endpoint to provide users with accurate, non\u2011representational legal information, enhancing self\u2011representation while maintaining transparency and compliance.",
+  "plan": {
+    "context": "The Prime Directive requires that users can access reliable legal information without the system misrepresenting itself as a lawyer. The current web app lacks a dedicated self\u2011help resource hub. We will add a static legal resources page and a lightweight API endpoint that serves a curated list of public legal documents and FAQs. This will improve user empowerment while keeping the system\u2019s role clear.",
+    "files_affected": [
+      "apps/web/pages/legal-resources.tsx",
+      "apps/web/components/LegalResources.tsx",
+      "apps/web/components/Disclaimer.tsx",
+      "apps/web/app/layout.tsx",
+      "apps/api/src/routes/legal-resources.ts",
+      "apps/api/src/types.ts",
+      "apps/api/src/middleware/disclaimerMiddleware.ts",
+      "apps/api/src/tests/legal-resources.test.ts",
+      "apps/web/src/styles/legal-resources.css"
+    ],
+    "dependencies": [
+      "zod",
+      "express"
+    ],
+    "database_changes": "none",
+    "api_changes": "Add GET /api/legal-resources returning JSON array of resource objects (title, url, description).",
+    "security_implications": "The endpoint is read\u2011only and serves only public data; no authentication required. All responses are sanitized and static. The disclaimer middleware ensures the page explicitly states the system is not a lawyer.",
+    "testing_requirements": "Unit tests for API route (status 200, correct schema). E2E test for page rendering and presence of disclaimer. Accessibility audit for the new page."
+  },
+  "implementation_steps": [
+    "Create a Zod schema for a legal resource object in apps/api/src/types.ts.",
+    "Implement GET /api/legal-resources in apps/api/src/routes/legal-resources.ts returning a hard\u2011coded array of resources.",
+    "Add a disclaimer middleware in apps/api/src/middleware/disclaimerMiddleware.ts to inject a disclaimer header for the route.",
+    "Create a React component LegalResources.tsx that fetches from /api/legal-resources and displays the list.",
+    "Create a Disclaimer.tsx component that renders a clear disclaimer about the system\u2019s limitations.",
+    "Add a new page legal-resources.tsx in apps/web/pages that uses the LegalResources component and includes the Disclaimer.",
+    "Update the main navigation (apps/web/app/layout.tsx) to link to the new page.",
+    "Add CSS styling for the new page in apps/web/src/styles/legal-resources.css.",
+    "Write unit tests for the API route in apps/api/src/tests/legal-resources.test.ts.",
+    "Write an E2E test in apps/web/tests/legal-resources.e2e.ts to verify page rendering and disclaimer presence.",
+    "Run lint, typecheck, and tests to ensure no regressions.",
+    "Commit changes and push to the repository."
+  ],
+  "requires_human_approval": false,
+  "capability_not_verified": []
+}

@@ -1,0 +1,21 @@
+{
+  "orient": "Ensure compliance with the master implementation prompt by reading it before any code is written, thereby preventing violations of constraints such as fabricating citations or proposing autonomous actions.",
+  "plan": {
+    "context": "The task requires that all engineers read the entire master implementation prompt before writing any line of code. This is a compliance step to guarantee adherence to the project's legal, security, and operational invariants.",
+    "files_affected": [],
+    "dependencies": [],
+    "database_changes": "none",
+    "api_changes": "none",
+    "security_implications": "None \u2013 this is a procedural compliance step.",
+    "testing_requirements": "None \u2013 no code changes are made."
+  },
+  "implementation_steps": [
+    "Open the master implementation prompt provided in the conversation.",
+    "Carefully read and review all sections, including AGENTS.md, the master build instructions, and any referenced files.",
+    "Confirm understanding of all constraints (e.g., no autonomous filing, no fabricated citations, no attorney recommendations).",
+    "Document that the master prompt has been read and understood (e.g., by adding a comment or a short note in the tracker).",
+    "Proceed to the next task only after this step is completed."
+  ],
+  "requires_human_approval": false,
+  "capability_not_verified": []
+}

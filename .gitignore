@@ -177,3 +177,5 @@ Thumbs.db
 *.swp
 .idea/
 .env.runtime
+.vercel
+.env*
