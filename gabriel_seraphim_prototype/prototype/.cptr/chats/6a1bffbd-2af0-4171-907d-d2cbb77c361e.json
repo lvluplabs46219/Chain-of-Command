@@ -1,0 +1,268 @@
+{
+  "id": "6a1bffbd-2af0-4171-907d-d2cbb77c361e",
+  "title": "start agents",
+  "summary": null,
+  "created_at": 1792216569980,
+  "updated_at": 1792219108802,
+  "history": {
+    "currentId": "fc2ca3c3-dc9c-41de-98ab-3640976fba89",
+    "messages": {
+      "a070c1b6-ddfb-4ef9-8c34-c485296586d4": {
+        "id": "a070c1b6-ddfb-4ef9-8c34-c485296586d4",
+        "parentId": null,
+        "childrenIds": [
+          "716c3bb9-0816-4737-8f87-1a5dfa10e089"
+        ],
+        "role": "user",
+        "content": "start agents",
+        "timestamp": 1792216569985,
+        "models": []
+      },
+      "716c3bb9-0816-4737-8f87-1a5dfa10e089": {
+        "id": "716c3bb9-0816-4737-8f87-1a5dfa10e089",
+        "parentId": "a070c1b6-ddfb-4ef9-8c34-c485296586d4",
+        "childrenIds": [
+          "289d2da5-9511-4e7a-9619-75884a7dc364"
+        ],
+        "role": "assistant",
+        "content": "\n\n> **Error:** Model 'ollama.gpt-oss:20b-cloud' was not found. Available models include: 'Bert-Phishing-ONNX', 'Bonsai-1.7B-gguf', 'Bonsai-4B-gguf', and 85 more. Use 'lemonade list' or GET /api/v1/models?show_all=true to see all available models.",
+        "timestamp": 1792216569990,
+        "model": "ollama.gpt-oss:20b-cloud",
+        "done": true,
+        "output": [
+          {
+            "type": "message",
+            "id": "77bb1b36-970a-4de7-b01b-64b8b67985a6",
+            "status": "completed",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "\n\n> **Error:** Model 'ollama.gpt-oss:20b-cloud' was not found. Available models include: 'Bert-Phishing-ONNX', 'Bonsai-1.7B-gguf', 'Bonsai-4B-gguf', and 85 more. Use 'lemonade list' or GET /api/v1/models?show_all=true to see all available models."
+              }
+            ]
+          }
+        ]
+      },
+      "289d2da5-9511-4e7a-9619-75884a7dc364": {
+        "id": "289d2da5-9511-4e7a-9619-75884a7dc364",
+        "parentId": "716c3bb9-0816-4737-8f87-1a5dfa10e089",
+        "childrenIds": [
+          "148905f5-cea0-48d1-9fa7-455e900fbc6e"
+        ],
+        "role": "user",
+        "content": "start",
+        "timestamp": 1792217376001,
+        "models": []
+      },
+      "148905f5-cea0-48d1-9fa7-455e900fbc6e": {
+        "id": "148905f5-cea0-48d1-9fa7-455e900fbc6e",
+        "parentId": "289d2da5-9511-4e7a-9619-75884a7dc364",
+        "childrenIds": [
+          "180c9589-7003-4b53-b461-2c37230a145a"
+        ],
+        "role": "assistant",
+        "content": "\n\n> **Error:** Model 'ollama.chain-of-command' was not found. Available models include: 'Bert-Phishing-ONNX', 'Bonsai-1.7B-gguf', 'Bonsai-4B-gguf', and 85 more. Use 'lemonade list' or GET /api/v1/models?show_all=true to see all available models.",
+        "timestamp": 1792217376009,
+        "model": "ollama.chain-of-command:latest",
+        "done": true,
+        "output": [
+          {
+            "type": "message",
+            "id": "70efd9d5-f6a8-460b-bf60-0d2230ac1da7",
+            "status": "completed",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "\n\n> **Error:** Model 'ollama.chain-of-command' was not found. Available models include: 'Bert-Phishing-ONNX', 'Bonsai-1.7B-gguf', 'Bonsai-4B-gguf', and 85 more. Use 'lemonade list' or GET /api/v1/models?show_all=true to see all available models."
+              }
+            ]
+          }
+        ]
+      },
+      "180c9589-7003-4b53-b461-2c37230a145a": {
+        "id": "180c9589-7003-4b53-b461-2c37230a145a",
+        "parentId": "148905f5-cea0-48d1-9fa7-455e900fbc6e",
+        "childrenIds": [
+          "d943efec-4882-4381-8436-73fe260e7189"
+        ],
+        "role": "user",
+        "content": "start",
+        "timestamp": 1792217389482,
+        "models": []
+      },
+      "d943efec-4882-4381-8436-73fe260e7189": {
+        "id": "d943efec-4882-4381-8436-73fe260e7189",
+        "parentId": "180c9589-7003-4b53-b461-2c37230a145a",
+        "childrenIds": [
+          "87538ce8-1985-4a35-b5ee-4f53bb6230ed"
+        ],
+        "role": "assistant",
+        "content": "\n\n> **Error:** Model 'ollama.gpt-oss:20b-cloud' was not found. Available models include: 'Bert-Phishing-ONNX', 'Bonsai-1.7B-gguf', 'Bonsai-4B-gguf', and 85 more. Use 'lemonade list' or GET /api/v1/models?show_all=true to see all available models.",
+        "timestamp": 1792217389485,
+        "model": "ollama.gpt-oss:20b-cloud",
+        "done": true,
+        "output": [
+          {
+            "type": "message",
+            "id": "10f94674-1b86-4ddc-ba8f-e46d20c99fc2",
+            "status": "completed",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "\n\n> **Error:** Model 'ollama.gpt-oss:20b-cloud' was not found. Available models include: 'Bert-Phishing-ONNX', 'Bonsai-1.7B-gguf', 'Bonsai-4B-gguf', and 85 more. Use 'lemonade list' or GET /api/v1/models?show_all=true to see all available models."
+              }
+            ]
+          }
+        ]
+      },
+      "87538ce8-1985-4a35-b5ee-4f53bb6230ed": {
+        "id": "87538ce8-1985-4a35-b5ee-4f53bb6230ed",
+        "parentId": "d943efec-4882-4381-8436-73fe260e7189",
+        "childrenIds": [
+          "87a4957b-d988-43fe-93f4-2c9bea6b7d24"
+        ],
+        "role": "user",
+        "content": "start",
+        "timestamp": 1792218003765,
+        "models": []
+      },
+      "87a4957b-d988-43fe-93f4-2c9bea6b7d24": {
+        "id": "87a4957b-d988-43fe-93f4-2c9bea6b7d24",
+        "parentId": "87538ce8-1985-4a35-b5ee-4f53bb6230ed",
+        "childrenIds": [
+          "0ed95e17-56ab-4784-a185-8117d255fc3a"
+        ],
+        "role": "assistant",
+        "content": "\n\n> **Error:** Model 'ollama.gpt-oss:20b-cloud' was not found. Available models include: 'Bert-Phishing-ONNX', 'Bonsai-1.7B-gguf', 'Bonsai-4B-gguf', and 85 more. Use 'lemonade list' or GET /api/v1/models?show_all=true to see all available models.",
+        "timestamp": 1792218003771,
+        "model": "ollama.gpt-oss:20b-cloud",
+        "done": true,
+        "output": [
+          {
+            "type": "message",
+            "id": "93929f44-64ec-46ab-9280-16b3bcb0469c",
+            "status": "completed",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "\n\n> **Error:** Model 'ollama.gpt-oss:20b-cloud' was not found. Available models include: 'Bert-Phishing-ONNX', 'Bonsai-1.7B-gguf', 'Bonsai-4B-gguf', and 85 more. Use 'lemonade list' or GET /api/v1/models?show_all=true to see all available models."
+              }
+            ]
+          }
+        ]
+      },
+      "0ed95e17-56ab-4784-a185-8117d255fc3a": {
+        "id": "0ed95e17-56ab-4784-a185-8117d255fc3a",
+        "parentId": "87a4957b-d988-43fe-93f4-2c9bea6b7d24",
+        "childrenIds": [
+          "f3609ad2-21f9-44fa-862f-2c85bd50be25"
+        ],
+        "role": "user",
+        "content": "start agents",
+        "timestamp": 1792219004340,
+        "models": []
+      },
+      "f3609ad2-21f9-44fa-862f-2c85bd50be25": {
+        "id": "f3609ad2-21f9-44fa-862f-2c85bd50be25",
+        "parentId": "0ed95e17-56ab-4784-a185-8117d255fc3a",
+        "childrenIds": [
+          "9e82bb44-c5a5-4975-961f-9f33771f3bb9",
+          "5e6731e2-0d35-4cc9-8a2a-e5f9a13717de"
+        ],
+        "role": "assistant",
+        "content": "\n\n> **Error:** Failed to decrypt API key. JWT secret may have changed",
+        "timestamp": 1792219004344,
+        "model": "ollama.gpt-oss:20b-cloud",
+        "done": true,
+        "output": [
+          {
+            "type": "message",
+            "id": "8f37549c-6377-4c39-8afe-33683bc97a67",
+            "status": "completed",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "\n\n> **Error:** Failed to decrypt API key. JWT secret may have changed"
+              }
+            ]
+          }
+        ]
+      },
+      "9e82bb44-c5a5-4975-961f-9f33771f3bb9": {
+        "id": "9e82bb44-c5a5-4975-961f-9f33771f3bb9",
+        "parentId": "f3609ad2-21f9-44fa-862f-2c85bd50be25",
+        "childrenIds": [
+          "bf03c468-dbef-4d09-a773-6e3f4225a84b"
+        ],
+        "role": "user",
+        "content": "start",
+        "timestamp": 1792219085793,
+        "models": []
+      },
+      "bf03c468-dbef-4d09-a773-6e3f4225a84b": {
+        "id": "bf03c468-dbef-4d09-a773-6e3f4225a84b",
+        "parentId": "9e82bb44-c5a5-4975-961f-9f33771f3bb9",
+        "childrenIds": [],
+        "role": "assistant",
+        "content": "",
+        "timestamp": 1792219085802,
+        "model": "agent:cline/mistralai/mistral-nemo",
+        "done": false,
+        "output": []
+      },
+      "5e6731e2-0d35-4cc9-8a2a-e5f9a13717de": {
+        "id": "5e6731e2-0d35-4cc9-8a2a-e5f9a13717de",
+        "parentId": "f3609ad2-21f9-44fa-862f-2c85bd50be25",
+        "childrenIds": [
+          "fc2ca3c3-dc9c-41de-98ab-3640976fba89"
+        ],
+        "role": "user",
+        "content": "start.\n",
+        "timestamp": 1792219108797,
+        "models": []
+      },
+      "fc2ca3c3-dc9c-41de-98ab-3640976fba89": {
+        "id": "fc2ca3c3-dc9c-41de-98ab-3640976fba89",
+        "parentId": "5e6731e2-0d35-4cc9-8a2a-e5f9a13717de",
+        "childrenIds": [
+          "8679a9ad-3e96-4ddc-9d68-dbf857f7ed63"
+        ],
+        "role": "assistant",
+        "content": "I'm sorry for the confusion earlier. Let's start fresh. How can I assist you today?",
+        "timestamp": 1792219108799,
+        "model": "agent:cline/mistralai/mistral-nemo",
+        "done": true,
+        "output": [
+          {
+            "type": "message",
+            "id": "9068b219-ad14-455c-9f02-4cfb322a49f4",
+            "status": "completed",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "output_text",
+                "text": "I'm sorry for the confusion earlier. Let's start fresh. How can I assist you today?"
+              }
+            ]
+          }
+        ]
+      },
+      "8679a9ad-3e96-4ddc-9d68-dbf857f7ed63": {
+        "id": "8679a9ad-3e96-4ddc-9d68-dbf857f7ed63",
+        "parentId": "fc2ca3c3-dc9c-41de-98ab-3640976fba89",
+        "childrenIds": [],
+        "role": "user",
+        "content": "start agents",
+        "timestamp": 1792219172059,
+        "models": [
+          "agent:cline/mistralai/mistral-nemo"
+        ]
+      }
+    }
+  }
+}
