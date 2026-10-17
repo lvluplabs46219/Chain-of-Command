@@ -57,7 +57,7 @@ export function ChambersView({ matter }: ChambersViewProps) {
         if (!hasMatter) {
           return "Welcome. No matter is open yet. Create a case in the Docket or finish onboarding so research can be grounded in your filings. I will not invent facts or case numbers.";
         }
-        return `Welcome. Indexed for this matter (${matter.caseNumber}): ${chargeCount} charge(s), ${docCount} evidence item(s). I have not independently verified court records. Ask a specific question about your filings, deadlines, or research — educational information only, not legal advice.`;
+        return `Welcome. Workspace matter ${matter.caseNumber} (${matter.title}). Indexed here: ${chargeCount} charge(s), ${docCount} evidence item(s). Live Indiana myCase is not connected — I only see what is stored in this app. Paste docket facts or ask a specific educational question. Not legal advice.`;
       })(),
       envelope: {
         type: "Information",

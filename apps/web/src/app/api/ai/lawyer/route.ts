@@ -66,9 +66,64 @@ function generateGroundedFallback(
     };
   }
 
+  // Infer Indiana case category from Odyssey-style case number (e.g. 73C01-2205-JP-000025)
+  const cn = (caseNumber || "").toUpperCase();
+  const isJp = /-JP-/.test(cn);
+  const isJc = /-JC-/.test(cn);
+  const isJm = /-JM-/.test(cn);
+  const isCr = /-F[1-6]-|-CM-|-IF-|-FD-|-FC-/.test(cn);
+  const isCv = /-PL-|-CT-|-SC-|-MF-|-CC-/.test(cn);
+
+  if (isJp || isJc || isJm) {
+    return {
+      text: `${MANDATORY_HEADER}### Indiana family / juvenile-related case (local docket not imported)
+
+Case Ref: ${caseNumber || "n/a"} | Title: ${caseTitle || "n/a"} | Jurisdiction: ${jurisdiction}
+
+**Important:** Chain of Command has **not** pulled live records from Indiana myCase (public.courts.in.gov). The AI only sees the case number and title you entered in this workspace.
+
+What you can do next (educational, not legal advice):
+1. Open the official docket on [Indiana myCase](https://public.courts.in.gov/mycase) and download or note: next hearing date, parties, and any orders.
+2. Enter those facts into your Docket / Timeline here so agents can work from *your* notes.
+3. For paternity / custody / parenting-time style matters, Indiana materials often involve Title 31 of the Indiana Code and local county family-court rules — confirm against the primary sources for *your* county.
+4. Ask a specific question (e.g. "What is a provisional hearing?" or "What is a CCS entry?") rather than "what should I do?" so the answer can stay concrete and limited.
+
+I will not invent docket events, party positions, or outcomes for this case number.${MANDATORY_FOOTER}`,
+      citations: [],
+    };
+  }
+
+  if (isCr) {
+    return {
+      text: `${MANDATORY_HEADER}### Indiana criminal-style case number (local docket not imported)
+
+Case Ref: ${caseNumber || "n/a"} | Title: ${caseTitle || "n/a"} | Jurisdiction: ${jurisdiction}
+
+**Important:** Live myCase / Odyssey records are **not** connected yet. Only the case number and title stored in this workspace are known.
+
+Educational next steps:
+1. Verify the case on Indiana myCase and note the next hearing and open motions.
+2. Add those facts to Timeline / Docket in this app.
+3. Ask a specific procedural question (deadlines, discovery, plea vs trial process) rather than open-ended "what should I do?"
+
+Self-representation rights are discussed in Faretta v. California, 422 U.S. 806 (1975); pro se litigants are still bound by court rules.${MANDATORY_FOOTER}`,
+      citations: ["Faretta v. California, 422 U.S. 806 (1975)"],
+    };
+  }
+
   return {
-    text: `${MANDATORY_HEADER}### Procedural Case Guidance: ${caseTitle || "Pro Se Case Workspace"}\n\nCase Ref: ${caseNumber || "Pro Se Record"} | Jurisdiction: ${jurisdiction}\n\n1. **Factual Integrity & Timeline Correlation:**\n   Review all charging affidavits and cross-reference officer narrative timestamps against dispatch recordings and physical exhibits.\n\n2. **Courtroom Etiquette & Addressing the Bench:**\n   Always address the presiding judge as 'Your Honor'. Arrive 30 minutes early, bring three (3) copies of any motion or exhibit, and speak clearly into the courtroom microphone.\n\n3. **Self-Representation Rights:**\n   The right to represent oneself is constitutionally grounded under Faretta v. California, 422 U.S. 806 (1975). Pro se litigants are held to the same substantive procedural rules as licensed counsel.${MANDATORY_FOOTER}`,
-    citations: ["Faretta v. California, 422 U.S. 806 (1975)", `Rules of Criminal Procedure for ${jurisdiction}`, "U.S. Const. amend. VI & XIV"],
+    text: `${MANDATORY_HEADER}### Case workspace guidance (no live court feed)
+
+Case Ref: ${caseNumber || "Pro Se Record"} | Title: ${caseTitle || "Pro Se Case Workspace"} | Jurisdiction: ${jurisdiction}
+
+Chain of Command does **not** currently scrape or API-connect to Indiana myCase. Answers are educational only and use only the matter fields stored here (title, case number, jurisdiction).
+
+1. Import or type real docket facts (hearings, parties, orders) into Timeline / Docket.
+2. Ask a specific question about a rule, deadline, or document type.
+3. Treat any citation as unverified until you open the primary source.
+
+I will not invent court records for this matter.${MANDATORY_FOOTER}`,
+    citations: [],
   };
 }
 
@@ -108,6 +163,7 @@ export async function POST(req: NextRequest) {
 Current Specialist Role: ${agentRole}
 Jurisdiction: ${jurisdiction}
 Case Context: ${context.caseTitle || "Self-Represented Matter"} (${context.caseNumber || "Pro Se"}) in ${context.courtName || "Superior Court"}.
+CRITICAL: You do NOT have live access to Indiana myCase or Odyssey. You only know the case fields provided in this prompt. Never invent docket entries, hearings, or party filings. If the user asks what is on the court record, tell them to check public.courts.in.gov/mycase and paste facts into the workspace.
 
 STRICT MANDATORY RULES (GEMINI.md & CHAIN OF COMMAND ARCHITECTURE):
 1. NO AUTONOMOUS FILING OR ACTION: Never claim to file, sign, submit, or contact court personnel or opposing parties.
@@ -177,7 +233,7 @@ This information is provided for educational and procedural purposes only and do
         context.caseNumber
       );
       generatedText = fallback.text;
-      citations = fallback.citations;
+      citations = []; // do not present template hints as grounded sources
       usedTemplateFallback = true;
     }
 
@@ -213,12 +269,13 @@ This information is provided for educational and procedural purposes only and do
       verified: usedLiveModel && !usedTemplateFallback,
       labeling: "Information",
       grounding: {
-        status: usedTemplateFallback ? "template_fallback" : usedLiveModel ? "model" : "ungrounded",
+        status: usedTemplateFallback ? "ungrounded" : usedLiveModel ? "model" : "ungrounded",
         jurisdiction,
-        citationsCount: citations.length,
+        citationsCount: usedTemplateFallback ? 0 : citations.length,
         note: usedTemplateFallback
-          ? "No live model available; educational template only — verify all citations."
-          : undefined,
+          ? "No live court feed and no model response — educational template only. Indiana myCase is not connected."
+          : "Model response only; citations are not auto-verified against the docket.",
+        myCaseConnected: false,
       },
       disclaimer: "This information is provided for educational and procedural purposes only and does not constitute legal advice.",
       humanReviewRequired: true,

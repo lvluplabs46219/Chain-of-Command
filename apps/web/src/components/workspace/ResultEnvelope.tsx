@@ -90,7 +90,11 @@ export function ResultEnvelope({
           className="text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#20222B] hover:bg-[#282B37] text-neutral-300 border border-[#2E313D] transition-colors"
         >
           <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
-          <span>{citations.length} Grounded Sources</span>
+          <span>
+            {citations.length === 0
+              ? "0 docket-linked sources (myCase not connected)"
+              : `${citations.length} cited source${citations.length === 1 ? "" : "s"} (verify primary text)`}
+          </span>
           {showSources ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
         </button>
       </div>
