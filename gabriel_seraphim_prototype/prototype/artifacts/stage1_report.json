@@ -9,20 +9,19 @@
     {
       "name": "ruff",
       "status": "warn",
-      "stdout": "UP035 `typing.List` is deprecated, use `list` instead\n --> app.py:3:1\n  |\n1 | \"\"\"Minimal sample application with intentional bugs for the prototype pipeline.\"\"\"\n2 |\n3 | from typing import List, Any\n  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n4 | import ast\n  |\n\nI001 [*] Import block is un-sorted or un-formatted\n --> app.py:3:1\n  |\n1 |   \"\"\"Minimal sample application with intentional bugs for the prototype pipeline.\"\"\"\n2 |\n3 | / from typing import List, Any\n4 | | import ast\n  | |__________^\nhelp: Organize imports\n  |\n2 |\n  - from typing import List, Any\n3 | import ast\n4 + from typing import Any, List\n5 |\n  |\n\nF401 [*] `ast` imported but unused\n --> app.py:4:8\n  |\n3 | from typing import List, Any\n4 | import ast\n  |        ^^^\nhelp: Remove unused import: `ast`\n  |\n3 | from typing import List, Any\n  - import ast\n4 |\n  |\n\nUP006 [*] Use `list` instead of `List` for type annotation\n  --> app.py:14:25\n   |\n14 | def reverse_list(items: List[int]) -> List[int]:\n   |                         ^^^^\n15 |     \"\"",
-      "stderr": ""
+      "stdout": "",
+      "stderr": "/usr/bin/python3: No module named ruff\n"
     },
     {
       "name": "mypy",
-      "status": "ok",
-      "stdout": "Success: no issues found in 1 source file\n",
-      "stderr": ""
+      "status": "fail",
+      "stdout": "",
+      "stderr": "/usr/bin/python3: No module named mypy\n"
     },
     {
       "name": "tsc",
-      "status": "fail",
-      "stdout": "index.ts(14,3): error TS2322: Type 'string' is not assignable to type 'number'.\n",
-      "stderr": ""
+      "status": "skipped",
+      "detail": "tsc binary not found"
     },
     {
       "name": "container_build_mock",
@@ -32,6 +31,6 @@
   ],
   "passed": false,
   "errors": [
-    "tsc failed"
+    "mypy failed"
   ]
 }

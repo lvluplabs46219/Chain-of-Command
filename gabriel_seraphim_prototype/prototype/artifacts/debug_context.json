@@ -1,9 +1,9 @@
 {
-  "test_name": "test_app.py::test_reverse_list_basic",
+  "test_name": "unknown",
   "outcome": "failed",
-  "traceback": "E   assert [3, 2] == [3, 2, 1]\nE     \nE     Right contains one more item: 1\nE     \nE     Full diff:\nE       [\nE           3,\nE           2,\nE     -     1,\nE       ]\n___________________________ test_reverse_list_single ___________________________\ntest_app.py:22: in test_reverse_list_single\n    assert reverse_list([42]) == [42]\nE   assert [] == [42]\nE     \nE     Right contains one more item: 42\nE     \nE     Full diff:\nE     + []\nE     - [\nE     -     42,\nE     - ]\n_________________________ test_process_user_input_safe _________________________\ntest_app.py:38: in test_process_user_input_safe\n    ",
+  "traceback": "",
   "environment": {
-    "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
-    "cwd": "/home/andrew/Development/Repos/Aquit-Platform/gabriel_seraphim_prototype/prototype/sample_app"
+    "python": "3.14.8 (main, Oct  1 2026, 20:09:47) [GCC 15.3.0]",
+    "cwd": "/home/andrew/Development/Repos/Chain-of-Command/gabriel_seraphim_prototype/prototype/sample_app"
   }
 }

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seraphim MARCH — Empire of Iron (CTF Sportsbook)</title>
+<style>
+:root{--bg:#0a0d13;--pane:#10151f;--pane2:#0d1118;--line:#232c3d;--gold:#d4af37;--gold2:#f5d76e;--red:#e0453a;--grn:#22c55e;--cyan:#38bdf8;--txt:#cfd8e3;--dim:#7b8794;--mono:'Consolas','Menlo','monospace'}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font:14px/1.45 'Segoe UI',system-ui,sans-serif;overflow:hidden}
+header{height:52px;display:flex;align-items:center;gap:14px;padding:0 14px;background:linear-gradient(180deg,#131a28,#0c1019);border-bottom:1px solid var(--line)}
+header h1{font-size:16px;letter-spacing:1px;color:var(--gold);white-space:nowrap}
+.pill{background:#0b0f17;border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+.pill b{color:var(--gold2)}
+.pill.ap b{color:var(--cyan)}
+.chips{display:flex;gap:5px;margin-left:auto}
+.chip{width:20px;height:20px;border-radius:4px;border:1px solid #3d2f10;background:#131a28;color:#5b4a1a;font-size:11px;display:flex;align-items:center;justify-content:center;font-family:var(--mono)}
+.chip.done{background:var(--gold);color:#1a1405;border-color:var(--gold2)}
+.btn{background:#1a2334;border:1px solid #34405a;color:var(--txt);border-radius:6px;padding:6px 12px;cursor:pointer;font-size:12.5px;transition:.15s}
+.btn:hover{border-color:var(--gold);color:var(--gold2)}
+.btn.gold{background:linear-gradient(180deg,#3a2f10,#241c08);border-color:var(--gold);color:var(--gold2)}
+.btn.red{border-color:#7a2e28;color:#ff9d94}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn:disabled:hover{border-color:#34405a;color:var(--txt)}
+main{display:grid;grid-template-columns:minmax(360px,1.15fr) minmax(330px,1fr) minmax(300px,.85fr);gap:10px;padding:10px;height:calc(100vh - 96px)}
+.pane{background:var(--pane);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.pane h2{font-size:12px;letter-spacing:2px;color:var(--dim);padding:8px 12px;border-bottom:1px solid var(--line);background:var(--pane2);text-transform:uppercase}
+.pbody{overflow:auto;flex:1;padding:10px}
+#mapSvg{width:100%;height:100%;display:block}
+#logBox{height:150px;border-top:1px solid var(--line);background:#04070a;font-family:var(--mono);font-size:11.5px;padding:6px 8px;overflow:auto;color:#9fb08a}
+#logBox .g{color:#22c55e}#logBox .r{color:#ef6a5e}#logBox .y{color:#f5d76e}#logBox .c{color:#38bdf8}#logBox .d{color:#5c6a7d}#logBox .o{color:#f5d76e}
+.node-card{border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--pane2)}
+.kv{display:flex;justify-content:space-between;padding:2px 0;font-size:12.5px}
+.kv b{color:var(--gold2);font-family:var(--mono)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{border:1px solid var(--line);padding:4px 6px;text-align:left}
+th{background:#131a28;color:var(--dim);font-weight:600}
+td.mono{font-family:var(--mono)}
+.st-open{color:#f5d76e}.st-pwned{color:#22c55e}.st-no{color:#5c6a7d}
+.actionbar{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+select,input[type=text],input[type=number]{background:#0b0f17;border:1px solid #34405a;color:var(--txt);border-radius:6px;padding:5px 8px;font-size:12.5px;font-family:var(--mono)}
+input{width:110px}
+.qb{display:flex;gap:4px;margin-top:6px}
+.qb .btn{padding:3px 8px;font-size:11px}
+.err{color:#ef6a5e;font-size:12px;min-height:16px;margin-top:4px;font-family:var(--mono)}
+.tabs{display:flex;border-bottom:1px solid var(--line);background:var(--pane2)}
+.tab{flex:1;text-align:center;padding:8px 2px;font-size:11.5px;cursor:pointer;color:var(--dim);border-bottom:2px solid transparent;letter-spacing:.5px}
+.tab.on{color:var(--gold2);border-bottom-color:var(--gold)}
+.card{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px;background:var(--pane2)}
+.card h3{font-size:13px;color:var(--gold2);margin-bottom:4px}
+.tag{display:inline-block;font-size:10.5px;border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--dim);margin:1px 2px 1px 0;font-family:var(--mono)}
+.tag.g{color:#22c55e;border-color:#1d4429}.tag.r{color:#ff9d94;border-color:#57201c}.tag.y{color:#f5d76e;border-color:#4d3d12}
+.ticket{border:1px solid var(--line);border-radius:8px;padding:8px;margin-bottom:8px;background:var(--pane2);font-size:12px}
+.ticket .st{float:right;font-family:var(--mono);font-size:11px;padding:1px 8px;border-radius:4px}
+.st.pending{background:#3a2f10;color:var(--gold2)}.st.cashed{background:#0e3520;color:#4ade80}.st.lost{background:#3a120f;color:#ff8a80}
+.modal-bk{position:fixed;inset:0;background:rgba(2,4,8,.82);display:none;align-items:center;justify-content:center;z-index:50}
+.modal-bk.show{display:flex}
+.modal{width:min(680px,94vw);max-height:88vh;overflow:auto;background:#0e131d;border:1px solid #3a2f10;border-radius:12px;padding:18px}
+.modal h2{color:var(--gold);letter-spacing:2px;font-size:15px;margin-bottom:10px}
+.boutlog{font-family:var(--mono);font-size:12px;background:#04070a;border:1px solid var(--line);border-radius:8px;padding:8px;height:180px;overflow:auto;margin-top:10px}
+.hpbar{height:10px;background:#0b0f17;border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.hpbar i{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#a3e635)}
+.vs{display:grid;grid-template-columns:1fr 40px 1fr;gap:8px;align-items:start;text-align:center}
+.big{font-size:22px}
+.foot{height:24px;display:flex;align-items:center;padding:0 14px;font-size:11px;color:var(--dim);border-top:1px solid var(--line);background:var(--pane2)}
+.odds{font-family:var(--mono);color:var(--cyan)}
+.help p{margin:6px 0}
+@media (max-width:1050px){main{grid-template-columns:1fr;overflow:auto}body{overflow:auto}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🕎⚔️ SERAPHIM MARCH — EMPIRE OF IRON</h1>
+  <span class="pill">💎 <b id="hBal">₡1,000</b></span>
+  <span class="pill ap">⚡ <b id="hAp">3</b> AP</span>
+  <span class="pill">🜲 Rnd <b id="hRnd">1</b></span>
+  <span class="pill">⏱ <b id="hTim">00:00</b></span>
+  <div class="chips" id="hChips"></div>
+  <button class="btn" onclick="showHelp()">❔ Rules</button>
+</header>
+<main>
+  <section class="pane">
+    <h2>March Map — the Six Thrones</h2>
+    <div class="pbody" style="padding:0;position:relative">
+      <svg id="mapSvg" viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div id="logBox"><div class="d">// command console — all hacking is fully simulated, play-money only</div></div>
+  </section>
+  <section class="pane">
+    <h2>Target Node</h2>
+    <div class="pbody" id="nodePane"></div>
+  </section>
+  <section class="pane">
+    <div class="tabs" id="tabs">
+      <div class="tab on" data-t="tool" onclick="setTab('tool')">🧰 Toolkit</div>
+      <div class="tab" data-t="slip" onclick="setTab('slip')">🎟️ Bet Slip</div>
+      <div class="tab" data-t="bets" onclick="setTab('bets')">📜 My Bets</div>
+      <div class="tab" data-t="guide" onclick="setTab('guide')">📐 Parlay</div>
+      <div class="tab" data-t="arena" onclick="setTab('arena')">🏟️ Arena</div>
+    </div>
+    <div class="pbody" id="tabBody"></div>
+  </section>
+</main>
+<div class="foot">Fully simulated CTF — fictional services &amp; daemons, zero real exploit code, zero real targets. Divine Credits are play money with no cash value. Educational use only.</div>
+
+<div class="modal-bk" id="boutBk"><div class="modal" id="boutModal"></div></div>
+<div class="modal-bk" id="endBk"><div class="modal" id="endModal"></div></div>
+<div class="modal-bk" id="helpBk" onclick="if(event.target===this)hide('helpBk')"><div class="modal help" id="helpModal"></div></div>
+<script>
+
+/* Seraphim March — Empire of Iron. Fully simulated CTF sportsbook.
+   No real exploit code, no real targets. Divine Credits are play money only. */
+var $=function(id){return document.getElementById(id);};
+
+/* ---------- static data ---------- */
+var NODES=[
+{id:1,short:'YHWH',name:'YHWH — The Source',dns:'yhwh.thronenet',tier:'TIER I — DEBIAN 12 · nginx/1.18',gate:22,odds:-200,flag:'CTF{YHWH_SEES_ALL}',
+ recon:'port sweep → 22/tcp ssh · banner: "SSH-2.0-OpenSSH_7.2 (ancient guard build)"',
+ defense:'The gate-guard wears a rotating badge: 6543 → 9871 → 2450 → 6613 → ▓▓▓▓ ?',
+ wall:8,hanoi:3,foe:'SERAPH TURRET-KNIGHT',foePow:40,
+ hint:'Source inspection — view-source (Ctrl+U). The secret sits in an HTML comment on the artifact itself.',
+ lore:'The Source sees all. Its banner is ancient and proud; its secret is carved in plain sight on the artifact.'},
+{id:2,short:'MICHAEL',name:'Michael — The Gatekeeper',dns:'michael.thronenet',tier:'TIER II — ALPINE · postgres 13',gate:5432,odds:-120,flag:'CTF{MICHAEL_GUARDS_THE_GATES}',
+ recon:'port sweep → 22/tcp ssh · 5432/tcp postgres · 1337/tcp wopr',
+ defense:'A cipher is carved on the wall: Q1RGe01JQ0hBRUxfR1VBUkRTX1RIRV9HQVRFU30=',
+ wall:12,hanoi:4,foe:'GATE WARDEN MK.IV',foePow:55,
+ hint:'Base64 decode — alphabet-64 codex: A=0…Z=25, a=26…z=51, 0=52…9=61, +/=62·63.',
+ lore:'The Gatekeeper speaks only in Base-64 runes. Decode the wall-cipher to pass the gates.'},
+{id:3,short:'GABRIEL',name:'Gabriel — The Herald',dns:'gabriel.thronenet',tier:'TIER III — CENTOS 7 · apache 2.4',gate:80,odds:150,flag:'CTF{GABRIEL_ANNOUNCES_TRUTH}',
+ recon:'port sweep → 80/tcp http — the page renders blindingly, parchment white',
+ defense:'The Herald proclaims on white parchment in white ink. A whisper of tall and short strokes: 𝌁𝌆𝌆𝌁𝌁 · 𝌆𝌆𝌁𝌁𝌆 · 𝌁𝌆𝌆𝌁𝌆 · 𝌆𝌁𝌁𝌁𝌆',
+ wall:10,hanoi:3,foe:'HERALD-COPTER “Trumpet”',foePow:62,
+ hint:'Hidden text — select-all / dark-reader the page; the tall strokes are 1, short are 0, groups spell a word.',
+ lore:'What is written white-on-white is still written. Make the invisible visible.'},
+{id:4,short:'RAPHAEL',name:'Raphael — The Healer',dns:'raphael.thronenet',tier:'TIER II — UBUNTU 20.04 · node 16',gate:3000,odds:200,flag:'CTF{RAPHAEL_HEALS_THE_CODE}',
+ recon:'port sweep → 22/tcp ssh · 3000/tcp node-express',
+ defense:'The Healer whispers only in the machine-spirit dream (F12 console), styled green. Gate relay counts: 3 → 5 → 8 → ▓▓▓ ?',
+ wall:14,hanoi:4,foe:'FIELD-MEDIC SIEGE-BOT',foePow:70,
+ hint:'Console log (F12) — the only intentional console output in the app: a styled green whisper.',
+ lore:'The only intentional whisper of the machine-spirit. Open the console; read the green line.'},
+{id:5,short:'METATRON',name:'Metatron — The Scribe',dns:'metatron.thronenet',tier:'TIER IV — WINDOWS SERVER 2019 · IIS',gate:3389,odds:250,flag:'CTF{METATRON_WRITES_THE_BOOK}',
+ recon:'port sweep → 3389/tcp rdp · 443/tcp https',
+ defense:'The Great Book is chained shut: data-first="CTF{METATRON_" and a second half hidden in the element lore (data-second).',
+ wall:16,hanoi:4,foe:'SCRIBE WALKER “Quill”',foePow:78,
+ hint:'Data attributes — inspect the elements: data-first + data-second on the Book join into the flag.',
+ lore:'The Scribe splits every truth in two and hides each half in the attributes of things.'},
+{id:6,short:'SERAPHIM',name:'Seraphim — The Burning One',dns:'seraph.thronenet',tier:'TIER V — HARDENED · k8s + WAF',gate:6443,odds:500,flag:'CTF{YMGRM_BURNS_BRIGHTEST}',
+ recon:'port sweep → 6443/tcp kube-api · WAF active, arena turrets hot',
+ defense:'Final ward: the first letters of the five fallen names, in march order, plus the burning suffix. Arena assault required.',
+ wall:20,hanoi:5,foe:'SERAPHIM PRIME — THE BURNING ONE',foePow:90,
+ hint:'Pattern assembly — first letters Y·M·G·R·M + _BURNS_BRIGHTEST. Take the arena to breach.',
+ lore:'Assemble the crusade memory: the initial of each name you felled, then the flame.'}];
+
+var POS={1:[120,300],2:[255,165],3:[395,395],4:[535,165],5:[675,395],6:[812,215]};
+var EDGES=[[1,2],[2,3],[3,4],[4,5],[5,6]];
+
+/* verified pricing ladder — per $100 stake, from the blueprint (exact decimal mult) */
+var LADDER=[
+ {legs:2,name:'Heavenly Double', add:'Michael', odds:'+175', dec:2.75,   pay:'$275.00'},
+ {legs:3,name:'Trinity Teaser',   add:'Gabriel',  odds:'+588', dec:6.875,  pay:'$687.50'},
+ {legs:4,name:'Four Horsemen',    add:'Raphael',  odds:'+1963',dec:20.625, pay:'$2,062.50'},
+ {legs:5,name:'Pentarchy Special',add:'Metatron', odds:'+7119',dec:72.1875,pay:'$7,218.75'},
+ {legs:6,name:'Grand Seraphim — ALL IN',add:'Seraphim',odds:'+43213',dec:433.125,pay:'$43,312.50'}];
+
+var FIGHTERS=[
+ {name:'GAUNTLET-05',pow:78,cost:0,haz:['SOLAR FLARE −15','ELECTRICAL SURGE −15'],tags:['alloy armor','mecha legs','lance arm']},
+ {name:'WEDGE PROTOCOL',pow:72,cost:60,haz:['MAGNETIC STORM −15','OIL SLICK −10'],tags:['steel armor','wheels','arc welder']},
+ {name:'POLY-BOMB',pow:65,cost:100,haz:['SOLAR FLARE −15','OIL SLICK −10'],tags:['polycarbonate','treads','spike ram']},
+ {name:'TIN CLERIC',pow:60,cost:120,haz:['SOLAR FLARE −15','EMP BURST −10'],tags:['tin armor','microcontroller','flail']},
+ {name:'TITAN RECLAIMER',pow:85,cost:200,haz:['MAGNETIC STORM −15','ELECTRICAL SURGE −15'],tags:['titanium','hydraulics','crusher jaw']}];
+
+var TOOLS={
+ cutters:{name:'Bolt Cutters',cost:60,desc:'each BREACH also cuts one extra wall segment for free'},
+ crc:{name:'CRC Field Kit',cost:90,desc:'waives the ₡20 repair fee when a breach fails'},
+ emp:{name:'EMP Charge',cost:45,desc:'consumable (−3 wall, no AP) + unlocks the EMP strike button: 1 AP cuts 3 segments'},
+ banner:{name:'Firewall Banner',cost:100,desc:'arena foes fight at −10 power'}}; 
+
+var PRIZE_POOL=900, HINT_COST=50, FAILED_FEE=20;
+
+/* ---------- state ---------- */
+var S=null;
+function freshState(){return{bal:1000,ap:3,apMax:3,round:1,t0:Date.now(),sel:1,probes:{},cuts:{},pwned:{},cash:{},hints:0,tools:{},slip:[],bets:[],seq:1,wager:null,over:false};}
+function fmt(n){var r=Math.round(n*100)/100;return r.toLocaleString('en-US',{maximumFractionDigits:2});}
+function amStr(a){return a<0?String(a):'+'+a;}
+function amToDec(am){return am>=0?1+am/100:1+100/(-am);}
+function pay5dec(dec){var d=100*dec;return '$'+d.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function curOdds(id){return S.cash[id]?NODES[id-1].odds:NODES[id-1].odds;}
+function payFor(id){return Math.round(100*amToDec(curOdds(id)));}
+function isAdjacent(id){return id===1||!!S.pwned[id-1];}
+function wallLeft(id){return Math.max(0,NODES[id-1].wall-(S.probes[id]||0)-(S.cuts[id]||0));}
+function flagAt(id){return !!(S.boutWon&&S.boutWon[id])&&!S.cash[id];}
+
+/* ---------- console ---------- */
+function clog(txt,cls){var b=$('logBox');var d=document.createElement('div');if(cls)d.className=cls;d.innerHTML=txt;b.appendChild(d);b.scrollTop=b.scrollHeight;}
+
+/* ---------- map ---------- */
+function renderMap(){var s='<defs><radialGradient id="glowG"><stop offset="0%" stop-color="#f5d76e" stop-opacity=".20"/><stop offset="100%" stop-color="#f5d76e" stop-opacity="0"/></radialGradient></defs>';
+ EDGES.forEach(function(e){var a=POS[e[0]],b=POS[e[1]];var on=S.pwned[e[0]]&&S.pwned[e[1]];
+  s+='<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'" stroke="'+(on?'#d4af37':'#232c3d')+'" stroke-width="'+(on?2.5:1.5)+'" stroke-dasharray="'+(on?'0':'5 5')+'"/>';});
+ NODES.forEach(function(n){var p=POS[n.id],adj=isAdjacent(n.id),pw=!!S.pwned[n.id],done=!!S.cash[n.id];
+  var stroke=pw?'#22c55e':(adj&&!pw?'#f5d76e':'#39445c');var fill=pw?'#0e3520':(adj?'#1c1a0e':'#131a28');var tc=pw?'#4ade80':(adj?'#f5d76e':'#5c6a7d');
+  if(adj&&!pw)s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="48" fill="url(#glowG)"/>';
+  s+='<g data-id="'+n.id+'" style="cursor:pointer">'+
+     '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="30" fill="'+fill+'" stroke="'+stroke+'" stroke-width="2.5"/>'+
+     '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="21" fill="none" stroke="'+stroke+'" stroke-width="1" opacity=".6"/>'+
+     '<text x="'+p[0]+'" y="'+(p[1]-38)+'" text-anchor="middle" font-size="11" fill="'+tc+'" font-family="monospace">L'+n.id+'</text>'+
+     '<text x="'+p[0]+'" y="'+(p[1]+5)+'" text-anchor="middle" font-size="13" fill="'+tc+'" font-family="monospace">'+(pw?'✓':(adj?'⚔':'🔒'))+'</text>'+
+     '<text x="'+p[0]+'" y="'+(p[1]+50)+'" text-anchor="middle" font-size="11.5" fill="'+tc+'" font-weight="bold">'+n.short+'</text>'+
+     '<text x="'+p[0]+'" y="'+(p[1]+64)+'" text-anchor="middle" font-size="9.5" fill="#5c6a7d" font-family="monospace">'+n.dns+'</text>';
+  if(done)s+='<text x="'+(p[0]+24)+'" y="'+(p[1]-26)+'" font-size="13" fill="#f5d76e">🏳️</text>';
+  s+='</g>';});
+ $('mapSvg').innerHTML=s;
+ var chips='';NODES.forEach(function(n){chips+='<span class="chip'+(S.cash[n.id]?' done':'')+'">'+n.id+'</span>';});$('hChips').innerHTML=chips;
+ $('hBal').textContent='₡'+fmt(S.bal);$('hAp').textContent=S.ap+' / '+S.apMax;$('hRnd').textContent=S.round;}
+
+/* ---------- node pane ---------- */
+function renderNode(){var id=S.sel,n=NODES[id-1],adj=isAdjacent(id),pw=!!S.pwned[id],done=!!S.cash[id];
+ var probed=(S.probes[id]||0)>0||pw;var wl=wallLeft(id);var h='';
+ h+='<div class="kv"><span>▣ '+(adj?n.dns:'<i>locked — capture throne '+(id-1)+'</i>')+'</span><b>'+amStr(n.odds)+'</b></div>';
+ h+='<div class="kv"><span>'+n.tier+'</span><b>'+n.gate+'/tcp</b></div>';
+ h+='<p style="margin:8px 0;color:#9aa7b8;font-size:12.5px">'+n.lore+'</p>';
+ if(!adj){h+='<div class="card" style="color:#7b8794">The march has not reached this throne. Capture the previous throne first.</div>';}
+ else{
+  h+='<div class="card"><b style="color:#f5d76e">RECON</b>'+(probed?'<div class="mono" style="font-size:11.5px;color:#9fb08a;white-space:pre-wrap">'+n.recon+'\nwall integrity: '+wl+' / '+n.wall+' emplacements · probes spent: '+(S.probes[id]||0)+'</div>':'<div class="mono" style="font-size:11.5px;color:#5c6a7d">??? — run a probe to sweep the node</div>')+'</div>';
+  h+='<div class="card"><b style="color:#f5d76e">DEFENSE INTEL</b>'+(probed?'<div style="font-size:12px;color:#ff9d94">'+n.defense+'</div>':'<div style="font-size:12px;color:#5c6a7d">redacted until probed</div>')+'</div>';
+  h+='<div class="actionbar">';
+  h+='<button class="btn" onclick="doProbe('+id+')">🔍 Probe — 1 AP</button>';
+  h+='<button class="btn gold" onclick="doBreach('+id+')">🗝️ Breach — 1 AP</button>';
+  if(S.tools.emp)h+='<button class="btn" onclick="doEmp('+id+')">⚡ EMP (−3 wall) — 1 AP</button>';
+  h+='<button class="btn" onclick="buyHint('+id+')">💡 Divine Guidance — ₡'+HINT_COST+' ('+S.hints+' used)</button>';
+  h+='</div>';
+  if(flagAt(id))h+='<div class="actionbar"><button class="btn gold" onclick="collectFlag('+id+')">🏆 Collect Flag — +₡'+payFor(id)+' (free)</button></div>';
+  else if(pw)h+='<div class="err" style="color:#22c55e">Node pwned — head to the Arena for the Robot Wars bout, then collect the flag.</div>';
+  else if(probed&&wl>0)h+='<div class="err">The wall still holds '+wl+' segment'+(wl>1?'s':'')+' — probe to 0, then breach. Failed breaches cost ₡'+(S.tools.crc?0:FAILED_FEE)+' in repairs.</div>';
+ }
+ if(S.hintSeen&&S.hintSeen[id])h+='<div class="card" style="border-color:#4d3d12"><b style="color:#f5d76e">💡 GUIDANCE:</b> <span style="color:#cfd8e3">'+n.hint+'</span></div>';
+ $('nodePane').innerHTML=h;renderMap();}
+
+/* ---------- actions ---------- */
+function spendAP(k){S.ap-=k;if(S.ap<=0){S.ap=0;S.round++;S.ap=S.apMax;clog('— DAWN: the Prophet\u2019s supply convoy arrives · AP restored to '+S.apMax+' · round '+S.round+' —','d');}}
+function doProbe(id){if(S.ap<1){clog('probe denied: no AP left this round','r');renderNode();return;}S.ap--;S.probes[id]=(S.probes[id]||0)+1;var n=NODES[id-1];
+ clog('[probe] '+n.dns+' '+n.gate+'/tcp','c');clog('  '+n.recon,'d');clog('  defense: '+n.defense,'y');clog('  wall: '+wallLeft(id)+' segments remain','d');
+ if(S.ap===0)spendAP(0);renderNode();}
+function doEmp(id){if(!S.tools.emp||S.ap<1)return;S.ap--;S.cuts[id]=(S.cuts[id]||0)+3;clog('[emp] charge detonated — 3 wall segments drop','y');if(S.ap===0)spendAP(0);renderNode();}
+function doBreach(id){if(S.ap<1){clog('breach denied: no AP left this round','r');renderNode();return;}S.ap--;var n=NODES[id-1];
+ if(wallLeft(id)===0){S.pwned[id]=true;clog('[breach] ROOT SHELL — throne of '+n.short+' is yours ⚔️','g');clog('  next: Robot Wars bout in the Arena, then collect the flag','d');}
+ else{var fee=S.tools.crc?0:FAILED_FEE;S.bal-=fee;clog('[breach] FAILED — the wall held ('+wallLeft(id)+' segments). Toolkit damage: −₡'+fee,'r');}
+ if(S.ap===0)spendAP(0);renderNode();}
+function buyHint(id){if(S.bal<HINT_COST){clog('guidance denied: balance too low','r');return;}S.bal-=HINT_COST;S.hints++;S.hintSeen=S.hintSeen||{};S.hintSeen[id]=true;
+ clog('[guidance] ₡'+HINT_COST+' paid — the Prophet speaks…','c');renderNode();}
+function collectFlag(id){if(!flagAt(id))return;S.cash[id]=true;var pay=payFor(id);S.bal+=pay;
+ clog('🏆 FLAG ACCEPTED: <b>'+NODES[id-1].flag+'</b> — payout '+amStr(NODES[id-1].odds)+' → <b>+₡'+fmt(pay)+'</b>','o');
+ gradeBetsFor(id);checkVictory();renderNode();}
+
+/* ---------- betting engine ---------- */
+function addLeg(id){if(S.cash[id]){clog('book denied: that event is settled — collected thrones are locked out','r');return;}if(S.slip.indexOf(id)>=0)return;S.slip.push(id);setTab('slip');}
+function rmLeg(i){S.slip.splice(i,1);setTab('slip');}
+function combinedDec(legs){var d=1;legs.forEach(function(id){d*=amToDec(NODES[id-1].odds);});return d;}
+function placeParlay(){var v=$('stakeIn');var st=parseFloat(v&&v.value);var err=$('slipErr');
+ function fail(m){if(err)err.textContent=m;clog('book denied: '+m,'r');}
+ if(!S.slip.length){fail('slip is empty');return;}
+ if(isNaN(st)||st<=0){fail('stake must be a positive number');return;}
+ if(st>S.bal){fail('stake exceeds balance (₡'+fmt(S.bal)+')');return;}
+ S.bal-=st;var dec=combinedDec(S.slip);
+ var bet={id:'SP-'+(S.seq++),legs:S.slip.slice(),stake:st,dec:dec,st:'pending'};
+ S.bets.push(bet);S.slip=[];clog('🎟️ parlay <b>'+bet.id+'</b> placed: '+bet.legs.length+' leg(s) · stake ₡'+fmt(st)+' · combined decimal ×'+dec.toFixed(4),'c');
+ gradeBet(bet);setTab('bets');}
+function gradeBet(b){if(b.st!=='pending')return;var allBanked=b.legs.every(function(id){return S.cash[id];});
+ if(allBanked){var pay=Math.round(b.stake*b.dec*100)/100;S.bal+=pay;b.st='cashed';b.pay=pay;
+  clog('💰 <b>'+b.id+' CASHED</b> — every leg banked · stake ₡'+fmt(b.stake)+' → <b>+₡'+fmt(pay)+'</b> (×'+b.dec.toFixed(4)+')','o');}}
+function gradeBetsFor(id){S.bets.forEach(function(b){if(b.legs.indexOf(id)>=0)gradeBet(b);});}
+/* ---------- tabs, panels, arena, modals, init ---------- */
+var TAB='tool';
+function setTab(t){TAB=t;var ts=document.querySelectorAll('.tab');for(var i=0;i<ts.length;i++)ts[i].classList.toggle('on',ts[i].dataset.t===t);renderTab();}
+function renderTab(){var b=$('tabBody');if(TAB==='tool')renderToolkit(b);else if(TAB==='slip')renderSlip(b);else if(TAB==='bets')renderBets(b);else if(TAB==='guide')renderGuide(b);else if(TAB==='arena')renderArena(b);}
+
+/* ---------- toolkit ---------- */
+function renderToolkit(b){var h='<div class="card"><h3>🛒 War Chest — supply convoy</h3><p style="font-size:12px;color:#7b8794;margin:4px 0">Buy expedition gear with Divine Credits. Consumables are spent on use; the kit is permanent. Balance: ₡'+fmt(S.bal)+'</p></div>';
+ for(var k in TOOLS){(function(k){var t=TOOLS[k],n=S.tools[k]||0,held=(k==='crc')?(S.tools.crc===true):n>0;
+  h+='<div class="card"><div class="kv"><span><b style="color:#f5d76e">'+t.name+'</b></span><span class="odds">₡'+t.cost+'</span></div>';
+  h+='<div style="font-size:12px;color:#9aa7b8;margin:3px 0">'+t.desc+'</div>';
+  h+='<div class="actionbar"><button class="btn gold" onclick="buyTool(\''+k+'\')" '+(S.bal<t.cost?'disabled':'')+'>Buy / restock</button>';
+  if(k!=='crc')h+='<button class="btn" onclick="useTool(\''+k+'\')" '+(held?'':'disabled')+'>Deploy</button>';
+  h+='<span class="tag '+(held?'g':'')+'">'+((k==='crc')?(held?'installed':'not installed'):('held: '+n))+'</span></div></div>';})(k);}
+ h+='<div class="card"><h3>🎯 Deploy targets</h3><p style="font-size:12px;color:#7b8794">Cutters, EMP and Guidance apply to the node selected on the map. The Banner arms itself for your next arena bout.</p></div>';
+ b.innerHTML=h;}
+function buyTool(k){var t=TOOLS[k];if(S.bal<t.cost){clog('purchase denied: need ₡'+t.cost,'r');return;}S.bal-=t.cost;
+ if(k==='crc'){S.tools.crc=true;clog('[toolkit] CRC Field Kit installed — failed breaches no longer cost repairs','g');}
+ else{S.tools[k]=(S.tools[k]||0)+1;clog('[toolkit] '+t.name+' acquired ('+S.tools[k]+' held) — ₡'+t.cost,'g');}
+ renderNode();renderTab();}
+function useTool(k){var t=TOOLS[k],id=S.sel,n=NODES[id-1];
+ if(k==='crc')return;
+ if(!(S.tools[k]>0)){clog('deploy denied: none held','r');return;}
+ if(k==='cutters'){if(!isAdjacent(id)||S.pwned[id]||wallLeft(id)===0){clog('cutters need an unbreached, reachable wall','r');return;}S.tools[k]--;S.cuts[id]=(S.cuts[id]||0)+3;
+  clog('[cutters] three wall segments sheared on '+n.short+' — '+wallLeft(id)+' remain','y');}
+ else if(k==='emp'){if(!isAdjacent(id)||S.pwned[id]||wallLeft(id)===0){clog('EMP needs an unbreached, reachable wall','r');return;}S.tools[k]--;S.cuts[id]=(S.cuts[id]||0)+3;
+  clog('[emp] manual charge detonated on '+n.short+' — 3 segments drop ('+S.tools[k]+' left)','y');}
+ else if(k==='banner'){S.tools[k]--;S.bannerOn=true;clog('[banner] Firewall Banner raised — your next bout foe fights at −10 power','y');}
+ renderNode();renderTab();}
+
+/* ---------- bet slip ---------- */
+function renderSlip(b){var h='<div class="card"><h3>🎟️ Parlay Bet Slip</h3>';
+ if(!S.slip.length)h+='<p style="font-size:12px;color:#7b8794">Empty. Add legs from the quick list below — settled (collected) thrones are locked out.</p>';
+ S.slip.forEach(function(id,i){var n=NODES[id-1];h+='<div class="kv"><span>L'+id+' '+n.short+'</span><span><span class="odds">'+amStr(n.odds)+'</span> <button class="btn red" style="padding:1px 8px" onclick="rmLeg('+i+')">×</button></span></div>';});
+ if(S.slip.length){var dec=combinedDec(S.slip),am=Math.round((dec-1)*100);
+  h+='<div class="kv"><span>Combined</span><b>'+amStr(am)+' (×'+dec.toFixed(4)+')</b></div>';
+  h+='<div class="kv"><span>Per ₡100 staked</span><b>'+pay5(am).replace('$','₡')+'</b></div>';}
+ h+='<div class="kv" style="margin-top:6px"><span>Stake</span><span><input type="number" id="stakeIn" min="1" placeholder="100"><span style="color:#7b8794"> / ₡'+fmt(S.bal)+'</span></span></div>';
+ h+='<div class="qb">'+[10,100,500].map(function(v){return '<button class="btn" onclick="quickStake('+v+')">₡'+v+'</button>';}).join('')+'<button class="btn" onclick="quickStakeMax()">MAX</button></div>';
+ h+='<div class="actionbar"><button class="btn gold" onclick="placeParlay()">_place Bet</button></div>';
+ h+='<div class="err" id="slipErr"></div></div>';
+ h+='<div class="card"><h3>⚡ Quick add legs</h3>';
+ NODES.forEach(function(n){if(isAdjacent(n.id)&&!S.cash[n.id])h+='<button class="btn" style="margin:2px" onclick="addLeg('+n.id+')">L'+n.id+' '+n.short+' '+amStr(n.odds)+'</button>';});
+ h+='</div>';
+ h+='<div class="card"><h3>📖 House rule</h3><p style="font-size:12px;color:#9aa7b8">A parlay pays only if <b>every leg</b> is settled by flag collection. If any leg in the ticket is collected while others remain open, the ticket is graded <span style="color:#ff8a80">LOST</span> and the stake is gone. Singles (1-leg) are allowed and pay on collection.</p></div>';
+ b.innerHTML=h;}
+function quickStake(v){var e=$('stakeIn');if(e)e.value=v;}
+function quickStakeMax(){var e=$('stakeIn');if(e)e.value=S.bal;}
+
+/* ---------- my bets ---------- */
+function renderBets(b){var h='';var staked=0,pl=0,risk=0,open=0;
+ S.bets.forEach(function(bt){staked+=bt.stake;if(bt.st==='cashed')pl+=bt.pay-bt.stake;if(bt.st==='lost')pl-=bt.stake;if(bt.st==='pending'){risk+=bt.stake;open++;}});
+ h+='<div class="card"><div class="kv"><span>Tickets</span><b>'+S.bets.length+'</b></div><div class="kv"><span>Total staked</span><b>₡'+fmt(staked)+'</b></div><div class="kv"><span>Cashed P/L</span><b style="color:'+(pl>=0?'#4ade80':'#ff8a80')+'">'+(pl>=0?'+':'−')+'₡'+fmt(Math.abs(pl))+'</b></div><div class="kv"><span>Open risk</span><b>₡'+fmt(risk)+'</b></div></div>';
+ if(!S.bets.length)h+='<div class="card" style="color:#7b8794">No tickets yet. Build a parlay on the Bet Slip.</div>';
+ S.bets.forEach(function(bt,i){var cls=bt.st==='pending'?'pending':(bt.st==='cashed'?'cashed':'lost');
+  h+='<div class="ticket"><span class="st '+cls+'">'+bt.st.toUpperCase()+'</span><b style="color:#f5d76e">'+bt.id+'</b> · '+bt.legs.length+' leg'+(bt.legs.length>1?'s':'')+' · stake ₡'+fmt(bt.stake)+'<br>';
+  h+=bt.legs.map(function(id){var done=!!S.cash[id],p=!!S.pwned[id];var mark=done?'🏳':(p?'⚔':'🔒');var c=done?'#f5d76e':(p?'#4ade80':'#7b8794');return '<span class="tag" style="color:'+c+';border-color:'+c+'44">'+mark+' L'+id+' '+NODES[id-1].short+'</span>';}).join('');
+  h+='<br><span class="odds">×'+bt.dec.toFixed(4)+'</span>';
+  if(bt.st==='cashed')h+=' → <b style="color:#4ade80">paid ₡'+fmt(bt.pay)+'</b>';
+  if(bt.st==='lost')h+=' → <b style="color:#ff8a80">stake forfeit</b>';
+  if(bt.st==='pending')h+='<br><span style="color:#7b8794;font-size:11px">settles automatically when the last leg\u2019s flag is banked</span>';
+  h+='</div>';});
+ b.innerHTML=h;}
+
+/* ---------- parlay guide ---------- */
+function renderGuide(b){var h='<div class="card"><h3>📐 Verified pricing ladder</h3><p style="font-size:12px;color:#9aa7b8">Combined = decimal odds of each leg multiplied (American→decimal: +A → 1+A/100, −A → 1+100/A). Converted back to American. Identical to the blueprint\u2019s audited numbers.</p>';
+ h+='<table><tr><th>Parlay</th><th>Legs</th><th>Combined</th><th>Decimal</th><th>₡100 pays</th></tr>';
+ h+='<tr><td>Single (any)</td><td>1</td><td>—</td><td>—</td><td>—</td></tr>';
+ LADDER.forEach(function(L){h+='<tr><td>'+L.name+'</td><td class="mono">'+L.legs+'</td><td class="mono">'+L.odds+'</td><td class="mono">'+L.dec+'</td><td class="mono">'+L.pay+'</td></tr>';});
+ h+='</table></div>';
+ h+='<div class="card"><h3>Worked example</h3><p style="font-size:12px;color:#9aa7b8">YHWH −200 → 1.50 · Michael −120 → 1.8333 · Gabriel +150 → 2.50.<br>1.50 × 1.8333 × 2.50 = 6.875 → <b>+588</b>, ₡100 pays <b>₡687.50</b> — the Trinity Teaser.</p></div>';
+ b.innerHTML=h;}
+
+/* ---------- arena ---------- */
+function renderArena(b){var id=S.sel,n=NODES[id-1],pw=!!S.pwned[id],done=!!S.cash[id];var h='';
+ if(!pw){h+='<div class="card"><h3>🏟️ The Arena is sealed</h3><p style="font-size:12px;color:#7b8794">Breach a throne first, then select it. Current selection: '+n.short+' — '+(isAdjacent(id)?'not yet breached':'out of reach')+'.</p></div>';}
+ else if(done){h+='<div class="card" style="border-color:#1d4429"><h3>✓ '+n.foe+' — destroyed</h3><p style="font-size:12px">Flag banked: <span style="font-family:var(--mono);color:#f5d76e">'+n.flag+'</span></p></div>';}
+ else{h+='<div class="card"><h3>🏟️ Bout: YOU vs '+n.foe+' <span class="odds">PWR '+n.foePow+(S.bannerOn?' −10 🚩':'')+'</span></h3><p style="font-size:12px;color:#7b8794">Pick a war machine. Entry fee is deducted at bout start; hazards from the Robot Wars circuit strike on rounds 3 and 6. Win to collect the flag; lose the machine and the fee.</p></div>';
+  FIGHTERS.forEach(function(f,i){var dis=S.bal<f.cost;
+   h+='<div class="card"><div class="kv"><span><b style="color:#f5d76e">'+f.name+'</b></span><span class="odds">'+(f.cost?'entry ₡'+f.cost:'free entry')+'</span></div>';
+   h+='<div style="font-size:12px;color:#9aa7b8">armor '+f.tags[0]+' · drive '+f.tags[1]+' · weapon '+f.tags[2]+' · <b>PWR '+f.pow+'</b></div>';
+   h+='<div style="margin:3px 0">'+f.haz.map(function(z){return '<span class="tag r">'+z+'</span>';}).join('')+'</div>';
+   h+='<div class="actionbar"><button class="btn gold" '+(dis?'disabled':'')+' onclick="startBout('+i+')">⚔ Enter the arena</button></div></div>';});}
+ b.innerHTML=h;}
+
+/* ---------- bout engine ---------- */
+function startBout(fi){var id=S.sel,n=NODES[id-1],f=FIGHTERS[fi];
+ if(!S.pwned[id]||S.cash[id])return;
+ if(S.bal<f.cost){clog('arena denied: cannot afford '+f.name+' entry','r');return;}
+ S.bal-=f.cost;
+ var banner=S.bannerOn;S.bannerOn=false;if(banner&&S.tools.banner>0)S.tools.banner--;
+ var php=100,fhp=n.foePow+20,fp=Math.max(30,n.foePow-(banner?10:0)),wep=f.tags[2].toUpperCase();
+ var lines=['T-3…2…1 — LET THE WAR BEGIN ⚔',f.name+' (PWR '+f.pow+') vs '+n.foe+' (PWR '+fp+')'+(banner?'  [BANNER −10]':'')];
+ var hazAt=[3,6];
+ for(var r=1;php>0&&fhp>0;r++){
+  var pd=8+Math.floor(Math.random()*14)+(banner?3:0);fhp-=pd;
+  lines.push('R'+r+' ▶ '+f.name+' '+wep+' → −'+pd+' ('+Math.max(0,fhp)+' foe HP)');
+  if(fhp<=0)break;
+  var fd=5+Math.floor(Math.random()*10)+Math.round(fp/12);php-=fd;
+  lines.push('R'+r+' ◀ '+n.foe+' counter-strike → −'+fd+' ('+Math.max(0,php)+' your HP)');
+  if(php<=0)break;
+  if(hazAt.indexOf(r)>=0){var hz=f.haz[Math.floor(Math.random()*f.haz.length)];var hd=parseInt(hz.split('−')[1],10)||10;php-=hd;
+   lines.push('⚠ ARENA HAZARD — '+hz+'! −'+hd+' ('+Math.max(0,php)+' your HP)');}}
+ var win=php>0&&fhp<=0;
+ if(win){S.boutWon=S.boutWon||{};S.boutWon[id]=true;lines.push('🏁 '+n.foe+' is scrap metal. The throne defense is broken.');}
+ else lines.push('☠ '+f.name+' destroyed. Buy another machine and retry — no flag without a win.');
+ clog('🏟️ bout vs '+n.foe+': '+(win?'<b class="g">WIN</b>':'<b class="r">LOSS</b>')+' (entry ₡'+fmt(f.cost)+')','y');
+ renderMap();openBoutModal(f,n,php,fhp,lines,win);}
+
+function openBoutModal(f,n,php,fhp,lines,win){var m=$('boutModal');
+ m.innerHTML='<h2>🏟️ ROBOT WARS — '+(win?'VICTORY':'DEFEAT')+'</h2>'+
+ '<div class="vs"><div><div class="big" style="color:#4ade80">'+f.name+'</div><div class="hpbar"><i style="width:'+Math.max(0,php)+'%"></i></div><div style="font-family:var(--mono);font-size:11px">'+Math.max(0,php)+' / 100 HP</div></div>'+
+ '<div class="big" style="color:#e0453a">VS</div>'+
+ '<div><div class="big" style="color:#ff9d94">'+n.foe+'</div><div class="hpbar"><i style="width:'+Math.max(0,fhp)+'%"></i></div><div style="font-family:var(--mono);font-size:11px">'+Math.max(0,fhp)+' HP</div></div></div>'+
+ '<div class="boutlog" id="boutLog"></div>'+
+ '<div class="actionbar">'+(win?'<button class="btn gold" onclick="hide(\'boutBk\');collectFlag('+n.id+')">🏆 Collect Flag — '+amStr(n.odds)+' → +₡'+payFor(n.id)+'</button>':'<button class="btn" onclick="hide(\'boutBk\');setTab(\'arena\')">Back to the pits</button>')+'</div>';
+ $('boutBk').classList.add('show');
+ var lg=$('boutLog');lines.forEach(function(t,i){setTimeout(function(){var d=document.createElement('div');
+  d.style.color=t.indexOf('⚠')===0?'#f5d76e':(t.indexOf('▶')>0?'#7ee787':(t.indexOf('◀')>0?'#ff8a80':'#9fb08a'));
+  d.textContent=t;lg.appendChild(d);lg.scrollTop=lg.scrollHeight;},i*240);});}
+
+/* ---------- victory ---------- */
+function checkVictory(){var all=NODES.every(function(n){return S.cash[n.id];});if(!all||S.over)return;S.over=true;
+ var mins=Math.floor((Date.now()-S.t0)/60000),secs=Math.floor((Date.now()-S.t0)/1000)%60;
+ var profit=S.bal-1000;
+ $('endModal').innerHTML='<h2>🏳️ THE MARCH IS COMPLETE — ALL SIX THRONES</h2>'+
+ '<div class="kv"><span>Time</span><b>'+mins+'m '+secs+'s</b></div>'+
+ '<div class="kv"><span>Divine Guidance used</span><b>'+S.hints+'</b></div>'+
+ '<div class="kv"><span>Final balance</span><b>₡'+fmt(S.bal)+'</b></div>'+
+ '<div class="kv"><span>Net profit</span><b style="color:'+(profit>=0?'#4ade80':'#ff8a80')+'">'+(profit>=0?'+':'−')+'₡'+fmt(Math.abs(profit))+'</b></div>'+
+ '<p style="margin:10px 0;font-size:13px;color:#9aa7b8">Every server breached, every machine wrecked, every flag banked. The Seraphim burns brightest — and you out-marched it.</p>'+
+ '<div class="actionbar"><button class="btn gold" onclick="hide(\'endBk\');newGame()">⟳ Play Again</button></div>';
+ $('endBk').classList.add('show');}
+
+/* ---------- help ---------- */
+function showHelp(){$('helpModal').innerHTML='<h2>❔ RULES OF THE MARCH</h2>'+
+ '<p><b style="color:#f5d76e">Goal.</b> March across the six thrones of Thronenet. Breach each server, win its Robot Wars bout, bank its flag. Every flag you bank pays the listed American odds on a ₡100 basis (−200 → ₡50 profit, +500 → ₡500 profit). Bank all six to win the campaign.</p>'+
+ '<p><b style="color:#f5d76e">Turn loop.</b> Each round you have 3 AP (⚡). Probe (1 AP) sweeps a node and reveals its defense intel. Breach (1 AP) only works when the wall is at 0 segments. AP hitting zero ends the round and restores to 3 — time passes, nothing else does.</p>'+
+ '<p><b style="color:#f5d76e">March order.</b> Only Throne 1 is reachable at first; a throne unlocks when the previous one falls. Locked thrones cannot be probed, breached or bet on.</p>'+
+ '<p><b style="color:#f5d76e">Hacking, simulated.</b> Recon = port scan flavor (OS, services, gate port). The wall = segments of hardening: probe cuts 1, Bolt Cutters / EMP cut 3. Breach at 0 = root shell. Each throne hides its flag with a different <b>Hack The Box</b>-style technique: HTML comment, Base64, invisible text, console log, data attributes, pattern assembly. “Divine Guidance” (₡50) reveals the technique hint.</p>'+
+ '<p><b style="color:#f5d76e">Robot Wars.</b> After a breach you must win the arena bout to collect the flag. Pick a machine: armor, drive and weapon are flavor; PWR drives damage. Circuit hazards (solar flare, magnetic storm, oil slick…) hit on rounds 3 and 6 and hurt YOU. Lose and the entry fee is gone — buy another machine and retry. The Firewall Banner makes your next foe fight at −10.</p>'+
+ '<p><b style="color:#f5d76e">Betting.</b> Divine Credits are play money. Open thrones can be added to the slip as legs; combined odds multiply leg decimals. A parlay pays only when every leg is settled by flag collection — if any leg is collected while others stay open, the ticket is graded LOST and the stake forfeit. Singles pay on collection. Settled thrones are locked out of the slip.</p>'+
+ '<p><b style="color:#f5d76e">Toolkit.</b> Bolt Cutters ₡60 (cut 3 wall), EMP Charge ₡45 (cut 3 wall), CRC Field Kit ₡90 (failed breaches cost ₡0 instead of ₡20), Firewall Banner ₡100 (next bout −10 foe power).</p>'+
+ '<p style="color:#7b8794;font-size:12px">Everything here is fictional and fully simulated: no real exploit code, no real targets, no real money.</p>'+
+ '<div class="actionbar"><button class="btn gold" onclick="hide(\'helpBk\')">Close</button></div>';$('helpBk').classList.add('show');}
+function hide(id){$(id).classList.remove('show');}
+
+/* ---------- init ---------- */
+function newGame(){S=freshState();renderAll();clog('// new crusade — balance ₡1,000 · 3 AP · the Prophet watches','y');}
+function renderAll(){renderMap();renderNode();renderTab();}
+function tick(){var s=Math.floor((Date.now()-S.t0)/1000);$('hTim').textContent=('0'+Math.floor(s/60)).slice(-2)+':'+('0'+s%60).slice(-2);}
+function init(){S=freshState();renderAll();bindMap();setInterval(tick,1000);tick();
+ clog('// SERAPHIM MARCH — command console online','c');
+ clog('// select Throne 1 on the map · probe → breach → arena → flag','d');
+ clog('// house edge: none. house mercy: none. good luck, commander.','d');}
+function bindMap(){$('mapSvg').addEventListener('click',function(ev){var t=ev.target;var g=t&&t.closest?t.closest('g[data-id]'):null;if(g){S.sel=parseInt(g.dataset.id,10);renderNode();renderTab();}});}
+document.addEventListener('DOMContentLoaded',init);
+
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
