@@ -51,18 +51,17 @@ export function WorkspaceHeader({
       <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-md supports-[backdrop-filter]:bg-zinc-900/70">
         {/* Utility tray — global safety + disclaimer only */}
         <div className="flex items-center justify-end gap-2 px-4 sm:px-6 py-1.5 border-b border-zinc-800/80 bg-zinc-950/40">
-          <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-amber-500/90">
+          <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-amber-500/80">
             <Info className="w-3 h-3" />
             Pro se workspace — not legal advice
           </span>
-          {/* Crisis lifeline: supportive teal, never alarm-red (avoids error-state association) */}
           <button
             type="button"
             onClick={() => setCrisisModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-teal-950/40 border border-teal-600/40 hover:bg-teal-900/50 hover:border-teal-500/60 text-teal-200 text-[11px] font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
-            title="Crisis & safety resources (988)"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-950/50 border border-red-800/50 hover:bg-red-900/50 text-red-300 text-[11px] font-medium transition-colors"
+            title="Crisis & Safety Protocol"
           >
-            <PhoneCall className="w-3.5 h-3.5 text-teal-300" />
+            <PhoneCall className="w-3.5 h-3.5 text-red-400" />
             <span>Crisis Help (988)</span>
           </button>
         </div>
@@ -79,11 +78,11 @@ export function WorkspaceHeader({
                   <span className="font-bold text-sm tracking-wide text-white uppercase font-mono">
                     Chain of Command
                   </span>
-                  <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700">
+                  <span className="text-[10px] uppercase font-mono tracking-wider px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
                     Legal OS
                   </span>
                 </div>
-                <p className="text-[11px] text-zinc-400 hidden sm:block">
+                <p className="text-[11px] text-zinc-300 font-medium hidden sm:block">
                   Case operating workspace for self-represented litigants
                 </p>
               </div>
@@ -95,19 +94,21 @@ export function WorkspaceHeader({
               <button
                 type="button"
                 onClick={() => setMatterDropdownOpen(!matterDropdownOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-[#D4AF37]/40 text-xs font-medium text-zinc-200 transition-colors max-w-full"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-[#D4AF37]/50 text-xs font-medium text-zinc-200 transition-colors max-w-full"
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-                <div className="text-left min-w-0">
-                  <div className="font-semibold text-white max-w-[180px] sm:max-w-[240px] truncate">
-                    {activeMatter.title}
+                <span className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0" />
+                <div className="text-left min-w-0 leading-tight">
+                  <div className="font-semibold text-white text-xs max-w-[180px] sm:max-w-[240px] truncate leading-5">
+                    {activeMatter.title || "No matter open"}
                   </div>
-                  <div className="text-[10px] text-zinc-400 font-mono truncate">
-                    {activeMatter.caseNumber}
+                  <div className="text-[10px] text-zinc-400 font-mono tracking-wide truncate leading-4 mt-0.5">
+                    {(activeMatter.caseNumber && activeMatter.caseNumber !== "—")
+                      ? activeMatter.caseNumber
+                      : "No case number"}
                     {jurisdiction ? ` · ${jurisdiction}` : ""}
                   </div>
                 </div>
-                <ChevronDown className="w-3.5 h-3.5 text-zinc-500 ml-1 shrink-0" />
+                <ChevronDown className="w-3.5 h-3.5 text-zinc-400 ml-1 shrink-0" />
               </button>
 
               {matterDropdownOpen && (
@@ -162,19 +163,23 @@ export function WorkspaceHeader({
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            {speedyLimit != null && speedyLimit > 0 && speedyDays != null && (
-              <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-950 border border-amber-900/40 text-xs">
+            {speedyLimit != null &&
+              speedyLimit > 0 &&
+              speedyDays != null &&
+              activeMatter.id !== "matter-empty" &&
+              Boolean(jurisdiction && jurisdiction.trim()) && (
+              <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-950 border border-amber-900/40 text-xs" title="Only shown when a matter and jurisdiction are set. Confirm against your court rules.">
                 <Clock className="w-3.5 h-3.5 text-amber-400" />
                 <div>
-                  <span className="text-zinc-400">Speedy trial: </span>
+                  <span className="text-zinc-500">Speedy trial window: </span>
                   <span className="font-mono font-semibold text-amber-300">
-                    {speedyDays} / {speedyLimit}d
+                    Day {speedyDays} of {speedyLimit}
                   </span>
                 </div>
               </div>
             )}
             {onChangeJurisdiction && jurisdiction !== undefined && (
-              <span className="hidden xl:inline text-[10px] font-mono text-zinc-400 uppercase tracking-wider">
+              <span className="hidden xl:inline text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
                 {jurisdiction || "Jurisdiction unset"}
               </span>
             )}
@@ -184,8 +189,8 @@ export function WorkspaceHeader({
 
       {crisisModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-zinc-950 border border-teal-700/50 rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-2xl">
-            <div className="flex items-center gap-3 text-teal-300">
+          <div className="bg-zinc-950 border border-red-800/60 rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-red-400">
               <ShieldAlert className="w-6 h-6 shrink-0" />
               <h3 className="text-lg font-bold text-white">Emergency & crisis safety resources</h3>
             </div>
@@ -194,11 +199,11 @@ export function WorkspaceHeader({
               violence, reach out to dedicated confidential hotlines:
             </p>
             <div className="space-y-3">
-              <div className="p-3 bg-teal-950/30 border border-teal-700/40 rounded-xl">
+              <div className="p-3 bg-red-950/30 border border-red-800/40 rounded-xl">
                 <div className="font-semibold text-white text-sm">National Suicide & Crisis Lifeline</div>
                 <p className="text-xs text-zinc-400 mt-0.5">Call or text 988 (24/7, free & confidential)</p>
               </div>
-              <div className="p-3 bg-teal-950/30 border border-teal-700/40 rounded-xl">
+              <div className="p-3 bg-red-950/30 border border-red-800/40 rounded-xl">
                 <div className="font-semibold text-white text-sm">National Domestic Violence Hotline</div>
                 <p className="text-xs text-zinc-400 mt-0.5">
                   Call 1-800-799-SAFE (7233) or text "START" to 88788
