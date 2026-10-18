@@ -1,23 +1,29 @@
 @import "tailwindcss";
 
-/* Candy — Playful & Vibrant (DESIGN.md) + Legal OS structure */
-:root {
+/* ============================================================
+   THE FIRM — Candy "Joyful Pop" theme, app-wide
+   Canonical palette (matches The Firm agent playground / empyrean)
+   ============================================================ */
+:root, [data-theme="light"] {
   /* Surfaces */
-  --background: #fffbfe;
+  --background: #fff7fb;
   --foreground: #281330;
   --surface: #fff7fb;
   --surface-dim: #efd0f7;
   --surface-bright: #fff7fb;
+  --surface-lowest: #ffffff;
+  --surface-low: #ffefff;
   --surface-container: #fde7ff;
   --surface-container-high: #fae0ff;
+  --surface-container-highest: #f8d8ff;
   --on-surface: #281330;
   --on-surface-variant: #57414a;
   --outline: #8a707b;
   --outline-variant: #ddbfca;
 
-  /* Brand accents */
-  --primary: #e040a0;
-  --primary-md: #af0a78;
+  /* Candy brand accents */
+  --primary: #af0a78;
+  --primary-accent: #e040a0;
   --on-primary: #ffffff;
   --secondary: #7c52aa;
   --on-secondary: #ffffff;
@@ -25,11 +31,43 @@
   --on-tertiary: #ffffff;
   --error: #ba1a1a;
   --on-error: #ffffff;
+  --success: #10b981;
 
-  /* Legacy aliases used across dark workspace components */
+  /* Candy alias tokens (used by The Firm playground) */
+  --candy-surface: #fff7fb;
+  --candy-surface-container: #fde7ff;
+  --candy-on-surface: #281330;
+  --candy-on-surface-variant: #57414a;
+  --candy-primary: #af0a78;
+  --candy-primary-accent: #e040a0;
+  --candy-secondary: #7c52aa;
+  --candy-tertiary: #0096cc;
+  --candy-online: #10b981;
+  --font-candy: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Legacy Sovereign aliases — REMAPPED to Candy so every existing
+     component (sov-panel, sov-btn-gold, raw var() references) follows
+     the app-wide Candy theme. One-file rebrand. */
+  --sov-void: #fff7fb;
+  --sov-ink: #ffffff;
+  --sov-ink-2: #fde7ff;
+  --sov-gold: #e040a0;        /* was #D4AF37 — now candy pink */
+  --sov-gold-soft: #fffbff;
+  --sov-gold-muted: #af0a78;
+  --sov-emerald: #7c52aa;     /* was emerald — now candy purple */
+  --sov-emerald-bright: #cda0fe;
+  --sov-success: #10b981;
+  --sov-danger: #ba1a1a;
+  --sov-blue: #0096cc;
+  --sov-indigo: #7c52aa;
+  --sov-glow-gold: 0 0 20px rgba(224, 64, 160, 0.35);
+  --sov-glow-gold-sm: 0 0 12px rgba(224, 64, 160, 0.25);
+  --sov-glow-emerald: 0 4px 20px rgba(124, 82, 170, 0.4);
+
+  /* Legacy CoC aliases */
   --coc-gold: #e040a0;
-  --coc-bg: #fffbfe;
-  --coc-panel: #fff7fb;
+  --coc-bg: #fff7fb;
+  --coc-panel: #fde7ff;
   --coc-border: #ddbfca;
 
   --radius-sm: 0.5rem;
@@ -39,23 +77,63 @@
   --radius-full: 9999px;
 }
 
-/* Workspace still offers a dark shell option via .dark */
-.dark {
-  --background: #0a0b0e;
-  --foreground: #e1e2e5;
-  --surface: #141519;
-  --surface-container: #1a1b22;
-  --on-surface: #e1e2e5;
-  --on-surface-variant: #a1a1aa;
-  --outline: #3f3f46;
-  --outline-variant: #27272a;
-  --primary: #e040a0;
+/* Dark shell — Candy dark, matches The Firm playground dark mode */
+.dark, [data-theme="dark"] {
+  --background: #1d0e23;
+  --foreground: #feebff;
+  --surface: #1d0e23;
+  --surface-dim: #16081b;
+  --surface-bright: #291432;
+  --surface-lowest: #140718;
+  --surface-low: #22102a;
+  --surface-container: #2c1536;
+  --surface-container-high: #371a43;
+  --surface-container-highest: #432052;
+  --on-surface: #feebff;
+  --on-surface-variant: #e0bfd2;
+  --outline: #77566a;
+  --outline-variant: #492a3e;
+
+  --primary: #ff4db8;
+  --primary-accent: #e040a0;
+  --on-primary: #ffffff;
   --secondary: #cda0fe;
+  --on-secondary: #281330;
   --tertiary: #7ed0ff;
-  --coc-gold: #e040a0;
-  --coc-bg: #0a0b0e;
-  --coc-panel: #141519;
-  --coc-border: #272830;
+  --on-tertiary: #140718;
+  --error: #ffb4ab;
+  --on-error: #140718;
+  --success: #10b981;
+
+  --candy-surface: #1d0e23;
+  --candy-surface-container: #2c1536;
+  --candy-on-surface: #feebff;
+  --candy-on-surface-variant: #e0bfd2;
+  --candy-primary: #ff4db8;
+  --candy-primary-accent: #e040a0;
+  --candy-secondary: #cda0fe;
+  --candy-tertiary: #7ed0ff;
+
+  --sov-void: #1d0e23;
+  --sov-ink: #2c1536;
+  --sov-ink-2: #371a43;
+  --sov-gold: #ff4db8;
+  --sov-gold-soft: #feebff;
+  --sov-gold-muted: #e040a0;
+  --sov-emerald: #cda0fe;
+  --sov-emerald-bright: #cda0fe;
+  --sov-success: #10b981;
+  --sov-danger: #ffb4ab;
+  --sov-blue: #7ed0ff;
+  --sov-indigo: #cda0fe;
+  --sov-glow-gold: 0 0 20px rgba(255, 77, 184, 0.35);
+  --sov-glow-gold-sm: 0 0 12px rgba(255, 77, 184, 0.25);
+  --sov-glow-emerald: 0 4px 20px rgba(205, 160, 254, 0.4);
+
+  --coc-gold: #ff4db8;
+  --coc-bg: #1d0e23;
+  --coc-panel: #2c1536;
+  --coc-border: #492a3e;
 }
 
 body {
@@ -69,7 +147,7 @@ body {
 /* Candy interactive primitives */
 .candy-btn-primary {
   border-radius: var(--radius-full);
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary-accent), var(--primary));
   color: var(--on-primary);
   font-weight: 600;
   box-shadow: 0 4px 16px rgba(224, 64, 160, 0.22);
@@ -77,7 +155,7 @@ body {
 }
 .candy-btn-primary:hover {
   transform: scale(1.03);
-  box-shadow: 0 6px 20px rgba(224, 64, 160, 0.3);
+  box-shadow: 0 6px 24px rgba(224, 64, 160, 0.3);
 }
 
 .candy-btn-secondary {
@@ -123,6 +201,48 @@ body {
   color: var(--error);
   border: 1px solid rgba(186, 26, 26, 0.35);
 }
+
+/* Legacy Sovereign utility classes — now Candy-styled so old
+   markup renders consistently without component rewrites */
+.sov-panel {
+  background: var(--surface-container);
+  border: 1px solid var(--outline-variant);
+  border-radius: 18px;
+  backdrop-filter: blur(24px);
+}
+.sov-btn-gold {
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--primary-accent), var(--primary));
+  color: var(--on-primary);
+  font-weight: 700;
+  box-shadow: 0 0 20px rgba(224, 64, 160, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.sov-btn-gold:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 28px rgba(224, 64, 160, 0.45);
+}
+.sov-btn-emerald {
+  border-radius: var(--radius-full);
+  background: var(--secondary);
+  color: var(--on-secondary);
+  font-weight: 600;
+  transition: transform 0.15s ease;
+}
+.sov-btn-emerald:hover { transform: translateY(-1px); }
+.sov-btn-outline {
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: 1px solid var(--outline-variant);
+  color: var(--on-surface);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.sov-btn-outline:hover { transform: translateY(-1px); border-color: var(--secondary); }
+.sov-selected {
+  outline: 2px solid var(--primary-accent);
+  box-shadow: 0 0 20px rgba(224, 64, 160, 0.35);
+}
+.sov-live-dot { background: var(--primary-accent); box-shadow: 0 0 8px rgba(224, 64, 160, 0.6); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
