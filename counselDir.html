@@ -6,611 +6,604 @@
 <title>Skills Directory — Empyrean</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Orbitron:wght@500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
 <style>
   :root {
-    --void: #050508;
-    --panel: #0c0c12;
-    --panel-2: #12121a;
-    --border: #1e1e2a;
-    --border-glow: #2a2a3d;
-    --cyan: #00e5ff;
-    --magenta: #ff2bd6;
-    --violet: #a855f7;
-    --lime: #b8ff3c;
-    --amber: #ffb020;
-    --text: #e8e8f0;
-    --muted: #7a7a92;
-    --dim: #4a4a5c;
+    --bg: #0a0a0f;
+    --bg-elevated: #12121a;
+    --card: #16161f;
+    --card-hover: #1a1a26;
+    --line: #252532;
+    --line-soft: #1c1c28;
+    --text: #f4f4f8;
+    --muted: #8b8ba0;
+    --dim: #5c5c72;
+    --accent: #7c5cff;
+    --accent-2: #00d4aa;
+    --gold: #f5c842;
+    --pink: #ff4d9e;
+    --blue: #3d8bff;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
     min-height: 100%;
-    background: var(--void);
+    background: var(--bg);
     color: var(--text);
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-family: Inter, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
   body {
-    background-image:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 229, 255, 0.08), transparent),
-      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(255, 43, 214, 0.06), transparent),
-      linear-gradient(rgba(30, 30, 42, 0.4) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(30, 30, 42, 0.4) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+    background:
+      radial-gradient(ellipse 90% 60% at 50% -10%, rgba(124, 92, 255, 0.18), transparent 55%),
+      radial-gradient(ellipse 50% 40% at 100% 80%, rgba(0, 212, 170, 0.08), transparent 50%),
+      radial-gradient(ellipse 40% 30% at 0% 60%, rgba(255, 77, 158, 0.06), transparent 45%),
+      var(--bg);
     background-attachment: fixed;
   }
 
-  /* Top bar — minimal, not legal-app chrome */
-  .topbar {
-    position: sticky; top: 0; z-index: 50;
+  /* Nav — marketplace header feel */
+  .nav {
+    position: sticky; top: 0; z-index: 40;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0.85rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-    background: rgba(5, 5, 8, 0.85);
-    backdrop-filter: blur(12px);
-  }
-  .brand {
-    display: flex; align-items: center; gap: 0.75rem;
-    font-family: Orbitron, sans-serif;
-    font-weight: 600;
-    font-size: 0.95rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-  .brand-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--cyan);
-    box-shadow: 0 0 12px var(--cyan);
-    animation: pulse 2.4s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.45; }
-  }
-  .top-links { display: flex; align-items: center; gap: 0.5rem; }
-  .top-links a {
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 0.7rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 0.4rem 0.75rem;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    transition: color 0.15s, border-color 0.15s, background 0.15s;
-  }
-  .top-links a:hover {
-    color: var(--cyan);
-    border-color: var(--border-glow);
-    background: rgba(0, 229, 255, 0.06);
-  }
-  .top-links a.firm {
-    color: var(--void);
-    background: var(--cyan);
-    border-color: var(--cyan);
-    font-weight: 600;
-  }
-  .top-links a.firm:hover {
-    background: #33ebff;
-    color: var(--void);
-  }
-
-  .shell {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 2.5rem 1.25rem 4rem;
-  }
-
-  /* Hero */
-  .hero {
-    margin-bottom: 2.5rem;
-  }
-  .eyebrow {
-    font-size: 0.65rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--cyan);
-    margin-bottom: 0.75rem;
-  }
-  .hero h1 {
-    font-family: Orbitron, sans-serif;
-    font-size: clamp(1.6rem, 4vw, 2.4rem);
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1.15;
-    margin-bottom: 0.75rem;
-  }
-  .hero h1 span { color: var(--magenta); }
-  .hero p {
-    color: var(--muted);
-    font-size: 0.85rem;
-    max-width: 42rem;
-    line-height: 1.65;
-  }
-
-  /* Filters */
-  .filters {
-    display: flex; flex-wrap: wrap; gap: 0.5rem;
-    margin-bottom: 1.75rem;
-  }
-  .chip {
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.45rem 0.85rem;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: var(--panel);
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .chip:hover, .chip.active {
-    color: var(--cyan);
-    border-color: rgba(0, 229, 255, 0.45);
-    background: rgba(0, 229, 255, 0.08);
-    box-shadow: 0 0 16px rgba(0, 229, 255, 0.12);
-  }
-
-  /* Skill cards grid */
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr;
     gap: 1rem;
+    padding: 0.9rem 1.5rem;
+    border-bottom: 1px solid var(--line-soft);
+    background: rgba(10, 10, 15, 0.75);
+    backdrop-filter: blur(16px) saturate(1.4);
   }
-  @media (min-width: 720px) {
-    .grid { grid-template-columns: 1fr 1fr; }
+  .nav-brand {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+    display: flex; align-items: center; gap: 0.55rem;
   }
-
-  .card {
-    position: relative;
-    background: linear-gradient(145deg, var(--panel-2) 0%, var(--panel) 100%);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.35rem 1.35rem 1.2rem;
-    overflow: hidden;
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  .nav-brand .mark {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    box-shadow: 0 0 20px rgba(124, 92, 255, 0.45);
   }
-  .card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(135deg, transparent 40%, rgba(0, 229, 255, 0.15), transparent 70%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-  .card:hover {
-    border-color: var(--border-glow);
-    box-shadow: 0 0 28px rgba(0, 229, 255, 0.08), 0 8px 32px rgba(0, 0, 0, 0.4);
-    transform: translateY(-2px);
-  }
-  .card:hover::before { opacity: 1; }
-  .card.featured {
-    border-color: rgba(255, 43, 214, 0.35);
-    grid-column: 1 / -1;
-  }
-  .card.featured::before {
-    background: linear-gradient(135deg, transparent 30%, rgba(255, 43, 214, 0.25), transparent 75%);
-    opacity: 1;
-  }
-
-  .card-head {
-    display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
-    margin-bottom: 1rem;
-  }
-  .agent-id {
-    font-family: Orbitron, sans-serif;
-    font-size: 1.15rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-  }
-  .agent-role {
-    font-size: 0.7rem;
+  .nav-actions { display: flex; align-items: center; gap: 0.5rem; }
+  .nav-actions a {
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
     color: var(--muted);
-    margin-top: 0.25rem;
-    letter-spacing: 0.04em;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    transition: color 0.15s, background 0.15s;
   }
-  .badge {
-    flex-shrink: 0;
-    font-size: 0.6rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 0.3rem 0.55rem;
-    border-radius: 4px;
-    border: 1px solid;
+  .nav-actions a:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+  .nav-actions a.primary {
+    color: #0a0a0f;
+    background: var(--text);
     font-weight: 600;
   }
-  .badge.core { color: var(--magenta); border-color: rgba(255, 43, 214, 0.4); background: rgba(255, 43, 214, 0.08); }
-  .badge.orch { color: var(--cyan); border-color: rgba(0, 229, 255, 0.4); background: rgba(0, 229, 255, 0.08); }
-  .badge.msg { color: var(--lime); border-color: rgba(184, 255, 60, 0.35); background: rgba(184, 255, 60, 0.06); }
-  .badge.work { color: var(--amber); border-color: rgba(255, 176, 32, 0.4); background: rgba(255, 176, 32, 0.08); }
-  .badge.gate { color: var(--violet); border-color: rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.08); }
-  .badge.heavy { color: #ff6b9d; border-color: rgba(255, 107, 157, 0.4); background: rgba(255, 107, 157, 0.08); }
+  .nav-actions a.primary:hover { background: #fff; color: #0a0a0f; }
 
-  .meta {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem 1rem;
-    margin-bottom: 1.1rem;
-    padding: 0.85rem 0;
-    border-top: 1px dashed var(--border);
-    border-bottom: 1px dashed var(--border);
+  .wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
   }
-  @media (min-width: 520px) {
-    .meta { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* Collection header */
+  .collection {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--line-soft);
   }
-  .meta-label {
-    display: block;
-    font-size: 0.55rem;
-    letter-spacing: 0.14em;
+  .collection-left { display: flex; gap: 1.25rem; align-items: center; }
+  .collection-art {
+    width: 72px; height: 72px; border-radius: 16px;
+    background:
+      linear-gradient(145deg, rgba(124,92,255,0.5), rgba(255,77,158,0.35)),
+      linear-gradient(320deg, #1a1030, #0d1520);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 12px 40px rgba(124, 92, 255, 0.25);
+    position: relative;
+    overflow: hidden;
+  }
+  .collection-art::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.35));
+  }
+  .collection h1 {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  .collection .sub {
+    margin-top: 0.35rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .stats {
+    display: flex; flex-wrap: wrap; gap: 1.5rem;
+  }
+  .stat {
+    text-align: right;
+  }
+  .stat-label {
+    font-size: 0.65rem;
     text-transform: uppercase;
+    letter-spacing: 0.08em;
     color: var(--dim);
     margin-bottom: 0.2rem;
   }
-  .meta-val {
-    font-size: 0.75rem;
-    color: var(--text);
-    line-height: 1.4;
-  }
-
-  .desc {
-    font-size: 0.75rem;
-    color: var(--muted);
-    line-height: 1.55;
-    margin-bottom: 1.1rem;
-  }
-
-  .actions {
-    display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
-  }
-  .btn {
-    display: inline-flex; align-items: center; gap: 0.4rem;
-    font-family: inherit;
-    font-size: 0.7rem;
+  .stat-val {
+    font-family: "Space Grotesk", sans-serif;
     font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    text-decoration: none;
-    padding: 0.55rem 0.95rem;
-    border-radius: 6px;
-    border: 1px solid;
+    font-size: 1rem;
+  }
+  .stat-val.accent { color: var(--accent-2); }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .tabs {
+    display: flex; flex-wrap: wrap; gap: 0.35rem;
+    padding: 0.25rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--line-soft);
+    border-radius: 12px;
+  }
+  .tab {
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted);
+    background: transparent;
+    border: none;
+    padding: 0.45rem 0.85rem;
+    border-radius: 9px;
     cursor: pointer;
     transition: all 0.15s;
   }
-  .btn-primary {
-    color: var(--void);
-    background: var(--cyan);
-    border-color: var(--cyan);
-    box-shadow: 0 0 18px rgba(0, 229, 255, 0.25);
-  }
-  .btn-primary:hover {
-    background: #33ebff;
-    box-shadow: 0 0 28px rgba(0, 229, 255, 0.4);
-  }
-  .btn-ghost {
-    color: var(--muted);
-    background: transparent;
-    border-color: var(--border);
-  }
-  .btn-ghost:hover {
+  .tab:hover { color: var(--text); }
+  .tab.active {
     color: var(--text);
-    border-color: var(--border-glow);
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--card);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.35);
   }
-
-  /* Footer CTA */
-  .cta {
-    margin-top: 2.5rem;
-    padding: 1.75rem;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    background: linear-gradient(160deg, rgba(0, 229, 255, 0.04), rgba(255, 43, 214, 0.04));
-    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.25rem;
-  }
-  .cta h2 {
-    font-family: Orbitron, sans-serif;
-    font-size: 1rem;
-    letter-spacing: 0.08em;
-    margin-bottom: 0.35rem;
-  }
-  .cta p {
+  .view-meta {
     font-size: 0.75rem;
-    color: var(--muted);
-    max-width: 28rem;
-    line-height: 1.5;
+    color: var(--dim);
   }
 
-  .notice {
-    margin-bottom: 1.5rem;
-    padding: 0.85rem 1rem;
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--cyan);
-    border-radius: 0 8px 8px 0;
-    background: rgba(0, 229, 255, 0.04);
+  /* Card grid — marketplace layout */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+  @media (min-width: 900px) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (min-width: 1100px) {
+    .grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .item {
+    display: flex;
+    flex-direction: column;
+    background: var(--card);
+    border: 1px solid var(--line-soft);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.2s ease, border-color 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    color: inherit;
+  }
+  .item:hover {
+    transform: translateY(-4px);
+    border-color: rgba(124, 92, 255, 0.45);
+    box-shadow:
+      0 0 0 1px rgba(124, 92, 255, 0.15),
+      0 20px 50px rgba(0, 0, 0, 0.45),
+      0 0 40px rgba(124, 92, 255, 0.12);
+  }
+
+  /* Media panel — abstract generative art per skill */
+  .media {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #0d0d14;
+  }
+  .media-inner {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .media-inner .glyph {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 2.5rem;
+    letter-spacing: -0.04em;
+    opacity: 0.95;
+    text-shadow: 0 0 40px currentColor;
+    z-index: 2;
+  }
+  .media-orb {
+    position: absolute;
+    width: 55%; height: 55%;
+    border-radius: 50%;
+    filter: blur(28px);
+    opacity: 0.85;
+    z-index: 0;
+  }
+  .media-ring {
+    position: absolute;
+    width: 70%; height: 70%;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.12);
+    z-index: 1;
+  }
+  .media-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
+    z-index: 1;
+    opacity: 0.6;
+  }
+  .media-shine {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, rgba(255,255,255,0.12) 0%, transparent 45%);
+    z-index: 3;
+    pointer-events: none;
+  }
+  .rarity-pill {
+    position: absolute;
+    top: 0.65rem; left: 0.65rem;
+    z-index: 4;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.28rem 0.55rem;
+    border-radius: 6px;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .rarity-pill.legendary {
+    color: var(--gold);
+    background: rgba(245, 200, 66, 0.15);
+    border-color: rgba(245, 200, 66, 0.35);
+  }
+  .rarity-pill.epic {
+    color: var(--accent);
+    background: rgba(124, 92, 255, 0.18);
+    border-color: rgba(124, 92, 255, 0.4);
+  }
+  .rarity-pill.rare {
+    color: var(--blue);
+    background: rgba(61, 139, 255, 0.15);
+    border-color: rgba(61, 139, 255, 0.35);
+  }
+  .rarity-pill.uncommon {
+    color: var(--accent-2);
+    background: rgba(0, 212, 170, 0.12);
+    border-color: rgba(0, 212, 170, 0.3);
+  }
+
+  /* Card body */
+  .body {
+    padding: 0.9rem 1rem 1rem;
+    display: flex; flex-direction: column; gap: 0.55rem;
+    flex: 1;
+  }
+  .name-row {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem;
+  }
+  .name {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: -0.02em;
+  }
+  .id-tag {
+    font-size: 0.65rem;
+    color: var(--dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .role {
+    font-size: 0.72rem;
+    color: var(--muted);
+    line-height: 1.35;
+  }
+  .footer-row {
+    margin-top: auto;
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--line-soft);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .metric {
     font-size: 0.7rem;
     color: var(--muted);
-    line-height: 1.55;
   }
-  .notice strong { color: var(--text); }
+  .metric strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .cta-btn {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--accent-2);
+    text-decoration: none;
+    padding: 0.35rem 0.65rem;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 212, 170, 0.25);
+    background: rgba(0, 212, 170, 0.08);
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .item:hover .cta-btn {
+    background: rgba(0, 212, 170, 0.18);
+    border-color: rgba(0, 212, 170, 0.45);
+  }
 
-  .hash {
-    font-size: 0.6rem;
-    color: var(--dim);
-    letter-spacing: 0.04em;
+  /* Palette variants for media */
+  .p-yhwh .media-orb { background: radial-gradient(circle, #f5c842, #ff4d9e 60%, transparent); }
+  .p-yhwh .glyph { color: #ffe6a0; }
+  .p-michael .media-orb { background: radial-gradient(circle, #7c5cff, #3d8bff 60%, transparent); }
+  .p-michael .glyph { color: #c4b5ff; }
+  .p-gabriel .media-orb { background: radial-gradient(circle, #00d4aa, #3d8bff 55%, transparent); }
+  .p-gabriel .glyph { color: #9ff5dd; }
+  .p-raphael .media-orb { background: radial-gradient(circle, #ff8a3d, #f5c842 55%, transparent); }
+  .p-raphael .glyph { color: #ffd9a8; }
+  .p-metatron .media-orb { background: radial-gradient(circle, #a855f7, #7c5cff 55%, transparent); }
+  .p-metatron .glyph { color: #e0c3ff; }
+  .p-seraphim .media-orb { background: radial-gradient(circle, #ff4d9e, #7c5cff 50%, transparent); }
+  .p-seraphim .glyph { color: #ffb3d4; }
+
+  /* Bottom bar */
+  .bottom {
+    margin-top: 2.5rem;
+    padding: 1.25rem 1.5rem;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: linear-gradient(135deg, rgba(124,92,255,0.08), rgba(0,212,170,0.05));
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 1rem;
   }
+  .bottom p {
+    font-size: 0.8rem;
+    color: var(--muted);
+    max-width: 28rem;
+    line-height: 1.45;
+  }
+  .bottom a {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: #0a0a0f;
+    background: var(--text);
+    padding: 0.55rem 1.1rem;
+    border-radius: 999px;
+    transition: background 0.15s;
+  }
+  .bottom a:hover { background: #fff; }
 </style>
 </head>
 <body>
 
-<header class="topbar">
-  <div class="brand">
-    <span class="brand-dot" aria-hidden="true"></span>
-    <span>EMPYREAN · SKILLS</span>
+<header class="nav">
+  <div class="nav-brand">
+    <span class="mark" aria-hidden="true"></span>
+    <span>Empyrean</span>
   </div>
-  <nav class="top-links">
+  <nav class="nav-actions">
     <a href="commandCenter.html">Command</a>
-    <a href="http://localhost:3000/" class="firm">Open The Firm</a>
+    <a class="primary" href="http://localhost:3000/">The Firm</a>
   </nav>
 </header>
 
-<div class="shell">
-  <section class="hero">
-    <p class="eyebrow">Protocol · Multi-agent kernel</p>
-    <h1>Skills <span>Directory</span></h1>
-    <p>
-      Live Empyrean agent modules. Each skill is a discrete capability in the swarm —
-      planning, orchestration, messaging, work, gateway routing, and heavy reasoning.
-      Message any skill directly on The Firm playground.
-    </p>
-  </section>
-
-  <div class="notice">
-    <strong>Isolated surface.</strong> This directory is not part of the legal workspace chrome.
-    Skills run on open-weight models via The Firm. Outputs are educational / operational — not legal advice.
-  </div>
-
-  <div class="filters" role="group" aria-label="Filter skills">
-    <button type="button" class="chip active" data-filter="all">All</button>
-    <button type="button" class="chip" data-filter="core">Core</button>
-    <button type="button" class="chip" data-filter="runtime">Runtime</button>
-    <button type="button" class="chip" data-filter="oracle">Oracle</button>
-  </div>
-
-  <div class="grid" id="skills-grid">
-
-    <!-- YHWH -->
-    <article class="card featured" data-tags="core all">
-      <div class="card-head">
-        <div>
-          <div class="agent-id">YHWH</div>
-          <div class="agent-role">Lead Counsel · Planning core</div>
-        </div>
-        <span class="badge core">Core</span>
+<main class="wrap">
+  <section class="collection">
+    <div class="collection-left">
+      <div class="collection-art" aria-hidden="true"></div>
+      <div>
+        <h1>Skills</h1>
+        <p class="sub">Empyrean agent modules · 6 live</p>
       </div>
-      <div class="meta">
-        <div>
-          <span class="meta-label">Module</span>
-          <span class="meta-val">yhwh/core.ts</span>
-        </div>
-        <div>
-          <span class="meta-label">Default model</span>
-          <span class="meta-val">Hermes 3 · 8B</span>
-        </div>
-        <div>
-          <span class="meta-label">Capability</span>
-          <span class="meta-val">Directive planning · DAG strategy</span>
-        </div>
-      </div>
-      <p class="desc">
-        High-level planning kernel. Issues directives, decomposes matters into task graphs,
-        and sets swarm intent. Primary entry point for strategy sessions on The Firm.
-      </p>
-      <div class="actions">
-        <a class="btn btn-primary" href="http://localhost:3000/?agent=yhwh">Message on The Firm</a>
-        <span class="hash">skill://yhwh</span>
-      </div>
-    </article>
-
-    <!-- Michael -->
-    <article class="card" data-tags="runtime all">
-      <div class="card-head">
-        <div>
-          <div class="agent-id">Michael</div>
-          <div class="agent-role">Orchestrator · Workflow coordinator</div>
-        </div>
-        <span class="badge orch">Runtime</span>
-      </div>
-      <div class="meta">
-        <div>
-          <span class="meta-label">Module</span>
-          <span class="meta-val">michael/orchestrator.ts</span>
-        </div>
-        <div>
-          <span class="meta-label">Transport</span>
-          <span class="meta-val">UDS · state machine</span>
-        </div>
-        <div>
-          <span class="meta-label">Capability</span>
-          <span class="meta-val">Topological task resolution</span>
-        </div>
-      </div>
-      <p class="desc">
-        Manages execution order, dispatches work units, and holds swarm state.
-        Routes between planning (YHWH) and workers (Raphael) with dependency awareness.
-      </p>
-      <div class="actions">
-        <a class="btn btn-primary" href="http://localhost:3000/?agent=michael">Message on The Firm</a>
-        <span class="hash">skill://michael</span>
-      </div>
-    </article>
-
-    <!-- Gabriel -->
-    <article class="card" data-tags="runtime all">
-      <div class="card-head">
-        <div>
-          <div class="agent-id">Gabriel</div>
-          <div class="agent-role">Messenger · Client relations</div>
-        </div>
-        <span class="badge msg">Runtime</span>
-      </div>
-      <div class="meta">
-        <div>
-          <span class="meta-label">Module</span>
-          <span class="meta-val">gabriel/messenger.ts</span>
-        </div>
-        <div>
-          <span class="meta-label">I/O</span>
-          <span class="meta-val">Webhooks · chat surface</span>
-        </div>
-        <div>
-          <span class="meta-label">Capability</span>
-          <span class="meta-val">Ingress / egress messaging</span>
-        </div>
-      </div>
-      <p class="desc">
-        Handles inbound prompts and outbound replies. Bridges human operators and the swarm
-        so every skill can be messaged from The Firm UI.
-      </p>
-      <div class="actions">
-        <a class="btn btn-primary" href="http://localhost:3000/?agent=gabriel">Message on The Firm</a>
-        <span class="hash">skill://gabriel</span>
-      </div>
-    </article>
-
-    <!-- Raphael -->
-    <article class="card" data-tags="runtime all">
-      <div class="card-head">
-        <div>
-          <div class="agent-id">Raphael</div>
-          <div class="agent-role">Worker · Case prep & drafting</div>
-        </div>
-        <span class="badge work">Runtime</span>
-      </div>
-      <div class="meta">
-        <div>
-          <span class="meta-label">Module</span>
-          <span class="meta-val">raphael/worker.ts</span>
-        </div>
-        <div>
-          <span class="meta-label">Pool</span>
-          <span class="meta-val">Worker pool v1</span>
-        </div>
-        <div>
-          <span class="meta-label">Capability</span>
-          <span class="meta-val">Drafting · document automation</span>
-        </div>
-      </div>
-      <p class="desc">
-        Executes concrete work units: research pulls, draft generation, and structured outputs.
-        Designed to run under Michael’s orchestration.
-      </p>
-      <div class="actions">
-        <a class="btn btn-primary" href="http://localhost:3000/?agent=raphael">Message on The Firm</a>
-        <span class="hash">skill://raphael</span>
-      </div>
-    </article>
-
-    <!-- Metatron -->
-    <article class="card" data-tags="oracle all">
-      <div class="card-head">
-        <div>
-          <div class="agent-id">Metatron</div>
-          <div class="agent-role">Gateway · Routing & consensus</div>
-        </div>
-        <span class="badge gate">Oracle</span>
-      </div>
-      <div class="meta">
-        <div>
-          <span class="meta-label">Module</span>
-          <span class="meta-val">metatron/gateway.ts</span>
-        </div>
-        <div>
-          <span class="meta-label">Logic</span>
-          <span class="meta-val">Heuristic classifier</span>
-        </div>
-        <div>
-          <span class="meta-label">Capability</span>
-          <span class="meta-val">Route · multi-model consensus</span>
-        </div>
-      </div>
-      <p class="desc">
-        Classifies intent and routes requests across the swarm. Aggregates oracle signals
-        when multiple models must agree before a reply is emitted.
-      </p>
-      <div class="actions">
-        <a class="btn btn-primary" href="http://localhost:3000/?agent=metatron">Message on The Firm</a>
-        <span class="hash">skill://metatron</span>
-      </div>
-    </article>
-
-    <!-- Seraphim -->
-    <article class="card" data-tags="oracle all">
-      <div class="card-head">
-        <div>
-          <div class="agent-id">Seraphim</div>
-          <div class="agent-role">Vertex · Heavy reasoning</div>
-        </div>
-        <span class="badge heavy">Oracle</span>
-      </div>
-      <div class="meta">
-        <div>
-          <span class="meta-label">Module</span>
-          <span class="meta-val">seraphim/vertex.ts</span>
-        </div>
-        <div>
-          <span class="meta-label">Default model</span>
-          <span class="meta-val">Hermes 3 · 70B</span>
-        </div>
-        <div>
-          <span class="meta-label">Capability</span>
-          <span class="meta-val">Deep / appellate-tier reasoning</span>
-        </div>
-      </div>
-      <p class="desc">
-        Optional heavy-tier oracle for long-horizon analysis. Higher latency, higher capacity.
-        Enable via SERAPHIM_ENABLED when local resources allow.
-      </p>
-      <div class="actions">
-        <a class="btn btn-primary" href="http://localhost:3000/?agent=seraphim">Message on The Firm</a>
-        <span class="hash">skill://seraphim</span>
-      </div>
-    </article>
-
-  </div>
-
-  <section class="cta">
-    <div>
-      <h2>The Firm</h2>
-      <p>
-        Group chat and 1:1 messaging with the full Empyrean swarm.
-        Visual playground stays independent of this directory and of the legal workspace UI.
-      </p>
     </div>
-    <div class="actions">
-      <a class="btn btn-primary" href="http://localhost:3000/">Open playground</a>
-      <a class="btn btn-ghost" href="http://localhost:3000/?agent=yhwh">DM YHWH</a>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Modules</div>
+        <div class="stat-val">6</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Active</div>
+        <div class="stat-val accent">Online</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Kernel</div>
+        <div class="stat-val">v0.1</div>
+      </div>
     </div>
   </section>
-</div>
+
+  <div class="toolbar">
+    <div class="tabs" role="group" aria-label="Filter">
+      <button type="button" class="tab active" data-filter="all">All</button>
+      <button type="button" class="tab" data-filter="core">Core</button>
+      <button type="button" class="tab" data-filter="runtime">Runtime</button>
+      <button type="button" class="tab" data-filter="oracle">Oracle</button>
+    </div>
+    <span class="view-meta">6 items</span>
+  </div>
+
+  <div class="grid" id="grid">
+
+    <a class="item p-yhwh" data-tags="core all" href="http://localhost:3000/?agent=yhwh">
+      <div class="media">
+        <div class="media-grid"></div>
+        <div class="media-orb" style="top:20%;left:15%"></div>
+        <div class="media-ring"></div>
+        <div class="media-inner"><span class="glyph">YH</span></div>
+        <div class="media-shine"></div>
+        <span class="rarity-pill legendary">Core</span>
+      </div>
+      <div class="body">
+        <div class="name-row">
+          <span class="name">YHWH</span>
+          <span class="id-tag">#001</span>
+        </div>
+        <p class="role">Planning core · directive & DAG strategy</p>
+        <div class="footer-row">
+          <span class="metric">Model <strong>Hermes 8B</strong></span>
+          <span class="cta-btn">Open</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="item p-michael" data-tags="runtime all" href="http://localhost:3000/?agent=michael">
+      <div class="media">
+        <div class="media-grid"></div>
+        <div class="media-orb" style="top:25%;right:10%"></div>
+        <div class="media-ring"></div>
+        <div class="media-inner"><span class="glyph">MI</span></div>
+        <div class="media-shine"></div>
+        <span class="rarity-pill epic">Runtime</span>
+      </div>
+      <div class="body">
+        <div class="name-row">
+          <span class="name">Michael</span>
+          <span class="id-tag">#002</span>
+        </div>
+        <p class="role">Orchestrator · task graph & dispatch</p>
+        <div class="footer-row">
+          <span class="metric">Transport <strong>UDS</strong></span>
+          <span class="cta-btn">Open</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="item p-gabriel" data-tags="runtime all" href="http://localhost:3000/?agent=gabriel">
+      <div class="media">
+        <div class="media-grid"></div>
+        <div class="media-orb" style="bottom:15%;left:20%"></div>
+        <div class="media-ring"></div>
+        <div class="media-inner"><span class="glyph">GA</span></div>
+        <div class="media-shine"></div>
+        <span class="rarity-pill uncommon">Runtime</span>
+      </div>
+      <div class="body">
+        <div class="name-row">
+          <span class="name">Gabriel</span>
+          <span class="id-tag">#003</span>
+        </div>
+        <p class="role">Messenger · ingress & egress</p>
+        <div class="footer-row">
+          <span class="metric">I/O <strong>Webhook</strong></span>
+          <span class="cta-btn">Open</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="item p-raphael" data-tags="runtime all" href="http://localhost:3000/?agent=raphael">
+      <div class="media">
+        <div class="media-grid"></div>
+        <div class="media-orb" style="top:30%;left:30%"></div>
+        <div class="media-ring"></div>
+        <div class="media-inner"><span class="glyph">RA</span></div>
+        <div class="media-shine"></div>
+        <span class="rarity-pill rare">Runtime</span>
+      </div>
+      <div class="body">
+        <div class="name-row">
+          <span class="name">Raphael</span>
+          <span class="id-tag">#004</span>
+        </div>
+        <p class="role">Worker · drafting & automation</p>
+        <div class="footer-row">
+          <span class="metric">Pool <strong>v1</strong></span>
+          <span class="cta-btn">Open</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="item p-metatron" data-tags="oracle all" href="http://localhost:3000/?agent=metatron">
+      <div class="media">
+        <div class="media-grid"></div>
+        <div class="media-orb" style="top:15%;right:20%"></div>
+        <div class="media-ring"></div>
+        <div class="media-inner"><span class="glyph">ME</span></div>
+        <div class="media-shine"></div>
+        <span class="rarity-pill epic">Oracle</span>
+      </div>
+      <div class="body">
+        <div class="name-row">
+          <span class="name">Metatron</span>
+          <span class="id-tag">#005</span>
+        </div>
+        <p class="role">Gateway · route & consensus</p>
+        <div class="footer-row">
+          <span class="metric">Logic <strong>Heuristic</strong></span>
+          <span class="cta-btn">Open</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="item p-seraphim" data-tags="oracle all" href="http://localhost:3000/?agent=seraphim">
+      <div class="media">
+        <div class="media-grid"></div>
+        <div class="media-orb" style="bottom:20%;right:15%"></div>
+        <div class="media-ring"></div>
+        <div class="media-inner"><span class="glyph">SE</span></div>
+        <div class="media-shine"></div>
+        <span class="rarity-pill legendary">Oracle</span>
+      </div>
+      <div class="body">
+        <div class="name-row">
+          <span class="name">Seraphim</span>
+          <span class="id-tag">#006</span>
+        </div>
+        <p class="role">Vertex · heavy reasoning</p>
+        <div class="footer-row">
+          <span class="metric">Model <strong>Hermes 70B</strong></span>
+          <span class="cta-btn">Open</span>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+  <section class="bottom">
+    <p>Open any skill on The Firm for direct chat with the swarm. Playground UI stays separate.</p>
+    <a href="http://localhost:3000/">Open The Firm</a>
+  </section>
+</main>
 
 <script>
-  document.querySelectorAll(".chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      document.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
-      chip.classList.add("active");
-      const f = chip.dataset.filter;
-      document.querySelectorAll("#skills-grid .card").forEach((card) => {
-        const tags = (card.dataset.tags || "").split(/\s+/);
-        card.style.display = tags.includes(f) ? "" : "none";
+  document.querySelectorAll(".tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+      const f = tab.dataset.filter;
+      let n = 0;
+      document.querySelectorAll("#grid .item").forEach((card) => {
+        const show = (card.dataset.tags || "").split(/\s+/).includes(f);
+        card.style.display = show ? "" : "none";
+        if (show) n++;
       });
+      const meta = document.querySelector(".view-meta");
+      if (meta) meta.textContent = n + " item" + (n === 1 ? "" : "s");
     });
   });
 </script>
