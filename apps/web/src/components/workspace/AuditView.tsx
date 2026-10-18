@@ -98,7 +98,7 @@ export function AuditView({ matter }: AuditViewProps) {
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 border-b border-[#23242B] pb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-mono text-[#D4AF37] uppercase tracking-wider">Provenance & Security</span>
+            <span className="text-xs font-mono text-[#e040a0] uppercase tracking-wider">Provenance & Security</span>
             <span className="text-neutral-500">·</span>
             <span className="text-xs text-neutral-400">Append-Only Cryptographic Ledger (§16)</span>
           </div>
@@ -112,7 +112,7 @@ export function AuditView({ matter }: AuditViewProps) {
           <button
             onClick={handleVerifyChain}
             disabled={isVerifying}
-            className="px-3.5 py-2 text-xs font-semibold text-neutral-950 bg-[#D4AF37] hover:bg-[#c49f27] rounded-lg flex items-center gap-1.5 transition-colors disabled:opacity-50"
+            className="px-3.5 py-2 text-xs font-semibold text-neutral-950 bg-[#e040a0] hover:bg-[#c49f27] rounded-lg flex items-center gap-1.5 transition-colors disabled:opacity-50"
           >
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>{isVerifying ? "Verifying Hash Chain..." : "Verify Cryptographic Chain"}</span>
@@ -140,7 +140,7 @@ export function AuditView({ matter }: AuditViewProps) {
         </div>
 
         <div className="bg-[#141519] border border-[#272830] p-4 rounded-xl flex items-start gap-3">
-          <div className="p-2 bg-amber-950/50 border border-amber-800/40 rounded-lg text-[#D4AF37]">
+          <div className="p-2 bg-amber-950/50 border border-amber-800/40 rounded-lg text-[#e040a0]">
             <Shield className="w-4 h-4" />
           </div>
           <div>
@@ -186,7 +186,7 @@ export function AuditView({ matter }: AuditViewProps) {
             value={filterQuery}
             onChange={(e) => setFilterQuery(e.target.value)}
             placeholder="Search action, hash, actor, or citation..."
-            className="w-full bg-[#101114] border border-[#282932] rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-[#D4AF37]"
+            className="w-full bg-[#101114] border border-[#282932] rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-[#e040a0]"
           />
         </div>
 
@@ -202,7 +202,7 @@ export function AuditView({ matter }: AuditViewProps) {
               onClick={() => setActorFilter(tab.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
                 actorFilter === tab.id
-                  ? "bg-[#D4AF37] text-black font-semibold"
+                  ? "bg-[#e040a0] text-black font-semibold"
                   : "bg-neutral-800/60 text-neutral-400 hover:text-white"
               }`}
             >
@@ -221,7 +221,7 @@ export function AuditView({ matter }: AuditViewProps) {
           >
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-[#202127] pb-2.5">
               <div className="flex items-center gap-2.5">
-                <span className="font-mono text-xs text-[#D4AF37] font-semibold bg-[#D4AF37]/10 px-2 py-0.5 rounded border border-[#D4AF37]/20">
+                <span className="font-mono text-xs text-[#e040a0] font-semibold bg-[#e040a0]/10 px-2 py-0.5 rounded border border-[#e040a0]/20">
                   #{evt.id}
                 </span>
                 <span className="text-xs font-semibold text-white">{evt.action}</span>

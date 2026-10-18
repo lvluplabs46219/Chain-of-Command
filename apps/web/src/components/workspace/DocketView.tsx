@@ -21,7 +21,7 @@ export function DocketView({ matter }: DocketViewProps) {
     <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#272830]">
         <div>
-          <span className="text-xs font-mono uppercase text-[#D4AF37] font-semibold">
+          <span className="text-xs font-mono uppercase text-[#e040a0] font-semibold">
             Docket & Charging Document Analysis
           </span>
           <h1 className="text-2xl font-bold text-white mt-1">
@@ -41,7 +41,7 @@ export function DocketView({ matter }: DocketViewProps) {
             onClick={() => setSelectedChargeId(c.id)}
             className={`px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border ${
               selectedCharge?.id === c.id
-                ? "bg-[#D4AF37] text-neutral-950 border-[#D4AF37] shadow-lg shadow-[#D4AF37]/10"
+                ? "bg-[#e040a0] text-neutral-950 border-[#e040a0] shadow-lg shadow-[#e040a0]/10"
                 : "bg-[#161720] border-[#2A2C38] text-neutral-300 hover:bg-[#1E202B]"
             }`}
           >
@@ -72,7 +72,7 @@ export function DocketView({ matter }: DocketViewProps) {
               <div className="bg-[#181A24] border border-[#2B2E3D] rounded-xl p-4 sm:p-5 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono font-bold px-2.5 py-1 rounded bg-[#D4AF37]/20 text-[#E6C65A]">
+                    <span className="text-xs font-mono font-bold px-2.5 py-1 rounded bg-[#e040a0]/20 text-[#E6C65A]">
                       {selectedCharge.statuteCitation}
                     </span>
                     <span className="text-xs font-mono px-2 py-0.5 rounded bg-neutral-800 text-neutral-300">
@@ -103,7 +103,7 @@ export function DocketView({ matter }: DocketViewProps) {
               {/* Statutory Elements Breakdown */}
               <div className="space-y-3">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
+                  <ShieldCheck className="w-4 h-4 text-[#e040a0]" />
                   <span>Individual Statutory Elements (State Must Prove Every Element Beyond Reasonable Doubt)</span>
                 </h3>
 
@@ -115,7 +115,7 @@ export function DocketView({ matter }: DocketViewProps) {
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] font-bold text-xs flex items-center justify-center font-mono">
+                          <span className="w-6 h-6 rounded-full bg-[#e040a0]/20 text-[#e040a0] font-bold text-xs flex items-center justify-center font-mono">
                             {i + 1}
                           </span>
                           <h4 className="font-bold text-white text-sm">{el.name}</h4>

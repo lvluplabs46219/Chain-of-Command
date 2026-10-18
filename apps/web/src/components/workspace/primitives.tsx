@@ -15,7 +15,7 @@ export function SectionHeader({
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[#272830]">
       <div>
         {eyebrow && (
-          <p className="text-xs font-semibold tracking-wider uppercase text-[#D4AF37] mb-1">
+          <p className="text-xs font-semibold tracking-wider uppercase text-[#e040a0] mb-1">
             {eyebrow}
           </p>
         )}
@@ -42,7 +42,7 @@ export function StatusBadge({
 }) {
   const variantStyles = {
     neutral: "bg-neutral-800 text-neutral-300 border-neutral-700",
-    gold: "bg-[#D4AF37]/15 text-[#E6C65A] border-[#D4AF37]/30",
+    gold: "bg-[#e040a0]/15 text-[#E6C65A] border-[#e040a0]/30",
     success: "bg-emerald-950/40 text-emerald-300 border-emerald-800/40",
     warning: "bg-amber-950/40 text-amber-300 border-amber-800/40",
     danger: "bg-red-950/40 text-red-300 border-red-800/40",

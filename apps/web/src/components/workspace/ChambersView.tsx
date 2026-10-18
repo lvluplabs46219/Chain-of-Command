@@ -152,7 +152,7 @@ export function ChambersView({ matter }: ChambersViewProps) {
   return (
     <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-4">
       <div className="pb-3 border-b border-[#272830]">
-        <span className="text-xs font-mono uppercase text-[#D4AF37] font-semibold">
+        <span className="text-xs font-mono uppercase text-[#e040a0] font-semibold">
           AI Legal Team Chambers
         </span>
         <h1 className="text-2xl font-bold text-white mt-1">Ask your case team</h1>
@@ -173,12 +173,12 @@ export function ChambersView({ matter }: ChambersViewProps) {
       {emptyLocker && matter.id !== "matter-empty" && (
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#2A2B35] bg-[#141519] px-3 py-2.5 text-xs text-neutral-300">
           <span className="flex items-center gap-2">
-            <FolderOpen className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <FolderOpen className="w-3.5 h-3.5 text-[#e040a0]" />
             No charges or evidence indexed yet for this matter.
           </span>
           <Link
             href="/investigations"
-            className="px-3 py-1.5 rounded-full bg-[#D4AF37] text-neutral-950 font-semibold hover:bg-[#c49f27]"
+            className="px-3 py-1.5 rounded-full bg-[#e040a0] text-neutral-950 font-semibold hover:bg-[#c49f27]"
           >
             Add evidence
           </Link>
@@ -200,7 +200,7 @@ export function ChambersView({ matter }: ChambersViewProps) {
                   onClick={() => setSelectedAgent(agent)}
                   className={`w-full text-left p-3 rounded-xl border transition-all ${
                     active
-                      ? "bg-[#1C1E2A] border-[#D4AF37]/50 shadow-md shadow-[#D4AF37]/5"
+                      ? "bg-[#1C1E2A] border-[#e040a0]/50 shadow-md shadow-[#e040a0]/5"
                       : "bg-[#14151C] border-[#252735] hover:bg-[#181A24]"
                   }`}
                 >
@@ -216,7 +216,7 @@ export function ChambersView({ matter }: ChambersViewProps) {
                       {mode}
                     </span>
                   </div>
-                  <div className="text-[11px] text-[#D4AF37] mt-0.5">{agent.role}</div>
+                  <div className="text-[11px] text-[#e040a0] mt-0.5">{agent.role}</div>
                   <p className="text-[10px] text-neutral-400 mt-1 line-clamp-2">{agent.specialty}</p>
                 </button>
               );
@@ -247,7 +247,7 @@ export function ChambersView({ matter }: ChambersViewProps) {
               </div>
             </div>
             <div className="hidden sm:flex items-center gap-1.5 text-xs text-neutral-400">
-              <Shield className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <Shield className="w-3.5 h-3.5 text-[#e040a0]" />
               <span>Educational mode</span>
             </div>
           </div>
@@ -279,7 +279,7 @@ export function ChambersView({ matter }: ChambersViewProps) {
                   <div
                     className={`max-w-xl p-3.5 rounded-2xl text-xs sm:text-sm leading-relaxed ${
                       m.sender === "user"
-                        ? "bg-[#D4AF37] text-neutral-950 font-medium rounded-tr-none"
+                        ? "bg-[#e040a0] text-neutral-950 font-medium rounded-tr-none"
                         : "bg-[#1C1E2A] text-neutral-200 border border-[#2B2D3D] rounded-tl-none"
                     }`}
                   >
@@ -300,13 +300,13 @@ export function ChambersView({ matter }: ChambersViewProps) {
               value={promptInput}
               onChange={(e) => setPromptInput(e.target.value)}
               placeholder="Paste docket facts or ask an educational question…"
-              className="flex-1 min-h-[44px] bg-[#0c0d12] border border-[#2B2E3D] rounded-full px-4 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#D4AF37]"
+              className="flex-1 min-h-[44px] bg-[#0c0d12] border border-[#2B2E3D] rounded-full px-4 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#e040a0]"
               aria-label="Message to selected agent"
             />
             <button
               type="submit"
               disabled={!promptInput.trim()}
-              className="px-5 min-h-[44px] rounded-full bg-[#D4AF37] hover:bg-[#c49f27] disabled:opacity-40 disabled:cursor-not-allowed text-neutral-950 font-bold text-sm flex items-center gap-2 transition-colors shadow-[0_4px_16px_rgba(212,175,55,0.2)]"
+              className="px-5 min-h-[44px] rounded-full bg-[#e040a0] hover:bg-[#c49f27] disabled:opacity-40 disabled:cursor-not-allowed text-neutral-950 font-bold text-sm flex items-center gap-2 transition-colors shadow-[0_4px_16px_rgba(212,175,55,0.2)]"
             >
               <Send className="w-4 h-4" />
               <span>Send</span>

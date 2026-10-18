@@ -61,7 +61,7 @@ export function SettingsView({ readingLevel, onSetReadingLevel }: SettingsViewPr
   return (
     <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
       <div className="pb-4 border-b border-[#272830]">
-        <span className="text-xs font-mono uppercase text-[#D4AF37] font-semibold">
+        <span className="text-xs font-mono uppercase text-[#e040a0] font-semibold">
           System Configuration & Privacy
         </span>
         <h1 className="text-2xl font-bold text-white mt-1">Security, Accessibility & Audit Ledger</h1>
@@ -75,7 +75,7 @@ export function SettingsView({ readingLevel, onSetReadingLevel }: SettingsViewPr
         <div className="space-y-4">
           <div className="bg-[#14151C] border border-[#262835] rounded-xl p-5 space-y-4">
             <h3 className="font-bold text-white text-sm flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-[#D4AF37]" />
+              <BookOpen className="w-4 h-4 text-[#e040a0]" />
               <span>Cognitive Reading Complexity</span>
             </h3>
 
@@ -86,12 +86,12 @@ export function SettingsView({ readingLevel, onSetReadingLevel }: SettingsViewPr
                   onClick={() => onSetReadingLevel(lvl)}
                   className={`w-full text-left p-3 rounded-lg border text-xs font-medium transition-colors flex items-center justify-between ${
                     readingLevel === lvl
-                      ? "bg-[#D4AF37]/15 border-[#D4AF37] text-[#E6C65A] font-bold"
+                      ? "bg-[#e040a0]/15 border-[#e040a0] text-[#E6C65A] font-bold"
                       : "bg-[#181923] border-[#292B3A] text-neutral-300 hover:bg-[#1E202B]"
                   }`}
                 >
                   <span>{lvl}</span>
-                  {readingLevel === lvl && <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />}
+                  {readingLevel === lvl && <CheckCircle2 className="w-4 h-4 text-[#e040a0]" />}
                 </button>
               ))}
             </div>
@@ -99,7 +99,7 @@ export function SettingsView({ readingLevel, onSetReadingLevel }: SettingsViewPr
 
           <div className="bg-[#14151C] border border-[#262835] rounded-xl p-5 space-y-4">
             <h3 className="font-bold text-white text-sm flex items-center gap-2">
-              <Shield className="w-4 h-4 text-[#D4AF37]" />
+              <Shield className="w-4 h-4 text-[#e040a0]" />
               <span>External Action Cryptographic Gate</span>
             </h3>
 
@@ -127,7 +127,7 @@ export function SettingsView({ readingLevel, onSetReadingLevel }: SettingsViewPr
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-white text-sm flex items-center gap-2">
-              <Lock className="w-4 h-4 text-[#D4AF37]" />
+              <Lock className="w-4 h-4 text-[#e040a0]" />
               <span>Traceable AI Operations Ledger (RULE 29 Auditability)</span>
             </h3>
             <span className="text-[11px] font-mono text-neutral-400">
@@ -158,7 +158,7 @@ export function SettingsView({ readingLevel, onSetReadingLevel }: SettingsViewPr
                     {log.provenanceHash}
                   </span>
                   <div className="flex items-center gap-3">
-                    <span className="text-[#D4AF37]">{log.sourcesCount} Grounded Citations</span>
+                    <span className="text-[#e040a0]">{log.sourcesCount} Grounded Citations</span>
                     <span className="text-emerald-400 flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3" />
                       <span>Human Reviewed</span>

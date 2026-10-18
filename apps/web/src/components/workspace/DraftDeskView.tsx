@@ -48,7 +48,7 @@ export function DraftDeskView({ matter, onOpenActionModal }: DraftDeskViewProps)
     return (
       <div className="p-6 max-w-3xl mx-auto">
         <div className="bg-[#141519] border border-[#272830] rounded-xl p-8 text-center space-y-3">
-          <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4AF37]">Draft Desk</p>
+          <p className="text-[10px] font-mono uppercase tracking-widest text-[#e040a0]">Draft Desk</p>
           <h1 className="text-xl font-serif font-bold text-white">No drafts yet</h1>
           <p className="text-sm text-neutral-400 leading-relaxed">
             {hasMatter
@@ -63,7 +63,7 @@ export function DraftDeskView({ matter, onOpenActionModal }: DraftDeskViewProps)
   return (
     <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
       <div className="pb-4 border-b border-[#272830]">
-        <span className="text-xs font-mono uppercase text-[#D4AF37] font-semibold">
+        <span className="text-xs font-mono uppercase text-[#e040a0] font-semibold">
           Draft Desk & Document Intelligence
         </span>
         <h1 className="text-2xl font-bold text-white mt-1">Court-Ready Pleadings & Motions</h1>
@@ -85,7 +85,7 @@ export function DraftDeskView({ matter, onOpenActionModal }: DraftDeskViewProps)
                 onClick={() => setSelectedDocIndex(idx)}
                 className={`w-full text-left p-3.5 rounded-xl border transition-all ${
                   selectedDocIndex === idx
-                    ? "bg-[#1C1E2A] border-[#D4AF37]/50 shadow-md shadow-[#D4AF37]/5"
+                    ? "bg-[#1C1E2A] border-[#e040a0]/50 shadow-md shadow-[#e040a0]/5"
                     : "bg-[#14151C] border-[#252735] hover:bg-[#181A24]"
                 }`}
               >
@@ -124,7 +124,7 @@ export function DraftDeskView({ matter, onOpenActionModal }: DraftDeskViewProps)
                     "Draft requires signature & clerk submission."
                   )
                 }
-                className="px-3.5 py-1.5 rounded-lg bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 text-xs font-bold flex items-center gap-1.5 shadow-md"
+                className="px-3.5 py-1.5 rounded-lg bg-[#e040a0] hover:bg-[#c49f27] text-neutral-950 text-xs font-bold flex items-center gap-1.5 shadow-md"
               >
                 <Lock className="w-3.5 h-3.5" />
                 <span>Prepare Filing Packet</span>

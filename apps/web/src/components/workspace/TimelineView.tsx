@@ -36,7 +36,7 @@ export function TimelineView({ matter, timeline, onSaveTimelineRecord, matterId 
     <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#272830]">
         <div>
-          <span className="text-xs font-mono uppercase text-[#D4AF37] font-semibold">
+          <span className="text-xs font-mono uppercase text-[#e040a0] font-semibold">
             Chronology & Contradiction Reconstruction
           </span>
           <h1 className="text-2xl font-bold text-white mt-1">Factual Case Timeline</h1>
@@ -54,7 +54,7 @@ export function TimelineView({ matter, timeline, onSaveTimelineRecord, matterId 
             onClick={() => setFilterCategory(cat)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
               filterCategory === cat
-                ? "bg-[#D4AF37] text-neutral-950 font-bold"
+                ? "bg-[#e040a0] text-neutral-950 font-bold"
                 : "bg-[#161720] border border-[#272935] text-neutral-300 hover:bg-[#1C1E27]"
             }`}
           >
@@ -87,7 +87,7 @@ export function TimelineView({ matter, timeline, onSaveTimelineRecord, matterId 
               className={`absolute left-1.5 top-3 -translate-x-1/2 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                 event.hasContradiction
                   ? "bg-amber-500 border-amber-300 text-black"
-                  : "bg-[#13141A] border-[#D4AF37] text-[#D4AF37]"
+                  : "bg-[#13141A] border-[#e040a0] text-[#e040a0]"
               }`}
             >
               <div className="w-1.5 h-1.5 rounded-full bg-current" />
@@ -102,7 +102,7 @@ export function TimelineView({ matter, timeline, onSaveTimelineRecord, matterId 
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-bold text-[#D4AF37]">
+                  <span className="font-mono text-xs font-bold text-[#e040a0]">
                     {event.date} {event.time && `· ${event.time}`}
                   </span>
                   <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-neutral-800 text-neutral-300">
