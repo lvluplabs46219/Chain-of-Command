@@ -1,6 +1,6 @@
 {
-  "name": "The Firm (Acquit.ai Agent Playground)",
-  "description": "The Firm: multi-agent AI counsel playground featuring YHWH (Lead Counsel), Michael (Managing Partner), Gabriel (Client Relations), Raphael (Case Prep), and Metatron/Seraphim (Research & Appellate Oracles) — powered by custom open-weight models.",
+  "name": "The Firm",
+  "description": "The Firm: Telegram-style legal ops messaging. Boardroom (multi-agent), Private Chambers (1:1 specialists), user-named practice. Agents: YHWH, Michael, Gabriel, Raphael, Metatron, Seraphim.",
   "capabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
   ]
