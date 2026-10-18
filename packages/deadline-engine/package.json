@@ -1,0 +1,15 @@
+{
+  "name": "@chain-of-command/deadline-engine",
+  "version": "1.0.0",
+  "description": "Chain of Command Deterministic Legal Deadline Rules Engine",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

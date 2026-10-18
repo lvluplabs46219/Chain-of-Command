@@ -1,0 +1,15 @@
+{
+  "name": "@chain-of-command/legal-library",
+  "version": "1.0.0",
+  "description": "Chain of Command Legal Library, Citations & Grounding Guard",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

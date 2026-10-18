@@ -1,7 +1,7 @@
-import { ChainOfCommandMasterApp } from "@/components/ChainOfCommandMasterApp";
+import { ChainOfCommandWorkspace } from "@/components/ChainOfCommandWorkspace";
 
 export const dynamic = "force-dynamic";
 
 export default function HomePage() {
-  return <ChainOfCommandMasterApp initialTab="dashboard" />;
+  return <ChainOfCommandWorkspace initialTab="dashboard" />;
 }

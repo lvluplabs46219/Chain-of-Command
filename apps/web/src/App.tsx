@@ -277,7 +277,7 @@ function MainApp() {
       <div className="flex-1 relative">
         <Routes>
           {/* Primary Legal OS Workspace Pages */}
-          <Route path="/" element={<StitchCategoryPage categoryId="command_center" />} />
+          <Route path="/" element={<ChainOfCommandWorkspace />} />
           <Route path="/command-center" element={<StitchCategoryPage categoryId="command_center" />} />
           <Route path="/docket" element={<StitchCategoryPage categoryId="the_docket" />} />
           <Route path="/cases" element={<StitchCategoryPage categoryId="the_docket" />} />
@@ -323,15 +323,9 @@ function MainApp() {
           <Route path="/gallery" element={<StitchGallery />} />
           <Route path="/stitch" element={<StitchGallery />} />
 
-          {/* Pro Workspace Tools (Protected with WorkspaceGuard) */}
-          <Route
-            path="/chain-of-command"
-            element={
-              <WorkspaceGuard>
-                <ChainOfCommandWorkspace />
-              </WorkspaceGuard>
-            }
-          />
+          {/* Pro Workspace Tools */}
+          <Route path="/chain-of-command" element={<ChainOfCommandWorkspace />} />
+          <Route path="/legal-os" element={<ChainOfCommandWorkspace />} />
           <Route
             path="/document-editor"
             element={
