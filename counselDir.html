@@ -1,404 +1,618 @@
 <!DOCTYPE html>
-
-<html class="dark" lang="en"><head>
+<html lang="en" class="dark">
+<head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Counsel Directory</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Skills Directory — Empyrean</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Orbitron:wght@500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --void: #050508;
+    --panel: #0c0c12;
+    --panel-2: #12121a;
+    --border: #1e1e2a;
+    --border-glow: #2a2a3d;
+    --cyan: #00e5ff;
+    --magenta: #ff2bd6;
+    --violet: #a855f7;
+    --lime: #b8ff3c;
+    --amber: #ffb020;
+    --text: #e8e8f0;
+    --muted: #7a7a92;
+    --dim: #4a4a5c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    min-height: 100%;
+    background: var(--void);
+    color: var(--text);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 229, 255, 0.08), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(255, 43, 214, 0.06), transparent),
+      linear-gradient(rgba(30, 30, 42, 0.4) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 30, 42, 0.4) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+    background-attachment: fixed;
+  }
+
+  /* Top bar — minimal, not legal-app chrome */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.85rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(5, 5, 8, 0.85);
+    backdrop-filter: blur(12px);
+  }
+  .brand {
+    display: flex; align-items: center; gap: 0.75rem;
+    font-family: Orbitron, sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .brand-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 12px var(--cyan);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+  .top-links { display: flex; align-items: center; gap: 0.5rem; }
+  .top-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .top-links a:hover {
+    color: var(--cyan);
+    border-color: var(--border-glow);
+    background: rgba(0, 229, 255, 0.06);
+  }
+  .top-links a.firm {
+    color: var(--void);
+    background: var(--cyan);
+    border-color: var(--cyan);
+    font-weight: 600;
+  }
+  .top-links a.firm:hover {
+    background: #33ebff;
+    color: var(--void);
+  }
+
+  .shell {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  /* Hero */
+  .hero {
+    margin-bottom: 2.5rem;
+  }
+  .eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 0.75rem;
+  }
+  .hero h1 {
+    font-family: Orbitron, sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1.15;
+    margin-bottom: 0.75rem;
+  }
+  .hero h1 span { color: var(--magenta); }
+  .hero p {
+    color: var(--muted);
+    font-size: 0.85rem;
+    max-width: 42rem;
+    line-height: 1.65;
+  }
+
+  /* Filters */
+  .filters {
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    margin-bottom: 1.75rem;
+  }
+  .chip {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--panel);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .chip:hover, .chip.active {
+    color: var(--cyan);
+    border-color: rgba(0, 229, 255, 0.45);
+    background: rgba(0, 229, 255, 0.08);
+    box-shadow: 0 0 16px rgba(0, 229, 255, 0.12);
+  }
+
+  /* Skill cards grid */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  @media (min-width: 720px) {
+    .grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .card {
+    position: relative;
+    background: linear-gradient(145deg, var(--panel-2) 0%, var(--panel) 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.35rem 1.35rem 1.2rem;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, transparent 40%, rgba(0, 229, 255, 0.15), transparent 70%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .card:hover {
+    border-color: var(--border-glow);
+    box-shadow: 0 0 28px rgba(0, 229, 255, 0.08), 0 8px 32px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+  }
+  .card:hover::before { opacity: 1; }
+  .card.featured {
+    border-color: rgba(255, 43, 214, 0.35);
+    grid-column: 1 / -1;
+  }
+  .card.featured::before {
+    background: linear-gradient(135deg, transparent 30%, rgba(255, 43, 214, 0.25), transparent 75%);
+    opacity: 1;
+  }
+
+  .card-head {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .agent-id {
+    font-family: Orbitron, sans-serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+  .agent-role {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 0.25rem;
+    letter-spacing: 0.04em;
+  }
+  .badge {
+    flex-shrink: 0;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.55rem;
+    border-radius: 4px;
+    border: 1px solid;
+    font-weight: 600;
+  }
+  .badge.core { color: var(--magenta); border-color: rgba(255, 43, 214, 0.4); background: rgba(255, 43, 214, 0.08); }
+  .badge.orch { color: var(--cyan); border-color: rgba(0, 229, 255, 0.4); background: rgba(0, 229, 255, 0.08); }
+  .badge.msg { color: var(--lime); border-color: rgba(184, 255, 60, 0.35); background: rgba(184, 255, 60, 0.06); }
+  .badge.work { color: var(--amber); border-color: rgba(255, 176, 32, 0.4); background: rgba(255, 176, 32, 0.08); }
+  .badge.gate { color: var(--violet); border-color: rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.08); }
+  .badge.heavy { color: #ff6b9d; border-color: rgba(255, 107, 157, 0.4); background: rgba(255, 107, 157, 0.08); }
+
+  .meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem 1rem;
+    margin-bottom: 1.1rem;
+    padding: 0.85rem 0;
+    border-top: 1px dashed var(--border);
+    border-bottom: 1px dashed var(--border);
+  }
+  @media (min-width: 520px) {
+    .meta { grid-template-columns: 1fr 1fr 1fr; }
+  }
+  .meta-label {
+    display: block;
+    font-size: 0.55rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 0.2rem;
+  }
+  .meta-val {
+    font-size: 0.75rem;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.55;
+    margin-bottom: 1.1rem;
+  }
+
+  .actions {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.55rem 0.95rem;
+    border-radius: 6px;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-primary {
+    color: var(--void);
+    background: var(--cyan);
+    border-color: var(--cyan);
+    box-shadow: 0 0 18px rgba(0, 229, 255, 0.25);
+  }
+  .btn-primary:hover {
+    background: #33ebff;
+    box-shadow: 0 0 28px rgba(0, 229, 255, 0.4);
+  }
+  .btn-ghost {
+    color: var(--muted);
+    background: transparent;
+    border-color: var(--border);
+  }
+  .btn-ghost:hover {
+    color: var(--text);
+    border-color: var(--border-glow);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  /* Footer CTA */
+  .cta {
+    margin-top: 2.5rem;
+    padding: 1.75rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: linear-gradient(160deg, rgba(0, 229, 255, 0.04), rgba(255, 43, 214, 0.04));
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.25rem;
+  }
+  .cta h2 {
+    font-family: Orbitron, sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.35rem;
+  }
+  .cta p {
+    font-size: 0.75rem;
+    color: var(--muted);
+    max-width: 28rem;
+    line-height: 1.5;
+  }
+
+  .notice {
+    margin-bottom: 1.5rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--cyan);
+    border-radius: 0 8px 8px 0;
+    background: rgba(0, 229, 255, 0.04);
+    font-size: 0.7rem;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .notice strong { color: var(--text); }
+
+  .hash {
+    font-size: 0.6rem;
+    color: var(--dim);
+    letter-spacing: 0.04em;
+  }
+</style>
 </head>
-<body class="flex flex-col min-h-screen bg-surface">
-<!-- TopAppBar Medium -->
-<header class="bg-surface-container-low dark:bg-surface-container-low text-primary dark:text-primary docked full-width top-0 border-b border-outline-variant flat no shadows flex justify-between items-center w-full px-gutter h-16 sticky z-50">
-<div class="flex items-center gap-6">
-<h1 class="text-headline-md font-headline-md font-bold text-on-surface dark:text-on-surface">Acquit.ai</h1>
-<!-- Navigation Links -->
-<nav class="hidden md:flex items-center gap-4">
-<a class="text-on-surface-variant text-body-md font-body-md hover:bg-surface-variant hover:text-on-surface px-3 py-2 rounded-DEFAULT transition-all" href="#">File</a>
-<a class="text-on-surface-variant text-body-md font-body-md hover:bg-surface-variant hover:text-on-surface px-3 py-2 rounded-DEFAULT transition-all" href="#">Edit</a>
-<a class="text-on-surface-variant text-body-md font-body-md hover:bg-surface-variant hover:text-on-surface px-3 py-2 rounded-DEFAULT transition-all" href="#">View</a>
-<a class="text-on-surface-variant text-body-md font-body-md hover:bg-surface-variant hover:text-on-surface px-3 py-2 rounded-DEFAULT transition-all" href="#">Matter</a>
-<a class="text-on-surface-variant text-body-md font-body-md hover:bg-surface-variant hover:text-on-surface px-3 py-2 rounded-DEFAULT transition-all" href="#">Account</a>
-</nav>
-</div>
-<!-- Trailing Actions -->
-<div class="flex items-center gap-2">
-<a aria-label="The Firm playground" class="p-2 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface rounded-full transition-colors active:scale-95 duration-75 flex items-center gap-2" href="http://localhost:3000/">
-<span class="material-symbols-outlined">forum</span>
-<span class="text-label-caps font-label-caps hidden lg:inline">The Firm</span>
-</a>
-<button aria-label="notifications" class="p-2 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface rounded-full transition-colors active:scale-95 duration-75">
-<span class="material-symbols-outlined">notifications</span>
-</button>
-<button aria-label="settings" class="p-2 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface rounded-full transition-colors active:scale-95 duration-75">
-<span class="material-symbols-outlined">settings</span>
-</button>
-<button aria-label="account_circle" class="p-2 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface rounded-full transition-colors active:scale-95 duration-75">
-<span class="material-symbols-outlined">account_circle</span>
-</button>
-</div>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-dot" aria-hidden="true"></span>
+    <span>EMPYREAN · SKILLS</span>
+  </div>
+  <nav class="top-links">
+    <a href="commandCenter.html">Command</a>
+    <a href="http://localhost:3000/" class="firm">Open The Firm</a>
+  </nav>
 </header>
-<div class="flex flex-1 relative overflow-hidden">
-<!-- SideNavBar -->
-<aside class="bg-surface-container dark:bg-surface-container text-secondary dark:text-secondary docked left-0 h-screen w-[280px] border-r border-outline-variant flat no shadows fixed left-0 top-16 bottom-0 flex flex-col z-40 hidden md:flex">
-<!-- Header -->
-<div class="p-6 border-b border-outline-variant">
-<div class="flex items-center gap-4 mb-4">
-<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center border border-outline-variant overflow-hidden">
-<span class="material-symbols-outlined text-on-surface">balance</span>
-</div>
-<div>
-<h2 class="text-label-caps font-label-caps tracking-widest text-on-surface">Legal OS</h2>
-<p class="text-data-mono font-data-mono text-on-surface-variant text-xs mt-1">Matter 2024-772B</p>
-</div>
-</div>
-<button class="w-full py-2 bg-legal-gold text-surface font-data-mono text-data-mono font-bold hover:brightness-110 transition-all border border-legal-gold uppercase tracking-wider" style="background-color: #e040a0; color: #fffbff; border-color: #e040a0;">New Filing</button>
-</div>
-<!-- Tabs -->
-<nav class="flex-1 py-4 flex flex-col gap-1 overflow-y-auto">
-<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant font-medium text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 ease-in-out" href="#">
-<span class="material-symbols-outlined text-[20px]">dashboard</span>
-<span>Command Center</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant font-medium text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 ease-in-out" href="#">
-<span class="material-symbols-outlined text-[20px]">gavel</span>
-<span>The Docket</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-3 text-on-surface border-l-4 border-secondary bg-surface-variant font-bold text-label-caps font-label-caps transition-all duration-200 ease-in-out" href="#">
-<span class="material-symbols-outlined text-[20px]">groups</span>
-<span>Chambers</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant font-medium text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 ease-in-out" href="http://localhost:3000/">
-<span class="material-symbols-outlined text-[20px]">forum</span>
-<span>The Firm</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant font-medium text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 ease-in-out" href="#">
-<span class="material-symbols-outlined text-[20px]">menu_book</span>
-<span>Law Library</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant font-medium text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 ease-in-out" href="#">
-<span class="material-symbols-outlined text-[20px]">folder_shared</span>
-<span>Record Room</span>
-</a>
-</nav>
-<!-- Footer Tabs -->
-<div class="mt-auto border-t border-outline-variant py-4 flex flex-col gap-1">
-<a class="flex items-center gap-4 px-6 py-2 text-on-surface-variant font-medium text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 ease-in-out" href="#">
-<span class="material-symbols-outlined text-[18px]">help</span>
-<span>Support</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-2 text-on-surface-variant font-medium text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 ease-in-out" href="#">
-<span class="material-symbols-outlined text-[18px]">archive</span>
-<span>Archive</span>
-</a>
-</div>
-</aside>
-<!-- Main Content Area (12 Column Grid on Desktop) -->
-<main class="flex-1 ml-0 md:ml-[280px] p-gutter md:p-lg h-[calc(100vh-64px)] overflow-y-auto flex flex-col md:flex-row gap-lg">
-<!-- Left Column: Search & Filters -->
-<div class="w-full md:w-1/3 lg:w-1/4 flex flex-col gap-6 shrink-0">
-<!-- Page Title -->
-<div>
-<h2 class="text-display-case font-display-case text-on-surface mb-2">Counsel Directory</h2>
-<p class="text-body-md font-body-md text-on-surface-variant">Identify and engage AI counsel — custom open-weight model attorneys — and message them directly on The Firm.</p>
-</div>
-<!-- Narrow Your Search Panel -->
-<div class="border border-outline-variant bg-surface-container p-6 flex flex-col gap-4 relative">
-<div class="absolute top-0 left-0 w-1 h-full bg-surface-variant"></div>
-<h3 class="text-label-caps font-label-caps text-on-surface tracking-widest uppercase border-b border-outline-variant pb-2 mb-2 flex items-center gap-2">
-<span class="material-symbols-outlined text-sm">filter_list</span> Narrow Your Search
-                    </h3>
-<!-- Search Input -->
-<div class="flex flex-col gap-1">
-<label class="text-data-mono font-data-mono text-xs text-on-surface-variant uppercase">Name or Practice</label>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
-<input class="w-full bg-surface-dim border-b border-outline-variant px-8 py-2 text-data-mono font-data-mono text-on-surface focus:outline-none focus:border-on-surface transition-colors placeholder-on-surface-variant/50" placeholder="e.g. Lead Counsel, Research" type="text">
-</div>
-</div>
-<!-- Practice Area Filter -->
-<div class="flex flex-col gap-1">
-<label class="text-data-mono font-data-mono text-xs text-on-surface-variant uppercase">Practice Area</label>
-<select class="w-full bg-surface-dim border-b border-outline-variant px-2 py-2 text-data-mono font-data-mono text-on-surface focus:outline-none focus:border-on-surface appearance-none cursor-pointer">
-<option>All Areas</option>
-<option>Matter Strategy</option>
-<option>Statutory Research</option>
-<option>Drafting &amp; Case Prep</option>
-<option>Client Communications</option>
-<option>Appellate / Deep Reasoning</option>
-</select>
-</div>
-<!-- Model Filter -->
-<div class="flex flex-col gap-1">
-<label class="text-data-mono font-data-mono text-xs text-on-surface-variant uppercase">Model Tier (Open Weights)</label>
-<select class="w-full bg-surface-dim border-b border-outline-variant px-2 py-2 text-data-mono font-data-mono text-on-surface focus:outline-none focus:border-on-surface appearance-none cursor-pointer">
-<option>Any Tier</option>
-<option>Hermes 3 8B (Local)</option>
-<option>Hermes 3 70B (Heavy)</option>
-<option>Worker / Internal</option>
-</select>
-</div>
-<!-- Status Filter -->
-<div class="flex flex-col gap-1">
-<label class="text-data-mono font-data-mono text-xs text-on-surface-variant uppercase">Availability</label>
-<select class="w-full bg-surface-dim border-b border-outline-variant px-2 py-2 text-data-mono font-data-mono text-on-surface focus:outline-none focus:border-on-surface appearance-none cursor-pointer">
-<option>Any Status</option>
-<option>Active</option>
-<option>Idle / Standby</option>
-</select>
-</div>
-<button class="mt-4 w-full py-2 border border-outline-variant text-data-mono font-data-mono text-on-surface hover:bg-surface-variant transition-colors uppercase tracking-wider text-xs">Apply Filters</button>
-</div>
-</div>
-<!-- Right Column: Results List -->
-<div class="flex-1 flex flex-col gap-6">
-<!-- Directory Notice Banner -->
-<div class="border border-outline-variant bg-surface-container-high p-4 flex items-start gap-4">
-<span class="material-symbols-outlined text-on-surface-variant mt-1">info</span>
-<div>
-<h4 class="text-data-mono font-data-mono text-on-surface font-bold uppercase mb-1">Directory Notice</h4>
-<p class="text-body-md font-body-md text-on-surface-variant text-sm">All counsel listed are AI attorneys powered by custom open-weight models running on The Firm, the Acquit.ai agent playground. AI-generated legal information is not legal advice; consult a licensed human attorney for any binding matter.</p>
-</div>
-</div>
-<!-- Listings Container -->
-<div class="flex flex-col gap-4">
 
-<!-- AI Counsel Listing: Eleanor Vance -->
-<article class="border border-legal-gold bg-surface-container p-6 relative flex flex-col gap-4 hover:border-on-surface-variant transition-colors group" style="border-color: #e040a0;">
-<div class="absolute top-0 right-0 bg-legal-gold text-surface px-2 py-1 text-[10px] font-data-mono uppercase font-bold flex items-center gap-1" style="background-color: #e040a0; color: #fffbff;">
-<span class="material-symbols-outlined text-[12px]">star</span> Lead Counsel
-                        </div>
-<div class="flex items-start justify-between">
-<div>
-<h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors">Eleanor Vance, Esq.</h3>
-<p class="text-data-mono font-data-mono text-secondary">Lead Counsel & Operations Lead — AI Counsel</p>
-</div>
-<div class="flex items-center gap-2 border border-[#af0a78] px-3 py-1 rounded-full bg-surface-variant/50">
-<span class="material-symbols-outlined text-sm legal-gold" style="color: #e040a0;">smart_toy</span>
-<span class="text-label-caps font-label-caps text-on-surface">Open-Weight AI</span>
-</div>
-</div>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-outline-variant">
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Practice Areas</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Matter Strategy, Legal Research</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Model (Open Weights)</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Hermes 3 8B (open-weight)</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Capability</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Directive planning & DAG strategy</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Contact</span>
-<a class="text-data-mono font-data-mono text-secondary hover:underline text-sm flex items-center gap-1" href="http://localhost:3000/?agent=yhwh">
-<span class="material-symbols-outlined text-[14px]">forum</span> Message on The Firm
-                                </a>
-</div>
-</div>
-</article>
+<div class="shell">
+  <section class="hero">
+    <p class="eyebrow">Protocol · Multi-agent kernel</p>
+    <h1>Skills <span>Directory</span></h1>
+    <p>
+      Live Empyrean agent modules. Each skill is a discrete capability in the swarm —
+      planning, orchestration, messaging, work, gateway routing, and heavy reasoning.
+      Message any skill directly on The Firm playground.
+    </p>
+  </section>
 
-<!-- AI Counsel Listing: Marcus T. Reed -->
-<article class="border border-outline-variant bg-surface-container p-6 relative flex flex-col gap-4 hover:border-on-surface-variant transition-colors group">
+  <div class="notice">
+    <strong>Isolated surface.</strong> This directory is not part of the legal workspace chrome.
+    Skills run on open-weight models via The Firm. Outputs are educational / operational — not legal advice.
+  </div>
 
-<div class="flex items-start justify-between">
-<div>
-<h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors">Marcus T. Reed, Esq.</h3>
-<p class="text-data-mono font-data-mono text-on-surface-variant">Managing Partner & Workflow Coordinator — AI Counsel</p>
-</div>
-<div class="flex items-center gap-2 border border-[#af0a78] px-3 py-1 rounded-full bg-surface-variant/50">
-<span class="material-symbols-outlined text-sm legal-gold" style="color: #e040a0;">smart_toy</span>
-<span class="text-label-caps font-label-caps text-on-surface">Open-Weight AI</span>
-</div>
-</div>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-outline-variant border-dashed">
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Practice Areas</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Case Orchestration, Task Dispatch</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Model (Open Weights)</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">State Machine v2 (internal)</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Capability</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Topological task resolution</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Contact</span>
-<a class="text-data-mono font-data-mono text-secondary hover:underline text-sm flex items-center gap-1" href="http://localhost:3000/?agent=michael">
-<span class="material-symbols-outlined text-[14px]">forum</span> Message on The Firm
-                                </a>
-</div>
-</div>
-</article>
+  <div class="filters" role="group" aria-label="Filter skills">
+    <button type="button" class="chip active" data-filter="all">All</button>
+    <button type="button" class="chip" data-filter="core">Core</button>
+    <button type="button" class="chip" data-filter="runtime">Runtime</button>
+    <button type="button" class="chip" data-filter="oracle">Oracle</button>
+  </div>
 
-<!-- AI Counsel Listing: Sarah Jenkins -->
-<article class="border border-outline-variant bg-surface-container p-6 relative flex flex-col gap-4 hover:border-on-surface-variant transition-colors group">
+  <div class="grid" id="skills-grid">
 
-<div class="flex items-start justify-between">
-<div>
-<h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors">Sarah Jenkins, Esq.</h3>
-<p class="text-data-mono font-data-mono text-on-surface-variant">Research Scribe & Consensus Counsel — AI Counsel</p>
-</div>
-<div class="flex items-center gap-2 border border-[#af0a78] px-3 py-1 rounded-full bg-surface-variant/50">
-<span class="material-symbols-outlined text-sm legal-gold" style="color: #e040a0;">smart_toy</span>
-<span class="text-label-caps font-label-caps text-on-surface">Open-Weight AI</span>
-</div>
-</div>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-outline-variant border-dashed">
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Practice Areas</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Statutory Research, Multi-Model Consensus</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Model (Open Weights)</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Heuristic Classifier + Hermes</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Capability</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Gateway routing & oracle consensus</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Contact</span>
-<a class="text-data-mono font-data-mono text-secondary hover:underline text-sm flex items-center gap-1" href="http://localhost:3000/?agent=metatron">
-<span class="material-symbols-outlined text-[14px]">forum</span> Message on The Firm
-                                </a>
-</div>
-</div>
-</article>
+    <!-- YHWH -->
+    <article class="card featured" data-tags="core all">
+      <div class="card-head">
+        <div>
+          <div class="agent-id">YHWH</div>
+          <div class="agent-role">Lead Counsel · Planning core</div>
+        </div>
+        <span class="badge core">Core</span>
+      </div>
+      <div class="meta">
+        <div>
+          <span class="meta-label">Module</span>
+          <span class="meta-val">yhwh/core.ts</span>
+        </div>
+        <div>
+          <span class="meta-label">Default model</span>
+          <span class="meta-val">Hermes 3 · 8B</span>
+        </div>
+        <div>
+          <span class="meta-label">Capability</span>
+          <span class="meta-val">Directive planning · DAG strategy</span>
+        </div>
+      </div>
+      <p class="desc">
+        High-level planning kernel. Issues directives, decomposes matters into task graphs,
+        and sets swarm intent. Primary entry point for strategy sessions on The Firm.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="http://localhost:3000/?agent=yhwh">Message on The Firm</a>
+        <span class="hash">skill://yhwh</span>
+      </div>
+    </article>
 
-<!-- AI Counsel Listing: David Chen -->
-<article class="border border-outline-variant bg-surface-container p-6 relative flex flex-col gap-4 hover:border-on-surface-variant transition-colors group">
+    <!-- Michael -->
+    <article class="card" data-tags="runtime all">
+      <div class="card-head">
+        <div>
+          <div class="agent-id">Michael</div>
+          <div class="agent-role">Orchestrator · Workflow coordinator</div>
+        </div>
+        <span class="badge orch">Runtime</span>
+      </div>
+      <div class="meta">
+        <div>
+          <span class="meta-label">Module</span>
+          <span class="meta-val">michael/orchestrator.ts</span>
+        </div>
+        <div>
+          <span class="meta-label">Transport</span>
+          <span class="meta-val">UDS · state machine</span>
+        </div>
+        <div>
+          <span class="meta-label">Capability</span>
+          <span class="meta-val">Topological task resolution</span>
+        </div>
+      </div>
+      <p class="desc">
+        Manages execution order, dispatches work units, and holds swarm state.
+        Routes between planning (YHWH) and workers (Raphael) with dependency awareness.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="http://localhost:3000/?agent=michael">Message on The Firm</a>
+        <span class="hash">skill://michael</span>
+      </div>
+    </article>
 
-<div class="flex items-start justify-between">
-<div>
-<h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors">David Chen, Esq.</h3>
-<p class="text-data-mono font-data-mono text-on-surface-variant">Case Prep & Drafting Specialist — AI Counsel</p>
-</div>
-<div class="flex items-center gap-2 border border-[#af0a78] px-3 py-1 rounded-full bg-surface-variant/50">
-<span class="material-symbols-outlined text-sm legal-gold" style="color: #e040a0;">smart_toy</span>
-<span class="text-label-caps font-label-caps text-on-surface">Open-Weight AI</span>
-</div>
-</div>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-outline-variant border-dashed">
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Practice Areas</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Drafting, Filing Prep, Document Automation</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Model (Open Weights)</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Worker Pool v1 (open-weight)</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Capability</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Scaffolding & migrations</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Contact</span>
-<a class="text-data-mono font-data-mono text-secondary hover:underline text-sm flex items-center gap-1" href="http://localhost:3000/?agent=raphael">
-<span class="material-symbols-outlined text-[14px]">forum</span> Message on The Firm
-                                </a>
-</div>
-</div>
-</article>
+    <!-- Gabriel -->
+    <article class="card" data-tags="runtime all">
+      <div class="card-head">
+        <div>
+          <div class="agent-id">Gabriel</div>
+          <div class="agent-role">Messenger · Client relations</div>
+        </div>
+        <span class="badge msg">Runtime</span>
+      </div>
+      <div class="meta">
+        <div>
+          <span class="meta-label">Module</span>
+          <span class="meta-val">gabriel/messenger.ts</span>
+        </div>
+        <div>
+          <span class="meta-label">I/O</span>
+          <span class="meta-val">Webhooks · chat surface</span>
+        </div>
+        <div>
+          <span class="meta-label">Capability</span>
+          <span class="meta-val">Ingress / egress messaging</span>
+        </div>
+      </div>
+      <p class="desc">
+        Handles inbound prompts and outbound replies. Bridges human operators and the swarm
+        so every skill can be messaged from The Firm UI.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="http://localhost:3000/?agent=gabriel">Message on The Firm</a>
+        <span class="hash">skill://gabriel</span>
+      </div>
+    </article>
 
-<!-- AI Counsel Listing: Ryan Okafor -->
-<article class="border border-outline-variant bg-surface-container p-6 relative flex flex-col gap-4 hover:border-on-surface-variant transition-colors group">
+    <!-- Raphael -->
+    <article class="card" data-tags="runtime all">
+      <div class="card-head">
+        <div>
+          <div class="agent-id">Raphael</div>
+          <div class="agent-role">Worker · Case prep & drafting</div>
+        </div>
+        <span class="badge work">Runtime</span>
+      </div>
+      <div class="meta">
+        <div>
+          <span class="meta-label">Module</span>
+          <span class="meta-val">raphael/worker.ts</span>
+        </div>
+        <div>
+          <span class="meta-label">Pool</span>
+          <span class="meta-val">Worker pool v1</span>
+        </div>
+        <div>
+          <span class="meta-label">Capability</span>
+          <span class="meta-val">Drafting · document automation</span>
+        </div>
+      </div>
+      <p class="desc">
+        Executes concrete work units: research pulls, draft generation, and structured outputs.
+        Designed to run under Michael’s orchestration.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="http://localhost:3000/?agent=raphael">Message on The Firm</a>
+        <span class="hash">skill://raphael</span>
+      </div>
+    </article>
 
-<div class="flex items-start justify-between">
-<div>
-<h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors">Ryan Okafor, Esq.</h3>
-<p class="text-data-mono font-data-mono text-on-surface-variant">Client Relations & Communications — AI Counsel</p>
-</div>
-<div class="flex items-center gap-2 border border-[#af0a78] px-3 py-1 rounded-full bg-surface-variant/50">
-<span class="material-symbols-outlined text-sm legal-gold" style="color: #e040a0;">smart_toy</span>
-<span class="text-label-caps font-label-caps text-on-surface">Open-Weight AI</span>
-</div>
-</div>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-outline-variant border-dashed">
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Practice Areas</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Client Updates, Notifications, Webhooks</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Model (Open Weights)</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Fanout Engine (open-weight)</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Capability</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Event delivery & comms</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Contact</span>
-<a class="text-data-mono font-data-mono text-secondary hover:underline text-sm flex items-center gap-1" href="http://localhost:3000/?agent=gabriel">
-<span class="material-symbols-outlined text-[14px]">forum</span> Message on The Firm
-                                </a>
-</div>
-</div>
-</article>
+    <!-- Metatron -->
+    <article class="card" data-tags="oracle all">
+      <div class="card-head">
+        <div>
+          <div class="agent-id">Metatron</div>
+          <div class="agent-role">Gateway · Routing & consensus</div>
+        </div>
+        <span class="badge gate">Oracle</span>
+      </div>
+      <div class="meta">
+        <div>
+          <span class="meta-label">Module</span>
+          <span class="meta-val">metatron/gateway.ts</span>
+        </div>
+        <div>
+          <span class="meta-label">Logic</span>
+          <span class="meta-val">Heuristic classifier</span>
+        </div>
+        <div>
+          <span class="meta-label">Capability</span>
+          <span class="meta-val">Route · multi-model consensus</span>
+        </div>
+      </div>
+      <p class="desc">
+        Classifies intent and routes requests across the swarm. Aggregates oracle signals
+        when multiple models must agree before a reply is emitted.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="http://localhost:3000/?agent=metatron">Message on The Firm</a>
+        <span class="hash">skill://metatron</span>
+      </div>
+    </article>
 
-<!-- AI Counsel Listing: Dwayne Carter -->
-<article class="border border-outline-variant bg-surface-container p-6 relative flex flex-col gap-4 hover:border-on-surface-variant transition-colors group">
+    <!-- Seraphim -->
+    <article class="card" data-tags="oracle all">
+      <div class="card-head">
+        <div>
+          <div class="agent-id">Seraphim</div>
+          <div class="agent-role">Vertex · Heavy reasoning</div>
+        </div>
+        <span class="badge heavy">Oracle</span>
+      </div>
+      <div class="meta">
+        <div>
+          <span class="meta-label">Module</span>
+          <span class="meta-val">seraphim/vertex.ts</span>
+        </div>
+        <div>
+          <span class="meta-label">Default model</span>
+          <span class="meta-val">Hermes 3 · 70B</span>
+        </div>
+        <div>
+          <span class="meta-label">Capability</span>
+          <span class="meta-val">Deep / appellate-tier reasoning</span>
+        </div>
+      </div>
+      <p class="desc">
+        Optional heavy-tier oracle for long-horizon analysis. Higher latency, higher capacity.
+        Enable via SERAPHIM_ENABLED when local resources allow.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="http://localhost:3000/?agent=seraphim">Message on The Firm</a>
+        <span class="hash">skill://seraphim</span>
+      </div>
+    </article>
 
-<div class="flex items-start justify-between">
-<div>
-<h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors">Dwayne Carter, Esq.</h3>
-<p class="text-data-mono font-data-mono text-on-surface-variant">Appellate & Deep Reasoning Oracle — AI Counsel</p>
+  </div>
+
+  <section class="cta">
+    <div>
+      <h2>The Firm</h2>
+      <p>
+        Group chat and 1:1 messaging with the full Empyrean swarm.
+        Visual playground stays independent of this directory and of the legal workspace UI.
+      </p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="http://localhost:3000/">Open playground</a>
+      <a class="btn btn-ghost" href="http://localhost:3000/?agent=yhwh">DM YHWH</a>
+    </div>
+  </section>
 </div>
-<div class="flex items-center gap-2 border border-[#af0a78] px-3 py-1 rounded-full bg-surface-variant/50">
-<span class="material-symbols-outlined text-sm legal-gold" style="color: #e040a0;">smart_toy</span>
-<span class="text-label-caps font-label-caps text-on-surface">Open-Weight AI</span>
-</div>
-</div>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-outline-variant border-dashed">
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Practice Areas</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Appellate Strategy, Deep Legal Analysis</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Model (Open Weights)</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Hermes 3 70B (open-weight)</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Capability</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Heavy-tier deep reasoning</span>
-</div>
-<div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Contact</span>
-<a class="text-data-mono font-data-mono text-secondary hover:underline text-sm flex items-center gap-1" href="http://localhost:3000/?agent=seraphim">
-<span class="material-symbols-outlined text-[14px]">forum</span> Message on The Firm
-                                </a>
-</div>
-</div>
-</article>
-</div>
-<!-- The Firm Playground CTA -->
-<div class="mt-8 border-t-2 border-[#af0a78] pt-6">
-<div class="flex items-center gap-3 mb-4">
-<span class="material-symbols-outlined text-primary">forum</span>
-<h3 class="text-headline-md font-headline-md text-on-surface">The Firm — Agent Playground</h3>
-</div>
-<p class="text-body-md font-body-md text-on-surface-variant mb-4 max-w-2xl">Message any counsel above directly in The Firm, the multi-agent playground where your AI attorneys strategize, research, draft, and report back in a group chat.</p>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-<a class="border border-outline-variant p-4 hover:bg-surface-variant transition-colors flex justify-between items-center group" href="http://localhost:3000/">
-<div>
-<h4 class="text-data-mono font-data-mono text-on-surface font-bold">Open The Firm (General Swarm)</h4>
-<p class="text-label-caps font-label-caps text-on-surface-variant text-[10px] mt-1">Group chat with all AI counsel</p>
-</div>
-<span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface">arrow_forward</span>
-</a>
-<a class="border border-outline-variant p-4 hover:bg-surface-variant transition-colors flex justify-between items-center group" href="http://localhost:3000/?agent=yhwh">
-<div>
-<h4 class="text-data-mono font-data-mono text-on-surface font-bold">Direct Message Lead Counsel</h4>
-<p class="text-label-caps font-label-caps text-on-surface-variant text-[10px] mt-1">1:1 chat with Eleanor Vance (YHWH)</p>
-</div>
-<span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface">arrow_forward</span>
-</a>
-</div>
-</div>
-</div>
-</div>
-</main>
-</div>
-</body></html>
+
+<script>
+  document.querySelectorAll(".chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
+      chip.classList.add("active");
+      const f = chip.dataset.filter;
+      document.querySelectorAll("#skills-grid .card").forEach((card) => {
+        const tags = (card.dataset.tags || "").split(/\s+/);
+        card.style.display = tags.includes(f) ? "" : "none";
+      });
+    });
+  });
+</script>
+</body>
+</html>
