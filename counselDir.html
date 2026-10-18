@@ -21,6 +21,10 @@
 </div>
 <!-- Trailing Actions -->
 <div class="flex items-center gap-2">
+<a aria-label="The Firm playground" class="p-2 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface rounded-full transition-colors active:scale-95 duration-75 flex items-center gap-2" href="http://localhost:3000/">
+<span class="material-symbols-outlined">forum</span>
+<span class="text-label-caps font-label-caps hidden lg:inline">The Firm</span>
+</a>
 <button aria-label="notifications" class="p-2 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface rounded-full transition-colors active:scale-95 duration-75">
 <span class="material-symbols-outlined">notifications</span>
 </button>
@@ -39,14 +43,14 @@
 <div class="p-6 border-b border-outline-variant">
 <div class="flex items-center gap-4 mb-4">
 <div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center border border-outline-variant overflow-hidden">
-<img alt="Firm Seal" class="w-full h-full object-cover" data-alt="A macro shot of a debossed metallic firm seal on dark charcoal legal paper. The seal is intricate with classic scales of justice, rendered in a brutalist, high-contrast style. Dark mode aesthetic, institutional feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzLNiAaIeEKJ9oM6o1zdbZAKAonTHRTX0RuRea2h3lfpzpJYAD8nxnPlXIJL1ycJ-pHqDmZlSFLS2Cs1xrJCoQSrRTEkbJWJP4buPQbS2EbI_jHkhROBBIod7ktIQObNMTRx8sLrqgGvL_uHCRUbXyd3p9Xrlys6ftXbpADkxxxFqqkuz3zxsMM7Lx3QiAzXYxynuaT_0VcuwChbK5fMEyjCMEGdPslgOlJIxDSHJSJ4vNEZIHpqsX7w"/>
+<span class="material-symbols-outlined text-on-surface">balance</span>
 </div>
 <div>
 <h2 class="text-label-caps font-label-caps tracking-widest text-on-surface">Legal OS</h2>
 <p class="text-data-mono font-data-mono text-on-surface-variant text-xs mt-1">Matter 2024-772B</p>
 </div>
 </div>
-<button class="w-full py-2 bg-legal-gold text-surface font-data-mono text-data-mono font-bold hover:brightness-110 transition-all border border-legal-gold uppercase tracking-wider" style="background-color: #D4AF37; color: #141313; border-color: #D4AF37;">New Filing</button>
+<button class="w-full py-2 bg-legal-gold text-surface font-data-mono text-data-mono font-bold hover:brightness-110 transition-all border border-legal-gold uppercase tracking-wider" style="background-color: #e040a0; color: #fffbff; border-color: #e040a0;">New Filing</button>
 </div>
 <!-- Tabs -->
 <nav class="flex-1 py-4 flex flex-col gap-1 overflow-y-auto">
@@ -58,10 +62,13 @@
 <span class="material-symbols-outlined text-[20px]">gavel</span>
 <span>The Docket</span>
 </a>
-<!-- Active State Example (Assuming 'Chambers' or similar is directory context, but let's highlight generic if none perfect, though rules say find closest match. 'Record Room' sounds directory-like, but 'Chambers' usually implies personnel. Let's highlight none specific to 'Counsel Directory' as it's a generic directory page, but 'Chambers' is closest to personnel) -->
 <a class="flex items-center gap-4 px-6 py-3 text-on-surface border-l-4 border-secondary bg-surface-variant font-bold text-label-caps font-label-caps transition-all duration-200 ease-in-out" href="#">
 <span class="material-symbols-outlined text-[20px]">groups</span>
 <span>Chambers</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant font-medium text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 ease-in-out" href="http://localhost:3000/">
+<span class="material-symbols-outlined text-[20px]">forum</span>
+<span>The Firm</span>
 </a>
 <a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant font-medium text-label-caps font-label-caps hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 ease-in-out" href="#">
 <span class="material-symbols-outlined text-[20px]">menu_book</span>
@@ -86,12 +93,12 @@
 </aside>
 <!-- Main Content Area (12 Column Grid on Desktop) -->
 <main class="flex-1 ml-0 md:ml-[280px] p-gutter md:p-lg h-[calc(100vh-64px)] overflow-y-auto flex flex-col md:flex-row gap-lg">
-<!-- Left Column: Search & Filters (Inspector style but left aligned for this specific layout) -->
+<!-- Left Column: Search & Filters -->
 <div class="w-full md:w-1/3 lg:w-1/4 flex flex-col gap-6 shrink-0">
 <!-- Page Title -->
 <div>
 <h2 class="text-display-case font-display-case text-on-surface mb-2">Counsel Directory</h2>
-<p class="text-body-md font-body-md text-on-surface-variant">Identify and engage verified legal professionals across jurisdictions.</p>
+<p class="text-body-md font-body-md text-on-surface-variant">Identify and engage AI counsel — custom open-weight model attorneys — and message them directly on The Firm.</p>
 </div>
 <!-- Narrow Your Search Panel -->
 <div class="border border-outline-variant bg-surface-container p-6 flex flex-col gap-4 relative">
@@ -101,10 +108,10 @@
                     </h3>
 <!-- Search Input -->
 <div class="flex flex-col gap-1">
-<label class="text-data-mono font-data-mono text-xs text-on-surface-variant uppercase">Name or Firm</label>
+<label class="text-data-mono font-data-mono text-xs text-on-surface-variant uppercase">Name or Practice</label>
 <div class="relative">
 <span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
-<input class="w-full bg-surface-dim border-b border-outline-variant px-8 py-2 text-data-mono font-data-mono text-on-surface focus:outline-none focus:border-on-surface transition-colors placeholder-on-surface-variant/50" placeholder="e.g. Smith &amp; Associates" type="text">
+<input class="w-full bg-surface-dim border-b border-outline-variant px-8 py-2 text-data-mono font-data-mono text-on-surface focus:outline-none focus:border-on-surface transition-colors placeholder-on-surface-variant/50" placeholder="e.g. Lead Counsel, Research" type="text">
 </div>
 </div>
 <!-- Practice Area Filter -->
@@ -112,29 +119,30 @@
 <label class="text-data-mono font-data-mono text-xs text-on-surface-variant uppercase">Practice Area</label>
 <select class="w-full bg-surface-dim border-b border-outline-variant px-2 py-2 text-data-mono font-data-mono text-on-surface focus:outline-none focus:border-on-surface appearance-none cursor-pointer">
 <option>All Areas</option>
-<option>Corporate Litigation</option>
-<option>Intellectual Property</option>
-<option>Criminal Defense</option>
-<option>Family Law</option>
+<option>Matter Strategy</option>
+<option>Statutory Research</option>
+<option>Drafting &amp; Case Prep</option>
+<option>Client Communications</option>
+<option>Appellate / Deep Reasoning</option>
 </select>
 </div>
-<!-- Jurisdiction Filter -->
+<!-- Model Filter -->
 <div class="flex flex-col gap-1">
-<label class="text-data-mono font-data-mono text-xs text-on-surface-variant uppercase">Jurisdiction (Bar)</label>
+<label class="text-data-mono font-data-mono text-xs text-on-surface-variant uppercase">Model Tier (Open Weights)</label>
 <select class="w-full bg-surface-dim border-b border-outline-variant px-2 py-2 text-data-mono font-data-mono text-on-surface focus:outline-none focus:border-on-surface appearance-none cursor-pointer">
-<option>Any State</option>
-<option>New York</option>
-<option>California</option>
-<option>Texas</option>
+<option>Any Tier</option>
+<option>Hermes 3 8B (Local)</option>
+<option>Hermes 3 70B (Heavy)</option>
+<option>Worker / Internal</option>
 </select>
 </div>
-<!-- Language Filter -->
+<!-- Status Filter -->
 <div class="flex flex-col gap-1">
-<label class="text-data-mono font-data-mono text-xs text-on-surface-variant uppercase">Language</label>
+<label class="text-data-mono font-data-mono text-xs text-on-surface-variant uppercase">Availability</label>
 <select class="w-full bg-surface-dim border-b border-outline-variant px-2 py-2 text-data-mono font-data-mono text-on-surface focus:outline-none focus:border-on-surface appearance-none cursor-pointer">
-<option>English</option>
-<option>Spanish</option>
-<option>Mandarin</option>
+<option>Any Status</option>
+<option>Active</option>
+<option>Idle / Standby</option>
 </select>
 </div>
 <button class="mt-4 w-full py-2 border border-outline-variant text-data-mono font-data-mono text-on-surface hover:bg-surface-variant transition-colors uppercase tracking-wider text-xs">Apply Filters</button>
@@ -147,132 +155,243 @@
 <span class="material-symbols-outlined text-on-surface-variant mt-1">info</span>
 <div>
 <h4 class="text-data-mono font-data-mono text-on-surface font-bold uppercase mb-1">Directory Notice</h4>
-<p class="text-body-md font-body-md text-on-surface-variant text-sm">This index is provided as a raw directory for informational purposes only. It does not constitute an endorsement, recommendation, or referral by Acquit.ai. Users must independently verify credentials.</p>
+<p class="text-body-md font-body-md text-on-surface-variant text-sm">All counsel listed are AI attorneys powered by custom open-weight models running on The Firm, the Acquit.ai agent playground. AI-generated legal information is not legal advice; consult a licensed human attorney for any binding matter.</p>
 </div>
 </div>
 <!-- Listings Container -->
 <div class="flex flex-col gap-4">
-<!-- Featured Listing -->
-<article class="border border-legal-gold bg-surface-container p-6 relative flex flex-col gap-4" style="border-color: #D4AF37;">
-<div class="absolute top-0 right-0 bg-legal-gold text-surface px-2 py-1 text-[10px] font-data-mono uppercase font-bold flex items-center gap-1" style="background-color: #D4AF37; color: #141313;">
-<span class="material-symbols-outlined text-[12px]">star</span> Featured Listing
+
+<!-- AI Counsel Listing: Eleanor Vance -->
+<article class="border border-legal-gold bg-surface-container p-6 relative flex flex-col gap-4 hover:border-on-surface-variant transition-colors group" style="border-color: #e040a0;">
+<div class="absolute top-0 right-0 bg-legal-gold text-surface px-2 py-1 text-[10px] font-data-mono uppercase font-bold flex items-center gap-1" style="background-color: #e040a0; color: #fffbff;">
+<span class="material-symbols-outlined text-[12px]">star</span> Lead Counsel
                         </div>
 <div class="flex items-start justify-between">
 <div>
-<h3 class="text-headline-md font-headline-md text-on-surface mb-1">Eleanor Vance, Esq.</h3>
-<p class="text-data-mono font-data-mono text-secondary">Vance &amp; Partners LLP</p>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors">Eleanor Vance, Esq.</h3>
+<p class="text-data-mono font-data-mono text-secondary">Lead Counsel & Operations Lead — AI Counsel</p>
 </div>
-<div class="flex items-center gap-2 border border-[#2C3E50] px-3 py-1 rounded-full bg-surface-variant/50">
-<span class="material-symbols-outlined text-sm legal-gold" style="color: #D4AF37;">verified</span>
-<span class="text-label-caps font-label-caps text-on-surface">NY Bar Verified</span>
+<div class="flex items-center gap-2 border border-[#af0a78] px-3 py-1 rounded-full bg-surface-variant/50">
+<span class="material-symbols-outlined text-sm legal-gold" style="color: #e040a0;">smart_toy</span>
+<span class="text-label-caps font-label-caps text-on-surface">Open-Weight AI</span>
 </div>
 </div>
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-outline-variant">
 <div>
 <span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Practice Areas</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Corporate M&amp;A, Securities</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Matter Strategy, Legal Research</span>
 </div>
 <div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Admissions</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">NY, SDNY, EDNY</span>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Model (Open Weights)</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Hermes 3 8B (open-weight)</span>
 </div>
 <div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Experience</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">15+ Years</span>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Capability</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Directive planning & DAG strategy</span>
 </div>
 <div>
 <span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Contact</span>
-<button class="text-data-mono font-data-mono text-secondary hover:underline text-sm flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">mail</span> Request Dossier
-                                </button>
+<a class="text-data-mono font-data-mono text-secondary hover:underline text-sm flex items-center gap-1" href="http://localhost:3000/?agent=yhwh">
+<span class="material-symbols-outlined text-[14px]">forum</span> Message on The Firm
+                                </a>
 </div>
 </div>
 </article>
-<!-- Standard Listing 1 -->
+
+<!-- AI Counsel Listing: Marcus T. Reed -->
 <article class="border border-outline-variant bg-surface-container p-6 relative flex flex-col gap-4 hover:border-on-surface-variant transition-colors group">
+
 <div class="flex items-start justify-between">
 <div>
-<h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors">Marcus T. Reed</h3>
-<p class="text-data-mono font-data-mono text-on-surface-variant">Reed Defense Group</p>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors">Marcus T. Reed, Esq.</h3>
+<p class="text-data-mono font-data-mono text-on-surface-variant">Managing Partner & Workflow Coordinator — AI Counsel</p>
 </div>
-<div class="flex items-center gap-2 border border-[#2C3E50] px-3 py-1 rounded-full">
-<span class="material-symbols-outlined text-sm text-secondary">shield</span>
-<span class="text-label-caps font-label-caps text-on-surface-variant">CA Bar Verified</span>
+<div class="flex items-center gap-2 border border-[#af0a78] px-3 py-1 rounded-full bg-surface-variant/50">
+<span class="material-symbols-outlined text-sm legal-gold" style="color: #e040a0;">smart_toy</span>
+<span class="text-label-caps font-label-caps text-on-surface">Open-Weight AI</span>
 </div>
 </div>
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-outline-variant border-dashed">
 <div>
 <span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Practice Areas</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">White Collar, Criminal Defense</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Case Orchestration, Task Dispatch</span>
 </div>
 <div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Admissions</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">CA, 9th Circuit</span>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Model (Open Weights)</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">State Machine v2 (internal)</span>
 </div>
 <div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Experience</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">22 Years</span>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Capability</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Topological task resolution</span>
 </div>
 <div>
 <span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Contact</span>
-<button class="text-data-mono font-data-mono text-on-surface-variant hover:text-on-surface transition-colors text-sm flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">mail</span> Connect
-                                </button>
+<a class="text-data-mono font-data-mono text-secondary hover:underline text-sm flex items-center gap-1" href="http://localhost:3000/?agent=michael">
+<span class="material-symbols-outlined text-[14px]">forum</span> Message on The Firm
+                                </a>
 </div>
 </div>
 </article>
-<!-- Standard Listing 2 -->
+
+<!-- AI Counsel Listing: Sarah Jenkins -->
 <article class="border border-outline-variant bg-surface-container p-6 relative flex flex-col gap-4 hover:border-on-surface-variant transition-colors group">
+
 <div class="flex items-start justify-between">
 <div>
-<h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors">Sarah Jenkins</h3>
-<p class="text-data-mono font-data-mono text-on-surface-variant">Jenkins &amp; Associates</p>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors">Sarah Jenkins, Esq.</h3>
+<p class="text-data-mono font-data-mono text-on-surface-variant">Research Scribe & Consensus Counsel — AI Counsel</p>
 </div>
-<div class="flex items-center gap-2 border border-[#2C3E50] px-3 py-1 rounded-full">
-<span class="material-symbols-outlined text-sm text-secondary">shield</span>
-<span class="text-label-caps font-label-caps text-on-surface-variant">TX Bar Verified</span>
+<div class="flex items-center gap-2 border border-[#af0a78] px-3 py-1 rounded-full bg-surface-variant/50">
+<span class="material-symbols-outlined text-sm legal-gold" style="color: #e040a0;">smart_toy</span>
+<span class="text-label-caps font-label-caps text-on-surface">Open-Weight AI</span>
 </div>
 </div>
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-outline-variant border-dashed">
 <div>
 <span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Practice Areas</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">Intellectual Property, Patents</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Statutory Research, Multi-Model Consensus</span>
 </div>
 <div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Admissions</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">TX, USPTO</span>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Model (Open Weights)</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Heuristic Classifier + Hermes</span>
 </div>
 <div>
-<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Experience</span>
-<span class="text-body-md font-body-md text-on-surface text-sm">8 Years</span>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Capability</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Gateway routing & oracle consensus</span>
 </div>
 <div>
 <span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Contact</span>
-<button class="text-data-mono font-data-mono text-on-surface-variant hover:text-on-surface transition-colors text-sm flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">mail</span> Connect
-                                </button>
+<a class="text-data-mono font-data-mono text-secondary hover:underline text-sm flex items-center gap-1" href="http://localhost:3000/?agent=metatron">
+<span class="material-symbols-outlined text-[14px]">forum</span> Message on The Firm
+                                </a>
 </div>
 </div>
 </article>
-<!-- Pro Bono Section -->
-<div class="mt-8 border-t-2 border-[#2C3E50] pt-6">
+
+<!-- AI Counsel Listing: David Chen -->
+<article class="border border-outline-variant bg-surface-container p-6 relative flex flex-col gap-4 hover:border-on-surface-variant transition-colors group">
+
+<div class="flex items-start justify-between">
+<div>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors">David Chen, Esq.</h3>
+<p class="text-data-mono font-data-mono text-on-surface-variant">Case Prep & Drafting Specialist — AI Counsel</p>
+</div>
+<div class="flex items-center gap-2 border border-[#af0a78] px-3 py-1 rounded-full bg-surface-variant/50">
+<span class="material-symbols-outlined text-sm legal-gold" style="color: #e040a0;">smart_toy</span>
+<span class="text-label-caps font-label-caps text-on-surface">Open-Weight AI</span>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-outline-variant border-dashed">
+<div>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Practice Areas</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Drafting, Filing Prep, Document Automation</span>
+</div>
+<div>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Model (Open Weights)</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Worker Pool v1 (open-weight)</span>
+</div>
+<div>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Capability</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Scaffolding & migrations</span>
+</div>
+<div>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Contact</span>
+<a class="text-data-mono font-data-mono text-secondary hover:underline text-sm flex items-center gap-1" href="http://localhost:3000/?agent=raphael">
+<span class="material-symbols-outlined text-[14px]">forum</span> Message on The Firm
+                                </a>
+</div>
+</div>
+</article>
+
+<!-- AI Counsel Listing: Ryan Okafor -->
+<article class="border border-outline-variant bg-surface-container p-6 relative flex flex-col gap-4 hover:border-on-surface-variant transition-colors group">
+
+<div class="flex items-start justify-between">
+<div>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors">Ryan Okafor, Esq.</h3>
+<p class="text-data-mono font-data-mono text-on-surface-variant">Client Relations & Communications — AI Counsel</p>
+</div>
+<div class="flex items-center gap-2 border border-[#af0a78] px-3 py-1 rounded-full bg-surface-variant/50">
+<span class="material-symbols-outlined text-sm legal-gold" style="color: #e040a0;">smart_toy</span>
+<span class="text-label-caps font-label-caps text-on-surface">Open-Weight AI</span>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-outline-variant border-dashed">
+<div>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Practice Areas</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Client Updates, Notifications, Webhooks</span>
+</div>
+<div>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Model (Open Weights)</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Fanout Engine (open-weight)</span>
+</div>
+<div>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Capability</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Event delivery & comms</span>
+</div>
+<div>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Contact</span>
+<a class="text-data-mono font-data-mono text-secondary hover:underline text-sm flex items-center gap-1" href="http://localhost:3000/?agent=gabriel">
+<span class="material-symbols-outlined text-[14px]">forum</span> Message on The Firm
+                                </a>
+</div>
+</div>
+</article>
+
+<!-- AI Counsel Listing: Dwayne Carter -->
+<article class="border border-outline-variant bg-surface-container p-6 relative flex flex-col gap-4 hover:border-on-surface-variant transition-colors group">
+
+<div class="flex items-start justify-between">
+<div>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-1 group-hover:text-primary transition-colors">Dwayne Carter, Esq.</h3>
+<p class="text-data-mono font-data-mono text-on-surface-variant">Appellate & Deep Reasoning Oracle — AI Counsel</p>
+</div>
+<div class="flex items-center gap-2 border border-[#af0a78] px-3 py-1 rounded-full bg-surface-variant/50">
+<span class="material-symbols-outlined text-sm legal-gold" style="color: #e040a0;">smart_toy</span>
+<span class="text-label-caps font-label-caps text-on-surface">Open-Weight AI</span>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-outline-variant border-dashed">
+<div>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Practice Areas</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Appellate Strategy, Deep Legal Analysis</span>
+</div>
+<div>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Model (Open Weights)</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Hermes 3 70B (open-weight)</span>
+</div>
+<div>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Capability</span>
+<span class="text-body-md font-body-md text-on-surface text-sm">Heavy-tier deep reasoning</span>
+</div>
+<div>
+<span class="block text-data-mono font-data-mono text-[10px] text-on-surface-variant uppercase mb-1">Contact</span>
+<a class="text-data-mono font-data-mono text-secondary hover:underline text-sm flex items-center gap-1" href="http://localhost:3000/?agent=seraphim">
+<span class="material-symbols-outlined text-[14px]">forum</span> Message on The Firm
+                                </a>
+</div>
+</div>
+</article>
+</div>
+<!-- The Firm Playground CTA -->
+<div class="mt-8 border-t-2 border-[#af0a78] pt-6">
 <div class="flex items-center gap-3 mb-4">
-<span class="material-symbols-outlined text-primary">volunteer_activism</span>
-<h3 class="text-headline-md font-headline-md text-on-surface">Pro Bono &amp; Legal Aid</h3>
+<span class="material-symbols-outlined text-primary">forum</span>
+<h3 class="text-headline-md font-headline-md text-on-surface">The Firm — Agent Playground</h3>
 </div>
-<p class="text-body-md font-body-md text-on-surface-variant mb-4 max-w-2xl">Access organizations providing free or low-cost legal assistance for qualifying individuals and non-profits.</p>
+<p class="text-body-md font-body-md text-on-surface-variant mb-4 max-w-2xl">Message any counsel above directly in The Firm, the multi-agent playground where your AI attorneys strategize, research, draft, and report back in a group chat.</p>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-<a class="border border-outline-variant p-4 hover:bg-surface-variant transition-colors flex justify-between items-center group" href="#">
+<a class="border border-outline-variant p-4 hover:bg-surface-variant transition-colors flex justify-between items-center group" href="http://localhost:3000/">
 <div>
-<h4 class="text-data-mono font-data-mono text-on-surface font-bold">National Legal Aid Defender Assoc.</h4>
-<p class="text-label-caps font-label-caps text-on-surface-variant text-[10px] mt-1">Nationwide Resources</p>
+<h4 class="text-data-mono font-data-mono text-on-surface font-bold">Open The Firm (General Swarm)</h4>
+<p class="text-label-caps font-label-caps text-on-surface-variant text-[10px] mt-1">Group chat with all AI counsel</p>
 </div>
 <span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface">arrow_forward</span>
 </a>
-<a class="border border-outline-variant p-4 hover:bg-surface-variant transition-colors flex justify-between items-center group" href="#">
+<a class="border border-outline-variant p-4 hover:bg-surface-variant transition-colors flex justify-between items-center group" href="http://localhost:3000/?agent=yhwh">
 <div>
-<h4 class="text-data-mono font-data-mono text-on-surface font-bold">State Bar Pro Bono Directory</h4>
-<p class="text-label-caps font-label-caps text-on-surface-variant text-[10px] mt-1">Select Jurisdiction First</p>
+<h4 class="text-data-mono font-data-mono text-on-surface font-bold">Direct Message Lead Counsel</h4>
+<p class="text-label-caps font-label-caps text-on-surface-variant text-[10px] mt-1">1:1 chat with Eleanor Vance (YHWH)</p>
 </div>
 <span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface">arrow_forward</span>
 </a>
