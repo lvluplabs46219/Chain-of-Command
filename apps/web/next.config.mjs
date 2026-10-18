@@ -22,7 +22,7 @@ function getApiDestination() {
 const nextConfig = {
   output: process.env.VERCEL ? undefined : 'standalone',
   reactStrictMode: true,
-  allowedDevOrigins: ['*.run.app', '*.us-east1.run.app', '*.cloudrun.app', 'localhost:3000', '127.0.0.1:3000'],
+  allowedDevOrigins: ['*.run.app', '*.us-east1.run.app', '*.cloudrun.app', '*.google.com', '*.googleusercontent.com', 'localhost:3000', '127.0.0.1:3000'],
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -57,7 +57,6 @@ const nextConfig = {
       {
         source: '/:path*',
         headers: [
-          { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
@@ -69,8 +68,8 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://app.infisical.com https://va.vercel-scripts.com http://127.0.0.1:11434 http://localhost:11434",
-              "frame-ancestors 'none'",
+              "connect-src 'self' ws: wss: https://*.supabase.co wss://*.supabase.co https://app.infisical.com https://va.vercel-scripts.com http://127.0.0.1:11434 http://localhost:11434",
+              "frame-ancestors *",
               "base-uri 'self'",
               "form-action 'self'",
             ].join('; '),

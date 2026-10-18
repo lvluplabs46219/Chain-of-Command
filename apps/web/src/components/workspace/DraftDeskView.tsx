@@ -18,7 +18,7 @@ import { ResultEnvelope } from "./ResultEnvelope";
 
 interface DraftDeskViewProps {
   matter: Matter;
-  onOpenActionModal: (title: string, court: string, summary: string) => void;
+  onOpenActionModal?: (title: string, court: string, summary: string) => void;
 }
 
 export function DraftDeskView({ matter, onOpenActionModal }: DraftDeskViewProps) {

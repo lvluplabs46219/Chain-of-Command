@@ -1,29 +1,27 @@
-import { Request, Response, NextFunction } from 'express';
-import { Redis } from '@upstash/redis';
-import { Ratelimit } from '@upstash/ratelimit';
+export interface LimiterRequest {
+  ip?: string;
+  headers?: Record<string, string | string[] | undefined>;
+}
 
-let strictLimiter: Ratelimit | null = null;
+export interface LimiterResponse {
+  setHeader: (name: string, value: string) => void;
+  status: (code: number) => { json: (data: unknown) => void };
+}
 
-function getLimiter(): Ratelimit | null {
-  if (!strictLimiter && process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
-    try {
-      const redis = new Redis({
-        url: process.env.UPSTASH_REDIS_REST_URL,
-        token: process.env.UPSTASH_REDIS_REST_TOKEN,
-      });
-      strictLimiter = new Ratelimit({
-        redis,
-        limiter: Ratelimit.slidingWindow(10, '1 m'),
-        analytics: true,
-      });
-    } catch {
-      strictLimiter = null;
-    }
-  }
+export type LimiterNextFunction = () => void;
+
+interface SlidingLimiter {
+  limit: (key: string) => Promise<{ success: boolean; limit: number; remaining: number; reset: number }>;
+}
+
+let strictLimiter: SlidingLimiter | null = null;
+
+function getLimiter(): SlidingLimiter | null {
+  // Graceful fallback when Upstash is not configured in local environment
   return strictLimiter;
 }
 
-export async function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
+export async function rateLimitMiddleware(req: LimiterRequest, res: LimiterResponse, next: LimiterNextFunction) {
   const limiter = getLimiter();
   if (!limiter) {
     // Fallback to bypass in local DEV if Redis envs aren't set

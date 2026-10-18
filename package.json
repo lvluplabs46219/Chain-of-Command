@@ -6,23 +6,25 @@
     "apps/*"
   ],
   "scripts": {
-    "prebuild": "rm -rf apps/web/node_modules/next && ln -s ../../node_modules/next apps/web/node_modules/next",
-    "dev": "next dev apps/web -p 3000 -H 0.0.0.0",
-    "build": "NODE_ENV=production NODE_OPTIONS='--max-old-space-size=1536' next build apps/web --no-lint",
-    "lint": "next lint apps/web",
-    "start": "next start apps/web -p 3000 -H 0.0.0.0",
+    "prebuild": "true",
+    "dev": "npm --prefix apps/web run dev",
+    "build": "npm --prefix apps/web run build",
+    "lint": "npm --prefix apps/web run lint",
+    "start": "npm --prefix apps/web run start",
     "secrets:agent": "infisical agent --config config/infisical/agent-config.yaml",
     "secrets:agent:root": "infisical agent --config agent-config.yaml"
   },
   "dependencies": {
+    "@types/three": "^0.186.0",
+    "botid": "^1.5.11",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.16.0",
+    "motion": "^12.4.7",
     "next": "^15.1.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "lucide-react": "^1.16.0",
-    "motion": "^12.4.7",
-    "clsx": "^2.1.1",
     "tailwind-merge": "^3.0.1",
-    "botid": "^1.5.11"
+    "three": "^0.186.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.7",

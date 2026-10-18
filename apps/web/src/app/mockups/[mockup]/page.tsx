@@ -1,5 +1,7 @@
 const MOCKUP_NAME_PATTERN = /^[a-z0-9._-]+$/i;
 
+export const dynamic = "force-dynamic";
+
 export default async function MockupPage({
   params,
 }: {

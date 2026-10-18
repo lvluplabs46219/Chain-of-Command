@@ -66,6 +66,10 @@ const CourtWatchView = dynamic(
   () => import("./workspace/CourtWatchView").then((m) => ({ default: m.CourtWatchView })),
   { loading: viewFallback },
 );
+const Courtroom3DWarRoom = dynamic(
+  () => import("./courtroom3d/Courtroom3DWarRoom").then((m) => ({ default: m.Courtroom3DWarRoom })),
+  { loading: viewFallback },
+);
 const DirectoryView = dynamic(
   () => import("./workspace/DirectoryView").then((m) => ({ default: m.DirectoryView })),
   { loading: viewFallback },
@@ -383,6 +387,16 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
         {activeTab === "draft_desk" && <DraftDeskView matter={activeMatter} />}
 
         {activeTab === "court_watch" && <CourtWatchView matter={activeMatter} />}
+
+        {activeTab === "courtroom_3d" && (
+          <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-4">
+            <Courtroom3DWarRoom
+              matter={activeMatter}
+              evidence={evidence}
+              onNavigateTab={(tab) => setActiveTab(tab as WorkspaceTab)}
+            />
+          </div>
+        )}
 
         {activeTab === "directory" && <DirectoryView />}
 

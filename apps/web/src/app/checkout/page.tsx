@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+export const dynamic = "force-dynamic";
+
 export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');

@@ -11,6 +11,8 @@ import {
   Clock,
   Volume2,
 } from "lucide-react";
+import { Courtroom3DWarRoom } from "../courtroom3d/Courtroom3DWarRoom";
+import { Compass, FileCheck } from "lucide-react";
 import { Matter } from "@/lib/workspace-data";
 
 interface CourtWatchViewProps {
@@ -18,6 +20,7 @@ interface CourtWatchViewProps {
 }
 
 export function CourtWatchView({ matter }: CourtWatchViewProps) {
+  const [activeSubMode, setActiveSubMode] = useState<"checklist" | "3d_warroom">("3d_warroom");
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
 
   const toggleCheck = (id: string) => {
@@ -84,17 +87,50 @@ export function CourtWatchView({ matter }: CourtWatchViewProps) {
 
   return (
     <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
-      <div className="pb-4 border-b border-[#272830]">
-        <span className="text-xs font-mono uppercase text-[#D4AF37] font-semibold">
-          Courtroom Readiness & Logistics
-        </span>
-        <h1 className="text-2xl font-bold text-white mt-1">Court Watch & Anxiety Reduction</h1>
-        <p className="text-xs sm:text-sm text-neutral-400 mt-1">
-          Prepare for your hearing with procedural clarity, protocol checklists, and courtroom etiquette.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#272830]">
+        <div>
+          <span className="text-xs font-mono uppercase text-[#D4AF37] font-semibold">
+            Courtroom Readiness & 3D Spatial Preparation
+          </span>
+          <h1 className="text-2xl font-bold text-white mt-1">Court Watch & Hearing War Room</h1>
+          <p className="text-xs sm:text-sm text-neutral-400 mt-1">
+            Rehearse hearing procedures in 3D, inspect station protocols, and master courtroom logistics.
+          </p>
+        </div>
+
+        {/* View Mode Toggle */}
+        <div className="flex items-center gap-1.5 p-1 bg-[#14151C] border border-[#272832] rounded-xl shrink-0">
+          <button
+            type="button"
+            onClick={() => setActiveSubMode("3d_warroom")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeSubMode === "3d_warroom"
+                ? "bg-[#D4AF37] text-neutral-950 shadow-md font-bold"
+                : "text-neutral-400 hover:text-white"
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span>3D War Room</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveSubMode("checklist")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeSubMode === "checklist"
+                ? "bg-[#D4AF37] text-neutral-950 shadow-md font-bold"
+                : "text-neutral-400 hover:text-white"
+            }`}
+          >
+            <FileCheck className="w-3.5 h-3.5" />
+            <span>Protocols & Checklist</span>
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {activeSubMode === "3d_warroom" ? (
+        <Courtroom3DWarRoom matter={matter} />
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left 2 Cols: Logistics Checklist */}
         <div className="lg:col-span-2 space-y-4">
           <h2 className="text-sm font-bold text-white flex items-center gap-2">
@@ -168,6 +204,7 @@ export function CourtWatchView({ matter }: CourtWatchViewProps) {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }

@@ -27,12 +27,17 @@ export interface TimelineEvent {
   date: string;
   time?: string;
   title: string;
-  category: "Arrest" | "Booking" | "Appearance" | "Discovery" | "Motion" | "Hearing" | "Evidence";
+  category: "Arrest" | "Booking" | "Appearance" | "Discovery" | "Motion" | "Hearing" | "Evidence" | string;
   description: string;
   sourceDoc?: string;
-  sourceType: "SOURCE_COURT" | "SOURCE_USER" | "SOURCE_PUBLIC";
+  sourceType?: "SOURCE_COURT" | "SOURCE_USER" | "SOURCE_PUBLIC";
   hasContradiction?: boolean;
   contradictionNote?: string;
+  officialRecordRef?: string;
+  isContradiction?: boolean;
+  notes?: string;
+  sources?: string[];
+  matterId?: string;
 }
 
 export interface LegalAuthority {
@@ -687,6 +692,10 @@ export interface TimelineRecord {
   description: string;
   officialRecordRef?: string;
   isContradiction?: boolean;
+  hasContradiction?: boolean;
+  contradictionNote?: string;
+  sourceType?: "SOURCE_COURT" | "SOURCE_USER" | "SOURCE_PUBLIC";
+  sourceDoc?: string;
   notes?: string;
   sources?: string[];
 }
@@ -699,8 +708,12 @@ export const INITIAL_TIMELINE_RECORDS: TimelineRecord[] = (SAMPLE_MATTERS[0]?.ti
   date: t.date,
   time: t.time,
   description: t.description,
-  officialRecordRef: t.officialRecordRef,
-  isContradiction: t.isContradiction,
+  officialRecordRef: t.officialRecordRef || t.sourceDoc,
+  isContradiction: t.isContradiction ?? t.hasContradiction,
+  hasContradiction: t.hasContradiction ?? t.isContradiction,
+  contradictionNote: t.contradictionNote,
+  sourceType: t.sourceType || "SOURCE_COURT",
+  sourceDoc: t.sourceDoc,
   notes: t.notes,
   sources: t.sources,
 }));
@@ -795,6 +808,8 @@ export interface LegalPrecedent {
   jurisdiction: string;
   significance: string;
   keyRule: string;
+  precedentialStatus?: string;
+  quote?: string;
 }
 
 export const LANDMARK_LEGAL_PRECEDENTS: LegalPrecedent[] = [

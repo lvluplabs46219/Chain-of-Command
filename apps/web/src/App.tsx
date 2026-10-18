@@ -43,7 +43,8 @@ const ROUTES: RouteDefinition[] = [
 ];
 
 function getBasePath(): string {
-  return import.meta.env.BASE_URL.replace(/\/$/, "");
+  const metaEnv = (import.meta as unknown as { env?: { BASE_URL?: string } }).env;
+  return (metaEnv?.BASE_URL || "").replace(/\/$/, "");
 }
 
 function _resolveComponent(

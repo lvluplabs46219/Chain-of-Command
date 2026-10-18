@@ -6,16 +6,48 @@ import { Matter, Charge } from "@/lib/workspace-data";
 import { ResultEnvelope } from "./ResultEnvelope";
 
 interface DocketViewProps {
-  matter: Matter;
+  matter?: Matter;
+  matters?: Matter[];
+  activeMatter?: Matter;
+  onSelectMatter?: (m: Matter) => void;
+  onSaveMatter?: (updated: Matter) => Promise<void | Matter>;
+  onOpenNewMatterModal?: () => void;
 }
 
-export function DocketView({ matter }: DocketViewProps) {
+export function DocketView({
+  matter,
+  matters,
+  activeMatter,
+  onSelectMatter,
+  onSaveMatter,
+  onOpenNewMatterModal,
+}: DocketViewProps) {
+  const effectiveMatter = matter || activeMatter || (matters && matters[0]) || ({
+    id: "matter-empty",
+    caseNumber: "—",
+    title: "No active matter",
+    court: "",
+    jurisdiction: "",
+    judge: "",
+    prosecutor: "",
+    filingDate: "",
+    status: "Active",
+    speedyTrialDaysRemaining: 0,
+    speedyTrialLimit: 70,
+    readingLevel: "Plain English",
+    charges: [],
+    timeline: [],
+    authorities: [],
+    evidence: [],
+    deadlines: [],
+  } as Matter);
+
   const [selectedChargeId, setSelectedChargeId] = useState<string>(
-    matter.charges[0]?.id || ""
+    effectiveMatter.charges?.[0]?.id || ""
   );
 
   const selectedCharge =
-    matter.charges.find((c) => c.id === selectedChargeId) || matter.charges[0];
+    effectiveMatter.charges?.find((c) => c.id === selectedChargeId) || effectiveMatter.charges?.[0];
 
   return (
     <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
@@ -28,14 +60,14 @@ export function DocketView({ matter }: DocketViewProps) {
             Charges, Statutory Elements & Sentencing Ranges
           </h1>
           <p className="text-xs sm:text-sm text-neutral-400 mt-1">
-            Matter: {matter.caseNumber} · Reading Level: {matter.readingLevel}
+            Matter: {effectiveMatter.caseNumber} · Reading Level: {effectiveMatter.readingLevel}
           </p>
         </div>
       </div>
 
       {/* Charge Selector Bar */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        {matter.charges.map((c) => (
+        {effectiveMatter.charges?.map((c) => (
           <button
             key={c.id}
             onClick={() => setSelectedChargeId(c.id)}

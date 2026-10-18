@@ -2,6 +2,8 @@ import fs from "fs";
 import path from "path";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 function formatName(name: string) {
   return name
     .replace(/acquit\.ai_/gi, "Chain of Command ")

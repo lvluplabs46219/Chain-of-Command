@@ -97,13 +97,39 @@ export function ChambersView({ matter }: ChambersViewProps) {
           message: userMsg.text,
           jurisdiction: matter.jurisdiction || "Indiana",
           agentRole: selectedAgent.name || selectedAgent.role,
+          conversationHistory: messages
+            .filter((m) => m.id !== thinkingId)
+            .slice(-10)
+            .map((m) => ({
+              sender: m.sender,
+              text: m.text,
+            })),
           context: {
             caseTitle: matter.title,
             caseNumber: matter.caseNumber,
             courtName: matter.courtName || matter.court,
+            judge: matter.judge,
+            prosecutor: matter.prosecutor,
             matterId: matter.id,
             chargeCount: matter.charges?.length ?? 0,
             evidenceCount: matter.evidence?.length ?? 0,
+            charges: matter.charges?.map((c) => ({
+              count: c.countNumber,
+              title: c.title,
+              statute: c.statuteCitation,
+              tier: c.tier,
+              summary: c.plainEnglishSummary,
+            })),
+            evidence: matter.evidence?.map((e) => ({
+              title: e.title,
+              type: e.type,
+              status: e.status,
+            })),
+            deadlines: matter.deadlines?.map((d) => ({
+              title: d.title,
+              dueDate: d.dueDate,
+              daysRemaining: d.daysRemaining,
+            })),
           },
         }),
       });

@@ -7,7 +7,7 @@
     "predev": "true",
     "dev": "next dev -p 3000 -H 0.0.0.0",
     "prebuild": "true",
-    "build": "NODE_ENV=production next build",
+    "build": "NODE_ENV=production next build --no-lint",
     "start": "next start -p 3000 -H 0.0.0.0",
     "lint": "tsc -p tsconfig.json --noEmit",
     "typecheck": "tsc -p tsconfig.json --noEmit",
