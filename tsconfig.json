@@ -13,9 +13,19 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "paths": {
-      "@/*": ["./apps/web/src/*"]
+      "@/*": ["./apps/web/src/*"],
+      "@chain-of-command/agent-runtime": ["./packages/agent-runtime/src/index.ts"],
+      "@chain-of-command/agent-sdk": ["./packages/agent-sdk/src/index.ts"],
+      "@chain-of-command/legal-library": ["./packages/legal-library/src/index.ts"],
+      "@chain-of-command/deadline-engine": ["./packages/deadline-engine/src/index.ts"],
+      "@chain-of-command/shared": ["./packages/shared/src/index.ts"],
+      "@chain-of-command/audit": ["./packages/audit/src/index.ts"],
+      "@chain-of-command/model-gateway": ["./packages/model-gateway/src/index.ts"],
+      "@chain-of-command/auth": ["./packages/auth/src/index.ts"],
+      "@chain-of-command/rag-engine": ["./packages/rag-engine/src/index.ts"],
+      "@chain-of-command/database": ["./packages/database/index.ts"]
     }
   },
-  "include": ["apps/web/**/*"],
+  "include": ["apps/web/**/*", "packages/*/src/**/*"],
   "exclude": ["node_modules"]
 }

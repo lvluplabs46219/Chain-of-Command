@@ -75,10 +75,14 @@
     "zod": "^3.24.2"
   },
   "dependencies": {
+    "@chain-of-command/agent-runtime": "*",
+    "@chain-of-command/agent-sdk": "*",
+    "@chain-of-command/audit": "*",
+    "@chain-of-command/deadline-engine": "*",
+    "@chain-of-command/legal-library": "*",
+    "@chain-of-command/shared": "*",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.116.0",
-    "@vercel/analytics": "^2.0.1",
-    "@vercel/speed-insights": "^2.0.0",
     "@google/genai": "^2.17.1",
     "motion": "^12.4.7",
     "botid": "^1.5.11",

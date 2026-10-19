@@ -21,6 +21,18 @@ function getApiDestination() {
 
 const nextConfig = {
   output: process.env.VERCEL ? undefined : 'standalone',
+  transpilePackages: [
+    '@chain-of-command/agent-runtime',
+    '@chain-of-command/agent-sdk',
+    '@chain-of-command/legal-library',
+    '@chain-of-command/deadline-engine',
+    '@chain-of-command/shared',
+    '@chain-of-command/audit',
+    '@chain-of-command/model-gateway',
+    '@chain-of-command/auth',
+    '@chain-of-command/rag-engine',
+    '@chain-of-command/database',
+  ],
   reactStrictMode: true,
   allowedDevOrigins: ['*.run.app', '*.us-east1.run.app', '*.cloudrun.app', '*.google.com', '*.googleusercontent.com', 'localhost:3000', '127.0.0.1:3000'],
   typescript: {
