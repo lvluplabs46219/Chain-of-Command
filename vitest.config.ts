@@ -10,9 +10,13 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["packages/*/src/**/*.test.ts", "tests/**/*.test.ts"],
+    include: [
+      "packages/*/src/**/*.test.ts",
+      "tests/**/*.test.ts",
+      "apps/api/tests/chain-persistence.test.ts",
+    ],
     // The API smoke scripts start an HTTP server and run separately via tsx.
-    exclude: ["apps/**", "archive/**", ".devcontainer/**", "**/node_modules/**"],
+    exclude: ["archive/**", ".devcontainer/**", "**/node_modules/**"],
     pool: "forks",
     maxWorkers: 2,
   },

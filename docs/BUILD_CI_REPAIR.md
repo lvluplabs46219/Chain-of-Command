@@ -1,6 +1,6 @@
 # Focused build and CI repair
 
-Branch: `fix/build-ci-reliability`. Base: `8d2b43ee29ce0e001bc221677c3356ef6a35c0a8`. Tracker: `COC-291`, still in progress. This branch restores meaningful checks and fixes confirmed build/test wiring failures; it is not merge-ready while API chain-persistence type errors and high dependency advisories remain.
+Branch: `fix/build-ci-reliability`. Base: `8d2b43ee29ce0e001bc221677c3356ef6a35c0a8`. Tracker: `COC-291`, still in progress. This document records the initial repair checkpoint at `ee79889`; the API type-error blocker was subsequently fixed, with 30 new chain regressions and 53 total passing tests. See `docs/CHAIN_PERSISTENCE_REPAIR.md` for the follow-up; high dependency advisories still prevent merge readiness.
 
 ## Requirements to implement
 
@@ -36,7 +36,7 @@ Branch: `fix/build-ci-reliability`. Base: `8d2b43ee29ce0e001bc221677c3356ef6a35c
 
 The research result fallback no longer claims that synthetic citations are verified or assigns them a fabricated positive confidence score. This is a conservative data-contract correction, not legal-source validation.
 
-## Acceptance criteria
+## Initial acceptance checkpoint at ee79889
 
 | Criterion | Local result |
 |---|---|

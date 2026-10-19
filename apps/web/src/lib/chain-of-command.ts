@@ -22,7 +22,7 @@
  * - Server-only protection (browser cannot authoritatively generate chain)
  */
 
-import { createHash, createHmac } from 'crypto';
+import { createHash, createHmac, randomUUID } from 'crypto';
 
 // ============================================================================
 // TYPES
@@ -104,7 +104,8 @@ export type ChainResourceType =
   | 'evidence'
   | 'citation'
   | 'session'
-  | 'agent_run';
+  | 'agent_run'
+  | 'chain';
 
 /**
  * A single link in the chain of command
@@ -113,6 +114,8 @@ export interface ChainEvent {
   // Core identifiers
   id: string;                    // UUID v7 or similar
   sequenceNumber: number;        // Monotonically increasing
+  chainId?: string;               // Persisted chain context; excluded from legacy hash format
+  createdAt?: string;             // ISO database metadata; excluded from the event hash
   
   // Event metadata
   type: ChainEventType;
@@ -364,6 +367,7 @@ function computeHMAC(data: string, secret: string): string {
 export interface ChainOfCommandOptions {
   signingSecret: string;        // Secret for HMAC signatures
   chainId?: string;             // Optional chain ID (defaults to caseId or resourceId)
+  initialEvents?: readonly ChainEvent[]; // Persisted snapshot for server-side signing/verification
 }
 
 /**
@@ -386,6 +390,12 @@ export class ChainOfCommand {
   constructor(options: ChainOfCommandOptions) {
     this.signingSecret = options.signingSecret;
     this.chainId = options.chainId || 'default';
+    for (const stored of options.initialEvents || []) {
+      const event = structuredClone(stored);
+      this.events.set(event.id, event);
+      this.sequenceCounter = Math.max(this.sequenceCounter, event.sequenceNumber);
+      if (event.previousHash === null) this.genesisHash = event.hash;
+    }
   }
   
   // ==========================================================================
@@ -426,6 +436,7 @@ export class ChainOfCommand {
     const event: Omit<ChainEvent, 'hash' | 'signature' | 'verified' | 'verificationErrors'> = {
       id,
       sequenceNumber,
+      chainId: this.chainId,
       type: params.type,
       timestamp,
       actorType: params.actorType,
@@ -717,7 +728,7 @@ export class ChainOfCommand {
       // 3. Verify signature
       if (this.signingSecret) {
         const computedSignature = computeHMAC(canonical, this.signingSecret);
-        if (event.signature && computedSignature !== event.signature) {
+        if (computedSignature !== event.signature) {
           eventErrors.push({
             type: 'invalid_signature',
             message: `Invalid signature: event ${event.id} signature is invalid`,
@@ -844,16 +855,30 @@ export class ChainOfCommand {
     
     const computedHash = computeSHA256(canonical);
     const isValid = computedHash === event.hash;
-    
-    return {
-      ...event,
-      verified: isValid,
-      verificationErrors: isValid ? [] : [{
+    const validSignature = !this.signingSecret ||
+      computeHMAC(canonical, this.signingSecret) === event.signature;
+    const verificationErrors: ChainVerificationError[] = [];
+    if (!isValid) {
+      verificationErrors.push({
         type: 'tampered_hash',
         message: 'Event hash does not match computed hash',
         eventId: event.id,
         sequenceNumber: event.sequenceNumber,
-      }],
+      });
+    }
+    if (!validSignature) {
+      verificationErrors.push({
+        type: 'invalid_signature',
+        message: 'Event signature is missing or invalid',
+        eventId: event.id,
+        sequenceNumber: event.sequenceNumber,
+      });
+    }
+
+    return {
+      ...event,
+      verified: isValid && validSignature,
+      verificationErrors,
     };
   }
   
@@ -981,8 +1006,7 @@ export class ChainOfCommand {
    * In production, this would use UUID v7 or database-generated IDs
    */
   private generateEventId(): string {
-    // Simple implementation for now
-    return `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return randomUUID();
   }
   
   /**

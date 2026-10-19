@@ -1,14 +1,10 @@
 /**
- * Chain of Command - Server-Side Supabase Integration
- * 
- * This module provides server-side persistence for the Chain of Command service.
- * It connects to Supabase and provides CRUD operations for chain events.
- * 
- * IMPORTANT: This is server-only code. The browser cannot authoritatively generate
- * the chain - only the server can create and sign chain events.
+ * Server-only persistence for the Chain of Command.
+ *
+ * Compose the synchronous snapshot signer/verifier rather than overriding its
+ * synchronous readers with promises. PostgreSQL remains the authoritative store.
  */
-
-import { eq, and, desc, asc, isNull, not, count } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, isNull, lte, sql, type SQL } from 'drizzle-orm';
 import { db } from '../db';
 import {
   chainEvents,
@@ -29,582 +25,370 @@ import {
   type ChainTrackingInfo,
 } from '../../../../apps/web/src/lib/chain-of-command';
 
-// ============================================================================
-// SUPABASE CHAIN SERVICE
-// ============================================================================
+type StoredEvent = typeof chainEvents.$inferSelect;
+type StoredMetadata = typeof chainMetadata.$inferSelect;
+type ChainDataAccess = Pick<typeof db, 'select' | 'insert' | 'update'>;
+type ChainTransaction = ChainDataAccess & Pick<typeof db, 'execute'>;
 
-/**
- * Options for the Supabase Chain of Command service
- */
-export interface SupabaseChainOptions {
-  signingSecret: string;
+export interface ChainDatabase extends ChainDataAccess {
+  transaction<T>(work: (transaction: ChainTransaction) => Promise<T>): Promise<T>;
 }
 
-/**
- * Supabase-backed Chain of Command service
- * 
- * This class extends the base ChainOfCommand service with Supabase persistence.
- * All chain events are stored in the database for durability and auditability.
- */
-export class SupabaseChainOfCommand extends ChainOfCommand {
-  private db: typeof db;
-  
-  constructor(options: SupabaseChainOptions, database: typeof db = db) {
-    super(options);
-    this.db = database;
+export interface SupabaseChainOptions {
+  signingSecret: string;
+  chainId?: string;
+}
+
+type CreateEventParams = Parameters<ChainOfCommand['createEvent']>[0] & { chainId?: string };
+type GenesisParams = CreateEventParams & {
+  chainType?: string;
+  chainName?: string;
+  chainDescription?: string;
+};
+
+function isPayload(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+export class SupabaseChainOfCommand {
+  private readonly signingSecret: string;
+  private readonly chainId: string;
+
+  constructor(options: SupabaseChainOptions, private readonly database: ChainDatabase = db) {
+    this.signingSecret = options.signingSecret;
+    this.chainId = options.chainId || 'default';
   }
-  
-  // ==========================================================================
-  // EVENT CREATION (with persistence)
-  // ==========================================================================
-  
-  /**
-   * Creates a new chain event and persists it to Supabase
-   */
-  async createEvent(params: {
-    type: ChainEventType;
-    actorType: ChainActorType;
-    actorId: string;
-    actorName?: string;
-    resourceType: ChainResourceType;
-    resourceId: string;
-    resourceName?: string;
-    caseId?: string;
-    sessionId?: string;
-    agentRunId?: string;
-    evidenceFingerprint?: string;
-    evidenceId?: string;
-    payload?: Record<string, unknown>;
-    chainId?: string;  // Override default chain ID
-  }): Promise<ChainEvent> {
-    // First, create the event in memory (to get hash, signature, etc.)
-    const event = await super.createEvent(params);
-    
-    // Get chain ID
-    const chainId = params.chainId || this['chainId'];
-    
-    // Prepare database insert
-    const dbEvent: NewChainEvent = {
-      id: event.id,
-      chainId,
-      sequenceNumber: event.sequenceNumber,
-      type: event.type,
-      timestamp: new Date(event.timestamp),
-      actorType: event.actorType,
-      actorId: event.actorId,
-      actorName: event.actorName,
-      resourceType: event.resourceType,
-      resourceId: event.resourceId,
-      resourceName: event.resourceName,
-      hash: event.hash,
-      previousHash: event.previousHash,
-      evidenceFingerprint: event.evidenceFingerprint,
-      evidenceId: event.evidenceId,
-      caseId: event.caseId,
-      sessionId: event.sessionId,
-      agentRunId: event.agentRunId,
-      payload: event.payload,
-      signature: event.signature,
-      immutable: true,
-    };
-    
-    // Insert into database
-    const [insertedEvent] = await this.db
-      .insert(chainEvents)
-      .values(dbEvent)
-      .returning();
-    
-    // Update chain metadata
-    await this.updateChainMetadata(chainId, insertedEvent);
-    
-    // Return the event (with database metadata)
-    return {
-      ...event,
-      createdAt: insertedEvent.createdAt,
-    };
+
+  async createEvent(params: CreateEventParams): Promise<ChainEvent> {
+    return this.appendEvent(params);
   }
-  
-  /**
-   * Creates the genesis event and initializes the chain metadata
-   */
-  async createGenesisEvent(params: {
-    type: ChainEventType;
-    actorType: ChainActorType;
-    actorId: string;
-    actorName?: string;
-    resourceType: ChainResourceType;
-    resourceId: string;
-    resourceName?: string;
-    caseId?: string;
-    payload?: Record<string, unknown>;
-    chainId?: string;
-    chainType?: string;
-    chainName?: string;
-    chainDescription?: string;
-  }): Promise<ChainEvent> {
-    const chainId = params.chainId || this['chainId'];
-    const chainType = params.chainType || 'resource';
-    
-    // Create the genesis event
-    const event = await this.createEvent({ ...params, chainId });
-    
-    // Initialize chain metadata
-    const metadata: NewChainMetadata = {
-      chainId,
-      chainType,
-      name: params.chainName || `${params.resourceType}:${params.resourceId}`,
-      description: params.chainDescription || `Chain for ${params.resourceType} ${params.resourceId}`,
-      genesisEventId: event.id,
-      genesisTimestamp: new Date(event.timestamp),
-      genesisHash: event.hash,
-      latestEventId: event.id,
-      latestTimestamp: new Date(event.timestamp),
-      latestHash: event.hash,
-      latestSequenceNumber: event.sequenceNumber,
-      totalEvents: 1,
-      verifiedEvents: 1,
-      status: 'active',
-      verificationStatus: 'verified',
-      lastVerificationTimestamp: new Date(),
-      signingSecretHash: ChainOfCommand.computeEvidenceFingerprint(this['signingSecret']),
-    };
-    
-    await this.db
-      .insert(chainMetadata)
-      .values(metadata)
-      .onConflictDoUpdate({
-        target: chainMetadata.chainId,
-        set: metadata,
-      });
-    
-    return event;
+
+  async createGenesisEvent(params: GenesisParams): Promise<ChainEvent> {
+    return this.appendEvent(params, params);
   }
-  
-  // ==========================================================================
-  // EVENT RETRIEVAL (from database)
-  // ==========================================================================
-  
-  /**
-   * Gets a specific event by ID from the database
-   */
+
+  async createEvents(events: CreateEventParams[]): Promise<ChainEvent[]> {
+    const created: ChainEvent[] = [];
+    for (const event of events) created.push(await this.createEvent(event));
+    return created;
+  }
+
+  private async appendEvent(params: CreateEventParams, genesis?: GenesisParams): Promise<ChainEvent> {
+    const chainId = params.chainId || this.chainId;
+    return this.database.transaction(async (transaction) => {
+      // Serialize the read/sign/append operation across processes, not just this object.
+      // hashtextextended yields a bigint advisory key without changing any schema.
+      await transaction.execute(
+        sql`select pg_advisory_xact_lock(hashtextextended(${chainId}, 0))`,
+      );
+      const [latest] = await transaction.select().from(chainEvents)
+        .where(eq(chainEvents.chainId, chainId))
+        .orderBy(desc(chainEvents.sequenceNumber)).limit(1);
+      if (genesis && latest) throw new Error(`Chain ${chainId} already has a genesis event`);
+
+      const signer = this.snapshot(chainId, latest ? [this.mapDbEventToChainEvent(latest)] : []);
+      const event = await signer.createEvent(params);
+      const dbEvent: NewChainEvent = {
+        id: event.id,
+        chainId,
+        sequenceNumber: event.sequenceNumber,
+        type: event.type,
+        timestamp: new Date(event.timestamp),
+        actorType: event.actorType,
+        actorId: event.actorId,
+        actorName: event.actorName,
+        resourceType: event.resourceType,
+        resourceId: event.resourceId,
+        resourceName: event.resourceName,
+        hash: event.hash,
+        previousHash: event.previousHash,
+        evidenceFingerprint: event.evidenceFingerprint,
+        evidenceId: event.evidenceId,
+        caseId: event.caseId,
+        sessionId: event.sessionId,
+        agentRunId: event.agentRunId,
+        payload: event.payload,
+        signature: event.signature,
+        immutable: true,
+      };
+      const [inserted] = await transaction.insert(chainEvents).values(dbEvent).returning();
+      if (!inserted) throw new Error('Chain event insert returned no row');
+      await this.updateChainMetadata(chainId, inserted, transaction, genesis);
+      return this.mapDbEventToChainEvent(inserted);
+    });
+  }
+
   async getEvent(eventId: string): Promise<ChainEvent | null> {
-    const [event] = await this.db
-      .select()
-      .from(chainEvents)
-      .where(eq(chainEvents.id, eventId))
-      .limit(1);
-    
-    if (!event) return null;
-    
-    return this.mapDbEventToChainEvent(event);
+    const [event] = await this.database.select().from(chainEvents)
+      .where(eq(chainEvents.id, eventId)).limit(1);
+    return event ? this.mapDbEventToChainEvent(event) : null;
   }
-  
-  /**
-   * Gets the latest event in a chain from the database
-   */
-  async getLatestEvent(chainId?: string): Promise<ChainEvent | null> {
-    const targetChainId = chainId || this['chainId'];
-    
-    const [event] = await this.db
-      .select()
-      .from(chainEvents)
-      .where(eq(chainEvents.chainId, targetChainId))
-      .orderBy(desc(chainEvents.sequenceNumber))
-      .limit(1);
-    
-    if (!event) return null;
-    
-    return this.mapDbEventToChainEvent(event);
-  }
-  
-  /**
-   * Gets the genesis event in a chain from the database
-   */
-  async getGenesisEvent(chainId?: string): Promise<ChainEvent | null> {
-    const targetChainId = chainId || this['chainId'];
-    
-    const [event] = await this.db
-      .select()
-      .from(chainEvents)
-      .where(and(
-        eq(chainEvents.chainId, targetChainId),
-        isNull(chainEvents.previousHash)
-      ))
-      .orderBy(asc(chainEvents.sequenceNumber))
-      .limit(1);
-    
-    if (!event) return null;
-    
-    return this.mapDbEventToChainEvent(event);
-  }
-  
-  /**
-   * Gets all events in a chain from the database
-   */
-  async getChainEvents(options?: ChainQueryOptions): Promise<ChainEvent[]> {
-    const chainId = options?.chainId || this['chainId'];
-    const limit = options?.limit || 1000;
-    const offset = options?.offset || 0;
-    
-    let query = this.db
-      .select()
-      .from(chainEvents)
+
+  async getLatestEvent(chainId = this.chainId): Promise<ChainEvent | null> {
+    const [event] = await this.database.select().from(chainEvents)
       .where(eq(chainEvents.chainId, chainId))
-      .orderBy(asc(chainEvents.sequenceNumber))
-      .limit(limit)
-      .offset(offset);
-    
-    // Apply additional filters
-    if (options?.caseId) {
-      query = query.where(eq(chainEvents.caseId, options.caseId));
-    }
-    if (options?.resourceId) {
-      query = query.where(eq(chainEvents.resourceId, options.resourceId));
-    }
-    if (options?.resourceType) {
-      query = query.where(eq(chainEvents.resourceType, options.resourceType));
-    }
-    if (options?.actorId) {
-      query = query.where(eq(chainEvents.actorId, options.actorId));
-    }
-    if (options?.actorType) {
-      query = query.where(eq(chainEvents.actorType, options.actorType));
-    }
-    if (options?.eventType) {
-      query = query.where(eq(chainEvents.type, options.eventType));
-    }
-    if (options?.startDate) {
-      query = query.where(chainEvents.timestamp >= new Date(options.startDate));
-    }
-    if (options?.endDate) {
-      query = query.where(chainEvents.timestamp <= new Date(options.endDate));
-    }
-    
-    const events = await query;
-    
-    return events.map(e => this.mapDbEventToChainEvent(e));
+      .orderBy(desc(chainEvents.sequenceNumber)).limit(1);
+    return event ? this.mapDbEventToChainEvent(event) : null;
   }
-  
-  /**
-   * Gets chain metadata
-   */
-  async getChainMetadata(chainId?: string): Promise<any | null> {
-    const targetChainId = chainId || this['chainId'];
-    
-    const [metadata] = await this.db
-      .select()
-      .from(chainMetadata)
-      .where(eq(chainMetadata.chainId, targetChainId))
-      .limit(1);
-    
+
+  async getGenesisEvent(chainId = this.chainId): Promise<ChainEvent | null> {
+    const [event] = await this.database.select().from(chainEvents)
+      .where(and(eq(chainEvents.chainId, chainId), isNull(chainEvents.previousHash)))
+      .orderBy(asc(chainEvents.sequenceNumber)).limit(1);
+    return event ? this.mapDbEventToChainEvent(event) : null;
+  }
+
+  async getChainEvents(options?: ChainQueryOptions): Promise<ChainEvent[]> {
+    return this.readEvents(options, true);
+  }
+
+  async getResourceChain(resourceType: ChainResourceType, resourceId: string): Promise<ChainEvent[]> {
+    return this.getChainEvents({ resourceType, resourceId });
+  }
+
+  async getCaseChain(caseId: string): Promise<ChainEvent[]> {
+    return this.getChainEvents({ caseId });
+  }
+
+  private async readEvents(options: ChainQueryOptions = {}, paginate: boolean): Promise<ChainEvent[]> {
+    const conditions: SQL[] = [eq(chainEvents.chainId, options.chainId || this.chainId)];
+    if (options.caseId) conditions.push(eq(chainEvents.caseId, options.caseId));
+    if (options.resourceId) conditions.push(eq(chainEvents.resourceId, options.resourceId));
+    if (options.resourceType) conditions.push(eq(chainEvents.resourceType, options.resourceType));
+    if (options.actorId) conditions.push(eq(chainEvents.actorId, options.actorId));
+    if (options.actorType) conditions.push(eq(chainEvents.actorType, options.actorType));
+    if (options.eventType) conditions.push(eq(chainEvents.type, options.eventType));
+    if (options.startDate) conditions.push(gte(chainEvents.timestamp, this.parseDate(options.startDate)));
+    if (options.endDate) conditions.push(lte(chainEvents.timestamp, this.parseDate(options.endDate)));
+
+    const query = this.database.select().from(chainEvents)
+      .where(and(...conditions)).orderBy(asc(chainEvents.sequenceNumber));
+    const events = paginate
+      ? await query.limit(options.limit ?? 1000).offset(options.offset ?? 0)
+      : await query;
+    return events.map((event) => this.mapDbEventToChainEvent(event));
+  }
+
+  async getChainMetadata(chainId = this.chainId): Promise<StoredMetadata | null> {
+    const [metadata] = await this.database.select().from(chainMetadata)
+      .where(eq(chainMetadata.chainId, chainId)).limit(1);
     return metadata || null;
   }
-  
-  /**
-   * Gets all chains for a specific case
-   */
-  async getCaseChains(caseId: string): Promise<any[]> {
-    const metadata = await this.db
-      .select()
-      .from(chainMetadata)
-      .where(eq(chainMetadata.chainId, caseId));
-    
-    return metadata;
+
+  async getCaseChains(caseId: string): Promise<StoredMetadata[]> {
+    // Case ownership is stored on events, not on a nonexistent metadata.caseId column.
+    const ids = this.database.select({ chainId: chainEvents.chainId }).from(chainEvents)
+      .where(eq(chainEvents.caseId, caseId));
+    return this.database.select().from(chainMetadata).where(inArray(chainMetadata.chainId, ids));
   }
-  
-  /**
-   * Gets all chains
-   */
-  async getAllChains(): Promise<any[]> {
-    return this.db.select().from(chainMetadata);
+
+  async getAllChains(): Promise<StoredMetadata[]> {
+    return this.database.select().from(chainMetadata);
   }
-  
-  // ==========================================================================
-  // CHAIN VERIFICATION (with database)
-  // ==========================================================================
-  
-  /**
-   * Verifies the entire chain and logs the result
-   */
-  async verifyChain(options?: ChainQueryOptions & { 
+
+  async verifyChain(options?: ChainQueryOptions & {
     requestedBy?: string;
     logResult?: boolean;
   }): Promise<ChainVerificationResult> {
-    const chainId = options?.chainId || this['chainId'];
-    const requestedBy = options?.requestedBy || 'system';
-    
-    // Get events from database
-    const events = await this.getChainEvents(options);
-    
-    if (events.length === 0) {
-      return {
-        valid: false,
-        chainId,
-        totalEvents: 0,
-        verifiedEvents: 0,
-        errors: [],
-        hasTamperedHashes: false,
-        hasBrokenLinks: false,
-        hasSequenceGaps: false,
-        hasInvalidSignatures: false,
-        genesisEventId: null,
-        genesisTimestamp: null,
-        latestEventId: null,
-        latestTimestamp: null,
-        latestHash: null,
-      };
-    }
-    
-    // Perform verification
-    const result = await super.verifyChain(options);
-    
-    // Log the verification result
-    if (options?.logResult !== false) {
+    const startedAt = performance.now();
+    const chainId = options?.chainId || this.chainId;
+    // Verification must not silently stop at the browsing page-size limit.
+    const events = await this.readEvents(options, false);
+    const result = await this.snapshot(chainId, events).verifyChain();
+    if (options?.logResult !== false && events.length > 0) {
       const log: NewChainVerificationLog = {
         chainId,
-        requestedBy,
+        requestedBy: options?.requestedBy || 'system',
         requestedAt: new Date(),
         valid: result.valid,
         totalEvents: result.totalEvents,
         verifiedEvents: result.verifiedEvents,
-        tamperedHashesCount: result.errors.filter(e => e.type === 'tampered_hash').length,
-        brokenLinksCount: result.errors.filter(e => e.type === 'broken_link').length,
-        sequenceGapsCount: result.errors.filter(e => e.type === 'sequence_gap').length,
-        invalidSignaturesCount: result.errors.filter(e => e.type === 'invalid_signature').length,
-        duplicateSequencesCount: result.errors.filter(e => e.type === 'duplicate_sequence').length,
+        tamperedHashesCount: result.errors.filter((e) => e.type === 'tampered_hash').length,
+        brokenLinksCount: result.errors.filter((e) => e.type === 'broken_link').length,
+        sequenceGapsCount: result.errors.filter((e) => e.type === 'sequence_gap').length,
+        invalidSignaturesCount: result.errors.filter((e) => e.type === 'invalid_signature').length,
+        duplicateSequencesCount: result.errors.filter((e) => e.type === 'duplicate_sequence').length,
         errors: result.errors,
-        durationMs: 0, // Would be measured in actual implementation
+        durationMs: Math.round(performance.now() - startedAt),
       };
-      
-      await this.db.insert(chainVerificationLog).values(log);
-      
-      // Update chain metadata verification status
-      await this.db
-        .update(chainMetadata)
-        .set({
-          verificationStatus: result.valid ? 'verified' : 'tampered',
-          lastVerificationTimestamp: new Date(),
-        })
-        .where(eq(chainMetadata.chainId, chainId));
+      // A filtered result cannot certify or mark the entire chain as tampered.
+      const isFullChain = !options?.caseId && !options?.resourceId && !options?.resourceType &&
+        !options?.actorId && !options?.actorType && !options?.eventType &&
+        !options?.startDate && !options?.endDate;
+      await this.database.transaction(async (transaction) => {
+        await transaction.insert(chainVerificationLog).values(log);
+        if (isFullChain && result.latestEventId) {
+          await transaction.update(chainMetadata).set({
+            verificationStatus: result.valid ? 'verified' : 'tampered',
+            verifiedEvents: result.verifiedEvents,
+            lastVerificationTimestamp: new Date(),
+          }).where(and(
+            eq(chainMetadata.chainId, chainId),
+            // Do not certify newer events appended after this verification snapshot.
+            eq(chainMetadata.latestEventId, result.latestEventId),
+          ));
+        }
+      });
     }
-    
     return result;
   }
-  
-  // ==========================================================================
-  // TRACKING UI HELPERS
-  // ==========================================================================
-  
-  /**
-   * Gets tracking information for a resource (FedEx-style UI)
-   */
+
+  async verifyEvent(eventId: string): Promise<ChainEvent | null> {
+    const event = await this.getEvent(eventId);
+    return event ? this.snapshot(event.chainId || this.chainId, [event]).verifyEvent(eventId) : null;
+  }
+
   async getTrackingInfo(resourceType: ChainResourceType, resourceId: string): Promise<ChainTrackingInfo | null> {
-    // Get events for this resource
     const events = await this.getChainEvents({ resourceType, resourceId });
-    
-    if (events.length === 0) {
-      return null;
-    }
-    
-    // Get chain metadata
-    const chainId = events[0].chainId || this['chainId'];
-    const metadata = await this.getChainMetadata(chainId);
-    
-    // Perform verification
-    const verification = await this.verifyChain({ resourceType, resourceId, logResult: false });
-    
-    // Map to tracking events
-    const timeline = events.map(event => ({
-      sequenceNumber: event.sequenceNumber,
-      type: event.type,
-      timestamp: event.timestamp,
-      actorName: event.actorName || event.actorId,
-      actorType: event.actorType,
-      description: this.getEventDescription(event),
-      hash: event.hash,
-      previousHash: event.previousHash,
-      verified: verification.valid,
-    }));
-    
-    // Determine status
-    let status: 'verified' | 'unverified' | 'tampered' | 'incomplete' = 'verified';
-    if (!verification.valid) {
-      if (verification.hasTamperedHashes) {
-        status = 'tampered';
-      } else if (verification.hasBrokenLinks || verification.hasSequenceGaps) {
-        status = 'incomplete';
-      } else {
-        status = 'unverified';
-      }
-    }
-    
-    return {
+    if (events.length === 0) return null;
+    const chainId = events[0].chainId || this.chainId;
+    const verification = await this.verifyChain({ chainId, resourceType, resourceId, logResult: false });
+    return this.trackingInfo(events, verification, {
       resourceId,
       resourceType,
       resourceName: events[0].resourceName || resourceId,
       caseId: events[0].caseId || '',
-      chainId: chainId,
+    });
+  }
+
+  async getCaseTrackingInfo(caseId: string): Promise<ChainTrackingInfo[]> {
+    const chains = await this.getCaseChains(caseId);
+    const tracking: ChainTrackingInfo[] = [];
+    for (const chain of chains) {
+      const events = await this.getChainEvents({ chainId: chain.chainId, caseId });
+      if (events.length === 0) continue;
+      const verification = await this.verifyChain({ chainId: chain.chainId, logResult: false });
+      tracking.push(this.trackingInfo(events, verification, {
+        resourceId: chain.chainId,
+        resourceType: 'chain',
+        resourceName: chain.name || chain.chainId,
+        caseId,
+      }));
+    }
+    return tracking;
+  }
+
+  private snapshot(chainId: string, initialEvents: readonly ChainEvent[]): ChainOfCommand {
+    return new ChainOfCommand({ signingSecret: this.signingSecret, chainId, initialEvents });
+  }
+
+  private parseDate(value: string): Date {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) throw new Error(`Invalid chain query date: ${value}`);
+    return date;
+  }
+
+  private mapDbEventToChainEvent(event: StoredEvent): ChainEvent {
+    if (!isPayload(event.payload)) throw new Error(`Invalid chain event payload: ${event.id}`);
+    return {
+      id: event.id,
+      chainId: event.chainId,
+      createdAt: event.createdAt.toISOString(),
+      sequenceNumber: event.sequenceNumber,
+      type: event.type as ChainEventType,
+      timestamp: event.timestamp.toISOString(),
+      actorType: event.actorType as ChainActorType,
+      actorId: event.actorId,
+      actorName: event.actorName ?? undefined,
+      resourceType: event.resourceType as ChainResourceType,
+      resourceId: event.resourceId,
+      resourceName: event.resourceName ?? undefined,
+      hash: event.hash,
+      previousHash: event.previousHash,
+      evidenceFingerprint: event.evidenceFingerprint ?? undefined,
+      evidenceId: event.evidenceId ?? undefined,
+      caseId: event.caseId ?? undefined,
+      sessionId: event.sessionId ?? undefined,
+      agentRunId: event.agentRunId ?? undefined,
+      payload: event.payload,
+      signature: event.signature ?? undefined,
+      immutable: event.immutable,
+      // Retrieval is not verification; the verifier decides trust separately.
+      verified: false,
+      verificationErrors: [],
+    };
+  }
+
+  private async updateChainMetadata(
+    chainId: string,
+    event: StoredEvent,
+    transaction: ChainDataAccess,
+    genesis?: GenesisParams,
+  ): Promise<void> {
+    const [metadata] = await transaction.select().from(chainMetadata)
+      .where(eq(chainMetadata.chainId, chainId)).limit(1);
+    const latest = {
+      latestEventId: event.id,
+      latestTimestamp: event.timestamp,
+      latestHash: event.hash,
+      latestSequenceNumber: event.sequenceNumber,
+      verificationStatus: 'unverified',
+      updatedAt: new Date(),
+    };
+    if (metadata) {
+      await transaction.update(chainMetadata).set({
+        ...latest,
+        totalEvents: metadata.totalEvents + 1,
+        ...(!metadata.genesisEventId ? {
+          genesisEventId: event.id,
+          genesisTimestamp: event.timestamp,
+          genesisHash: event.hash,
+        } : {}),
+        ...(genesis ? {
+          chainType: genesis.chainType || 'resource',
+          name: genesis.chainName || `${event.resourceType}:${event.resourceId}`,
+          description: genesis.chainDescription || null,
+        } : {}),
+      }).where(eq(chainMetadata.chainId, chainId));
+    } else {
+      const fresh: NewChainMetadata = {
+        ...latest,
+        chainId,
+        chainType: genesis?.chainType || 'resource',
+        name: genesis?.chainName || `${event.resourceType}:${event.resourceId}`,
+        description: genesis?.chainDescription,
+        genesisEventId: event.id,
+        genesisTimestamp: event.timestamp,
+        genesisHash: event.hash,
+        totalEvents: 1,
+        verifiedEvents: 0,
+        status: 'active',
+        signingSecretHash: ChainOfCommand.computeEvidenceFingerprint(this.signingSecret),
+      };
+      await transaction.insert(chainMetadata).values(fresh);
+    }
+  }
+
+  private trackingInfo(
+    events: ChainEvent[],
+    verification: ChainVerificationResult,
+    resource: Pick<ChainTrackingInfo, 'resourceId' | 'resourceType' | 'resourceName' | 'caseId'>,
+  ): ChainTrackingInfo {
+    let status: ChainTrackingInfo['status'] = 'verified';
+    if (!verification.valid) {
+      status = verification.hasTamperedHashes || verification.hasInvalidSignatures ? 'tampered'
+        : verification.hasBrokenLinks || verification.hasSequenceGaps ? 'incomplete' : 'unverified';
+    }
+    return {
+      ...resource,
+      chainId: verification.chainId,
       totalEvents: events.length,
-      timeline,
+      timeline: events.map((event) => ({
+        sequenceNumber: event.sequenceNumber,
+        type: event.type,
+        timestamp: event.timestamp,
+        actorName: event.actorName || event.actorId,
+        actorType: event.actorType,
+        description: this.getEventDescription(event),
+        hash: event.hash,
+        previousHash: event.previousHash,
+        verified: verification.valid,
+      })),
       status,
       verificationResult: verification,
     };
   }
-  
-  /**
-   * Gets tracking information for a case
-   */
-  async getCaseTrackingInfo(caseId: string): Promise<ChainTrackingInfo[]> {
-    const chains = await this.getAllChains();
-    const caseChains = chains.filter(c => c.caseId === caseId);
-    
-    const trackingInfos: ChainTrackingInfo[] = [];
-    
-    for (const chain of caseChains) {
-      const events = await this.getChainEvents({ chainId: chain.chainId });
-      
-      if (events.length > 0) {
-        const verification = await this.verifyChain({ chainId: chain.chainId, logResult: false });
-        
-        const timeline = events.map(event => ({
-          sequenceNumber: event.sequenceNumber,
-          type: event.type,
-          timestamp: event.timestamp,
-          actorName: event.actorName || event.actorId,
-          actorType: event.actorType,
-          description: this.getEventDescription(event),
-          hash: event.hash,
-          previousHash: event.previousHash,
-          verified: verification.valid,
-        }));
-        
-        let status: 'verified' | 'unverified' | 'tampered' | 'incomplete' = 'verified';
-        if (!verification.valid) {
-          if (verification.hasTamperedHashes) {
-            status = 'tampered';
-          } else if (verification.hasBrokenLinks || verification.hasSequenceGaps) {
-            status = 'incomplete';
-          } else {
-            status = 'unverified';
-          }
-        }
-        
-        trackingInfos.push({
-          resourceId: chain.chainId,
-          resourceType: 'chain',
-          resourceName: chain.name || chain.chainId,
-          caseId,
-          chainId: chain.chainId,
-          totalEvents: events.length,
-          timeline,
-          status,
-          verificationResult: verification,
-        });
-      }
-    }
-    
-    return trackingInfos;
-  }
-  
-  // ==========================================================================
-  // PRIVATE HELPERS
-  // ==========================================================================
-  
-  /**
-   * Maps a database event to a ChainEvent
-   */
-  private mapDbEventToChainEvent(dbEvent: any): ChainEvent {
-    return {
-      id: dbEvent.id,
-      chainId: dbEvent.chainId,
-      sequenceNumber: dbEvent.sequenceNumber,
-      type: dbEvent.type as ChainEventType,
-      timestamp: dbEvent.timestamp.toISOString(),
-      actorType: dbEvent.actorType as ChainActorType,
-      actorId: dbEvent.actorId,
-      actorName: dbEvent.actorName,
-      resourceType: dbEvent.resourceType as ChainResourceType,
-      resourceId: dbEvent.resourceId,
-      resourceName: dbEvent.resourceName,
-      hash: dbEvent.hash,
-      previousHash: dbEvent.previousHash,
-      evidenceFingerprint: dbEvent.evidenceFingerprint,
-      evidenceId: dbEvent.evidenceId,
-      caseId: dbEvent.caseId,
-      sessionId: dbEvent.sessionId,
-      agentRunId: dbEvent.agentRunId,
-      payload: dbEvent.payload,
-      signature: dbEvent.signature,
-      immutable: dbEvent.immutable,
-      verified: true, // Will be verified on retrieval
-      verificationErrors: [],
-      createdAt: dbEvent.createdAt?.toISOString(),
-    };
-  }
-  
-  /**
-   * Updates chain metadata after inserting a new event
-   */
-  private async updateChainMetadata(chainId: string, event: any): Promise<void> {
-    const metadata = await this.getChainMetadata(chainId);
-    
-    if (metadata) {
-      // Check if this is a new genesis event
-      if (!metadata.genesisEventId) {
-        await this.db
-          .update(chainMetadata)
-          .set({
-            genesisEventId: event.id,
-            genesisTimestamp: new Date(event.timestamp),
-            genesisHash: event.hash,
-            latestEventId: event.id,
-            latestTimestamp: new Date(event.timestamp),
-            latestHash: event.hash,
-            latestSequenceNumber: event.sequenceNumber,
-            totalEvents: 1,
-            verifiedEvents: 1,
-          })
-          .where(eq(chainMetadata.chainId, chainId));
-      } else {
-        // Update latest event info
-        await this.db
-          .update(chainMetadata)
-          .set({
-            latestEventId: event.id,
-            latestTimestamp: new Date(event.timestamp),
-            latestHash: event.hash,
-            latestSequenceNumber: event.sequenceNumber,
-            totalEvents: metadata.totalEvents + 1,
-          })
-          .where(eq(chainMetadata.chainId, chainId));
-      }
-    } else {
-      // Create new metadata if it doesn't exist
-      await this.db.insert(chainMetadata).values({
-        chainId,
-        chainType: 'resource',
-        name: `${event.resourceType}:${event.resourceId}`,
-        genesisEventId: event.id,
-        genesisTimestamp: new Date(event.timestamp),
-        genesisHash: event.hash,
-        latestEventId: event.id,
-        latestTimestamp: new Date(event.timestamp),
-        latestHash: event.hash,
-        latestSequenceNumber: event.sequenceNumber,
-        totalEvents: 1,
-        verifiedEvents: 1,
-        status: 'active',
-        verificationStatus: 'verified',
-        lastVerificationTimestamp: new Date(),
-        signingSecretHash: ChainOfCommand.computeEvidenceFingerprint(this['signingSecret']),
-      });
-    }
-  }
-  
-  /**
-   * Gets a human-readable description for an event
-   * (Inherited from parent class, but we need to make it accessible)
-   */
+
   private getEventDescription(event: ChainEvent): string {
     const descriptions: Record<ChainEventType, string> = {
       'document.uploaded': `Document uploaded by ${event.actorName || event.actorId}`,
@@ -646,45 +430,20 @@ export class SupabaseChainOfCommand extends ChainOfCommand {
       'system.restore_performed': 'System restore performed',
       'system.migration_applied': 'Database migration applied',
     };
-    
-    return descriptions[event.type] || `Event: ${event.type}`;
+    return descriptions[event.type];
   }
 }
 
-// ============================================================================
-// FACTORY FUNCTIONS
-// ============================================================================
-
-/**
- * Creates a Supabase-backed ChainOfCommand instance for a specific case
- */
 export function createCaseChain(caseId: string, signingSecret: string): SupabaseChainOfCommand {
-  return new SupabaseChainOfCommand(
-    { signingSecret },
-    db
-  );
+  return new SupabaseChainOfCommand({ signingSecret, chainId: `case-${caseId}` });
 }
 
-/**
- * Creates a Supabase-backed ChainOfCommand instance for a specific resource
- */
 export function createResourceChain(
   resourceType: ChainResourceType,
   resourceId: string,
-  signingSecret: string
+  signingSecret: string,
 ): SupabaseChainOfCommand {
-  return new SupabaseChainOfCommand(
-    { signingSecret },
-    db
-  );
+  return new SupabaseChainOfCommand({ signingSecret, chainId: `${resourceType}-${resourceId}` });
 }
 
-// ============================================================================
-// EXPORTS
-// ============================================================================
-
-export {
-  chainEvents,
-  chainMetadata,
-  chainVerificationLog,
-};
+export { chainEvents, chainMetadata, chainVerificationLog };
