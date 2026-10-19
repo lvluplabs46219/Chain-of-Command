@@ -14,6 +14,7 @@ export default defineConfig({
       "packages/*/src/**/*.test.ts",
       "tests/**/*.test.ts",
       "apps/api/tests/chain-persistence.test.ts",
+      "apps/api/tests/dependency-security.test.ts",
     ],
     // The API smoke scripts start an HTTP server and run separately via tsx.
     exclude: ["archive/**", ".devcontainer/**", "**/node_modules/**"],

@@ -1,6 +1,6 @@
 # Chain-persistence type repair
 
-Tracker: `COC-291`, continued at the user's request on `fix/build-ci-reliability`. Parent repair commit: `ee79889e6e576525fa46b8fadbccf7d75c2a4829`.
+Tracker: `COC-291`, continued at the user's request on `fix/build-ci-reliability`. Parent repair commit: `ee79889e6e576525fa46b8fadbccf7d75c2a4829`. This records the chain-repair milestone; its then-outstanding high dependency findings were subsequently resolved in `docs/DEPENDENCY_SECURITY_REPAIR.md`.
 
 ## Requirements to implement
 

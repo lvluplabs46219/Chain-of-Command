@@ -1,6 +1,6 @@
 # Focused build and CI repair
 
-Branch: `fix/build-ci-reliability`. Base: `8d2b43ee29ce0e001bc221677c3356ef6a35c0a8`. Tracker: `COC-291`, still in progress. This document records the initial repair checkpoint at `ee79889`; the API type-error blocker was subsequently fixed, with 30 new chain regressions and 53 total passing tests. See `docs/CHAIN_PERSISTENCE_REPAIR.md` for the follow-up; high dependency advisories still prevent merge readiness.
+Branch: `fix/build-ci-reliability`. Base: `8d2b43ee29ce0e001bc221677c3356ef6a35c0a8`. Tracker: `COC-291`, still in progress. This document records the initial repair checkpoint at `ee79889`; later work fixed the API errors and high dependency findings. Read `docs/CHAIN_PERSISTENCE_REPAIR.md` and `docs/DEPENDENCY_SECURITY_REPAIR.md` for the follow-ups; the acceptance table below is historical, not the current vulnerability or test status.
 
 ## Requirements to implement
 
