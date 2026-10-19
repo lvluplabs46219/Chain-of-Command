@@ -94,8 +94,7 @@ export async function bootstrapWorkspaceSession(opts?: {
             },
             { onConflict: "auth_id" }
           )
-          .then(() => undefined)
-          .catch(() => undefined);
+          .then(() => undefined, () => undefined);
 
         const { data: matter } = await admin
           .from("matters")

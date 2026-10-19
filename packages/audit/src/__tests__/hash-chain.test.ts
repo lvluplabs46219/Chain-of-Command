@@ -14,7 +14,6 @@ function makeEvent(
     actorId: "user-1",
     action: "case.create",
     result: "success",
-    prevHash,
     ...overrides,
     prevHash,
   };

@@ -36,7 +36,7 @@ const nextConfig = {
   reactStrictMode: true,
   allowedDevOrigins: ['*.run.app', '*.us-east1.run.app', '*.cloudrun.app', '*.google.com', '*.googleusercontent.com', 'localhost:3000', '127.0.0.1:3000'],
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   experimental: {
     cpus: 1,
@@ -93,5 +93,4 @@ const nextConfig = {
 };
 
 export default nextConfig;
-
 

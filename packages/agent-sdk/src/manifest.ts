@@ -3,6 +3,8 @@
  * An agent is a configured, versioned, permissioned unit — not a persona skin.
  */
 
+export type JSONSchema = Record<string, unknown>;
+
 export type TaskClass =
   | 'reasoning'
   | 'extraction'

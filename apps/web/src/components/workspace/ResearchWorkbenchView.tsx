@@ -74,22 +74,16 @@ export function ResearchWorkbenchView({ matter, evidence = [] }: ResearchWorkben
         "Whether the posting of notices at the specific physical location complied with Ind. Code § 35-43-2-2(c) signage specifications (purple paint marks or 2-inch font notices).",
       citations: [
         {
-          id: "cite-1",
-          authority: "Ind. Code § 35-43-2-2",
-          pinpoint: "Subsections (b) and (c)",
-          jurisdiction: "Indiana",
-          tier: 1,
-          status: "verified",
+          statuteOrRule: "Ind. Code § 35-43-2-2, subsections (b) and (c)",
+          confidenceScore: 0,
+          provenance: "SOURCE_AI",
           summary: "Defines entry without contractual interest after denial as Class A misdemeanor.",
           sourceUrl: "https://iga.in.gov/laws/2024/ic/titles/35#35-43-2-2",
         },
         {
-          id: "cite-2",
-          authority: "State v. Vance (Ind. Ct. App. 2018)",
-          pinpoint: "98 N.E.3d 622, 626",
-          jurisdiction: "Indiana",
-          tier: 1,
-          status: "verified",
+          statuteOrRule: "State v. Vance (Ind. Ct. App. 2018), 98 N.E.3d 622, 626 (unverified)",
+          confidenceScore: 0,
+          provenance: "SOURCE_AI",
           summary: "State carries affirmative burden to negate defendant's belief of contractual permission.",
         },
       ],
@@ -138,22 +132,16 @@ export function ResearchWorkbenchView({ matter, evidence = [] }: ResearchWorkben
               "Whether local municipal camera records or dispatch CAD logs corroborate the officer's initial claimed reason for observation.",
             citations: [
               {
-                id: "cite-terry",
-                authority: "Terry v. Ohio",
-                pinpoint: "392 U.S. 1, 30 (1968)",
-                jurisdiction: "Federal / Constitutional",
-                tier: 1,
-                status: "verified",
+                statuteOrRule: "Terry v. Ohio, 392 U.S. 1, 30 (1968)",
+                confidenceScore: 0,
+                provenance: "SOURCE_AI",
                 summary: "Requires reasonable articulable suspicion for investigatory detention.",
                 sourceUrl: "https://supreme.justia.com/cases/federal/us/392/1/",
               },
               {
-                id: "cite-wardlow",
-                authority: "Illinois v. Wardlow",
-                pinpoint: "528 U.S. 119, 124 (2000)",
-                jurisdiction: "Federal / Constitutional",
-                tier: 1,
-                status: "verified",
+                statuteOrRule: "Illinois v. Wardlow, 528 U.S. 119, 124 (2000)",
+                confidenceScore: 0,
+                provenance: "SOURCE_AI",
                 summary: "Headlong unprovoked flight in high-crime area evaluated under totality of circumstances.",
                 sourceUrl: "https://supreme.justia.com/cases/federal/us/528/119/",
               },
@@ -180,13 +168,10 @@ export function ResearchWorkbenchView({ matter, evidence = [] }: ResearchWorkben
               "Local county court standing case-management orders and local magistrate courtroom procedures.",
             citations: [
               {
-                id: "cite-general",
-                authority: `${selectedJurisdiction} Rules of Criminal Procedure`,
-                pinpoint: "Rule 4",
-                jurisdiction: selectedJurisdiction,
-                tier: 1,
-                status: "verified",
+                statuteOrRule: `${selectedJurisdiction} Rules of Criminal Procedure (unverified)`,
                 summary: "Establishes procedure for calendaring, hearings, and speedy trial motions.",
+                confidenceScore: 0,
+                provenance: "SOURCE_AI",
               },
             ],
             fusedScoreExplanations: [
@@ -324,16 +309,19 @@ export function ResearchWorkbenchView({ matter, evidence = [] }: ResearchWorkben
           </div>
 
           <ResultEnvelope
-            label="Analysis"
-            groundingStatus={activeResearch.groundingStatus}
-            confidence="high"
-            confidenceBasis={activeResearch.confidenceBasis}
-            agentId="legal-research-ai-v2"
+            envelopeType="Analysis"
+            title={activeResearch.query}
+            timestamp="Research preview (not independently verified)"
             agentName="Legal Research AI"
-            whatWeCouldNotVerify={activeResearch.whatWeCouldNotVerify}
             citations={activeResearch.citations}
           >
             <div className="space-y-4">
+              <p className="text-xs text-amber-200">
+                Grounding: {activeResearch.groundingStatus}. {activeResearch.confidenceBasis}
+                {activeResearch.whatWeCouldNotVerify
+                  ? ` Not verified: ${activeResearch.whatWeCouldNotVerify}`
+                  : ""}
+              </p>
               <div className="p-3 bg-[#171A24] border border-[#282C3E] rounded-lg">
                 <span className="text-[11px] font-mono text-[#D4AF37] block mb-1">
                   RESEARCH INQUIRY ({activeResearch.jurisdiction}):

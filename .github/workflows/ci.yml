@@ -2,70 +2,77 @@ name: Security & QA Pipeline
 
 on:
   push:
-    branches: [ "main", "feature/**" ]
+    branches: ["main", "feature/**", "fix/**"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: qa-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  security-and-build:
+  checks:
+    name: ${{ matrix.check }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        check:
+          - typecheck:packages
+          - typecheck:web
+          - typecheck:api
+          - test:unit
+          - test:security
+          - test:security:bundle
+          - build:api
+          - build:web
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-placeholder-publishable-key
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Require a single committed npm lockfile
+        run: |
+          test -f package-lock.json
+          test ! -f pnpm-lock.yaml
+          test ! -f yarn.lock
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run ${{ matrix.check }}
+        run: npm run "${{ matrix.check }}"
+
+  dependency-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Fail on high or critical dependency findings
+        run: npm audit --audit-level=high
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: npm
-
-      - name: Reject dual lockfiles
-        run: |
-          if [ -f pnpm-lock.yaml ] && [ -f package-lock.json ]; then
-            echo "Both pnpm-lock.yaml and package-lock.json present — pick one package manager"
-            exit 1
-          fi
-
-      - name: Install Dependencies
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            echo "No package-lock.json yet — using npm install"
-            npm install --no-audit --no-fund
-          fi
-
-      - name: Security Scan (npm audit — critical)
-        run: npm audit --audit-level=critical
-
-      - name: Secret Scanning (TruffleHog)
+      - name: Scan working tree for verified secrets
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
           extra_args: --only-verified
-
-      - name: Type Check
-        run: npm run typecheck
-
-      - name: Build web
-        run: npm run build
-        env:
-          NODE_ENV: production
-
-      - name: Provider lockout (demo banned in production)
-        run: npx tsx apps/api/tests/provider-lockout.test.ts
-
-      - name: API security smoke (if test file present)
-        run: |
-          if [ -f apps/api/tests/security.test.ts ]; then
-            npx tsx apps/api/tests/security.test.ts || exit 1
-          else
-            echo "No security.test.ts — skip"
-          fi

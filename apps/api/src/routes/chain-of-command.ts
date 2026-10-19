@@ -47,7 +47,7 @@ const CreateChainEventSchema = z.object({
   agentRunId: z.string().optional(),
   evidenceFingerprint: z.string().optional(),
   evidenceId: z.string().optional(),
-  payload: z.record(z.unknown()).optional(),
+  payload: z.record(z.string(), z.unknown()).optional(),
 });
 
 // Schema for creating a genesis event

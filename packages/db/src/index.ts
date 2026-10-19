@@ -2,6 +2,16 @@ import dotenv from "dotenv";
 dotenv.config({ override: true });
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
+// Restore the existing chain-schema exports after the monorepo move.
+// This source re-export does not apply any database schema changes.
+export {
+  chainEvents,
+  chainMetadata,
+  chainVerificationLog,
+  type NewChainEvent,
+  type NewChainMetadata,
+  type NewChainVerificationLog,
+} from "../../database/schema/chain-of-command.js";
 import { pgTable, text, serial, boolean, real, integer, timestamp, jsonb, uuid, customType, pgEnum, doublePrecision } from "drizzle-orm/pg-core";
 
 const { Pool } = pg;

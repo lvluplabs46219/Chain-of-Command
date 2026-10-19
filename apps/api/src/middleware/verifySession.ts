@@ -15,7 +15,8 @@ function getSupabase() {
   return supabase;
 }
 
-export interface AuthenticatedRequest extends Request {
+// Authenticated routes use named single-segment parameters, not wildcard arrays.
+export interface AuthenticatedRequest extends Request<Record<string, string>> {
   user?: User;
 }
 

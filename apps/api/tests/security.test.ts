@@ -1,17 +1,27 @@
 import { createServer } from 'http';
-import app from '../src/app';
 import crypto from 'crypto';
+import assert from 'node:assert/strict';
 
-const port = 3001;
+// These smoke checks use public health and rejected requests, never DB reads/writes.
+// Preserve the fail-fast DB configuration contract without production credentials.
+process.env.DATABASE_URL = 'postgresql://smoke:smoke@127.0.0.1:65432/smoke';
+// A local rejecting Auth endpoint makes invalid-JWT checks deterministic and offline.
+const authServer = createServer((_req, res) => {
+  res.writeHead(401, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ code: 'bad_jwt', msg: 'Invalid JWT' }));
+});
+await new Promise<void>((resolve) => authServer.listen(0, '127.0.0.1', resolve));
+const authAddress = authServer.address();
+assert(authAddress && typeof authAddress !== 'string');
+process.env.SUPABASE_URL = `http://127.0.0.1:${authAddress.port}`;
+process.env.SUPABASE_ANON_KEY = 'offline-smoke-anon-key';
+process.env.ALLOWED_ORIGINS = 'https://acquit.ai';
+delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+const { default: app } = await import('../src/app');
+const { michaelOrchestrator } = await import('../src/ai/MichaelOrchestrator');
+
+let port = 0;
 const server = createServer(app);
-
-// Simple assertion helper
-function assert(condition: boolean, message: string) {
-  if (!condition) {
-    console.error('❌ FAIL: ' + message);
-    process.exit(1);
-  }
-}
 
 async function runTests() {
   console.log('Running Security Verification Tests...');
@@ -20,7 +30,7 @@ async function runTests() {
   let res = await fetch(`http://localhost:${port}/api/directory`);
   assert(res.status === 401, 'Unauthenticated request should return 401');
   let body = await res.json();
-  assert(body.error === 'UNAUTHORIZED', 'Unauthenticated request should have UNAUTHORIZED error');
+  assert(body.error?.code === 'UNAUTHENTICATED', 'Unauthenticated response must use the shared error taxonomy');
 
   res = await fetch(`http://localhost:${port}/api/directory`, {
     headers: { 'Authorization': 'Bearer invalid' }
@@ -51,8 +61,7 @@ async function runTests() {
     headers: { 'Content-Type': 'application/json', 'x-hub-signature-256': validSignature },
     body: JSON.stringify(payload)
   });
-  // Since db connection might fail or something else, but it shouldn't be 401
-  assert(res.status !== 401, 'Valid webhook signature should NOT return 401');
+  assert(res.status === 400, 'Valid signature with no matterId must reach payload validation and return 400');
 
   // SEC-6 & SEC-7 CORS & CSP
   res = await fetch(`http://localhost:${port}/api/health`, {
@@ -93,15 +102,21 @@ async function runTests() {
   // Restore NODE_ENV
   process.env.NODE_ENV = originalNodeEnv;
 
-  console.log('✅ All security verification tests passed!');
-  server.close();
-  process.exit(0);
+  console.log('All security verification tests passed.');
 }
 
-server.listen(port, () => {
-  runTests().catch(err => {
+server.listen(0, async () => {
+  const address = server.address();
+  assert(address && typeof address !== 'string');
+  port = address.port;
+  try {
+    await runTests();
+  } catch (err) {
     console.error('Test Error:', err);
+    process.exitCode = 1;
+  } finally {
+    michaelOrchestrator.cleanup();
     server.close();
-    process.exit(1);
-  });
+    authServer.close();
+  }
 });

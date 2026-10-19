@@ -1,4 +1,4 @@
-import { google } from "googleapis";
+import { google, type gmail_v1 } from "googleapis";
 
 export class GoogleWorkspaceClient {
   private auth: any;
@@ -59,7 +59,7 @@ export class GoogleWorkspaceClient {
     });
     
     const messages = res.data.messages || [];
-    const threads = [];
+    const threads: gmail_v1.Schema$Message[] = [];
     
     for (const msg of messages) {
       if (msg.id) {

@@ -32,6 +32,7 @@ interface DashboardViewProps {
   onNavigateTab: (tab: WorkspaceTab) => void;
   onOpenAddTimeline: () => void;
   onOpenAddEvidence: () => void;
+  onOpenNewMatter?: () => void;
 }
 
 export function DashboardView({

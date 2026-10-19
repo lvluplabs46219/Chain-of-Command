@@ -1,44 +1,29 @@
-name: Deploy and Build
+name: Production Build
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
-  # Uncomment id-token: write if you switch method to "oidc" later
-  # id-token: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
-      # Intermediate so we can gate steps without secrets-in-if (invalid)
-      INFISICAL_CID: ${{ secrets.INFISICAL_CLIENT_ID }}
-      INFISICAL_CSEC: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-placeholder-publishable-key
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Fetch Secrets from Infisical
-        if: env.INFISICAL_CID != '' && env.INFISICAL_CSEC != ''
-        continue-on-error: true
-        uses: Infisical/secrets-action@v1.0.18
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          method: universal
-          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
-          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          project-slug: ${{ secrets.INFISICAL_PROJECT_SLUG }}
-          env-slug: ${{ secrets.INFISICAL_ENV_SLUG }}
-          domain: https://app.infisical.com
-
-      - name: Verify Environment
-        run: |
-          if [ -n "$INFISICAL_CID" ] && [ -n "$INFISICAL_CSEC" ]; then
-            echo "Infisical credentials present — secret injection attempted (domain: app.infisical.com)"
-          else
-            echo "::notice::INFISICAL_CLIENT_ID / INFISICAL_CLIENT_SECRET not set."
-            echo "::notice::Add them under Settings → Secrets and variables → Actions."
-            echo "::notice::See docs/SECRETS_MANAGEMENT.md for Machine Identity setup."
-          fi
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Build API and web
+        run: npm run build
+      # This workflow verifies build output; it does not deploy or inject production secrets.

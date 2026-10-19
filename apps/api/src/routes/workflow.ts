@@ -86,8 +86,10 @@ workflowRouter.post("/workflow/dag/dispatch", requirePermission({ resource: "age
   tasks.push({
     task: {
       task_id: `${executionId}_intake`,
-      worker_name: "lead-counsel",
-      input_data: { objective: objective || "Case Analysis and Procedural Roadmap", matterId },
+      execution_id: executionId,
+      assigned_worker: "lead-counsel",
+      data_sensitivity: "case_data",
+      payload: { objective: objective || "Case Analysis and Procedural Roadmap", matterId },
       metadata: { retries: 0, max_retries: 2, timeout_ms: 30000 },
     },
     state: "PENDING",
@@ -99,8 +101,10 @@ workflowRouter.post("/workflow/dag/dispatch", requirePermission({ resource: "age
     tasks.push({
       task: {
         task_id: `${executionId}_rights`,
-        worker_name: "rights-checker",
-        input_data: { matterId, scope: "Constitutional and Procedural Rights Audit" },
+        execution_id: executionId,
+        assigned_worker: "rights-checker",
+        data_sensitivity: "case_data",
+        payload: { matterId, scope: "Constitutional and Procedural Rights Audit" },
         metadata: { retries: 0, max_retries: 2, timeout_ms: 30000 },
       },
       state: "PENDING",
@@ -112,8 +116,10 @@ workflowRouter.post("/workflow/dag/dispatch", requirePermission({ resource: "age
     tasks.push({
       task: {
         task_id: `${executionId}_deadlines`,
-        worker_name: "paralegal",
-        input_data: { matterId, scope: "Statutory Deadline & Filing Checklist Calculation" },
+        execution_id: executionId,
+        assigned_worker: "paralegal",
+        data_sensitivity: "case_data",
+        payload: { matterId, scope: "Statutory Deadline & Filing Checklist Calculation" },
         metadata: { retries: 0, max_retries: 2, timeout_ms: 30000 },
       },
       state: "PENDING",
@@ -127,8 +133,10 @@ workflowRouter.post("/workflow/dag/dispatch", requirePermission({ resource: "age
     tasks.push({
       task: {
         task_id: `${executionId}_prep`,
-        worker_name: "court-prep",
-        input_data: { matterId, scope: "Court Appearance & Readiness Brief" },
+        execution_id: executionId,
+        assigned_worker: "court-prep",
+        data_sensitivity: "case_data",
+        payload: { matterId, scope: "Court Appearance & Readiness Brief" },
         metadata: { retries: 0, max_retries: 2, timeout_ms: 30000 },
       },
       state: "PENDING",
@@ -150,14 +158,14 @@ workflowRouter.post("/workflow/dag/dispatch", requirePermission({ resource: "age
     executionId,
     status: "IN_PROGRESS",
     taskCount: tasks.length,
-    readyTasks: readyTasks.map(t => ({ taskId: t.task_id, worker: t.worker_name })),
+    readyTasks: readyTasks.map(t => ({ taskId: t.task_id, worker: t.assigned_worker })),
   });
 });
 
 /**
  * Query DAG Execution State
  */
-workflowRouter.get("/workflow/dag/:executionId", (req: Request, res: Response) => {
+workflowRouter.get("/workflow/dag/:executionId", (req: Request<{ executionId: string }>, res: Response) => {
   if (!requireUser(req, res)) return;
   const { executionId } = req.params;
   const state = michaelOrchestrator.getExecutionState(executionId);
@@ -168,7 +176,7 @@ workflowRouter.get("/workflow/dag/:executionId", (req: Request, res: Response) =
 
   const tasksArray = Array.from(state.tasks.entries()).map(([id, node]) => ({
     taskId: id,
-    worker: node.task.worker_name,
+    worker: node.task.assigned_worker,
     state: node.state,
     dependencies: node.dependencies,
     result: node.result,

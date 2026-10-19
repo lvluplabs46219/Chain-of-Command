@@ -2,6 +2,10 @@
   "name": "chain-of-command",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=22.12 <23"
+  },
+  "packageManager": "npm@10.8.2",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -9,8 +13,18 @@
   "scripts": {
     "prebuild": "true",
     "dev": "npm --prefix apps/web run dev",
-    "build": "npm --prefix apps/web run build",
-    "lint": "npm --prefix apps/web run lint",
+    "build": "npm run build:api && npm run build:web",
+    "build:api": "npm run build --workspace=apps/api",
+    "build:web": "npm run build --workspace=apps/web",
+    "typecheck": "npm run typecheck:packages && npm run typecheck:web && npm run typecheck:api",
+    "typecheck:packages": "tsc --project packages/tsconfig.json --noEmit",
+    "typecheck:web": "npm run typecheck --workspace=apps/web",
+    "typecheck:api": "npm run typecheck --workspace=apps/api",
+    "lint": "npm run typecheck",
+    "test": "npm run test:unit && npm run test:security",
+    "test:unit": "vitest run",
+    "test:security": "tsx apps/api/tests/provider-lockout.test.ts && tsx apps/api/tests/security.test.ts",
+    "test:security:bundle": "npm run build:api && node apps/api/dist/tests/security.test.mjs",
     "start": "npm --prefix apps/web run start",
     "secrets:agent": "infisical agent --config config/infisical/agent-config.yaml",
     "secrets:agent:root": "infisical agent --config agent-config.yaml"
@@ -28,6 +42,9 @@
     "three": "^0.186.1"
   },
   "devDependencies": {
+    "tsx": "^4.20.0",
+    "vitest": "4.1.11",
+    "vite": "7.3.7",
     "@types/node": "^22.10.7",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",

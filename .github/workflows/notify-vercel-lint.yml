@@ -1,4 +1,18 @@
-- name: 'notify vercel'
-  uses: 'vercel/repository-dispatch/actions/status@v1'
-  with:
-    name: Vercel - aquit-platform-api: lint
+name: CI Failure Summary
+
+on:
+  workflow_run:
+    workflows: ["Security & QA Pipeline"]
+    types: [completed]
+
+permissions: {}
+
+jobs:
+  summary:
+    if: github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record failed QA run (no external notification)
+        env:
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+        run: printf 'Security & QA failed. Review the run at %s\n' "$RUN_URL" >> "$GITHUB_STEP_SUMMARY"

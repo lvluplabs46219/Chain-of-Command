@@ -5,6 +5,21 @@
 
 export type AuditActorType = 'user' | 'agent' | 'system' | 'service';
 
+/** Payload-bound approval contract from the master implementation specification §9.5. */
+export interface HumanApproval {
+  id: string;
+  action: string;
+  scope: "one_time";
+  target: { type: string; ref: string; description: string };
+  payloadHash: string;
+  approvedBy: string;
+  approvedAt: string;
+  expiresAt: string;
+  method: "explicit_ui_confirm";
+  mfaSatisfied: boolean;
+  caseId: string;
+}
+
 export type AuditAction =
   | 'auth.login'
   | 'auth.logout'

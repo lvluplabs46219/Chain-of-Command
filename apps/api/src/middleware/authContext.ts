@@ -4,10 +4,9 @@
  */
 import { Response, NextFunction } from "express";
 import type { AuthenticatedRequest } from "./verifySession";
-import type { AuthContext, TenantRole, CaseRole } from "../../../packages/auth/src/types";
-import { authorize, requireAuth } from "../../../packages/auth/src/authorize";
-import type { PermissionCheck } from "../../../packages/auth/src/types";
-import { AppError, makeError } from "../../../packages/shared/src/errors";
+import type { AuthContext, TenantRole, CaseRole, PermissionCheck } from "@chain-of-command/auth";
+import { authorize, requireAuth } from "@chain-of-command/auth";
+import { AppError, makeError } from "@chain-of-command/shared";
 
 export interface AuthedRequest extends AuthenticatedRequest {
   auth?: AuthContext;

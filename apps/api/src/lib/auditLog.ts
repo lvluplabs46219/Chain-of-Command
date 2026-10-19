@@ -8,7 +8,7 @@ import {
   type AuditWriteInput,
   type AuditEvent,
   GENESIS_HASH,
-} from "../../../packages/audit/src/index";
+} from "@chain-of-command/audit";
 
 class MemoryAuditStore implements AuditStore {
   private byTenant = new Map<string, AuditEvent[]>();

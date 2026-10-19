@@ -294,9 +294,8 @@ async function executeRun(runId: string, record: RunRecord): Promise<void> {
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     record.events.push({
-      type: "error",
-      timestamp: Date.now(),
-      payload: { error: message },
+      type: "run.failed",
+      error: { code: "PROVIDER_ERROR", message },
     });
     record.done = true;
     await persistRunState(runId, record);
@@ -308,9 +307,8 @@ async function executeRun(runId: string, record: RunRecord): Promise<void> {
 
   if (detectPromptInjection(record.request.input)) {
     record.events.push({
-      type: "error",
-      timestamp: Date.now(),
-      payload: { error: "Prompt injection detected - request aborted" },
+      type: "run.failed",
+      error: { code: "INJECTION_FLAGGED", message: "Prompt injection detected - request aborted" },
     });
     record.done = true;
     await persistRunState(runId, record);

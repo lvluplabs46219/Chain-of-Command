@@ -2,6 +2,9 @@ import { DispatchTask, WorkerResult } from './SeraphimInterceptor';
 import { logger } from '../lib/logger';
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { executeTask } from './task-worker';
+import { z } from 'zod';
+
+const ProviderSchema = z.enum(["demo", "ollama", "openai", "gemini"]).optional();
 
 export type TaskState = 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED';
 
@@ -205,7 +208,7 @@ export class MichaelOrchestrator {
     let workerResult: WorkerResult;
     try {
       workerResult = await executeTask(task, {
-        provider: typeof task.payload?.provider === 'string' ? task.payload.provider : undefined,
+        provider: ProviderSchema.parse(task.payload?.provider),
         model: typeof task.payload?.model === 'string' ? task.payload.model : undefined,
         systemPrompt: typeof task.payload?.systemPrompt === 'string' ? task.payload.systemPrompt : undefined,
       });

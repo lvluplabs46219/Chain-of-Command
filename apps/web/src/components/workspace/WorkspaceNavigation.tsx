@@ -33,6 +33,7 @@ export type WorkspaceTab =
   | "timeline"
   | "draft_desk"
   | "court_watch"
+  | "courtroom_3d"
   | "directory"
   | "tasks"
   | "audit"
@@ -53,6 +54,7 @@ export const TAB_ROUTES: Record<WorkspaceTab, string> = {
   timeline: "/timeline",
   draft_desk: "/draft-desk",
   court_watch: "/court-watch",
+  courtroom_3d: "/courtroom-3d",
   directory: "/directory",
   tasks: "/tasks",
   audit: "/audit",
