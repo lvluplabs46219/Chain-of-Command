@@ -1,0 +1,35 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=othxichdhzdxgtatautb&features=docs,account,database,debugging,development,functions,branching",
+      "gallery": "https://api.mcp.github.com"
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "gallery": "https://api.mcp.github.com"
+    },
+    "vercel": {
+      "type": "http",
+      "url": "https://mcp.vercel.com",
+      "gallery": "https://api.mcp.github.com"
+    },
+    "desktop-commander": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@wonderwhy-er/desktop-commander@latest"]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/andrew/Development"],
+      "type": "stdio"
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "type": "stdio"
+    }
+  },
+  "_comment": "Production set for Chain of Command. Parked from full mcp.json: Cloudflare suite, Playwright, Chrome DevTools, BigQuery/Spanner/AlloyDB, Metasploit, Solana, HF, Postman, Docker gateway, debugai, next-devtools. Re-add only when actively needed."
+}
