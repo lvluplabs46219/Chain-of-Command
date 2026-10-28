@@ -77,71 +77,123 @@
   --radius-full: 9999px;
 }
 
-/* Dark shell — Candy dark, matches The Firm playground dark mode */
-.dark, [data-theme="dark"] {
-  --background: #1d0e23;
-  --foreground: #feebff;
-  --surface: #1d0e23;
-  --surface-dim: #16081b;
-  --surface-bright: #291432;
-  --surface-lowest: #140718;
-  --surface-low: #22102a;
-  --surface-container: #2c1536;
-  --surface-container-high: #371a43;
-  --surface-container-highest: #432052;
-  --on-surface: #feebff;
-  --on-surface-variant: #e0bfd2;
-  --outline: #77566a;
-  --outline-variant: #492a3e;
-
-  --primary: #ff4db8;
-  --primary-accent: #e040a0;
-  --on-primary: #ffffff;
-  --secondary: #cda0fe;
-  --on-secondary: #281330;
-  --tertiary: #7ed0ff;
-  --on-tertiary: #140718;
-  --error: #ffb4ab;
-  --on-error: #140718;
-  --success: #10b981;
-
-  --candy-surface: #1d0e23;
-  --candy-surface-container: #2c1536;
-  --candy-on-surface: #feebff;
-  --candy-on-surface-variant: #e0bfd2;
-  --candy-primary: #ff4db8;
-  --candy-primary-accent: #e040a0;
-  --candy-secondary: #cda0fe;
-  --candy-tertiary: #7ed0ff;
-
-  --sov-void: #1d0e23;
-  --sov-ink: #2c1536;
-  --sov-ink-2: #371a43;
-  --sov-gold: #ff4db8;
-  --sov-gold-soft: #feebff;
-  --sov-gold-muted: #e040a0;
-  --sov-emerald: #cda0fe;
-  --sov-emerald-bright: #cda0fe;
-  --sov-success: #10b981;
-  --sov-danger: #ffb4ab;
-  --sov-blue: #7ed0ff;
-  --sov-indigo: #cda0fe;
-  --sov-glow-gold: 0 0 20px rgba(255, 77, 184, 0.35);
-  --sov-glow-gold-sm: 0 0 12px rgba(255, 77, 184, 0.25);
-  --sov-glow-emerald: 0 4px 20px rgba(205, 160, 254, 0.4);
-
-  --coc-gold: #ff4db8;
-  --coc-bg: #1d0e23;
-  --coc-panel: #2c1536;
-  --coc-border: #492a3e;
-}
-
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   margin: 0;
   padding: 0;
+}
+
+/* ============================================================
+   CANDY THEME — Joyful Pop Comprehensive Page Overrides
+   Ensures every single tab & page consistently renders in the
+   vibrant, light Candy palette without dark mode blotches
+   ============================================================ */
+.candy-theme,
+[data-theme="candy"],
+:root {
+  background-color: #fff7fb;
+  color: #281330;
+}
+
+.candy-theme .bg-\[\#111214\],
+.candy-theme .bg-\[\#0A0B0E\],
+.candy-theme .bg-\[\#0C0D10\],
+.candy-theme .bg-\[\#101114\],
+.candy-theme .bg-zinc-950,
+.candy-theme .bg-zinc-950\/40,
+.candy-theme .bg-neutral-950 {
+  background-color: #fff7fb !important;
+}
+
+.candy-theme .bg-\[\#141519\],
+.candy-theme .bg-\[\#14151C\],
+.candy-theme .bg-\[\#18191D\],
+.candy-theme .bg-\[\#1C1E2A\],
+.candy-theme .bg-\[\#1a1b1e\],
+.candy-theme .bg-zinc-900,
+.candy-theme .bg-zinc-900\/80,
+.candy-theme .bg-zinc-900\/70,
+.candy-theme .bg-slate-900 {
+  background-color: #ffffff !important;
+  color: #281330 !important;
+  border-color: #f0d5e2 !important;
+  box-shadow: 0 4px 20px rgba(124, 82, 170, 0.06);
+}
+
+.candy-theme .border-zinc-800,
+.candy-theme .border-zinc-800\/80,
+.candy-theme .border-zinc-700,
+.candy-theme .border-\[\#272830\],
+.candy-theme .border-\[\#2A2B35\],
+.candy-theme .border-\[\#252735\],
+.candy-theme .border-\[\#23242B\],
+.candy-theme .border-slate-800 {
+  border-color: #f0d5e2 !important;
+}
+
+.candy-theme .text-white {
+  color: #281330 !important;
+}
+
+.candy-theme .text-neutral-200,
+.candy-theme .text-neutral-300,
+.candy-theme .text-zinc-200,
+.candy-theme .text-zinc-300 {
+  color: #3e2846 !important;
+}
+
+.candy-theme .text-neutral-400,
+.candy-theme .text-neutral-500,
+.candy-theme .text-zinc-400,
+.candy-theme .text-slate-400 {
+  color: #604868 !important;
+}
+
+.candy-theme .text-\[\#D4AF37\],
+.candy-theme .text-amber-400,
+.candy-theme .text-amber-500 {
+  color: #af0a78 !important;
+}
+
+.candy-theme .bg-\[\#D4AF37\],
+.candy-theme .bg-amber-500 {
+  background: linear-gradient(135deg, #e040a0, #af0a78) !important;
+  color: #ffffff !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 4px 16px rgba(175, 10, 120, 0.22) !important;
+}
+
+.candy-theme .bg-\[\#D4AF37\]\/10,
+.candy-theme .bg-\[\#D4AF37\]\/15,
+.candy-theme .bg-\[\#D4AF37\]\/20,
+.candy-theme .bg-\[\#D4AF37\]\/5,
+.candy-theme .bg-amber-500\/10 {
+  background-color: #ffd8e8 !important;
+  color: #8a005e !important;
+}
+
+.candy-theme .border-\[\#D4AF37\],
+.candy-theme .border-\[\#D4AF37\]\/30,
+.candy-theme .border-\[\#D4AF37\]\/40,
+.candy-theme .border-\[\#D4AF37\]\/50 {
+  border-color: #ffafd5 !important;
+}
+
+.candy-theme input,
+.candy-theme textarea,
+.candy-theme select {
+  background-color: #ffffff !important;
+  color: #281330 !important;
+  border-color: #ddbfca !important;
+  border-radius: 0.75rem !important;
+}
+.candy-theme input:focus,
+.candy-theme textarea:focus,
+.candy-theme select:focus {
+  border-color: #af0a78 !important;
+  outline: 2px solid rgba(224, 64, 160, 0.25) !important;
 }
 
 /* Candy interactive primitives */

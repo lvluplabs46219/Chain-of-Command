@@ -70,54 +70,54 @@ export function WorkspaceHeader({
         <div className="px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-4 min-w-0">
             <div className="flex items-center gap-2.5 shrink-0">
-              <div className="w-8 h-8 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37]">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#af0a78] to-[#e040a0] flex items-center justify-center text-white shadow-[0_4px_12px_rgba(175,10,120,0.25)]">
                 <Scale className="w-4 h-4" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm tracking-wide text-white uppercase font-mono">
+                  <span className="font-extrabold text-sm tracking-wide text-[#281330] font-sans">
                     Chain of Command
                   </span>
-                  <span className="text-[10px] uppercase font-mono tracking-wider px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
+                  <span className="text-[10px] uppercase font-mono tracking-wider px-2 py-0.5 rounded-full bg-[#ffd8e8] text-[#8a005e] font-bold">
                     Legal OS
                   </span>
                 </div>
-                <p className="text-[11px] text-zinc-300 font-medium hidden sm:block">
+                <p className="text-[11px] text-[#604868] font-medium hidden sm:block">
                   Case operating workspace for self-represented litigants
                 </p>
               </div>
             </div>
 
-            <div className="h-6 w-px bg-zinc-800 hidden md:block" />
+            <div className="h-6 w-px bg-[#f0d5e2] hidden md:block" />
 
             <div className="relative min-w-0">
               <button
                 type="button"
                 onClick={() => setMatterDropdownOpen(!matterDropdownOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-[#D4AF37]/50 text-xs font-medium text-zinc-200 transition-colors max-w-full"
+                className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#ddbfca] hover:border-[#af0a78] text-xs font-semibold text-[#281330] transition-colors max-w-full shadow-sm"
               >
-                <span className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#e040a0] shrink-0" />
                 <div className="text-left min-w-0 leading-tight">
-                  <div className="font-semibold text-white text-xs max-w-[180px] sm:max-w-[240px] truncate leading-5">
+                  <div className="font-bold text-[#281330] text-xs max-w-[180px] sm:max-w-[240px] truncate leading-5">
                     {activeMatter.title || "No matter open"}
                   </div>
-                  <div className="text-[10px] text-zinc-400 font-mono tracking-wide truncate leading-4 mt-0.5">
+                  <div className="text-[10px] text-[#604868] font-mono tracking-wide truncate leading-4 mt-0.5">
                     {(activeMatter.caseNumber && activeMatter.caseNumber !== "—")
                       ? activeMatter.caseNumber
                       : "No case number"}
                     {jurisdiction ? ` · ${jurisdiction}` : ""}
                   </div>
                 </div>
-                <ChevronDown className="w-3.5 h-3.5 text-zinc-400 ml-1 shrink-0" />
+                <ChevronDown className="w-3.5 h-3.5 text-[#604868] ml-1 shrink-0" />
               </button>
 
               {matterDropdownOpen && (
-                <div className="absolute left-0 mt-1.5 w-72 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl p-2 z-50">
-                  <div className="text-[10px] uppercase font-mono text-zinc-500 px-2 py-1">
+                <div className="absolute left-0 mt-2 w-80 bg-white border border-[#f0d5e2] rounded-2xl shadow-2xl p-2.5 z-50">
+                  <div className="text-[10px] uppercase font-mono text-[#8a707b] font-bold px-2 py-1">
                     Active legal matters
                   </div>
                   {matters.length === 0 && (
-                    <p className="px-2 py-2 text-xs text-zinc-500">No matters open yet.</p>
+                    <p className="px-2 py-2 text-xs text-[#604868]">No matters open yet.</p>
                   )}
                   {matters.map((m) => (
                     <button
@@ -127,20 +127,20 @@ export function WorkspaceHeader({
                         onSelectMatter(m);
                         setMatterDropdownOpen(false);
                       }}
-                      className={`w-full text-left p-2 rounded-lg text-xs transition-colors flex items-start justify-between ${
+                      className={`w-full text-left p-2.5 rounded-xl text-xs transition-colors flex items-start justify-between ${
                         m.id === activeMatter.id
-                          ? "bg-[#D4AF37]/15 text-white border border-[#D4AF37]/30"
-                          : "hover:bg-zinc-900 text-zinc-300 border border-transparent"
+                          ? "bg-[#ffd8e8] text-[#8a005e] font-semibold border border-[#ffafd5]"
+                          : "hover:bg-[#fff7fb] text-[#281330] border border-transparent"
                       }`}
                     >
                       <div className="min-w-0">
-                        <div className="font-semibold truncate">{m.title}</div>
-                        <div className="text-[10px] text-zinc-500 font-mono mt-0.5 truncate">
+                        <div className="font-bold truncate">{m.title}</div>
+                        <div className="text-[10px] text-[#604868] font-mono mt-0.5 truncate">
                           {m.caseNumber}
                         </div>
                       </div>
                       {m.id === activeMatter.id && (
-                        <Check className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
+                        <Check className="w-4 h-4 text-[#af0a78] shrink-0 mt-0.5" />
                       )}
                     </button>
                   ))}
@@ -151,7 +151,7 @@ export function WorkspaceHeader({
                         setMatterDropdownOpen(false);
                         onOpenNewMatterModal();
                       }}
-                      className="w-full mt-1 flex items-center gap-2 px-2 py-2 rounded-lg text-xs text-[#D4AF37] hover:bg-[#D4AF37]/10 border border-dashed border-[#D4AF37]/30"
+                      className="w-full mt-1.5 flex items-center justify-center gap-2 px-3 py-2 rounded-full text-xs text-[#8a005e] bg-[#ffd8e8]/60 hover:bg-[#ffd8e8] border border-dashed border-[#ffafd5] font-bold transition-colors"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       Open new matter
@@ -168,11 +168,11 @@ export function WorkspaceHeader({
               speedyDays != null &&
               activeMatter.id !== "matter-empty" &&
               Boolean(jurisdiction && jurisdiction.trim()) && (
-              <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-950 border border-amber-900/40 text-xs" title="Only shown when a matter and jurisdiction are set. Confirm against your court rules.">
-                <Clock className="w-3.5 h-3.5 text-amber-400" />
+              <div className="hidden lg:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#efdbff] border border-[#d3b4fc] text-xs" title="Only shown when a matter and jurisdiction are set. Confirm against your court rules.">
+                <Clock className="w-3.5 h-3.5 text-[#7c52aa]" />
                 <div>
-                  <span className="text-zinc-500">Speedy trial window: </span>
-                  <span className="font-mono font-semibold text-amber-300">
+                  <span className="text-[#5b3188] font-medium">Speedy trial: </span>
+                  <span className="font-mono font-bold text-[#2b0052]">
                     Day {speedyDays} of {speedyLimit}
                   </span>
                 </div>

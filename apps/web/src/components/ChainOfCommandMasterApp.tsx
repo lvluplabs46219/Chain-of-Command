@@ -294,10 +294,10 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
   const isEmptyWorkspace = !matters.length || activeMatter.id === "matter-empty";
 
   return (
-    <div className="min-h-screen bg-[#0C0D10] text-[#E1E2E5] flex flex-col font-sans selection:bg-[#D4AF37]/30">
+    <div className="min-h-screen bg-[#fff7fb] text-[#281330] flex flex-col font-sans selection:bg-[#ffd8e8]">
       {/* Header */}
       {isDemoMatter(activeMatter) && (
-        <div className="bg-amber-500 text-neutral-950 text-center text-xs font-bold tracking-wide py-1.5 px-3" role="status">
+        <div className="bg-[#ffd8e8] text-[#8a005e] border-b border-[#ffafd5] text-center text-xs font-bold tracking-wide py-1.5 px-3" role="status">
           DEMO DATA — sample case for exploration only. Not your real matter.
         </div>
       )}
@@ -314,17 +314,17 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
       <WorkspaceNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
       {isEmptyWorkspace && (
-        <div className="mx-4 mt-3 rounded-xl border border-[#D4AF37]/25 bg-[#D4AF37]/5 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="mx-4 mt-3 rounded-2xl border border-[#f0d5e2] bg-white px-4 py-3.5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
           <div>
-            <p className="text-sm text-[#EFE6D0] font-medium">No active matter yet</p>
-            <p className="text-xs text-neutral-400 mt-0.5">
+            <p className="text-sm text-[#281330] font-bold">No active matter open</p>
+            <p className="text-xs text-[#604868] mt-0.5">
               Open a case file to unlock deadlines, evidence, and the AI team on real data.
             </p>
           </div>
           <button
             type="button"
             onClick={() => setShowNewMatterModal(true)}
-            className="shrink-0 px-3 py-1.5 rounded-lg bg-[#D4AF37] text-neutral-950 text-xs font-semibold hover:bg-[#c49f27]"
+            className="shrink-0 px-4 py-2 rounded-full bg-gradient-to-r from-[#e040a0] to-[#af0a78] text-white text-xs font-bold shadow-[0_4px_16px_rgba(224,64,160,0.22)] hover:scale-[1.02] transition-transform"
           >
             Open new matter
           </button>
@@ -407,13 +407,13 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
         {activeTab === "archive" && <DesignArchiveView />}
       </section>
 
-      {/* Universal Mandatory Legal Footer Disclaimer (GEMINI.md Rule 5.B) */}
-      <footer className="border-t border-[#1F2026] bg-[#0A0B0E] py-4 px-6 text-center text-xs text-neutral-500 font-sans mt-auto">
+      {/* Universal Mandatory Legal Footer Disclaimer */}
+      <footer className="border-t border-[#f0d5e2] bg-white py-5 px-6 text-center text-xs text-[#604868] font-sans mt-auto">
         <div className="max-w-4xl mx-auto">
           <p className="leading-relaxed">
             This information is provided for educational and procedural purposes only and does not constitute legal advice. No attorney-client relationship is formed. Consult a licensed attorney for case-specific representation.
           </p>
-          <div className="flex items-center justify-center gap-3 mt-2 text-[11px] text-neutral-600 font-mono">
+          <div className="flex items-center justify-center gap-3 mt-2 text-[11px] text-[#8a707b] font-mono">
             <span>Chain of Command Legal OS</span>
             <span>·</span>
             <span>Pro Se Workspace</span>
@@ -425,81 +425,84 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
 
       {/* Open New Legal Matter Modal */}
       {showNewMatterModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#141519] border border-[#2A2B35] rounded-xl max-w-lg w-full p-6 text-neutral-200 shadow-2xl">
-            <h3 className="text-base font-semibold text-white mb-1">Open New Legal Matter Workspace</h3>
-            <p className="text-xs text-neutral-400 mb-4">Initialize a dedicated case folder for self-representation.</p>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-[#f0d5e2] rounded-3xl max-w-lg w-full p-6 sm:p-7 text-[#281330] shadow-2xl space-y-4">
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-[#af0a78]">Matter Workspace</span>
+              <h3 className="text-lg font-bold text-[#281330] mt-0.5">Open New Legal Matter</h3>
+              <p className="text-xs text-[#604868]">Initialize a dedicated case folder for self-representation.</p>
+            </div>
 
             <form onSubmit={handleCreateNewMatter} className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Case Caption / Title</label>
+                <label className="block text-[#604868] mb-1 font-mono uppercase text-[10px] font-bold">Case Caption / Title</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. State v. Smith or People v. Johnson"
+                  placeholder="e.g. State v. Smith or In Re Paternity of Baby Doe"
                   value={newMatterTitle}
                   onChange={(e) => setNewMatterTitle(e.target.value)}
-                  className="w-full bg-[#101114] border border-[#2A2B35] rounded-md px-3 py-2 text-white"
+                  className="w-full bg-[#fff7fb] border border-[#ddbfca] focus:border-[#af0a78] focus:ring-2 focus:ring-[#e040a0]/25 rounded-2xl px-3.5 py-2 text-[#281330]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Case Number</label>
+                  <label className="block text-[#604868] mb-1 font-mono uppercase text-[10px] font-bold">Case Number</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. 24-CR-008412"
+                    placeholder="e.g. 73C01-2205-JP-000025"
                     value={newMatterCaseNumber}
                     onChange={(e) => setNewMatterCaseNumber(e.target.value)}
-                    className="w-full bg-[#101114] border border-[#2A2B35] rounded-md px-3 py-2 text-white font-mono"
+                    className="w-full bg-[#fff7fb] border border-[#ddbfca] focus:border-[#af0a78] focus:ring-2 focus:ring-[#e040a0]/25 rounded-2xl px-3.5 py-2 text-[#281330] font-mono"
                   />
                 </div>
                 <div>
-                  <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Presiding Judge</label>
+                  <label className="block text-[#604868] mb-1 font-mono uppercase text-[10px] font-bold">Presiding Judge</label>
                   <input
                     type="text"
                     placeholder="e.g. Hon. Arthur Miller"
                     value={newMatterJudge}
                     onChange={(e) => setNewMatterJudge(e.target.value)}
-                    className="w-full bg-[#101114] border border-[#2A2B35] rounded-md px-3 py-2 text-white"
+                    className="w-full bg-[#fff7fb] border border-[#ddbfca] focus:border-[#af0a78] focus:ring-2 focus:ring-[#e040a0]/25 rounded-2xl px-3.5 py-2 text-[#281330]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Court Name</label>
+                <label className="block text-[#604868] mb-1 font-mono uppercase text-[10px] font-bold">Court Name</label>
                 <input
                   type="text"
-                  placeholder="e.g. Superior Court of California, County of Los Angeles"
+                  placeholder="e.g. Shelby Circuit Court, County of Shelby"
                   value={newMatterCourt}
                   onChange={(e) => setNewMatterCourt(e.target.value)}
-                  className="w-full bg-[#101114] border border-[#2A2B35] rounded-md px-3 py-2 text-white"
+                  className="w-full bg-[#fff7fb] border border-[#ddbfca] focus:border-[#af0a78] focus:ring-2 focus:ring-[#e040a0]/25 rounded-2xl px-3.5 py-2 text-[#281330]"
                 />
               </div>
 
               <div>
-                <label className="block text-neutral-400 mb-1 font-mono uppercase text-[10px]">Case Summary / Allegations</label>
+                <label className="block text-[#604868] mb-1 font-mono uppercase text-[10px] font-bold">Case Summary / Allegations</label>
                 <textarea
                   rows={2}
-                  placeholder="Summary of factual dispute, charges, or defense posture..."
+                  placeholder="Summary of factual dispute, allegations, or defense posture..."
                   value={newMatterSummary}
                   onChange={(e) => setNewMatterSummary(e.target.value)}
-                  className="w-full bg-[#101114] border border-[#2A2B35] rounded-md p-2 text-white"
+                  className="w-full bg-[#fff7fb] border border-[#ddbfca] focus:border-[#af0a78] focus:ring-2 focus:ring-[#e040a0]/25 rounded-2xl p-2.5 text-[#281330]"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-[#23242B] mt-4">
+              <div className="flex justify-end gap-2.5 pt-3 border-t border-[#f0d5e2] mt-4">
                 <button
                   type="button"
                   onClick={() => setShowNewMatterModal(false)}
-                  className="px-3.5 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-md text-xs"
+                  className="px-4 py-2 bg-[#fff7fb] hover:bg-[#ffd8e8] text-[#8a005e] border border-[#f0d5e2] rounded-full text-xs font-bold transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold rounded-md text-xs"
+                  className="px-5 py-2 bg-gradient-to-r from-[#e040a0] to-[#af0a78] text-white font-bold rounded-full text-xs shadow-[0_4px_16px_rgba(224,64,160,0.25)] hover:scale-[1.02] transition-transform"
                 >
                   Create Matter
                 </button>

@@ -11,7 +11,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: "#0A0B0E",
+  themeColor: "#af0a78",
 };
 
 const protectedRoutes = [
@@ -45,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" data-theme="candy" className="candy-theme">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -59,11 +59,11 @@ export default function RootLayout({
         />
         <Script src="/fetch-guard.js" strategy="afterInteractive" />
       </head>
-      <body className="bg-[#111214] text-[#e1e2e5] antialiased min-h-screen">
+      <body className="bg-[#fff7fb] text-[#281330] antialiased min-h-screen font-sans selection:bg-[#ffafd5] selection:text-[#281330]">
         <BotIdClient protect={protectedRoutes} />
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#D4AF37] focus:text-black focus:font-semibold focus:rounded focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#af0a78] focus:text-white focus:font-semibold focus:rounded-full focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#e040a0]"
         >
           Skip to main content
         </a>
