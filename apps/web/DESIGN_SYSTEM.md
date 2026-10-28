@@ -1,179 +1,66 @@
-# Acquit.ai — "Sovereign" Design System (Black & Gold)
+# Acquit.ai / Chain of Command — Design System (implementation notes)
 
-This is the canonical layout + color spec for the Acquit.ai case workspace.
-It documents what's **already implemented** in
-`src/components/mockups/acquit-case-workspace/` and fills in the pieces
-needed to make it a consistent, production-grade Web3-style system.
+**Authoritative design sources (read these first):**
 
-Tokens live in `src/index.css` under `:root` (prefixed `--sov-*`) and as
-utility classes (`.sov-panel`, `.sov-btn-gold`, etc.) in the `@layer utilities`
-block — use those instead of re-typing raw hex/rgba strings in new screens.
+| Document | Role |
+|---|---|
+| [`docs/design/DESIGN.md`](../../docs/design/DESIGN.md) | Candy — Playful & Vibrant palette, type, shape, motion |
+| [`docs/design/DIRECTION.md`](../../docs/design/DIRECTION.md) | Platform-of-places architecture + Candy-everywhere governance |
+| [`packages/shared/src/candy-tokens.css`](../../packages/shared/src/candy-tokens.css) | Single token source (`@chain-of-command/shared/candy-tokens.css`) |
+| [`apps/web/src/index.css`](./src/index.css) | App wiring: Candy tokens + legacy `--sov-*` aliases remapped to Candy |
 
----
-
-## 1. Why Black & Gold (not deep blue)
-
-Web3-style dark UIs generally work in one of two directions:
-
-- **Black & Gold** — "sovereign vault / private ledger" feel. Warm, premium,
-  authoritative. Reads as *trust + gravity* — fitting for a legal product
-  where the user is scared/stressed and needs to feel protected.
-- **Deep Blue / Indigo** — "network / protocol" feel (Coinbase, Base, most
-  DeFi dashboards). Reads as *tech + infrastructure*.
-
-**Recommendation: Black & Gold**, because:
-1. It's already ~95% implemented across all 12 existing screens (190+ uses
-   of `#D4AF37`, consistent `#0A0A0A` base, emerald secondary, glass panels,
-   gold glow shadows, serif headings).
-2. It differentiates from the sea of blue Web3/AI products.
-3. Gold-on-black reads as "your case is secured in a vault," which matches
-   the "Enclave Secured" messaging already in the sidebar.
-
-Deep blue is kept as a **secondary/future theme** (`--sov-blue`,
-`--sov-indigo` tokens exist) for a potential "Enterprise/Pro" tier toggle —
-not mixed into the primary experience.
+Where this file or any mockup conflicts with those sources, **those sources win**.
 
 ---
 
-## 2. Color Palette
+## 1. Platform identity: Candy everywhere
 
-| Role | Token | Hex | Notes |
-|---|---|---|---|
-| Base background | `--sov-void` | `#0A0A0A` | App shell, sidebar, header |
-| Raised surface | `--sov-ink` | `#0E0E0E` | Modals, popovers |
-| Alt surface | `--sov-ink-2` | `#111214` | Nested cards |
-| **Primary / Brand** | `--sov-gold` | `#D4AF37` | CTAs, active nav, glow, accents |
-| Gold soft | `--sov-gold-soft` | `#EFE6D0` | Text on light/white buttons |
-| Gold muted | `--sov-gold-muted` | `#c49f27` | Pressed state |
-| **Secondary** | `--sov-emerald` | `#174E48` | Secondary buttons, agent chat bubbles |
-| Emerald bright | `--sov-emerald-bright` | `#1f665e` | Emerald hover |
-| Success | `--sov-success` | `#34D399` | Verified / completed badges |
-| Danger | `--sov-danger` | `#FB7185` | Uncertainty / error badges |
-| Border (hairline) | — | `white/10` | All glass panel borders |
-| Text muted | — | `white/40–60` | Secondary/tertiary copy |
+The entire product uses the **Candy — Joyful Pop** theme:
 
-Glow shadows (also tokenized):
-```
---sov-glow-gold:      0 0 20px rgba(212,175,55,0.35)
---sov-glow-gold-sm:   0 0 12px rgba(212,175,55,0.25)
---sov-glow-emerald:   0 4px 20px rgba(23,78,72,0.4)
-```
+- Primary: hot pink (`#af0a78` / accent `#e040a0`)
+- Secondary: purple (`#744aa2` / `#7c52aa`)
+- Tertiary: sky blue (`#006388` / `#0096cc`)
+- Surfaces: light pink-lavender family (`#fff7fb`, `#fde7ff`, …)
+- Body type: **DM Sans** at 16px base
+- Shape: pills on buttons/badges; 16–20px radii on cards; tinted shadows
+- Motion: bouncy ease-out hover (`scale(1.03)`)
 
-## 3. Typography
+There is **no per-place color identity**. Places (Law School, Library, Draft Desk, Filing Center, Command Center) differentiate by layout, display typography, and metaphor — never by introducing new hex values.
 
-| Role | Font | Tailwind class | Used for |
-|---|---|---|---|
-| Display / headings | **Playfair Display** | `font-serif` | Page titles, section headings (`h2`, hero numbers) |
-| Body / UI | **Inter** | `font-sans` | Paragraph copy, chat text, form fields |
-| Data / labels | **JetBrains Mono** | `font-mono` | Case numbers, hashes, timestamps, badges, nav labels |
+---
 
-All three are already loaded via Google Fonts `<link>` in `index.html`;
-`src/index.css` now maps them to the `--font-serif/--font-sans/--font-mono`
-CSS variables so `font-serif`/`font-mono` utility classes resolve correctly
-(previously they fell back to Georgia/Menlo).
+## 2. Governance (enforced in review)
 
-Sizing conventions seen across screens:
-- Eyebrow labels: `text-[9-10px] font-bold tracking-widest uppercase text-[#D4AF37]`
-- Section titles: `font-serif text-[22-28px] text-white`
-- Body copy: `text-xs leading-[1.6] text-white/70`
+1. **No new hex values** in components. Use `var(--candy-*)` or Tailwind utilities mapped from Candy tokens.
+2. **One token source:** `packages/shared/src/candy-tokens.css`. Palette changes happen only there (+ `docs/design/DESIGN.md`).
+3. **Legacy Sovereign classes** (`.sov-panel`, `.sov-btn-gold`, `--sov-gold`, etc.) remain for existing markup but are **remapped to Candy** in `src/index.css`. Do not restore black/gold as a parallel theme.
+4. Empyrean (separate app) must import the same `candy-tokens.css` so the agent console matches the platform brand.
 
-## 4. Core Surface Patterns
+---
 
-**Glass panel** (`.sov-panel`) — the base card everywhere:
-```css
-background: rgba(255,255,255,0.03);
-border: 1px solid rgba(255,255,255,0.10);
-border-radius: 18px;
-backdrop-filter: blur(24px);
-```
+## 3. Places (route subtrees under `apps/web`)
 
-**Buttons** (3 tiers, all pill-shaped `rounded-full`, glow on hover):
-- `.sov-btn-gold` — primary action (solid gold, black text)
-- `.sov-btn-emerald` — secondary action (emerald fill, gold text)
-- `.sov-btn-outline` — tertiary / ghost (white/5 fill, white/20 border)
-
-**Selection state** (`.sov-selected`) — gold ring + soft glow, used for
-active carousel slide, selected agent, selected nav item.
-
-**Live indicator** (`.sov-live-dot`) — pulsing gold ping, used for
-"upcoming deadline," "active" badges, notification dots.
-
-## 5. Full App Layout Map
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│ SIDEBAR (280px, fixed, collapsible on mobile)                       │
-│  ── Brand mark (gold glow "A" mark + ACQUIT.AI / SOVEREIGN OS)      │
-│  ── WORKSPACE                                                       │
-│      Case overview · AI Lab · Google Workspace · Find an attorney   │
-│      Timeline · Documents · Filing center · Acquit Academy          │
-│  ── INTELLIGENCE                                                     │
-│      AI legal team · Law library                                    │
-│  ── Enclave Secured trust panel (glass, gold shield icon)            │
-│  ── User strip (avatar, name, role, overflow menu)                  │
-├─────────────────────────────────────────────────────────────────────┤
-│ MAIN                                                                 │
-│  Header: breadcrumb (CASES › SECTION) · docket badge · search ·      │
-│          notification bell (gold glow dot)                          │
-│                                                                       │
-│  Sub-nav tabs: Overview · Timeline · Documents · Court activity      │
-│               (gold underline + glow on active tab)                  │
-│                                                                       │
-│  ROUTES (rendered by activeNav / activeTab state):                  │
-│   • Case overview  → deadline hero card + AI assessment +            │
-│                       legal team panel + evidence summary            │
-│   • AI Lab          → 7-agent selector strip (horizontal scroll) +   │
-│                       EvidenceCarousel + timeline strip +            │
-│                       Simulation / Team Chat tabs                    │
-│   • Timeline         → CaseTimeline (vertical/branching)             │
-│   • Documents        → SovereignCylinder (full-bleed 3D doc ring)    │
-│   • Filing center    → FilingCenter (motion drafts, human-approval)  │
-│   • Find an attorney → AttorneyDirectory (filterable card grid)      │
-│   • Law library      → LawLibraryExplorer + RagCitationViewer        │
-│   • Acquit Academy   → AcquitAcademy (course carousel)               │
-│   • Google Workspace → GoogleWorkspaceIntegration                    │
-│                                                                       │
-│  Footer notice: disclaimer + "Plain English" toggle                  │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-### Carousels (Web3 "infinite feed" language) — all Embla-based
-
-| Carousel | Component | Behavior |
+| Place | Intended route | Metaphor |
 |---|---|---|
-| Evidence gallery | `EvidenceCarousel.tsx` | Autoplay 6s, loop, gold-glow on selected card, inspect modal w/ SHA-256 |
-| Document vault | `SovereignCylinder.tsx` | 3D rotating cylinder of filings, drag-to-rotate, IPFS-style CID chips |
-| Case progression | inside `AILab.tsx` | 4-up static strip (arrest → hearing → discovery → trial), gold ring on active |
-| Attorney cards | `AttorneyDirectory.tsx` | Filterable grid, could upgrade to `Carousel` primitive for mobile swipe |
-| Academy courses | `AcquitAcademy.tsx` | Course card carousel |
-| Law authorities | `LawLibraryExplorer.tsx` | Statute/case card carousel with cite-to-case action |
+| Draft Desk | `/desk` or `/draft-desk` | Hybrid editor (VS Code × Office × Acrobat × Lexis) |
+| Law Library | `/library` | Reading room; every AI claim resolves to a shelf-able source |
+| Law School | `/school` | Campus: lectures, moot court, exams, registrar |
+| Filing Center | `/filing` | State machine: draft → validate → submit → ACK → index |
+| Command Center | `/docket` + workspace | Case workspace, timeline, tasks |
+| Empyrean | separate deployment | Agent ops console |
 
-Base primitive: `src/components/ui/carousel.tsx` (shadcn wrapper over
-`embla-carousel-react`). `EvidenceCarousel` bypasses it and calls
-`useEmblaCarousel` + `embla-carousel-autoplay` directly for more control
-over per-slide styling — that's the right pattern to copy for new carousels
-that need custom slide chrome (glow rings, status badges, thumbnails).
+Ship order: **Draft Desk → Library → School** (each prior place supplies infrastructure the next consumes).
 
-## 6. Motion / Glow Rules
+---
 
-- Hover on any button: `translateY(-1px)` + glow shadow fade-in (150ms).
-- Active/selected card: persistent glow ring, slight `-translate-y-0.5`.
-- Deadline / live status: pulsing ring (`animate-ping`) behind a solid dot.
-- Modals: `animate-in fade-in duration-200` + backdrop blur.
-- Streaming AI text: blinking gold caret (`animate-pulse` bar).
+## 4. Implementation map (current)
 
-## 7. Open Gaps / Next Steps
+- Tokens + light/dark: `packages/shared/src/candy-tokens.css`
+- App CSS entry: `apps/web/src/index.css` (Candy + remapped `--sov-*` aliases + `.candy-*` / `.sov-*` utilities)
+- Historical mockups under `components/mockups/` may still contain raw black/gold classes; new screens must not copy those hexes — use Candy tokens or the remapped utilities.
 
-1. `AttorneyDirectory` and `AcquitAcademy` use flex/grid card lists, not the
-   shared `Carousel` primitive — consider migrating to `ui/carousel.tsx` +
-   `CarouselItem` for consistent swipe/keyboard nav + built-in prev/next glow
-   buttons instead of bespoke scroll containers.
-2. Some screens use raw hex (`#D4AF37`, `#174E48`) inline; new components
-   should reference the CSS vars (`var(--sov-gold)`) or the new utility
-   classes (`.sov-btn-gold`, `.sov-panel`) added in `src/index.css` so a
-   future rebrand (e.g. the deep-blue Pro theme) is a one-file change.
-3. `--radius` is currently `.5rem` globally (shadcn default) while the
-   Sovereign screens hand-round everything to `12–18px` via arbitrary
-   values (`rounded-[14px]`, `rounded-[18px]`) — worth promoting `14px`/
-   `18px` to named radius tokens (`--radius-sov-sm` / `--radius-sov-lg`) so
-   card rounding is consistent without hunting arbitrary values.
+---
+
+## 5. Historical note (Sovereign black & gold)
+
+An earlier "Sovereign" black-and-gold Web3 register existed in mockups and this file. It is **retired as the product skin**. References to `#D4AF37`, `#0A0A0A`, and "vault" gold are legacy only; they are overridden at the token layer so existing components render in Candy without a full rewrite.
