@@ -1,75 +1,75 @@
 # Law Library — Hybrid Legal Search (Supabase)
 
-**Goal:** Make `/library` a reading-room surface backed by retrieval that approaches LexisNexis-class *search quality* for pro se and internal agents — not a full commercial reporter license.
+Educational tool only. Not a substitute for a licensed attorney or commercial databases for court filing authority.
 
-Educational tool only. Not a substitute for a licensed attorney or licensed commercial databases for court filing authority.
-
-## What already exists
-
-| Layer | Location | Status |
-|-------|----------|--------|
-| Design doctrine (places + Candy) | `docs/design/DIRECTION.md`, `docs/design/DESIGN.md` | Authoritative |
-| Candy tokens | `packages/shared/src/candy-tokens.css` | Single source |
-| Corpus table + hybrid RPC | `supabase/migrations/20261028223000_legal_corpus_hybrid_search.sql` | Applied |
-| Citation / grounding helpers | `packages/legal-library` | Present |
-| Retriever service | `packages/rag-engine/src/retriever.ts` | Needs RPC name alignment |
-| Search client | `packages/rag-engine/src/supabaseSearch.ts` | **Uses `hybrid_legal_search` + `lexical_legal_search`** |
-
-### Schema (summary)
-
-- `public.legal_corpus` — jurisdiction, source_type, citation, title, content, `embedding vector(1536)`, generated `fts`
-- Indexes: HNSW on embedding, GIN on fts, jurisdiction
-- RLS: public **read** for anon/authenticated; no client writes
-- RPCs:
-  - `hybrid_legal_search(query_text, query_embedding, match_threshold, match_count, filter_jurisdiction)`
-  - `lexical_legal_search(query_text, match_count, filter_jurisdiction)` — citation/keyword path without embeddings
-
-## Architecture (Lexis-class pipeline)
+## Pipeline (shipped)
 
 ```
-User query (Law Library UI)
-    → embed (text-embedding-3-small, 1536)
-    → hybrid_legal_search (0.7 dense + 0.3 FTS)
-    → optional rerank (Cohere / cross-encoder)
-    → top-k passages into LLM with strict "cite only provided context"
-    → packages/legal-library grounding-guard validates citations
+Ingest (scripts/ingest_legal_corpus.py --seed)
+  → section/holding chunks + text-embedding-3-small (1536)
+  → public.legal_corpus
+
+UI /library → searchLegalCorpus(query, jurisdiction)
+  → hybrid_legal_search top-20 (or lexical fallback)
+  → Cohere rerank → top-5 (optional COHERE_API_KEY)
+  → Volume cards + citation chips + Open Volume reader
+
+Agent answers → searchAndGroundAnswer / groundAnswer
+  → packages/legal-library grounding guard
 ```
 
-Lexical path for exact citations (`PC 1538.5`, `Brady v. Maryland`) uses `lexical_legal_search` first or in parallel.
+## Files
 
-## What still must be built to rival commercial search *in practice*
+| Piece | Path |
+|-------|------|
+| Migration (hybrid + lexical RPCs) | `supabase/migrations/20261028223000_legal_corpus_hybrid_search.sql` |
+| Python ingest + chunking + CourtListener | `scripts/ingest_legal_corpus.py` |
+| Node JSONL ingest (legacy) | `scripts/ingest-legal-corpus.mjs` |
+| Seed CA PC + FRCP | `data/legal_corpus/seed_ca_pc_frcp.jsonl` |
+| Server actions | `apps/web/src/app/actions/legal-search.ts` |
+| Library UI | `apps/web/src/app/library/` |
+| Grounding | `packages/legal-library/src/ground-answer.ts` |
+| Design | `docs/design/DIRECTION.md`, Candy tokens |
 
-1. **Corpus ingestion (critical)**  
-   Empty table ⇒ empty library. Ingest:
-   - CA Penal Code / Evidence Code (official or public-domain consolidations)
-   - Federal Rules of Criminal Procedure
-   - Selected CourtListener opinions for target jurisdictions  
-   Script target: `scripts/ingest_legal_corpus.py` (embed + upsert on `(jurisdiction, citation)`).
+## Run ingest locally
 
-2. **Chunking strategy**  
-   Prefer section-level statutes and holding-sized opinion chunks (not whole documents). Store parent citation on every row.
+```bash
+cd ~/Development/Repos/Chain-of-Command
+export OPENAI_API_KEY=...
+export SUPABASE_URL=...          # or NEXT_PUBLIC_SUPABASE_URL
+export SUPABASE_SERVICE_ROLE_KEY=...
 
-3. **Rerank stage**  
-   After hybrid top-20, rerank to top-5 before synthesis.
+python3 scripts/ingest_legal_corpus.py --seed
 
-4. **UI place**  
-   Route `/library` under Candy tokens: Search the Stacks, Volume cards, Open Volume reader, Research Brief with verified citation chips only.
-
-5. **Agent contract**  
-   Every in-app agent answer that cites law must pass `packages/legal-library` grounding; unresolved cites are stripped or flagged.
-
-## Quick test (SQL)
-
-After corpus has rows with embeddings:
-
-```sql
--- Lexical smoke test
-select citation, title, fts_rank
-from lexical_legal_search('1538.5', 5, 'CA');
+# Optional opinions
+export COURTLISTENER_TOKEN=...
+python3 scripts/ingest_legal_corpus.py --courtlistener --query "search and seizure" --pages 2
 ```
 
-## Governance
+## Search API (server action)
 
-- In-app agents only (apps/api, packages/rag-engine, packages/legal-library).
-- Out-of-app DevOps agents in `agent/` must not use production service role against user matters; corpus read is public legal text only.
-- Candy theme only — no one-off library color schemes (`docs/design/DIRECTION.md`).
+```ts
+import { searchLegalCorpus, searchAndGroundAnswer } from '@/app/actions/legal-search'
+
+const hits = await searchLegalCorpus('PC 1538.5', 'CA')
+// hits.results length ≤ 5 after rerank
+
+const grounded = await searchAndGroundAnswer(
+  'suppression motion',
+  'Under Cal. Penal Code § 1538.5 a defendant may move to suppress...',
+  'CA',
+)
+```
+
+## Env
+
+| Variable | Role |
+|----------|------|
+| `OPENAI_API_KEY` | Embeddings (hybrid mode) |
+| `SUPABASE_URL` / service role | Corpus read/write |
+| `COHERE_API_KEY` | Optional rerank; without it top-5 from hybrid order |
+| `COURTLISTENER_TOKEN` | Optional opinion pull |
+
+## UI
+
+Open **`/library`** after `pnpm dev` in `apps/web`. Candy tokens only — no ad-hoc palette.
