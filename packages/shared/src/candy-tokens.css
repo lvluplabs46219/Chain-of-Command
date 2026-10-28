@@ -1,0 +1,137 @@
+/* ==========================================================================
+   Candy — Playful & Vibrant: platform design tokens
+   Authoritative source: docs/design/DESIGN.md
+   Consumed by: apps/web (Tailwind v4 @theme), empyrean dashboard, packages/ui-kit
+   Governance: docs/design/DIRECTION.md §3 — no color may be introduced
+   outside these tokens anywhere in the platform.
+   ========================================================================== */
+
+:root,
+[data-theme="light"] {
+  --candy-mode: "light";
+  --candy-surface: #fff7fb;
+  --candy-surface-dim: #efd0f7;
+  --candy-surface-bright: #fff7fb;
+  --candy-surface-lowest: #ffffff;
+  --candy-surface-low: #ffefff;
+  --candy-surface-container: #fde7ff;
+  --candy-surface-container-high: #fae0ff;
+  --candy-surface-container-highest: #f8d8ff;
+  --candy-on-surface: #281330;
+  --candy-on-surface-variant: #57414a;
+  --candy-inverse-surface: #3e2846;
+  --candy-inverse-on-surface: #feebff;
+  --candy-outline: #8a707b;
+  --candy-outline-variant: #ddbfca;
+  --candy-surface-tint: #b2107b;
+  --candy-primary: #af0a78;
+  --candy-primary-accent: #e040a0;
+  --candy-on-primary: #ffffff;
+  --candy-primary-container: #cf3192;
+  --candy-on-primary-container: #fffbff;
+  --candy-inverse-primary: #ffafd5;
+  --candy-primary-fixed: #ffd8e8;
+  --candy-primary-fixed-dim: #ffafd5;
+  --candy-on-primary-fixed: #3d0027;
+  --candy-on-primary-fixed-variant: #8a005e;
+  --candy-secondary: #744aa2;
+  --candy-secondary-accent: #7c52aa;
+  --candy-on-secondary: #ffffff;
+  --candy-secondary-container: #cda0fe;
+  --candy-on-secondary-container: #5a3086;
+  --candy-secondary-fixed: #efdbff;
+  --candy-secondary-fixed-dim: #dbb8ff;
+  --candy-on-secondary-fixed: #2b0052;
+  --candy-on-secondary-fixed-variant: #5b3188;
+  --candy-tertiary: #006388;
+  --candy-tertiary-accent: #0096cc;
+  --candy-on-tertiary: #ffffff;
+  --candy-tertiary-container: #007dab;
+  --candy-on-tertiary-container: #fcfcff;
+  --candy-tertiary-fixed: #c5e7ff;
+  --candy-tertiary-fixed-dim: #7ed0ff;
+  --candy-on-tertiary-fixed: #001e2d;
+  --candy-on-tertiary-fixed-variant: #004c6a;
+  --candy-error: #ba1a1a;
+  --candy-on-error: #ffffff;
+  --candy-error-container: #ffdad6;
+  --candy-on-error-container: #93000a;
+  --candy-neutral: #604868;
+  --candy-background: #fff7fb;
+  --candy-on-background: #281330;
+  --candy-surface-variant: #f8d8ff;
+  --candy-card-bg: #ffffff;
+  --candy-card-border: #f8d8ff;
+  --candy-shadow-primary: 0 4px 16px rgba(224, 64, 160, 0.22);
+  --candy-shadow-card: 0 6px 20px rgba(116, 74, 162, 0.08);
+  --candy-shadow-hover: 0 8px 24px rgba(224, 64, 160, 0.28);
+  --candy-online: #10b981;
+  --candy-check: #10b981;
+  --font-candy: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Radii (rem): sm 0.5 / default 1 / md 1.5 / lg 2 / xl 3 / full pill */
+  --candy-radius-sm: 0.5rem;
+  --candy-radius: 1rem;
+  --candy-radius-md: 1.5rem;
+  --candy-radius-lg: 2rem;
+  --candy-radius-xl: 3rem;
+  --candy-radius-full: 9999px;
+
+  /* Spacing */
+  --candy-space-xs: 0.25rem;
+  --candy-space-sm: 0.5rem;
+  --candy-space-md: 1rem;
+  --candy-space-lg: 1.5rem;
+  --candy-space-xl: 2rem;
+}
+
+[data-theme="dark"] {
+  --candy-mode: "dark";
+  --candy-surface: #1d0e23;
+  --candy-surface-dim: #16081b;
+  --candy-surface-bright: #291432;
+  --candy-surface-lowest: #140718;
+  --candy-surface-low: #22102a;
+  --candy-surface-container: #2c1536;
+  --candy-surface-container-high: #371a43;
+  --candy-surface-container-highest: #432052;
+  --candy-on-surface: #feebff;
+  --candy-on-surface-variant: #e0bfd2;
+  --candy-inverse-surface: #fde7ff;
+  --candy-inverse-on-surface: #281330;
+  --candy-outline: #77566a;
+  --candy-outline-variant: #492a3e;
+  --candy-surface-tint: #ff75c8;
+  --candy-primary: #ff4db8;
+  --candy-primary-accent: #e040a0;
+  --candy-on-primary: #ffffff;
+  --candy-primary-container: #930864;
+  --candy-on-primary-container: #ffd8e8;
+  --candy-inverse-primary: #af0a78;
+  --candy-secondary: #cda0fe;
+  --candy-secondary-accent: #9d6ee8;
+  --candy-on-secondary: #2b0052;
+  --candy-secondary-container: #5a3086;
+  --candy-on-secondary-container: #efdbff;
+  --candy-tertiary: #56ccf2;
+  --candy-tertiary-accent: #0096cc;
+  --candy-on-tertiary: #001e2d;
+  --candy-tertiary-container: #004c6a;
+  --candy-on-tertiary-container: #c5e7ff;
+  --candy-error: #ffb4ab;
+  --candy-on-error: #690005;
+  --candy-error-container: #93000a;
+  --candy-on-error-container: #ffdad6;
+  --candy-neutral: #e0bfd2;
+  --candy-background: #170a1b;
+  --candy-on-background: #feebff;
+  --candy-surface-variant: #3a1c46;
+  --candy-card-bg: #271330;
+  --candy-card-border: #442154;
+  --candy-shadow-primary: 0 4px 18px rgba(224, 64, 160, 0.4);
+  --candy-shadow-card: 0 6px 20px rgba(0, 0, 0, 0.4);
+  --candy-shadow-hover: 0 8px 26px rgba(224, 64, 160, 0.45);
+  --candy-online: #34d399;
+  --candy-check: #34d399;
+}

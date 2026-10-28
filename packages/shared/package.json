@@ -7,7 +7,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./errors": "./src/errors.ts",
-    "./envelope": "./src/envelope.ts"
+    "./envelope": "./src/envelope.ts",
+    "./candy-tokens.css": "./src/candy-tokens.css"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
