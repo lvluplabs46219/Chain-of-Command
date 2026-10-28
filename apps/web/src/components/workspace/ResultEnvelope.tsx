@@ -15,19 +15,36 @@ import {
 } from "lucide-react";
 
 export interface CitationItem {
-  statuteOrRule: string;
+  /** Stable id when available (research / RAG rows). */
+  id?: string;
+  /** Primary authority label (legacy ResultEnvelope field). */
+  statuteOrRule?: string;
+  /** Alternate authority label used by research workbench. */
+  authority?: string;
+  pinpoint?: string;
+  jurisdiction?: string;
+  tier?: number;
+  status?: string;
   sourceUrl?: string;
   summary: string;
-  confidenceScore: number;
-  provenance: "SOURCE_PUBLIC" | "SOURCE_COURT" | "SOURCE_USER" | "SOURCE_AI";
+  confidenceScore?: number;
+  provenance?: "SOURCE_PUBLIC" | "SOURCE_COURT" | "SOURCE_USER" | "SOURCE_AI";
 }
 
 interface ResultEnvelopeProps {
-  envelopeType: "Analysis" | "Information" | "Draft" | "Procedural Checklist" | "Synthesis";
-  title: string;
+  /** Preferred typed envelope kind. Falls back from `label` when omitted. */
+  envelopeType?: "Analysis" | "Information" | "Draft" | "Procedural Checklist" | "Synthesis";
+  /** Research workbench alias for envelopeType. */
+  label?: string;
+  title?: string;
   agentName: string;
-  timestamp: string;
+  agentId?: string;
+  timestamp?: string;
   citations: CitationItem[];
+  groundingStatus?: "grounded" | "partially_grounded" | "ungrounded";
+  confidence?: string;
+  confidenceBasis?: string;
+  whatWeCouldNotVerify?: string;
   requiresHumanReview?: boolean;
   /** Softer banner — prefer global footer for full legal text */
   compactDisclaimer?: boolean;
@@ -36,15 +53,38 @@ interface ResultEnvelopeProps {
 
 export function ResultEnvelope({
   envelopeType,
+  label,
   title,
   agentName,
+  agentId,
   timestamp,
   citations,
+  groundingStatus,
+  confidence,
+  confidenceBasis,
+  whatWeCouldNotVerify,
   requiresHumanReview = true,
   compactDisclaimer = false,
   children,
 }: ResultEnvelopeProps) {
   const [showSources, setShowSources] = useState(false);
+
+  const resolvedType: "Analysis" | "Information" | "Draft" | "Procedural Checklist" | "Synthesis" =
+    envelopeType ??
+    (label === "Information" ||
+    label === "Draft" ||
+    label === "Procedural Checklist" ||
+    label === "Synthesis"
+      ? label
+      : "Analysis");
+
+  const resolvedTitle =
+    title ??
+    (groundingStatus
+      ? `Grounding: ${groundingStatus.replace(/_/g, " ")}`
+      : label ?? "Result");
+
+  const resolvedTimestamp = timestamp ?? new Date().toLocaleString();
 
   const typeColorMap = {
     Analysis: "border-sky-500/40 bg-sky-950/20 text-sky-400",
@@ -86,17 +126,17 @@ export function ResultEnvelope({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span
-              className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${typeColorMap[envelopeType]}`}
+              className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${typeColorMap[resolvedType]}`}
             >
-              {envelopeType}
+              {resolvedType}
             </span>
             <span className="text-xs text-neutral-400 flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              {timestamp}
+              {resolvedTimestamp}
             </span>
             <span className="text-xs text-neutral-400">· via {agentName}</span>
           </div>
-          <h3 className="text-base sm:text-lg font-bold text-white">{title}</h3>
+          <h3 className="text-base sm:text-lg font-bold text-white">{resolvedTitle}</h3>
         </div>
 
         {/* Citations Count / Toggle */}
@@ -134,21 +174,21 @@ export function ResultEnvelope({
               >
                 <div className="flex items-center justify-between">
                   <span className="font-mono font-semibold text-[#D4AF37]">
-                    {c.statuteOrRule}
+                    {c.statuteOrRule || c.authority || "Authority"}
                   </span>
                   <span
                     className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-mono ${
-                      c.confidenceScore >= 0.9
+                      (c.confidenceScore ?? 0.8) >= 0.9
                         ? "bg-emerald-950/50 text-emerald-400 border border-emerald-800/40"
                         : "bg-amber-950/50 text-amber-400 border border-amber-800/40"
                     }`}
                   >
-                    Conf: {(c.confidenceScore * 100).toFixed(0)}%
+                    Conf: {(((c.confidenceScore ?? 0.8) * 100)).toFixed(0)}%
                   </span>
                 </div>
                 <p className="text-neutral-400 text-xs leading-relaxed">{c.summary}</p>
                 <div className="flex items-center justify-between pt-1 border-t border-[#1F2027] text-[11px]">
-                  <span className="text-neutral-500 font-mono text-[10px]">{c.provenance}</span>
+                  <span className="text-neutral-500 font-mono text-[10px]">{c.provenance || c.status || "SOURCE_PUBLIC"}</span>
                   {c.sourceUrl && (
                     <a
                       href={c.sourceUrl}

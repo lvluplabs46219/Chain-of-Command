@@ -83,19 +83,21 @@ export async function bootstrapWorkspaceSession(opts?: {
       if (!tenantErr && tenant?.id) {
         tenantId = tenant.id as string;
 
-        await admin
-          .from("users")
-          .upsert(
-            {
-              auth_id: userId,
-              email: user.email || `${userId}@anon.local`,
-              full_name: displayName,
-              tenant_id: tenantId,
-            },
-            { onConflict: "auth_id" }
-          )
-          .then(() => undefined)
-          .catch(() => undefined);
+        try {
+          await admin
+            .from("users")
+            .upsert(
+              {
+                auth_id: userId,
+                email: user.email || `${userId}@anon.local`,
+                full_name: displayName,
+                tenant_id: tenantId,
+              },
+              { onConflict: "auth_id" }
+            );
+        } catch {
+          /* ignore bootstrap user upsert failures */
+        }
 
         const { data: matter } = await admin
           .from("matters")

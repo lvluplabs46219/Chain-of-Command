@@ -76,3 +76,15 @@ export interface AuditWriteInput {
   errorCode?: string;
   metadata?: Record<string, unknown>;
 }
+
+
+/** Explicit human approval bound to a concrete external action + payload. */
+export interface HumanApproval {
+  id: string;
+  approvedBy: string;
+  approvedAt: string; // ISO timestamptz
+  actionName: string;
+  payloadHash: string;
+  expiresAt?: string;
+  note?: string;
+}

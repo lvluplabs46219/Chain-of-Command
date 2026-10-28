@@ -36,7 +36,8 @@ export type WorkspaceTab =
   | "directory"
   | "tasks"
   | "audit"
-  | "archive";
+  | "archive"
+  | "courtroom_3d";
 
 interface WorkspaceNavigationProps {
   activeTab: WorkspaceTab;
@@ -57,6 +58,7 @@ export const TAB_ROUTES: Record<WorkspaceTab, string> = {
   tasks: "/tasks",
   audit: "/audit",
   archive: "/archive",
+  courtroom_3d: "/courtroom-3d",
 };
 
 export function pathToTab(pathname: string): WorkspaceTab | null {

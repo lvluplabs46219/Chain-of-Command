@@ -16,7 +16,7 @@ export const LegalCitationSchema = z.object({
   chunkText: z.string(),
   similarityScore: z.number().min(0).max(1),
   sourceType: z.enum(['SOURCE_PUBLIC', 'SOURCE_USER', 'SOURCE_COURT']),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 export type LegalCitation = z.infer<typeof LegalCitationSchema>;
 
