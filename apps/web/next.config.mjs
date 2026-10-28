@@ -30,8 +30,8 @@ const nextConfig = {
     '@chain-of-command/audit',
     '@chain-of-command/model-gateway',
     '@chain-of-command/auth',
-    '@chain-of-command/rag-engine',
-    '@chain-of-command/database',
+    '@workspace/rag-engine',
+    '@workspace/db',
   ],
   reactStrictMode: true,
   allowedDevOrigins: ['*.run.app', '*.us-east1.run.app', '*.cloudrun.app', '*.google.com', '*.googleusercontent.com', 'localhost:3000', '127.0.0.1:3000'],
@@ -42,15 +42,20 @@ const nextConfig = {
     cpus: 1,
   },
   async rewrites() {
+    const rules = [
+      {
+        // Empyrean multi-agent daemon (apps/empyrean). Override with EMPYREAN_URL.
+        source: '/empyrean-api/:path*',
+        destination: `${(process.env.EMPYREAN_URL || 'http://localhost:3100').replace(/\/+$/, '')}/api/:path*`,
+      },
+    ];
     if (process.env.API_URL?.trim()) {
-      return [
-        {
-          source: '/api/external/:path*',
-          destination: getApiDestination(),
-        },
-      ];
+      rules.push({
+        source: '/api/external/:path*',
+        destination: getApiDestination(),
+      });
     }
-    return [];
+    return rules;
   },
   async headers() {
     return [
