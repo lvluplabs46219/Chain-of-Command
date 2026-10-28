@@ -29,6 +29,7 @@ import {
   Gavel,
 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
+import { LegalCorpusSearch } from "./LegalCorpusSearch";
 
 interface LibraryViewProps {
   evidence?: EvidenceRecord[];
@@ -62,7 +63,7 @@ type ClResult = {
 };
 
 export function LibraryView({ evidence = INITIAL_EVIDENCE_RECORDS, matter }: LibraryViewProps) {
-  const [activeSubTab, setActiveSubTab] = useState<"rag_search" | "case_law" | "precedents">("case_law");
+  const [activeSubTab, setActiveSubTab] = useState<"rag_search" | "case_law" | "corpus" | "precedents">("case_law");
 
   // RAG Search State
   const [ragQuery, setRagQuery] = useState<string>("");
@@ -362,6 +363,18 @@ export function LibraryView({ evidence = INITIAL_EVIDENCE_RECORDS, matter }: Lib
             <BookOpen className="w-3.5 h-3.5" />
             <span>Curated Precedents</span>
           </button>
+          <button
+            onClick={() => setActiveSubTab("corpus")}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+              activeSubTab === "corpus"
+                ? "bg-[#D4AF37] text-neutral-950 font-semibold shadow-sm"
+                : "text-neutral-400 hover:text-white"
+            }`}
+          >
+            <Scale className="w-3.5 h-3.5" />
+            <span>Legal Corpus</span>
+          </button>
+
         </div>
       </div>
 
@@ -714,6 +727,10 @@ export function LibraryView({ evidence = INITIAL_EVIDENCE_RECORDS, matter }: Lib
       )}
 
       {/* SUB-TAB 2: STATUTES, PRECEDENTS & CITATION VALIDATOR */}
+      {activeSubTab === "corpus" && (
+        <LegalCorpusSearch jurisdiction={matter?.jurisdiction} />
+      )}
+
       {activeSubTab === "precedents" && (
         <div className="space-y-6">
           {/* Citation Grounding Validator Bar */}
