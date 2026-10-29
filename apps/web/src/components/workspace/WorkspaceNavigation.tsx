@@ -135,6 +135,14 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
         <NavFeatureCarousel className="flex-1" />
         <div className="flex items-center gap-2 shrink-0">
           <Link
+            href="/playground"
+            className="candy-badge candy-badge-ai flex items-center gap-1.5 text-[11px] font-bold hover:opacity-90 transition-all"
+            title="Chambers Playground — Empyrean-style legal AI team with chain-of-command routing"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-400 animate-pulse" />
+            <span>Chambers Playground</span>
+          </Link>
+          <Link
             href="/vericue"
             className="candy-badge candy-badge-ai flex items-center gap-1.5 text-[11px] font-bold hover:opacity-90 transition-all"
             title="VeriCue AI — Forensic Telemetry Console"
