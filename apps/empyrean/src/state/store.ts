@@ -182,11 +182,40 @@ export class StateStore {
       contextSize: 8192,
     },
     slots: [
-      { id: "slot-01", name: "qwen2.5:7b (Primary Local)", backend: "ollama", status: "active", vramUsageGb: 4.8, contextWindow: 8192, tokensPerSec: 64.2 },
-      { id: "slot-02", name: "gemini-2.0-flash (Seraphim Cloud)", backend: "vertex", status: "active", vramUsageGb: 0.0, contextWindow: 32768, tokensPerSec: 120.5 },
-      { id: "slot-03", name: "mistral-large (Oracle 2)", backend: "vllm", status: "standby", vramUsageGb: 12.1, contextWindow: 16384, tokensPerSec: 42.1 },
-      { id: "slot-04", name: "llama3.2:3b (NPU Accelerated)", backend: "lemonade", status: "standby", vramUsageGb: 2.2, contextWindow: 4096, tokensPerSec: 88.0 },
+      { id: "slot-01", name: "hermes3:8b (Primary Local Ollama)", backend: "ollama", status: "active", vramUsageGb: 4.8, contextWindow: 8192, tokensPerSec: 68.4 },
+      { id: "slot-02", name: "hermes3:70b (Heavy Tier Hermes Cloud)", backend: "lemonade", status: "active", vramUsageGb: 0.0, contextWindow: 32768, tokensPerSec: 135.2 },
+      { id: "slot-03", name: "nous-hermes-2-solar:10.7b (Oracle Standby)", backend: "vllm", status: "standby", vramUsageGb: 6.8, contextWindow: 16384, tokensPerSec: 52.1 },
+      { id: "slot-04", name: "hermes-3-llama-3.1-8b (NPU Accelerated)", backend: "lemonade", status: "standby", vramUsageGb: 2.4, contextWindow: 4096, tokensPerSec: 92.0 },
     ],
+  };
+
+  private coreSettings = {
+    ctx_size: -1,
+    models_dir: "auto",
+    extra_models_dir: "",
+    broadcast: true,
+    default_model_source: "huggingface",
+    download_rate_limit: "",
+    offline: false,
+    auto_check_model_updates: true,
+  };
+
+  private runtimeOptions = {
+    host: process.env.LEMONADE_HOST ?? "127.0.0.1",
+    port: Number(process.env.LEMONADE_PORT ?? 13305),
+    api_key: process.env.LEMONADE_API_KEY ?? "",
+    max_loaded_models: 1,
+    llamacpp_bin_path: "auto",
+  };
+
+  private hermesSettings = {
+    yhwhModel: process.env.YHWH_MODEL ?? "hermes3:8b",
+    ollamaUrl: process.env.OLLAMA_URL ?? "http://127.0.0.1:11434",
+    hermesBaseUrl: process.env.HERMES_BASE_URL ?? "",
+    hermesApiKey: process.env.HERMES_API_KEY ?? "",
+    seraphimEnabled: process.env.SERAPHIM_ENABLED === "true",
+    seraphimModel: process.env.SERAPHIM_MODEL ?? "hermes3:70b",
+    gabrielWebhook: process.env.GABRIEL_WEBHOOKS ?? "http://localhost:3000/api/webhooks/gabriel",
   };
 
   constructor() {
@@ -197,6 +226,50 @@ export class StateStore {
     this.seedTriggers();
     this.seedCalls();
     this.seedTelegramMessages();
+  }
+
+  getFullSettings() {
+    return {
+      core: { ...this.coreSettings },
+      runtime: { ...this.runtimeOptions },
+      hermes: { ...this.hermesSettings },
+      parameters: { ...this.lemonade.parameters },
+      slots: [...this.lemonade.slots],
+    };
+  }
+
+  updateFullSettings(patch: any) {
+    if (patch.core) Object.assign(this.coreSettings, patch.core);
+    if (patch.runtime) {
+      Object.assign(this.runtimeOptions, patch.runtime);
+      if (patch.runtime.host) process.env.LEMONADE_HOST = patch.runtime.host;
+      if (patch.runtime.port) process.env.LEMONADE_PORT = String(patch.runtime.port);
+      if (patch.runtime.api_key) process.env.LEMONADE_API_KEY = patch.runtime.api_key;
+    }
+    if (patch.hermes) {
+      Object.assign(this.hermesSettings, patch.hermes);
+      if (patch.hermes.yhwhModel) {
+        process.env.YHWH_MODEL = patch.hermes.yhwhModel;
+        const yhwhAgent = this.agents.get("yhwh");
+        if (yhwhAgent) yhwhAgent.model = patch.hermes.yhwhModel;
+      }
+      if (patch.hermes.ollamaUrl) process.env.OLLAMA_URL = patch.hermes.ollamaUrl;
+      if (patch.hermes.hermesBaseUrl !== undefined) process.env.HERMES_BASE_URL = patch.hermes.hermesBaseUrl;
+      if (patch.hermes.hermesApiKey !== undefined) process.env.HERMES_API_KEY = patch.hermes.hermesApiKey;
+      if (patch.hermes.seraphimEnabled !== undefined) {
+        process.env.SERAPHIM_ENABLED = String(patch.hermes.seraphimEnabled);
+        const seraphimAgent = this.agents.get("seraphim");
+        if (seraphimAgent) seraphimAgent.status = patch.hermes.seraphimEnabled ? "active" : "idle";
+      }
+      if (patch.hermes.seraphimModel) {
+        process.env.SERAPHIM_MODEL = patch.hermes.seraphimModel;
+        const seraphimAgent = this.agents.get("seraphim");
+        if (seraphimAgent) seraphimAgent.model = patch.hermes.seraphimModel;
+      }
+      if (patch.hermes.gabrielWebhook) process.env.GABRIEL_WEBHOOKS = patch.hermes.gabrielWebhook;
+    }
+    if (patch.parameters) Object.assign(this.lemonade.parameters, patch.parameters);
+    return this.getFullSettings();
   }
 
   getLemonadeStatus(): LemonadeStatus {
@@ -226,11 +299,11 @@ export class StateStore {
         tier: "reason",
         description: "Triage coordinator and reasoning engine. Analyzes complex user intent and breaks requests into executable DAG execution trees.",
         provider: "ollama",
-        model: process.env.YHWH_MODEL ?? "qwen2.5:7b",
+        model: process.env.YHWH_MODEL ?? "hermes3:8b",
         target_kinds: ["llm.reason"],
         status: "active",
         last_heartbeat: new Date().toISOString(),
-        notes: "Primary orchestrating intelligence; local Ollama / Gemini fallback active",
+        notes: "Primary orchestrating intelligence; local Ollama Hermes / online Hermes fallback active",
         sort_order: 1,
       },
       {
@@ -295,12 +368,12 @@ export class StateStore {
         role_title: "External Cloud LLM Council & Deep Research",
         tier: "external",
         description: "Cloud reasoning pool: Google Gemini 2.0 Flash / Vertex AI, OpenAI GPT-4o, Anthropic Claude 3.5, and Mistral Large.",
-        provider: "vertex",
-        model: process.env.SERAPHIM_MODEL ?? "gemini-2.0-flash",
+        provider: "external",
+        model: process.env.SERAPHIM_MODEL ?? "hermes3:70b",
         target_kinds: ["llm.reason"],
-        status: "active",
+        status: process.env.SERAPHIM_ENABLED === "true" ? "active" : "idle",
         last_heartbeat: new Date().toISOString(),
-        notes: "Multi-oracle consensus and deep analysis enabled",
+        notes: "Hermes OpenAI-compatible heavy reasoning tier (OpenRouter / Nous)",
         sort_order: 6,
       },
     ];

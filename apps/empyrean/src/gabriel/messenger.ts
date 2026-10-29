@@ -1,60 +1,29 @@
 // Gabriel — Messenger Specialists.
 // Event-driven delivery: records events to the state log and fans out webhooks.
-import { StateStore } from "../state/store.js";
 import { Envelope, Event, envelope, log } from "../protocol/types.js";
-
-export interface EmitMessageOptions {
-  topic: string;
-  data: unknown;
-}
+import { StateStore } from "../state/store.js";
 
 export class Gabriel {
   constructor(private store: StateStore) {}
 
-  /** Record an event locally, then fan it out to configured webhooks. */
-  async emit(options: EmitMessageOptions): Promise<{ delivered: boolean; timestamp: string }> {
-    const timestamp = new Date().toISOString();
-    const webhookSetting = process.env.GABRIEL_WEBHOOKS ?? process.env.GABRIEL_WEBHOOK_URL ?? "";
-    const urls = webhookSetting.split(",").map((url) => url.trim()).filter(Boolean);
-    let deliveredCount = 0;
-
-    log("info", "gabriel", "emit", { topic: options.topic, timestamp, webhookCount: urls.length });
-
-    const event: Event = {
-      topic: options.topic,
-      data: options.data && typeof options.data === "object" && !Array.isArray(options.data)
-        ? options.data as Record<string, unknown>
-        : { value: options.data },
-    };
-
-    const results = await Promise.allSettled(
-      urls.map(async (url) => {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10_000);
+  /** Record + fan out an event. */
+  async emit(event: Event): Promise<{ topic: string; delivered: number }> {
+    this.store.appendEvent(event.topic, event.data);
+    const hooks = (process.env.GABRIEL_WEBHOOKS ?? "").split(",").map((h) => h.trim()).filter(Boolean);
+    const settled = await Promise.allSettled(
+      hooks.map(async (hook) => {
         try {
-          const response = await fetch(url, {
+          await fetch(hook, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(envelope("event", "gabriel", "external", event)),
-            signal: controller.signal,
           });
-          if (!response.ok) {
-            log("warn", "gabriel", "webhook_failed", { url, status: response.status });
-            return false;
-          }
-          return true;
-        } catch (error) {
-          log("warn", "gabriel", "webhook_error", { url, error: String(error) });
-          return false;
-        } finally {
-          clearTimeout(timeout);
+        } catch (e) {
+          log("warn", "gabriel", "webhook_failed", { hook, error: String(e) });
         }
       })
     );
-    deliveredCount = results.filter((result) => result.status === "fulfilled" && result.value).length;
-
-    this.store.appendEvent(options.topic, event.data, "gabriel", undefined, deliveredCount);
-    return { delivered: deliveredCount > 0, timestamp };
+    return { topic: event.topic, delivered: settled.filter((s) => s.status === "fulfilled").length };
   }
 
   /** Deliver an execution-context payload to a named target. */
