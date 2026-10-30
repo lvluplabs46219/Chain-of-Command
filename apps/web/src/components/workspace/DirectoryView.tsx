@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Link from "next/link";
 import {
   Users,
   Bot,
@@ -157,6 +158,19 @@ export function DirectoryView({
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+
+      <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-r from-[#2a1535]/80 to-[#141018] px-4 py-3">
+        <div>
+          <p className="text-sm font-bold text-white">3D AI Lawyer Rolodex</p>
+          <p className="text-xs text-neutral-400">Spin through every legal AI worker, skill, and specialist on your team.</p>
+        </div>
+        <Link
+          href="/directory/rolodex"
+          className="shrink-0 inline-flex items-center justify-center rounded-full bg-[#D4AF37] px-4 py-2 text-xs font-bold text-neutral-950 hover:bg-[#c49f27]"
+        >
+          Open 3D Directory
+        </Link>
+      </div>
       {/* Top Notification Toast */}
       {hiredToast && (
         <div className="fixed top-20 right-6 z-50 bg-gradient-to-r from-[#e040a0] to-[#af0a78] text-white px-5 py-3 rounded-full shadow-2xl font-bold text-xs flex items-center gap-2 animate-bounce">

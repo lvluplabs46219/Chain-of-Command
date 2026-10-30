@@ -288,14 +288,58 @@ export function ChambersPlayground() {
             <div className="font-extrabold text-lg truncate"><span style={{ color: c.primary }}>#</span> {ch.name}</div>
             <div className="text-xs truncate" style={{ color: c.onSurfaceVariant }}>{ch.desc}</div>
           </div>
-          <div className="ml-auto flex gap-2">
-            {["Open Canvas", "Call For Me", "+ Deploy Role"].map((b) => (
-              <motion.button key={b} whileHover={bounce ? { scale: 1.04 } : undefined} transition={spring}
-                className="px-3 py-1.5 rounded-full text-xs font-bold"
-                style={{ background: b.startsWith("+") ? c.primary : c.surfaceHighest,
-                  color: b.startsWith("+") ? "#ffffff" : c.onSurface,
-                  border: "1px solid " + (b.startsWith("+") ? c.primary : c.outlineVariant) }}>{b}</motion.button>
-            ))}
+          <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+            <Link
+              href="/directory/rolodex"
+              className="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors"
+              style={{
+                background: "transparent",
+                color: c.onSurfaceVariant,
+                border: "1px solid " + c.outlineVariant,
+              }}
+            >
+              Lawyer Directory 3D
+            </Link>
+            <motion.button
+              type="button"
+              whileHover={bounce ? { scale: 1.04 } : undefined}
+              transition={spring}
+              className="px-3 py-1.5 rounded-full text-xs font-semibold"
+              style={{
+                background: "transparent",
+                color: c.onSurface,
+                border: "1px solid " + c.outlineVariant,
+              }}
+            >
+              Open Canvas
+            </motion.button>
+            <motion.button
+              type="button"
+              whileHover={bounce ? { scale: 1.04 } : undefined}
+              transition={spring}
+              className="px-3 py-1.5 rounded-full text-xs font-semibold"
+              style={{
+                background: c.surfaceHighest,
+                color: c.onSurface,
+                border: "1px solid " + c.outlineVariant,
+              }}
+            >
+              Call For Me
+            </motion.button>
+            <motion.button
+              type="button"
+              whileHover={bounce ? { scale: 1.04 } : undefined}
+              transition={spring}
+              className="px-3.5 py-1.5 rounded-full text-xs font-bold shadow-md"
+              style={{
+                background: c.primary,
+                color: "#ffffff",
+                border: "1px solid " + c.primary,
+                boxShadow: "0 4px 14px rgba(175,10,120,0.35)",
+              }}
+            >
+              + Deploy Role
+            </motion.button>
           </div>
         </div>
 
