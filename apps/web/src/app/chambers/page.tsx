@@ -1,12 +1,12 @@
-import { ChainOfCommandMasterApp } from "@/components/ChainOfCommandMasterApp";
+import { ChambersPlayground } from "@/components/playground/ChambersPlayground";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Chambers — AI Legal Team | Chain of Command",
-  description: "Multi-agent legal workspace with specialized AI counselors",
+  title: "Chambers — Empyrean Legal AI Team | Chain of Command",
+  description: "Empyrean agent playground and AI lawyer chambers",
 };
 
-export default function ChambersPage() {
-  return <ChainOfCommandMasterApp initialTab="chambers" />;
+export default function Page() {
+  return <ChambersPlayground />;
 }

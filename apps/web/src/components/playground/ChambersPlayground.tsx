@@ -4,8 +4,16 @@
 // Slack-style: channel sidebar (Team Channels + Digital Employees), pinned directive,
 // agent message feed, Open Canvas / Call For Me / Appoint Counsel actions, Candy settings modal.
 // Chain of command: Head Legal AI -> Research AI -> Rights Checker -> Head. Not legal advice.
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import {
+  empyreanHealth,
+  empyreanSendMessage,
+  empyreanDirective,
+  empyreanListMessages,
+  empyreanListAgents,
+} from "@/lib/empyreanClient";
 
 const candy = {
   light: {
@@ -80,6 +88,8 @@ export function ChambersPlayground() {
   const [input, setInput] = useState("");
   const [routing, setRouting] = useState(false);
   const [logs, setLogs] = useState<Record<string, Msg[]>>(() => ({ ...SEED }));
+  const [empyreanOnline, setEmpyreanOnline] = useState<boolean | null>(null);
+  const [empyreanNote, setEmpyreanNote] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const c = candy[theme];
   const ch = CHANNELS.find((x) => x.id === channel)!;
@@ -89,17 +99,93 @@ export function ChambersPlayground() {
 
   const spring = bounce ? { type: "spring" as const, stiffness: 400, damping: 17 } : { duration: 0 };
 
-  const send = () => {
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const h = await empyreanHealth();
+      if (cancelled) return;
+      setEmpyreanOnline(h.ok);
+      if (h.ok) {
+        setEmpyreanNote(`Empyrean online · ${h.agentsCount ?? "?"} agents`);
+        try {
+          const agents = await empyreanListAgents();
+          if (!cancelled && agents.length) {
+            setEmpyreanNote(`Empyrean online · ${agents.length} agents (Michael orchestration)`);
+          }
+        } catch { /* optional */ }
+      } else {
+        setEmpyreanNote("Empyrean offline — demo chain active. Run: npm run dev:empyrean");
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const mapEmpyreanMsgs = useCallback((rows: { senderId?: string; senderName?: string; text?: string; timestamp?: string; isOutgoing?: boolean }[]): Msg[] => {
+    return rows.map((m) => {
+      let agent = (m.senderId || "head").toLowerCase();
+      if (m.isOutgoing || agent === "user") agent = "user";
+      else if (agent.includes("michael") || agent.includes("head")) agent = "head";
+      else if (agent.includes("research") || agent.includes("metatron")) agent = "research";
+      else if (agent.includes("right") || agent.includes("raphael")) agent = "rights";
+      else if (agent.includes("gabriel") || agent.includes("para")) agent = "paralegal";
+      else if (agent.includes("court") || agent.includes("seraph")) agent = "courtprep";
+      return {
+        agent,
+        text: m.text || "",
+        time: m.timestamp || new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      };
+    }).filter((m) => m.text);
+  }, []);
+
+  const send = async () => {
     const text = input.trim();
     if (!text || routing) return;
     setInput("");
     const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     setLogs((l) => ({ ...l, [channel]: [...(l[channel] ?? []), { agent: "user", text, time: now }] }));
     setRouting(true);
+    setEmpyreanNote(null);
+
+    // Prefer live Empyrean swarm
+    try {
+      const health = await empyreanHealth();
+      setEmpyreanOnline(health.ok);
+      if (health.ok) {
+        await empyreanSendMessage(channel, text);
+        // Also fire orchestrator directive for legal routing
+        try {
+          await empyreanDirective(text, { channel, surface: "chambers-playground" });
+        } catch (dirErr) {
+          console.warn("[Empyrean] directive", dirErr);
+        }
+        // Poll messages briefly for agent replies
+        for (let i = 0; i < 6; i++) {
+          await new Promise((r) => setTimeout(r, 700));
+          try {
+            const remote = await empyreanListMessages(channel);
+            if (remote.length) {
+              const mapped = mapEmpyreanMsgs(remote);
+              if (mapped.length) {
+                setLogs((l) => ({ ...l, [channel]: mapped }));
+              }
+            }
+          } catch { /* keep polling */ }
+        }
+        setRouting(false);
+        setEmpyreanNote("Routed through Empyrean (Michael → swarm)");
+        return;
+      }
+    } catch (err) {
+      console.warn("[Empyrean] send fallback", err);
+      setEmpyreanOnline(false);
+      setEmpyreanNote(err instanceof Error ? err.message : "Empyrean unreachable — demo chain");
+    }
+
+    // Offline demo chain of command
     const chain: Array<[string, string]> = [
       ["head", CANNED.head],
       ["research", "Researching the stacks for authorities on point... filing findings to this channel."],
-      ["rights", "Rights Audit complete. Cleared for delivery."],
+      ["rights", "Rights Audit complete. Cleared for delivery. Not legal advice."],
     ];
     chain.forEach(([agentId, reply], i) => {
       setTimeout(() => {
@@ -113,7 +199,20 @@ export function ChambersPlayground() {
   const visibleEmployees = view === "Channels" ? [] : EMPLOYEES;
 
   return (
-    <div className="flex h-screen w-full overflow-hidden" style={{ background: c.bg, color: c.onSurface, fontFamily: "DM Sans, system-ui, sans-serif" }}>
+    <div className="relative flex h-screen w-full overflow-hidden pt-7" style={{ background: c.bg, color: c.onSurface, fontFamily: "DM Sans, system-ui, sans-serif" }}>
+
+      {/* Empyrean status strip */}
+      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between gap-2 px-3 py-1.5 text-[10px] font-mono border-b" style={{ background: c.surfaceContainer, borderColor: c.cardBorder, color: c.onSurfaceVariant }}>
+        <span>
+          <span className="inline-block w-1.5 h-1.5 rounded-full mr-1.5 align-middle" style={{ background: empyreanOnline ? c.online : "#f43f5e" }} />
+          {empyreanNote || (empyreanOnline === null ? "Checking Empyrean…" : empyreanOnline ? "Empyrean connected" : "Empyrean offline (demo)")}
+        </span>
+        <span className="flex gap-3">
+          <Link href="/" className="hover:underline" style={{ color: c.primary }}>Workspace</Link>
+          <Link href="/library" className="hover:underline" style={{ color: c.primary }}>Library</Link>
+          <span style={{ color: c.outline }}>NOT LEGAL ADVICE</span>
+        </span>
+      </div>
 
       {/* ===== SIDEBAR ===== */}
       <div className="w-64 shrink-0 border-r flex flex-col" style={{ borderColor: c.cardBorder, background: c.surface }}>

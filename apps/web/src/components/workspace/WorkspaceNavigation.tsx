@@ -137,10 +137,10 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
           <Link
             href="/playground"
             className="candy-badge candy-badge-ai flex items-center gap-1.5 text-[11px] font-bold hover:opacity-90 transition-all"
-            title="Chambers Playground — Empyrean-style legal AI team with chain-of-command routing"
+            title="Empyrean AI Lawyer — live multi-agent playground"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-400 animate-pulse" />
-            <span>Chambers Playground</span>
+            <span>Empyrean AI Lawyer</span>
           </Link>
           <Link
             href="/vericue"
