@@ -181,13 +181,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       const supabase = getSupabaseClient();
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo:
-            typeof window !== "undefined"
-              ? `${window.location.origin}/`
-              : undefined,
+          redirectTo: origin ? `${origin}/auth/callback?next=/` : undefined,
           queryParams: {
             access_type: "offline",
             prompt: "select_account",
@@ -195,11 +193,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       });
       if (error) throw error;
+      // Browser navigates to Google; session lands on /auth/callback
     } catch (error) {
       console.error("Supabase Google sign-in failed:", error);
-      throw error;
-    } finally {
       setIsLoading(false);
+      throw error;
     }
   };
 
