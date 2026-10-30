@@ -138,10 +138,17 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
           <Link
             href="/playground"
             className="candy-badge candy-badge-ai flex items-center gap-1.5 text-[11px] font-bold hover:opacity-90 transition-all"
-            title="Empyrean AI Lawyer — live multi-agent playground"
+            title="CoC shell over Empyrean API — native UI at /empyrean"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-400 animate-pulse" />
             <span>Empyrean AI Lawyer</span>
+          </Link>
+          <Link
+            href="/empyrean"
+            className="candy-badge flex items-center gap-1.5 text-[11px] font-bold hover:opacity-90 transition-all border border-fuchsia-500/40 text-fuchsia-200"
+            title="Native Empyrean UI (unchanged)"
+          >
+            <span>Empyrean</span>
           </Link>
           <Link
             href="/vericue"

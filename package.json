@@ -14,7 +14,9 @@
     "lint": "npm --prefix apps/web run lint",
     "start": "npm --prefix apps/web run start",
     "secrets:agent": "infisical agent --config config/infisical/agent-config.yaml",
-    "secrets:agent:root": "infisical agent --config agent-config.yaml"
+    "secrets:agent:root": "infisical agent --config agent-config.yaml",
+    "dev:all": "echo \"Start Empyrean (:3100) + Web (:3000). Empyrean package is unchanged.\" && npm run dev:empyrean & npm run dev",
+    "dev:stack": "npm run dev:empyrean"
   },
   "dependencies": {
     "@types/three": "^0.186.0",
