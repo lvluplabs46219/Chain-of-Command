@@ -1,25 +1,50 @@
 /**
  * Chain of Command Client-Side Supabase Client & Realtime Engine
- * 
- * Configured for direct browser execution in embeds, Canva custom HTML blocks,
- * and Cloudflare Pages / Next.js deployments.
- * 
- * Interacts directly with public Supabase REST & Realtime websocket endpoints
- * using the public Anon Key. All operations respect Row Level Security (RLS).
+ *
+ * Browser client. Uses the public anon key only. RLS still applies.
  */
 
 import { createClient, SupabaseClient, User, Session, RealtimeChannel } from "@supabase/supabase-js";
 
-// Canonical Public Supabase Config (Environment Variables or Local Fallback)
-const SUPABASE_URL = 
-  (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_SUPABASE_URL) ||
-  (typeof process !== "undefined" && (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL)) ||
-  "https://fc3a93f4-2a16-445b-b0c4-aeaf0102f0ff.supabase.co";
+const PROJECT_REF = "othxichdhzdxgtatautb";
+const PROJECT_URL = `https://${PROJECT_REF}.supabase.co`;
+// Public anon key for this project. Safe in the browser. Not the service role.
+const PROJECT_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90aHhpY2hkaHpkeGd0YXRhdXRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NDA5NTIsImV4cCI6MjA5NjMxNjk1Mn0.FGYkAsb1nLOB1oTy4crS0mmtzRJ6Od98YlZkGhZdfiA";
+
+function usableUrl(value: string | undefined): string {
+  const v = (value || "").trim().replace(/^["']|["']$/g, "");
+  if (!v || v.includes("fc3a93f4") || v.includes("localhost")) return "";
+  return v;
+}
+
+function usableAnonKey(value: string | undefined): string {
+  const v = (value || "").trim().replace(/^["']|["']$/g, "");
+  if (!v || /mock|your-anon|acquit-platform|placeholder/i.test(v)) return "";
+  if (v.startsWith("sb_publishable_")) return v;
+  if (!v.startsWith("eyJ")) return "";
+  try {
+    const json = atob(v.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"));
+    const payload = JSON.parse(json) as { ref?: string; role?: string };
+    if (payload.ref === PROJECT_REF && payload.role === "anon") return v;
+  } catch {
+    return "";
+  }
+  return "";
+}
+
+const SUPABASE_URL =
+  usableUrl(typeof import.meta !== "undefined" ? (import.meta as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL : undefined) ||
+  usableUrl(typeof process !== "undefined" ? process.env.NEXT_PUBLIC_SUPABASE_URL : undefined) ||
+  usableUrl(typeof process !== "undefined" ? process.env.VITE_SUPABASE_URL : undefined) ||
+  PROJECT_URL;
 
 const SUPABASE_ANON_KEY =
-  (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_SUPABASE_ANON_KEY) ||
-  (typeof process !== "undefined" && (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY)) ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjcXVpdC1wbGF0Zm9ybSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjIwMDAwMDAwMDB9.mock-anon-key-acquit-ai";
+  usableAnonKey(typeof import.meta !== "undefined" ? (import.meta as { env?: Record<string, string> }).env?.VITE_SUPABASE_ANON_KEY : undefined) ||
+  usableAnonKey(typeof process !== "undefined" ? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY : undefined) ||
+  usableAnonKey(typeof process !== "undefined" ? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY : undefined) ||
+  usableAnonKey(typeof process !== "undefined" ? process.env.VITE_SUPABASE_ANON_KEY : undefined) ||
+  PROJECT_ANON_KEY;
 
 let browserSupabaseInstance: SupabaseClient | null = null;
 
@@ -44,9 +69,8 @@ export function getSupabaseClient(): SupabaseClient {
       },
     });
 
-    // Make available on window for custom client scripts
     if (typeof window !== "undefined") {
-      (window as any).acquitSupabase = browserSupabaseInstance;
+      (window as unknown as { acquitSupabase?: SupabaseClient }).acquitSupabase = browserSupabaseInstance;
     }
   }
 
@@ -59,36 +83,24 @@ export const supabase = getSupabaseClient();
  * Litigant Client-Side Authentication Service
  */
 export const litigantAuth = {
-  /**
-   * Get current session directly from client storage
-   */
   async getSession(): Promise<Session | null> {
     const client = getSupabaseClient();
     const { data } = await client.auth.getSession();
     return data.session;
   },
 
-  /**
-   * Get current user
-   */
   async getUser(): Promise<User | null> {
     const client = getSupabaseClient();
     const { data } = await client.auth.getUser();
     return data.user;
   },
 
-  /**
-   * Sign in with Email & Password
-   */
   async signInWithEmail(email: string, password: string) {
     const client = getSupabaseClient();
     return await client.auth.signInWithPassword({ email, password });
   },
 
-  /**
-   * Sign up as Self-Represented Litigant
-   */
-  async signUp(email: string, password: string, metadata?: Record<string, any>) {
+  async signUp(email: string, password: string, metadata?: Record<string, unknown>) {
     const client = getSupabaseClient();
     return await client.auth.signUp({
       email,
@@ -103,31 +115,18 @@ export const litigantAuth = {
     });
   },
 
-  /**
-   * Sign out entirely on client
-   */
   async signOut() {
     const client = getSupabaseClient();
     return await client.auth.signOut();
   },
 
-  /**
-   * Subscribe to auth state transitions
-   */
   onAuthStateChange(callback: (event: string, session: Session | null) => void) {
     const client = getSupabaseClient();
     return client.auth.onAuthStateChange(callback);
   },
 };
 
-/**
- * Client-Side Case Matters & Docket Service
- * Interacts directly with public.matters and public.legal_chunks via Supabase PostgREST
- */
 export const clientCaseData = {
-  /**
-   * Fetch active matters for currently authenticated litigant
-   */
   async fetchUserMatters(userId?: string) {
     const client = getSupabaseClient();
     let query = client.from("matters").select("*").order("created_at", { ascending: false });
@@ -142,9 +141,6 @@ export const clientCaseData = {
     return data || [];
   },
 
-  /**
-   * Fetch case timeline events
-   */
   async fetchTimelineEvents(matterId: string) {
     const client = getSupabaseClient();
     const { data, error } = await client
@@ -160,9 +156,6 @@ export const clientCaseData = {
     return data || [];
   },
 
-  /**
-   * Fetch legal authorities and statutory citations directly
-   */
   async searchAuthorities(queryTerm: string, jurisdiction?: string) {
     const client = getSupabaseClient();
     let query = client.from("authorities").select("*").limit(25);
@@ -180,16 +173,13 @@ export const clientCaseData = {
     return data || [];
   },
 
-  /**
-   * Subscribe to real-time docket updates for a case
-   */
   subscribeToMatterUpdates(
     matterId: string,
-    onUpdate: (payload: any) => void
+    onUpdate: (payload: unknown) => void
   ): RealtimeChannel {
     const client = getSupabaseClient();
     const channelName = `realtime-matter-${matterId}`;
-    
+
     return client
       .channel(channelName)
       .on(
@@ -201,7 +191,6 @@ export const clientCaseData = {
           filter: `id=eq.${matterId}`,
         },
         (payload) => {
-          console.log("[Supabase Realtime] Matter change received:", payload);
           onUpdate(payload);
         }
       )
