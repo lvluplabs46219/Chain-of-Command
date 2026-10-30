@@ -2,19 +2,24 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Scale, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useAuth } from "@/contexts/AuthContext";
-import { bootstrapWorkspaceSession } from "@/app/actions/bootstrap-session";
+import { signInWithEmail } from "@/app/actions/auth-email";
+
+const SITEKEY = process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY || "";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { loginAsLitigant, loginWithGoogle, isLoading, isAuthenticated } = useAuth();
+  const captchaRef = useRef<HCaptcha>(null);
+  const { isLoading, isAuthenticated } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -24,40 +29,6 @@ export default function LoginPage() {
     }
   }, [isLoading, isAuthenticated, router]);
 
-  const enterWorkspace = async (name: string, mail: string) => {
-    setSubmitting(true);
-    setError(null);
-    try {
-      // Prefer real Supabase session bootstrap (service-role tenant + anonymous auth + cookies)
-      const result = await bootstrapWorkspaceSession({
-        displayName: name,
-        redirectTo: "/",
-      });
-      // If redirect() did not fire (error path), surface it and fall back in dev only
-      if (result && result.ok === false) {
-        console.warn("[login] bootstrap failed:", result.error);
-        await loginAsLitigant(name, mail);
-        router.push("/");
-      }
-      // On success, server action already redirected
-    } catch (err) {
-      // NEXT_REDIRECT is expected on success; only treat real errors
-      const msg = err instanceof Error ? err.message : "";
-      if (msg.includes("NEXT_REDIRECT") || (err && typeof err === "object" && "digest" in err)) {
-        return; // successful redirect
-      }
-      console.warn("[login] bootstrap exception, demo fallback:", err);
-      try {
-        await loginAsLitigant(name, mail);
-        router.push("/");
-      } catch {
-        setError("Could not start session. Try again.");
-      }
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -65,21 +36,33 @@ export default function LoginPage() {
       setError("Enter a valid email address.");
       return;
     }
-    const name = email
-      .split("@")[0]
-      .replace(/[._]/g, " ")
-      .replace(/\b\w/g, (c) => c.toUpperCase());
-    await enterWorkspace(name || "Pro Se Litigant", email.trim().toLowerCase());
-  };
-
-  const handleGoogle = async () => {
-    setError(null);
+    if (!password) {
+      setError("Enter your password.");
+      return;
+    }
+    if (!captchaToken) {
+      setError("Complete the captcha.");
+      return;
+    }
     setSubmitting(true);
     try {
-      await loginWithGoogle();
+      const result = await signInWithEmail({
+        email: email.trim().toLowerCase(),
+        password,
+        captchaToken,
+      });
+      if (!result.ok) {
+        setError(result.error);
+        captchaRef.current?.resetCaptcha();
+        setCaptchaToken(null);
+        return;
+      }
       router.push("/");
+      router.refresh();
     } catch {
-      setError("Google sign-in is unavailable. Use email to continue.");
+      setError("Could not sign in. Try again.");
+      captchaRef.current?.resetCaptcha();
+      setCaptchaToken(null);
     } finally {
       setSubmitting(false);
     }
@@ -108,26 +91,8 @@ export default function LoginPage() {
 
         <div className="bg-[#141519] border border-[#2A2B35] rounded-2xl p-6 sm:p-8 shadow-2xl space-y-5">
           <p className="text-sm text-neutral-400 leading-relaxed">
-            Sign in to open your workspace. New accounts continue to onboarding to create a real matter — no demo case data is loaded.
+            Sign in with the email and password you used to create your account.
           </p>
-
-          <button
-            type="button"
-            onClick={handleGoogle}
-            disabled={submitting || isLoading}
-            className="w-full py-3 rounded-xl border border-[#2A2B35] hover:border-[#D4AF37]/40 text-neutral-200 text-sm font-medium disabled:opacity-50"
-          >
-            Continue with Google
-          </button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#2A2B35]" />
-            </div>
-            <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
-              <span className="bg-[#141519] px-2 text-neutral-500">or use email</span>
-            </div>
-          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
@@ -157,7 +122,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-[#101114] border border-[#2A2B35] rounded-lg px-3 py-2.5 pr-10 text-sm text-white focus:outline-none focus:border-[#D4AF37]"
-                  placeholder="Optional for local session"
+                  placeholder="Your password"
                 />
                 <button
                   type="button"
@@ -170,6 +135,21 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {SITEKEY ? (
+              <div className="flex justify-center py-1">
+                <HCaptcha
+                  ref={captchaRef}
+                  sitekey={SITEKEY}
+                  theme="dark"
+                  onVerify={(token) => setCaptchaToken(token)}
+                  onExpire={() => setCaptchaToken(null)}
+                  onError={() => setCaptchaToken(null)}
+                />
+              </div>
+            ) : (
+              <p className="text-xs text-amber-300">Captcha site key missing (NEXT_PUBLIC_HCAPTCHA_SITEKEY).</p>
+            )}
+
             {error && (
               <p role="alert" className="text-xs text-rose-300 bg-rose-950/40 border border-rose-500/30 rounded-lg px-3 py-2">
                 {error}
@@ -178,14 +158,14 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={submitting || isLoading}
+              disabled={submitting}
               className="w-full py-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {submitting || isLoading ? (
+              {submitting ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <>
-                  Continue
+                  Sign in
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -200,7 +180,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <p className="mt-4 text-center text-[10px] text-neutral-600 font-mono">
+        <p className="mt-4 text-center text-center text-[10px] text-neutral-600 font-mono">
           NOT LEGAL ADVICE · NO ATTORNEY-CLIENT RELATIONSHIP
         </p>
       </div>

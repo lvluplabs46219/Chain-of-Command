@@ -2,21 +2,26 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Scale, Eye, EyeOff, Loader2 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
+import { signUpWithEmail } from "@/app/actions/auth-email";
+
+const SITEKEY = process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY || "";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { loginAsLitigant, isLoading } = useAuth();
+  const captchaRef = useRef<HCaptcha>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const validate = () => {
@@ -36,19 +41,42 @@ export default function SignupPage() {
       setError("Passwords do not match.");
       return false;
     }
+    if (!captchaToken) {
+      setError("Complete the captcha.");
+      return false;
+    }
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setInfo(null);
     if (!validate()) return;
     setSubmitting(true);
     try {
-      await loginAsLitigant(name.trim(), email.trim().toLowerCase());
+      const result = await signUpWithEmail({
+        email: email.trim().toLowerCase(),
+        password,
+        fullName: name.trim(),
+        captchaToken: captchaToken!,
+      });
+      if (!result.ok) {
+        setError(result.error);
+        captchaRef.current?.resetCaptcha();
+        setCaptchaToken(null);
+        return;
+      }
+      if (result.needsEmailConfirm) {
+        setInfo(result.message || "Check your email to confirm, then sign in.");
+        return;
+      }
       router.push("/");
+      router.refresh();
     } catch {
       setError("Could not create account. Please try again.");
+      captchaRef.current?.resetCaptcha();
+      setCaptchaToken(null);
     } finally {
       setSubmitting(false);
     }
@@ -146,18 +174,38 @@ export default function SignupPage() {
               />
             </div>
 
+            {SITEKEY ? (
+              <div className="flex justify-center py-1">
+                <HCaptcha
+                  ref={captchaRef}
+                  sitekey={SITEKEY}
+                  theme="dark"
+                  onVerify={(token) => setCaptchaToken(token)}
+                  onExpire={() => setCaptchaToken(null)}
+                  onError={() => setCaptchaToken(null)}
+                />
+              </div>
+            ) : (
+              <p className="text-xs text-amber-300">Captcha site key missing (NEXT_PUBLIC_HCAPTCHA_SITEKEY).</p>
+            )}
+
             {error && (
               <div role="alert" className="text-xs text-rose-300 bg-rose-950/40 border border-rose-500/30 rounded-lg px-3 py-2">
                 {error}
               </div>
             )}
+            {info && (
+              <div role="status" className="text-xs text-emerald-300 bg-emerald-950/40 border border-emerald-500/30 rounded-lg px-3 py-2">
+                {info}
+              </div>
+            )}
 
             <button
               type="submit"
-              disabled={submitting || isLoading}
+              disabled={submitting}
               className="w-full py-2.5 rounded-lg bg-[#D4AF37] hover:bg-[#c49f27] text-neutral-950 font-semibold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {(submitting || isLoading) && <Loader2 className="w-4 h-4 animate-spin" />}
+              {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
               Create account
             </button>
           </form>
