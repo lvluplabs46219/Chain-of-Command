@@ -46,8 +46,9 @@ function buildWelcome(matter: Matter): string {
   );
 }
 
-export function ChambersView({ matter }: ChambersViewProps) {
-  const [selectedAgent, setSelectedAgent] = useState<AIAgent>(AI_TEAM_ROSTER[0]);
+export function ChambersView({ matter, agents = [] }: ChambersViewProps) {
+  const activeTeam = agents.length > 0 ? agents : AI_TEAM_ROSTER;
+  const [selectedAgent, setSelectedAgent] = useState<AIAgent>(activeTeam[0]);
   const [promptInput, setPromptInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -214,9 +215,19 @@ export function ChambersView({ matter }: ChambersViewProps) {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 min-h-[640px]">
         {/* Agent roster */}
         <div className="space-y-2 lg:col-span-1">
-          <h2 className="text-xs font-mono uppercase text-neutral-400 font-bold px-1">Your team</h2>
-          <div className="space-y-1.5">
-            {AI_TEAM_ROSTER.map((agent) => {
+          <div className="flex items-center justify-between px-1">
+            <h2 className="text-xs font-mono uppercase text-[#604868] font-bold">
+              Your Team ({activeTeam.length})
+            </h2>
+            <Link
+              href="/directory"
+              className="text-[11px] font-bold text-[#af0a78] hover:underline"
+            >
+              + Hire Agents
+            </Link>
+          </div>
+          <div className="space-y-1.5 max-h-[580px] overflow-y-auto pr-1">
+            {activeTeam.map((agent) => {
               const active = selectedAgent.id === agent.id;
               const mode = agentModeLabel(agent);
               return (
@@ -224,26 +235,25 @@ export function ChambersView({ matter }: ChambersViewProps) {
                   key={agent.id}
                   type="button"
                   onClick={() => setSelectedAgent(agent)}
-                  className={`w-full text-left p-3 rounded-xl border transition-all ${
+                  className={`w-full text-left p-3 rounded-2xl border transition-all ${
                     active
-                      ? "bg-[#1C1E2A] border-[#D4AF37]/50 shadow-md shadow-[#D4AF37]/5"
-                      : "bg-[#14151C] border-[#252735] hover:bg-[#181A24]"
+                      ? "bg-[#ffd8e8] border-[#ffafd5] text-[#8a005e] shadow-sm font-semibold"
+                      : "bg-white border-[#f0d5e2] hover:bg-[#fff7fb] text-[#281330]"
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <div className="font-bold text-white text-xs">{agent.name}</div>
+                    <div className="font-bold text-xs truncate">{agent.name}</div>
                     <span
-                      className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border ${
+                      className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase font-mono ${
                         mode === "Deep Review"
-                          ? "border-violet-500/40 text-violet-200 bg-violet-950/40"
-                          : "border-emerald-500/40 text-emerald-200 bg-emerald-950/30"
+                          ? "bg-[#efdbff] text-[#5b3188]"
+                          : "bg-[#e0f2fe] text-[#006388]"
                       }`}
                     >
                       {mode}
                     </span>
                   </div>
-                  <div className="text-[11px] text-[#D4AF37] mt-0.5">{agent.role}</div>
-                  <p className="text-[10px] text-neutral-400 mt-1 line-clamp-2">{agent.specialty}</p>
+                  <div className="text-[11px] text-[#7c52aa] mt-0.5 truncate">{agent.role}</div>
                 </button>
               );
             })}

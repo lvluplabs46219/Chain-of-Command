@@ -3,8 +3,8 @@ import { ChainOfCommandMasterApp } from "@/components/ChainOfCommandMasterApp";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Counsel Directory | Chain of Command",
-  description: "Bar listings and pro bono directory — not recommendations",
+  title: "Agent Directory | Chain of Command",
+  description: "AI Legal Workers, specialized AI skills, and attorney directory for your case team",
 };
 
 export default function DirectoryPage() {

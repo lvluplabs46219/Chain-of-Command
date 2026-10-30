@@ -237,6 +237,22 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
     saveAgents(newAgents);
   };
 
+  const handleAddAgent = (newAgent: SpecialistAgent) => {
+    const exists = agents.some((a) => a.id === newAgent.id);
+    const updated = exists
+      ? agents.map((a) => (a.id === newAgent.id ? { ...a, status: "Active" as const } : a))
+      : [...agents, { ...newAgent, status: "Active" as const }];
+    setAgents(updated);
+    saveAgents(updated);
+  };
+
+  const handleRemoveAgent = (agentId: string) => {
+    if (agentId === "agent-head") return;
+    const updated = agents.filter((a) => a.id !== agentId);
+    setAgents(updated);
+    saveAgents(updated);
+  };
+
   const handleSaveTimeline = (rec: TimelineRecord) => {
     saveTimelineRecord(rec);
     setTimeline(loadTimeline(activeMatter.id));
@@ -398,7 +414,15 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
           </div>
         )}
 
-        {activeTab === "directory" && <DirectoryView />}
+        {activeTab === "directory" && (
+          <DirectoryView
+            matter={activeMatter}
+            agents={agents}
+            onAddAgent={handleAddAgent}
+            onRemoveAgent={handleRemoveAgent}
+            onNavigateTab={(tab) => setActiveTab(tab)}
+          />
+        )}
 
         {activeTab === "tasks" && <TasksDeadlinesView matter={activeMatter} />}
 

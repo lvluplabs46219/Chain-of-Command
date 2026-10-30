@@ -13,6 +13,7 @@ import {
   FileSignature,
   Eye,
   UserCheck,
+  Bot,
   CalendarCheck2,
   Shield,
   Layers,
@@ -91,7 +92,7 @@ const MORE_TABS: {
   { id: "library", label: "Law Library", icon: BookOpen },
   { id: "investigations", label: "Investigations", icon: Search },
   { id: "court_watch", label: "Court Watch", icon: Eye },
-  { id: "directory", label: "Counsel Directory", icon: UserCheck },
+  { id: "directory", label: "Agent Directory", icon: Bot },
   { id: "audit", label: "Audit", icon: Shield },
   { id: "archive", label: "Archive", icon: Layers },
 ];
