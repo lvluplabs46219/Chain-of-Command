@@ -1,8 +1,6 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { getSupabaseClient } from "@/lib/supabaseClient";
@@ -17,7 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
  *   /auth/callback#access_token=...&refresh_token=...&type=signup
  * which the server route cannot read — this page can.
  */
-export default function AuthCallbackCompletePage() {
+function AuthCallbackCompleteInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextRaw = searchParams.get("next") || "/";
@@ -112,7 +110,14 @@ export default function AuthCallbackCompletePage() {
     async function bridge(
       accessToken: string,
       refreshToken: string | undefined,
-      session: { user: { id: string; email?: string | null; user_metadata?: Record<string, unknown> }; expires_in?: number },
+      session: {
+        user: {
+          id: string;
+          email?: string | null;
+          user_metadata?: Record<string, unknown>;
+        };
+        expires_in?: number;
+      },
     ) {
       setAuthToken(accessToken);
       const meta = session.user.user_metadata || {};
@@ -132,7 +137,6 @@ export default function AuthCallbackCompletePage() {
       } catch {
         /* ignore */
       }
-      // Clear sensitive hash from address bar
       if (typeof window !== "undefined" && window.location.hash) {
         window.history.replaceState(null, "", window.location.pathname + window.location.search);
       }
@@ -167,5 +171,22 @@ export default function AuthCallbackCompletePage() {
         )}
       </div>
     </div>
+  );
+}
+
+function ConfirmingFallback() {
+  return (
+    <div className="min-h-screen bg-[#0C0D10] text-[#E1E2E5] flex flex-col items-center justify-center p-6">
+      <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37] mx-auto mb-4" />
+      <p className="text-sm text-neutral-300">Confirming your email…</p>
+    </div>
+  );
+}
+
+export default function AuthCallbackCompletePage() {
+  return (
+    <Suspense fallback={<ConfirmingFallback />}>
+      <AuthCallbackCompleteInner />
+    </Suspense>
   );
 }
