@@ -125,7 +125,7 @@ export default function LoginPage() {
 
         <div className="bg-[#141519] border border-[#2A2B35] rounded-2xl p-6 sm:p-8 shadow-2xl space-y-5">
           <p className="text-sm text-neutral-400 leading-relaxed">
-            Use the email and password from signup. Complete the captcha first — Supabase rejects logins without it.
+            Sign in with email/password or Google. Complete captcha when shown (required by Supabase).
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
@@ -179,7 +179,9 @@ export default function LoginPage() {
                   onExpire={() => setCaptchaToken(null)}
                   onError={() => {
                     setCaptchaToken(null);
-                    setError("Captcha failed to load. Check network / ad blockers, or add localhost to hCaptcha domains.");
+                    setError(
+                      "Captcha failed to load. In hCaptcha dashboard → Settings → Domains, add: localhost and 127.0.0.1 (and lvluplabs.pro for prod). Disable ad blockers on this tab, then refresh."
+                    );
                   }}
                 />
               </div>

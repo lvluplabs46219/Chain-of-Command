@@ -65,6 +65,8 @@ export const TAB_ROUTES: Record<WorkspaceTab, string> = {
 export function pathToTab(pathname: string): WorkspaceTab | null {
   if (pathname === "/" || pathname === "") return "dashboard";
   if (pathname.startsWith("/ai-intelligence")) return "chambers";
+  if (pathname.startsWith("/playground")) return "chambers";
+  if (pathname.startsWith("/empyrean")) return "chambers";
   const entry = Object.entries(TAB_ROUTES).find(
     ([, route]) => route !== "/" && pathname.startsWith(route)
   );
@@ -77,10 +79,11 @@ const PRIMARY_TABS: {
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
   { id: "dashboard", label: "Command Center", icon: LayoutDashboard },
+  { id: "chambers", label: "AI Lawyer", icon: Bot },
   { id: "docket", label: "The Docket", icon: Gavel },
-  { id: "chambers", label: "Chambers", icon: Users },
   { id: "timeline", label: "Timeline", icon: Clock },
   { id: "draft_desk", label: "Draft Desk", icon: FileSignature },
+  { id: "library", label: "Law Library", icon: BookOpen },
   { id: "tasks", label: "Tasks", icon: CalendarCheck2 },
 ];
 
@@ -89,7 +92,6 @@ const MORE_TABS: {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
-  { id: "library", label: "Law Library", icon: BookOpen },
   { id: "investigations", label: "Investigations", icon: Search },
   { id: "court_watch", label: "Court Watch", icon: Eye },
   { id: "directory", label: "Agent Directory", icon: Bot },
@@ -135,21 +137,6 @@ export function WorkspaceNavigation({ activeTab, onTabChange }: WorkspaceNavigat
       <div className="px-4 py-2 border-b border-zinc-800/80 flex items-center justify-between gap-3 flex-wrap">
         <NavFeatureCarousel className="flex-1" />
         <div className="flex items-center gap-2 shrink-0">
-          <Link
-            href="/playground"
-            className="candy-badge candy-badge-ai flex items-center gap-1.5 text-[11px] font-bold hover:opacity-90 transition-all"
-            title="CoC shell over Empyrean API — native UI at /empyrean"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-400 animate-pulse" />
-            <span>Empyrean AI Lawyer</span>
-          </Link>
-          <Link
-            href="/empyrean"
-            className="candy-badge flex items-center gap-1.5 text-[11px] font-bold hover:opacity-90 transition-all border border-fuchsia-500/40 text-fuchsia-200"
-            title="Native Empyrean UI (unchanged)"
-          >
-            <span>Empyrean</span>
-          </Link>
           <Link
             href="/vericue"
             className="candy-badge candy-badge-ai flex items-center gap-1.5 text-[11px] font-bold hover:opacity-90 transition-all"
