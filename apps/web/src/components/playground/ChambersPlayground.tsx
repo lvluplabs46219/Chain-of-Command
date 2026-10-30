@@ -7,6 +7,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { LayoutGrid, X } from "lucide-react";
+import { AgentRolodex3D } from "@/components/directory/AgentRolodex3D";
 import {
   empyreanHealth,
   empyreanSendMessage,
@@ -90,6 +92,7 @@ export function ChambersPlayground() {
   const [logs, setLogs] = useState<Record<string, Msg[]>>(() => ({ ...SEED }));
   const [empyreanOnline, setEmpyreanOnline] = useState<boolean | null>(null);
   const [empyreanNote, setEmpyreanNote] = useState<string | null>(null);
+  const [rolodexOpen, setRolodexOpen] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const c = candy[theme];
   const ch = CHANNELS.find((x) => x.id === channel)!;
@@ -227,7 +230,10 @@ export function ChambersPlayground() {
             style={{ background: c.surfaceContainer, color: c.onSurface, border: "1px solid " + c.outlineVariant }} />
           <div className="flex gap-1.5 mt-2">
             {(["All", "Channels", "Employees", "Canvas"] as const).map((t) => (
-              <button key={t} onClick={() => setView(t)}
+              <button key={t} onClick={() => {
+                setView(t);
+                if (t === "Employees") setRolodexOpen(true);
+              }}
                 className="px-2.5 py-1 rounded-full text-xs font-semibold transition-all"
                 style={{
                   background: view === t ? c.primary : c.surfaceContainer,
@@ -254,7 +260,19 @@ export function ChambersPlayground() {
           )}
           {visibleEmployees.length > 0 && (
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider mb-1.5" style={{ color: c.onSurfaceVariant }}>Digital Employees</div>
+              <div className="flex items-center justify-between gap-2 mb-1.5">
+                <div className="text-xs font-bold uppercase tracking-wider" style={{ color: c.onSurfaceVariant }}>Digital Employees</div>
+                <button
+                  type="button"
+                  title="Open 3D Agent Rolodex"
+                  onClick={() => setRolodexOpen(true)}
+                  className="p-1.5 rounded-lg transition-colors"
+                  style={{ color: c.primary, border: "1px solid " + c.outlineVariant, background: c.surfaceContainer }}
+                  aria-label="Open 3D agent rolodex"
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                </button>
+              </div>
               {visibleEmployees.map((a) => (
                 <motion.button key={a.id} whileHover={bounce ? { scale: 1.02 } : undefined} transition={spring}
                   className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg mb-0.5 text-left"
@@ -289,17 +307,20 @@ export function ChambersPlayground() {
             <div className="text-xs truncate" style={{ color: c.onSurfaceVariant }}>{ch.desc}</div>
           </div>
           <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
-            <Link
-              href="/directory/rolodex"
-              className="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors"
+            <motion.button
+              type="button"
+              whileHover={bounce ? { scale: 1.04 } : undefined}
+              transition={spring}
+              onClick={() => setRolodexOpen(true)}
+              className="px-3 py-1.5 rounded-full text-xs font-semibold"
               style={{
                 background: "transparent",
                 color: c.onSurfaceVariant,
                 border: "1px solid " + c.outlineVariant,
               }}
             >
-              Lawyer Directory 3D
-            </Link>
+              View Agent Rolodex
+            </motion.button>
             <motion.button
               type="button"
               whileHover={bounce ? { scale: 1.04 } : undefined}
@@ -472,5 +493,34 @@ export function ChambersPlayground() {
         )}
       </AnimatePresence>
     </div>
+
+      {/* 3D Agent Rolodex overlay — does not leave the task thread permanently */}
+      <AnimatePresence>
+        {rolodexOpen && (
+          <motion.div
+            className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{ background: "rgba(8,6,12,0.72)", backdropFilter: "blur(6px)" }}
+          >
+            <button
+              type="button"
+              className="absolute inset-0 cursor-default"
+              aria-label="Dismiss rolodex"
+              onClick={() => setRolodexOpen(false)}
+            />
+            <motion.div
+              className="relative z-10 w-full max-w-5xl"
+              initial={{ y: 28, opacity: 0, scale: 0.98 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 16, opacity: 0, scale: 0.98 }}
+              transition={spring}
+            >
+              <AgentRolodex3D variant="overlay" onClose={() => setRolodexOpen(false)} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
   );
 }

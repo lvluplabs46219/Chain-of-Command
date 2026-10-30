@@ -10,7 +10,15 @@ import { ALL_AVAILABLE_AI_AGENTS, type AIAgent } from "@/lib/workspace-data";
  * Pure CSS 3D transforms — no Three.js dependency.
  * Educational / pro se assist only — not legal advice.
  */
-export function AgentRolodex3D({ agents }: { agents?: AIAgent[] }) {
+export function AgentRolodex3D({
+  agents,
+  variant = "page",
+  onClose,
+}: {
+  agents?: AIAgent[];
+  variant?: "page" | "overlay";
+  onClose?: () => void;
+}) {
   const roster = agents?.length ? agents : ALL_AVAILABLE_AI_AGENTS;
   const [index, setIndex] = useState(0);
   const n = roster.length;
@@ -24,7 +32,13 @@ export function AgentRolodex3D({ agents }: { agents?: AIAgent[] }) {
   const cards = useMemo(() => roster, [roster]);
 
   return (
-    <div className="min-h-screen bg-[#0C0D10] text-[#E1E2E5] flex flex-col">
+    <div
+      className={
+        variant === "overlay"
+          ? "h-full max-h-[min(92vh,900px)] bg-[#0C0D10] text-[#E1E2E5] flex flex-col rounded-2xl overflow-hidden border border-[#2A2B35] shadow-2xl"
+          : "min-h-screen bg-[#0C0D10] text-[#E1E2E5] flex flex-col"
+      }
+    >
       <header className="flex items-center justify-between gap-3 border-b border-[#2A2B35] px-4 py-3">
         <div className="flex items-center gap-3">
           <Link
@@ -40,7 +54,18 @@ export function AgentRolodex3D({ agents }: { agents?: AIAgent[] }) {
             AI Lawyer Rolodex
           </h1>
         </div>
-        <p className="text-[10px] font-mono text-neutral-500">NOT LEGAL ADVICE · AI WORKERS & SKILLS</p>
+        <div className="flex items-center gap-3">
+          <p className="text-[10px] font-mono text-neutral-500">NOT LEGAL ADVICE · AI WORKERS & SKILLS</p>
+          {variant === "overlay" && onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-full border border-[#2A2B35] px-3 py-1 text-[11px] font-semibold text-neutral-300 hover:border-[#D4AF37] hover:text-[#D4AF37]"
+            >
+              Close
+            </button>
+          )}
+        </div>
       </header>
 
       <div className="flex-1 flex flex-col lg:flex-row gap-6 p-4 md:p-8 max-w-6xl mx-auto w-full">
