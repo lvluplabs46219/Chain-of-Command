@@ -15,6 +15,12 @@ export type NavFeatureItem = {
 
 const DEFAULT_FEATURES: NavFeatureItem[] = [
   {
+    href: "/playground",
+    title: "The Wire",
+    subtitle: "AI Lawyer Swarm & Agent Playground",
+    badge: "AI",
+  },
+  {
     href: "/vericue",
     title: "VeriCue AI",
     subtitle: "Candy Forensic Telemetry Console",
@@ -23,39 +29,49 @@ const DEFAULT_FEATURES: NavFeatureItem[] = [
   {
     href: "/chambers",
     title: "Chambers",
-    subtitle: "AI legal team conference room",
+    subtitle: "Counsel Roster, Conference Room & Brief Board",
     badge: "AI",
   },
   {
     href: "/docket",
     title: "The Docket",
-    subtitle: "Active matters & case files",
+    subtitle: "Docket Entries & Matter Status",
     badge: "Core",
   },
   {
     href: "/timeline",
-    title: "Chronology",
-    subtitle: "Case events & deadlines",
+    title: "Case Timeline",
+    subtitle: "Chronology & Case Events",
   },
   {
     href: "/library",
     title: "Law Library",
-    subtitle: "Search the stacks",
+    subtitle: "Search the Stacks & Open Volumes",
   },
   {
     href: "/investigations",
     title: "Investigations",
-    subtitle: "Evidence locker & research",
+    subtitle: "Active Research & Evidence Locker",
   },
   {
     href: "/draft-desk",
-    title: "Draft Desk",
-    subtitle: "Motions & filing prep",
+    title: "Record Room",
+    subtitle: "Filing Table & Draft Desk",
   },
   {
     href: "/court-watch",
     title: "Court Watch",
-    subtitle: "Hearings & docket activity",
+    subtitle: "Upcoming Appearances & Deadline Engine",
+  },
+  {
+    href: "/directory",
+    title: "Counsel Directory",
+    subtitle: "Counsel Listings & AI Legal Workers",
+  },
+  {
+    href: "/tasks",
+    title: "Motions & Tasks",
+    subtitle: "Motion Board & Action Items",
   },
 ];
 

@@ -188,19 +188,26 @@ export function DirectoryView({
             <div className="flex items-center gap-2 flex-wrap">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ffd8e8] text-[#8a005e] text-xs font-bold font-mono uppercase tracking-wide">
                 <Bot className="w-3.5 h-3.5 text-[#af0a78]" />
-                Agent Directory · AI Legal Workers & Skills
+                Counsel Directory · AI Legal Workers & Skills
               </span>
               <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#efdbff] text-[#5b3188] text-xs font-semibold">
                 <Award className="w-3.5 h-3.5 text-[#7c52aa]" />
                 {ALL_AVAILABLE_AI_AGENTS.length} Specialized AI Workers Available
               </span>
+              <Link
+                href="/playground"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-gradient-to-r from-[#e040a0] to-[#af0a78] text-white text-xs font-bold shadow-md hover:scale-[1.02] transition-transform"
+                title="The Wire — live AI lawyer and multi-agent swarm playground"
+              >
+                <span>⚡ The Wire — Swarm Playground</span>
+              </Link>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-[#281330] tracking-tight">
-              AI Legal Team Directory & Skills Marketplace
+              AI Legal Workers, Skills & Counsel Directory
             </h1>
             <p className="text-xs sm:text-sm text-[#604868] max-w-2xl leading-relaxed">
-              Hire specialized AI agents with tailored legal skills to join your pro se defense team.
-              Each agent features transparent operational directives, statutory grounding, and direct Chambers integration.
+              Hire specialized AI agents and legal workers with verified skills to join your pro se defense team,
+              or search the neutral bar-verified counsel directory. Test live agents on <span className="font-bold text-[#af0a78]">The Wire</span>.
             </p>
           </div>
 
@@ -229,7 +236,7 @@ export function DirectoryView({
               }`}
             >
               <UserCheck className="w-4 h-4" />
-              <span>Neutral Bar Directory</span>
+              <span>Counsel Directory</span>
             </button>
           </div>
         </div>
@@ -470,12 +477,15 @@ export function DirectoryView({
       {/* ============================================================== */}
       {activeDirectoryTab === "human_counsel" && (
         <div className="space-y-6">
-          {/* Mandatory Directory Disclaimer Banner */}
+          {/* Directory Notice: Mandatory Disclaimer Banner */}
           <div className="bg-[#fff7fb] border border-[#f0d5e2] rounded-3xl p-5 text-xs text-[#281330] flex items-start gap-3.5 shadow-sm">
             <Info className="w-5 h-5 text-[#af0a78] shrink-0 mt-0.5" />
             <div className="space-y-1">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-[#af0a78] font-bold">
+                Directory Notice
+              </div>
               <h4 className="font-bold text-sm text-[#281330]">
-                Neutral Attorney Directory & Independent Bar Records
+                Neutral Bar Records & Independent Counsel
               </h4>
               <p className="text-[#604868] leading-relaxed">
                 Chain of Command does not rank, recommend, score, or endorse individual attorneys.
@@ -485,95 +495,105 @@ export function DirectoryView({
             </div>
           </div>
 
-          {/* Search & Area Filters */}
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            <div className="relative flex-1 w-full">
-              <Search className="w-4 h-4 text-[#8a707b] absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={attorneySearch}
-                onChange={(e) => setAttorneySearch(e.target.value)}
-                placeholder="Search attorneys by name, firm, or city (e.g. Indianapolis, Carmel)..."
-                className="w-full pl-9 pr-4 py-2.5 rounded-full bg-white border border-[#ddbfca] text-xs text-[#281330] placeholder:text-[#8a707b] focus:outline-none focus:ring-2 focus:ring-[#e040a0]/30 focus:border-[#af0a78] shadow-sm"
-              />
+          {/* Narrow Your Search: Search & Area Filters */}
+          <div className="space-y-2">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-[#8a707b] font-bold">
+              Narrow Your Search
             </div>
-            <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1">
-              {attorneyAreas.map((area) => (
-                <button
-                  key={area}
-                  type="button"
-                  onClick={() => setAttorneyArea(area)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${
-                    attorneyArea === area
-                      ? "bg-gradient-to-r from-[#e040a0] to-[#af0a78] text-white shadow-sm"
-                      : "bg-white border border-[#f0d5e2] text-[#604868] hover:bg-[#fff7fb]"
-                  }`}
-                >
-                  {area}
-                </button>
-              ))}
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <div className="relative flex-1 w-full">
+                <Search className="w-4 h-4 text-[#8a707b] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={attorneySearch}
+                  onChange={(e) => setAttorneySearch(e.target.value)}
+                  placeholder="Search attorneys by name, firm, or city (e.g. Indianapolis, Carmel)..."
+                  className="w-full pl-9 pr-4 py-2.5 rounded-full bg-white border border-[#ddbfca] text-xs text-[#281330] placeholder:text-[#8a707b] focus:outline-none focus:ring-2 focus:ring-[#e040a0]/30 focus:border-[#af0a78] shadow-sm"
+                />
+              </div>
+              <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1">
+                {attorneyAreas.map((area) => (
+                  <button
+                    key={area}
+                    type="button"
+                    onClick={() => setAttorneyArea(area)}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${
+                      attorneyArea === area
+                        ? "bg-gradient-to-r from-[#e040a0] to-[#af0a78] text-white shadow-sm"
+                        : "bg-white border border-[#f0d5e2] text-[#604868] hover:bg-[#fff7fb]"
+                    }`}
+                  >
+                    {area}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Attorney Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filteredAttorneys.map((atty) => (
-              <div
-                key={atty.id}
-                className="bg-white border border-[#f0d5e2] rounded-3xl p-5 sm:p-6 space-y-4 hover:border-[#ddbfca] hover:shadow-md transition-all"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-extrabold text-[#281330] text-base">{atty.fullName}</h3>
-                    <p className="text-xs text-[#604868] mt-0.5">{atty.firmName}</p>
-                  </div>
-                  <span
-                    className={`text-[10px] font-mono px-3 py-1 rounded-full font-bold ${
-                      atty.listingType === "VERIFIED_PUBLIC_DATA"
-                        ? "bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]"
-                        : "bg-[#eff6ff] text-[#2563eb] border border-[#bfdbfe]"
-                    }`}
-                  >
-                    {atty.listingType === "VERIFIED_PUBLIC_DATA" ? "Verified Bar Record" : "Attorney-Provided"}
-                  </span>
-                </div>
-
-                <div className="text-xs text-[#3e2846] space-y-1">
-                  <div className="flex items-center gap-1.5 text-[#604868]">
-                    <MapPin className="w-3.5 h-3.5 text-[#7c52aa]" />
-                    <span>{atty.officeCity} · {atty.jurisdiction}</span>
-                  </div>
-                  <div className="text-[#8a707b] text-[11px]">
-                    Admitted: {atty.admittedYear} · Bar ID: {atty.barNumber}
-                  </div>
-                </div>
-
-                {/* Practice Areas */}
-                <div className="flex flex-wrap gap-1.5">
-                  {atty.practiceAreas.map((area, idx) => (
+          {/* Counsel Listings Cards Grid */}
+          <div className="space-y-2">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-[#8a707b] font-bold">
+              Counsel Listings
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredAttorneys.map((atty) => (
+                <div
+                  key={atty.id}
+                  className="bg-white border border-[#f0d5e2] rounded-3xl p-5 sm:p-6 space-y-4 hover:border-[#ddbfca] hover:shadow-md transition-all"
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-extrabold text-[#281330] text-base">{atty.fullName}</h3>
+                      <p className="text-xs text-[#604868] mt-0.5">{atty.firmName}</p>
+                    </div>
                     <span
-                      key={idx}
-                      className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#fff7fb] border border-[#f0d5e2] text-[#57414a]"
+                      className={`text-[10px] font-mono px-3 py-1 rounded-full font-bold ${
+                        atty.listingType === "VERIFIED_PUBLIC_DATA"
+                          ? "bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]"
+                          : "bg-[#eff6ff] text-[#2563eb] border border-[#bfdbfe]"
+                      }`}
                     >
-                      {area}
+                      {atty.listingType === "VERIFIED_PUBLIC_DATA" ? "Bar Verified" : "Featured Listing"}
                     </span>
-                  ))}
-                </div>
+                  </div>
 
-                {/* Contact and Pro Bono Details */}
-                <div className="pt-3 border-t border-[#f0d5e2] flex items-center justify-between text-xs">
-                  <span className="text-[11px] text-[#604868]">
-                    {atty.publicDefenseEligible ? "Public Defense Eligible" : "Private Practice"}
-                  </span>
-                  <a
-                    href={`mailto:${atty.contactEmail}`}
-                    className="px-3.5 py-1.5 rounded-full bg-[#ffd8e8] text-[#8a005e] hover:bg-[#ffafd5] text-xs font-bold transition-colors"
-                  >
-                    Contact Office
-                  </a>
+                  <div className="text-xs text-[#3e2846] space-y-1">
+                    <div className="flex items-center gap-1.5 text-[#604868]">
+                      <MapPin className="w-3.5 h-3.5 text-[#7c52aa]" />
+                      <span>{atty.officeCity} · {atty.jurisdiction}</span>
+                    </div>
+                    <div className="text-[#8a707b] text-[11px]">
+                      Admitted: {atty.admittedYear} · Bar ID: {atty.barNumber}
+                    </div>
+                  </div>
+
+                  {/* Practice Areas */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {atty.practiceAreas.map((area, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#fff7fb] border border-[#f0d5e2] text-[#57414a]"
+                      >
+                        {area}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Contact and Pro Bono Details */}
+                  <div className="pt-3 border-t border-[#f0d5e2] flex items-center justify-between text-xs">
+                    <span className="text-[11px] text-[#604868] font-medium">
+                      {atty.publicDefenseEligible ? "Pro Bono & Legal Aid Eligible" : "Private Practice"}
+                    </span>
+                    <a
+                      href={`mailto:${atty.contactEmail}`}
+                      className="px-3.5 py-1.5 rounded-full bg-[#ffd8e8] text-[#8a005e] hover:bg-[#ffafd5] text-xs font-bold transition-colors"
+                    >
+                      Attorney Profile
+                    </a>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}

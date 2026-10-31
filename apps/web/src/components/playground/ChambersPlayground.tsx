@@ -221,8 +221,11 @@ export function ChambersPlayground() {
       <div className="w-64 shrink-0 border-r flex flex-col" style={{ borderColor: c.cardBorder, background: c.surface }}>
         <div className="p-3 border-b" style={{ borderColor: c.cardBorder }}>
           <div className="flex items-center gap-2 mb-3">
-            <span className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm font-extrabold" style={{ background: c.primary }}>⚖</span>
-            <span className="font-extrabold text-lg">Chambers</span>
+            <span className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm font-extrabold" style={{ background: c.primary }}>⚡</span>
+            <div>
+              <span className="font-extrabold text-lg block leading-none">The Wire</span>
+              <span className="text-[10px] font-mono tracking-wider font-semibold block mt-0.5" style={{ color: c.primary }}>AI Lawyer Swarm</span>
+            </div>
             <button onClick={() => setSettings(true)} className="ml-auto w-8 h-8 rounded-full flex items-center justify-center text-lg"
               style={{ background: c.surfaceContainer, color: c.onSurfaceVariant }} title="Workspace & Bench Settings">⚙</button>
           </div>
@@ -426,7 +429,7 @@ export function ChambersPlayground() {
               style={{ background: c.primary }}>Send</motion.button>
           </div>
           <div className="text-center text-xs mt-2" style={{ color: c.onSurfaceVariant }}>
-            Notice of AI Assistance — Chambers output is not legal advice.
+            Notice of AI Assistance — The Wire swarm output is educational and procedural, not legal advice.
           </div>
         </div>
       </div>

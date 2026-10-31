@@ -10,6 +10,11 @@ import {
   Check,
   Plus,
   Info,
+  Bell,
+  AlertTriangle,
+  FileCheck,
+  FileText,
+  Bot,
 } from "lucide-react";
 import { Matter } from "@/lib/workspace-data";
 
@@ -34,6 +39,7 @@ export function WorkspaceHeader({
 }: WorkspaceHeaderProps) {
   const [matterDropdownOpen, setMatterDropdownOpen] = useState(false);
   const [crisisModalOpen, setCrisisModalOpen] = useState(false);
+  const [clerkOpen, setClerkOpen] = useState(false);
 
   const speedyDays =
     typeof (activeMatter as { speedyTrialDaysRemaining?: number }).speedyTrialDaysRemaining ===
@@ -178,6 +184,86 @@ export function WorkspaceHeader({
                 </div>
               </div>
             )}
+            {/* The Clerk — canonical court notification bell */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setClerkOpen(!clerkOpen)}
+                className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#ddbfca] hover:border-[#af0a78] text-xs font-bold text-[#281330] transition-colors shadow-sm"
+                title="The Clerk — case notifications & court filings"
+              >
+                <Bell className="w-3.5 h-3.5 text-[#af0a78]" />
+                <span className="hidden sm:inline">The Clerk</span>
+                <span className="w-2 h-2 rounded-full bg-[#e040a0] animate-pulse" />
+              </button>
+
+              {clerkOpen && (
+                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-[#f0d5e2] rounded-2xl shadow-2xl p-3 z-50 animate-in fade-in slide-in-from-top-1">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#f0d5e2]">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#af0a78]" />
+                      <span className="text-xs font-bold text-[#281330]">The Clerk</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-[#8a707b]">Court Filing Alerts</span>
+                  </div>
+                  <p className="text-[11px] text-[#604868] mt-2 mb-3 italic">
+                    “The Clerk has a notice for you.”
+                  </p>
+                  <div className="space-y-2">
+                    <div className="p-2.5 rounded-xl bg-[#fff7fb] border border-[#f0d5e2] text-xs space-y-1">
+                      <div className="font-bold text-[#ba1a1a] flex items-center gap-1.5">
+                        <AlertTriangle className="w-3.5 h-3.5" />
+                        <span>⚠ Appearance Approaching</span>
+                      </div>
+                      <p className="text-[#281330] text-[11px]">
+                        Pre-Trial Conference set in 14 days before Judge Miller (Courtroom 302).
+                      </p>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-[#fff7fb] border border-[#f0d5e2] text-xs space-y-1">
+                      <div className="font-bold text-[#af0a78] flex items-center gap-1.5">
+                        <FileCheck className="w-3.5 h-3.5" />
+                        <span>📋 Filing Deadline</span>
+                      </div>
+                      <p className="text-[#281330] text-[11px]">
+                        Formal Brady Discovery Demand response window: 72 hours remaining.
+                      </p>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-[#fff7fb] border border-[#f0d5e2] text-xs space-y-1">
+                      <div className="font-bold text-[#7c52aa] flex items-center gap-1.5">
+                        <Scale className="w-3.5 h-3.5" />
+                        <span>🏛 Court Activity</span>
+                      </div>
+                      <p className="text-[#281330] text-[11px]">
+                        Minute entry recorded: State disclosure filed in Marion Superior Court.
+                      </p>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-[#fff7fb] border border-[#f0d5e2] text-xs space-y-1">
+                      <div className="font-bold text-[#059669] flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5" />
+                        <span>📄 Record Ready</span>
+                      </div>
+                      <p className="text-[#281330] text-[11px]">
+                        Officer’s Report extraction verified; 2 factual discrepancies flagged.
+                      </p>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-[#fff7fb] border border-[#f0d5e2] text-xs space-y-1">
+                      <div className="font-bold text-[#2563eb] flex items-center gap-1.5">
+                        <Bot className="w-3.5 h-3.5" />
+                        <span>🤖 Counsel Update</span>
+                      </div>
+                      <p className="text-[#281330] text-[11px]">
+                        Research AI completed statutory analysis of IC 35-43-2-1 in Chambers.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {onChangeJurisdiction && jurisdiction !== undefined && (
               <span className="hidden xl:inline text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
                 {jurisdiction || "Jurisdiction unset"}

@@ -131,23 +131,43 @@ export function DashboardView({
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Top Banner: Case Posture */}
+      {/* OS Legal Document Menu Bar */}
+      <div className="bg-[#1b0d21] border border-[#f0d5e2]/20 rounded-xl px-4 py-2 flex items-center justify-between text-xs text-[#eedcf5] font-mono shadow-sm">
+        <div className="flex items-center gap-4">
+          <span className="font-bold text-[#ff75c8] uppercase tracking-wider text-[11px]">Command Center</span>
+          <div className="flex items-center gap-3 text-xs text-[#ddbfca]">
+            <span className="hover:text-white cursor-pointer transition-colors">File (Case Actions)</span>
+            <span>·</span>
+            <span className="hover:text-white cursor-pointer transition-colors">Edit (Case Info)</span>
+            <span>·</span>
+            <span className="hover:text-white cursor-pointer transition-colors">View (Layout Toggles)</span>
+            <span>·</span>
+            <button type="button" className="hover:text-white cursor-pointer transition-colors" onClick={() => onNavigateTab("chambers")}>Team (Counsel Roster)</button>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 text-[10px] text-zinc-400">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span>Case File Synced</span>
+        </div>
+      </div>
+
+      {/* Case File Banner (Case Posture) */}
       <div className="bg-[#141519] border border-[#272830] rounded-xl p-6 relative overflow-hidden">
         <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 border-b border-[#23242B] pb-5">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <span className="text-xs font-mono text-[#D4AF37] uppercase tracking-wider font-bold">
-                Active Legal Workspace
+                Case File Banner
               </span>
               <span className="text-zinc-500">·</span>
               <span className="text-xs text-white font-mono bg-zinc-900 border border-zinc-700/80 px-2.5 py-0.5 rounded font-bold tracking-wide">
                 {matter.caseNumber}
               </span>
               <span className="text-zinc-500">·</span>
-              {/* Static data value: high contrast neutral, reserving amber for interactive focal elements */}
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-100 bg-zinc-900/90 border border-zinc-700 px-2.5 py-0.5 rounded font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-zinc-200" />
-                <span>{matter.defenseStatus || "Self-Represented (Pro Se)"}</span>
+              {/* Docket Status badge */}
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-100 bg-zinc-900/90 border border-zinc-700 px-2.5 py-0.5 rounded font-mono" title="Docket Status">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Docket Status: {matter.defenseStatus || "Self-Represented (Pro Se)"}</span>
               </span>
             </div>
             <h1 className="text-3xl md:text-4xl font-serif font-extrabold text-white tracking-tight drop-shadow-sm leading-tight">
@@ -155,7 +175,7 @@ export function DashboardView({
             </h1>
             {/* Enhanced typography & micro-contrast for secondary body description (WCAG AA compliant: >= 4.5:1) */}
             <p className="text-sm font-semibold text-zinc-100 mt-2 leading-relaxed">
-              <span>{matter.courtName || matter.court || "—"}</span>
+              <span>Venue: {matter.courtName || matter.court || "—"}</span>
               <span className="text-zinc-400 mx-2">·</span>
               <span>Presiding: </span>
               <span className="text-white font-bold">{matter.judge || "Unassigned"}</span>
@@ -173,7 +193,7 @@ export function DashboardView({
               className="px-3.5 py-2 text-xs font-semibold text-zinc-100 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-zinc-500 rounded-lg flex items-center gap-2 transition-colors"
             >
               <Gavel className="w-3.5 h-3.5 text-zinc-300" />
-              <span>View Full Docket</span>
+              <span>Search the Docket</span>
             </button>
             {/* Primary interactive CTA: reserved Amber focus */}
             <button
@@ -181,13 +201,17 @@ export function DashboardView({
               className="px-4 py-2 text-xs font-bold text-neutral-950 bg-[#D4AF37] hover:bg-[#c49f27] rounded-lg flex items-center gap-1.5 transition-all shadow-lg shadow-[#D4AF37]/20 ring-1 ring-[#D4AF37]/60"
             >
               <Sparkles className="w-3.5 h-3.5 text-neutral-950" />
-              <span>Consult AI Team</span>
+              <span>Consult Chambers</span>
             </button>
           </div>
         </div>
 
-        {/* 4 Case Metrics — clean high-contrast static data values, letter-spaced all-caps headers */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-5">
+        {/* Brief Stats: 4 Case Metrics */}
+        <div className="pt-4">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 font-bold mb-2">
+            Brief Stats
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3">
             <div className="flex items-center justify-between text-[10px] text-zinc-200 font-mono uppercase tracking-widest mb-1.5 font-semibold">
               <span>Next appearance</span>
@@ -262,6 +286,7 @@ export function DashboardView({
           </div>
         </div>
       </div>
+    </div>
 
       {/* Quick Action Workbench — Consolidated with subtle corner hotkey badges */}
       <div>
@@ -410,22 +435,25 @@ export function DashboardView({
         </div>
       </div>
 
-      {/* Split Section: Active AI Team Roster & Contradiction Alerts */}
+      {/* Split Section: Chambers Panel & Chronology Rail Discrepancies */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: AI Legal Team Roster Preview */}
+        {/* Left: Chambers Panel */}
         <div className="lg:col-span-2 bg-[#141519] border border-[#272830] rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-bold text-white text-sm">Assigned AI Legal Team</h3>
+              <div className="text-[10px] font-mono text-[#D4AF37] uppercase tracking-wider font-bold mb-0.5">
+                Chambers Panel
+              </div>
+              <h3 className="font-bold text-white text-sm">Counsel Roster</h3>
               <p className="text-xs font-semibold text-zinc-200 mt-0.5">
-                Specialist agents active for {matter.title}
+                Specialist AI legal agents active for {matter.title}
               </p>
             </div>
             <button
               onClick={() => onNavigateTab("chambers")}
               className="text-xs font-bold text-[#D4AF37] hover:text-amber-300 hover:underline flex items-center gap-1 transition-colors"
             >
-              <span>Manage Team</span>
+              <span>Enter Chambers</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -451,12 +479,15 @@ export function DashboardView({
           </div>
         </div>
 
-        {/* Right: Contradictions & Discrepancies Radar */}
+        {/* Right: Chronology Rail & Court Log Radar */}
         <div className="bg-[#141519] border border-[#272830] rounded-xl p-5 flex flex-col justify-between">
           <div>
+            <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider font-bold mb-1">
+              Chronology Rail & Court Log
+            </div>
             <div className="flex items-center gap-2 text-zinc-100 mb-2">
               <AlertTriangle className="w-4 h-4 text-zinc-300" />
-              <h3 className="font-bold text-sm text-white">Investigation Factual Radar</h3>
+              <h3 className="font-bold text-sm text-white">Discrepancy Radar</h3>
             </div>
             <p className="text-xs text-zinc-200 mb-4 leading-relaxed font-medium">
               Discrepancies identified between official officer accounts and tangible evidence:

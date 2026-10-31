@@ -3,8 +3,8 @@ import { ChambersPlayground } from "@/components/playground/ChambersPlayground";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Empyrean Agent Playground — AI Lawyer | Chain of Command",
-  description: "Live Empyrean multi-agent swarm as your legal AI team playground",
+  title: "The Wire — AI Lawyer & Swarm Playground | Chain of Command",
+  description: "The Wire: Multi-agent AI legal swarm, hireable AI legal workers, and live conference room",
 };
 
 export default function PlaygroundPage() {
