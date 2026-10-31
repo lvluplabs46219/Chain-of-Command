@@ -490,9 +490,8 @@ export function ChambersPlayground() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
 
-      {/* 3D Agent Rolodex overlay — does not leave the task thread permanently */}
+      {/* 3D Agent Rolodex overlay — stays over the task thread */}
       <AnimatePresence>
         {rolodexOpen && (
           <motion.div
@@ -520,5 +519,6 @@ export function ChambersPlayground() {
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
   );
 }
