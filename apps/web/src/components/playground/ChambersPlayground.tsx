@@ -321,11 +321,9 @@ export function ChambersPlayground() {
             >
               View Agent Rolodex
             </motion.button>
-            <motion.button
-              type="button"
-              whileHover={bounce ? { scale: 1.04 } : undefined}
-              transition={spring}
-              className="px-3 py-1.5 rounded-full text-xs font-semibold"
+            <Link
+              href="/draft-desk"
+              className="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors"
               style={{
                 background: "transparent",
                 color: c.onSurface,
@@ -333,7 +331,7 @@ export function ChambersPlayground() {
               }}
             >
               Open Canvas
-            </motion.button>
+            </Link>
             <motion.button
               type="button"
               whileHover={bounce ? { scale: 1.04 } : undefined}

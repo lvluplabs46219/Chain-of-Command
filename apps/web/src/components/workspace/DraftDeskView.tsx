@@ -23,6 +23,16 @@ import {
   Scale,
   X,
   FileCheck,
+  Files,
+  Settings,
+  Bold,
+  Italic,
+  Underline,
+  AlignLeft,
+  AlignCenter,
+  List,
+  Undo2,
+  Redo2,
 } from "lucide-react";
 import { Matter, isDemoMatter } from "@/lib/workspace-data";
 
@@ -502,219 +512,174 @@ export function DraftDeskView({ matter, onOpenActionModal, onSendToChambers }: D
   const categories = ["All", "Pre-Trial", "Discovery & Evidence", "Constitutional", "Family & Paternity", "Appearance"];
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
-      {/* Top Banner & Header */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#f0d5e2] shadow-[0_8px_30px_rgba(224,64,160,0.06)] relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#ffd8e8]/50 via-[#fde7ff]/30 to-transparent rounded-full -mr-20 -mt-20 pointer-events-none" />
-
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ffd8e8] text-[#8a005e] text-xs font-bold font-mono uppercase tracking-wide">
-                <FileSignature className="w-3.5 h-3.5 text-[#af0a78]" />
-                Draft Desk · Motion Library
-              </span>
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#efdbff] text-[#5b3188] text-xs font-semibold">
-                <Sparkles className="w-3.5 h-3.5 text-[#7c52aa]" />
-                Auto-Filled with Matter Parameters
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#281330] tracking-tight">
-              Court Pleading & Motion Builder
-            </h1>
-            <p className="text-sm text-[#604868] max-w-2xl leading-relaxed">
-              Select any court-tested pro se motion below. The system automatically injects your active matter's
-              court name, cause number, presiding judge, statutory counts, and evidence.
-            </p>
-          </div>
-
-          {/* Active Matter Sync Pill */}
-          <div className="bg-[#fff7fb] border border-[#f0d5e2] rounded-2xl p-4 shrink-0 max-w-sm">
-            <div className="flex items-center justify-between text-xs font-bold text-[#8a005e] uppercase tracking-wider mb-2">
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-[#10b981]" />
-                Active Matter Attached
-              </span>
-              <span className="font-mono text-[11px] text-[#7c52aa] bg-white px-2 py-0.5 rounded-full border border-[#f0d5e2]">
-                {cleanStr(matter.caseNumber, "No Cause #")}
-              </span>
-            </div>
-            <div className="text-xs text-[#281330] font-semibold truncate">
-              {cleanStr(matter.title, "No active matter loaded")}
-            </div>
-            <div className="text-[11px] text-[#604868] truncate mt-0.5">
-              Court: <span className="font-medium text-[#281330]">{cleanStr(matter.court || matter.courtName, "Not set")}</span>
-            </div>
-            <div className="text-[11px] text-[#604868] truncate mt-0.5">
-              Judge: <span className="font-medium text-[#281330]">{cleanStr(matter.judge, "Not set")}</span>
-            </div>
-          </div>
+    <div className="flex flex-col h-[calc(100vh-7.5rem)] min-h-[640px] max-w-[1600px] mx-auto my-3 mx-3 sm:mx-4 rounded-xl overflow-hidden border border-[#3c3c3c] shadow-2xl bg-[#1e1e1e] text-[#cccccc]">
+      {/* VS Code–style menu bar */}
+      <div className="h-9 shrink-0 flex items-center justify-between px-3 border-b border-[#2b2b2b] bg-[#323233] text-[11px] select-none">
+        <div className="flex items-center gap-3 min-w-0">
+          <FileSignature className="w-3.5 h-3.5 text-[#c586c0] shrink-0" />
+          <span className="font-semibold text-[#e0e0e0] truncate">Draft Desk</span>
+          <span className="text-[#6a6a6a]">—</span>
+          <span className="truncate text-[#9cdcfe]">{selectedTemplate.name}.docx</span>
+        </div>
+        <div className="hidden md:flex items-center gap-3 text-[#a0a0a0]">
+          <span className="hover:text-white cursor-default">File</span>
+          <span className="hover:text-white cursor-default">Edit</span>
+          <span className="hover:text-white cursor-default">View</span>
+          <span className="hover:text-white cursor-default">Insert</span>
+          <span className="hover:text-white cursor-default">Format</span>
+          <span className="hover:text-white cursor-default">Tools</span>
+          <span className="hover:text-white cursor-default">Help</span>
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-mono text-[#808080]">
+          <span>UTF-8</span>
+          <span>·</span>
+          <span>Pleading</span>
+          <span>·</span>
+          <span className="text-amber-400/90">NOT LEGAL ADVICE</span>
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        {/* Category Pills */}
-        <div className="flex flex-wrap items-center gap-2">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-                activeCategory === cat
-                  ? "bg-gradient-to-r from-[#e040a0] to-[#af0a78] text-white shadow-[0_4px_16px_rgba(224,64,160,0.25)] scale-[1.02]"
-                  : "bg-white text-[#604868] border border-[#f0d5e2] hover:bg-[#fff7fb] hover:text-[#281330]"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Search Input */}
-        <div className="relative min-w-[240px]">
-          <Search className="w-4 h-4 text-[#8a707b] absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search motion templates..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 rounded-full bg-white border border-[#ddbfca] text-xs text-[#281330] placeholder:text-[#8a707b] focus:outline-none focus:ring-2 focus:ring-[#e040a0]/30 focus:border-[#af0a78] shadow-sm"
-          />
-        </div>
-      </div>
-
-      {/* Main Studio Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Template List (4 cols) */}
-        <div className="lg:col-span-4 space-y-3">
-          <div className="flex items-center justify-between px-1">
-            <span className="text-xs font-bold uppercase font-mono tracking-wider text-[#604868]">
-              Available Templates ({filteredTemplates.length})
-            </span>
-            <span className="text-[11px] text-[#af0a78] font-medium">Click to Load & Fill</span>
+      <div className="flex flex-1 min-h-0">
+        {/* Activity bar */}
+        <div className="w-12 shrink-0 flex flex-col items-center py-2 gap-1 border-r border-[#2b2b2b] bg-[#333333]">
+          <div className="p-2 rounded text-white border-l-2 border-[#007acc] bg-white/5" title="Templates">
+            <Files className="w-5 h-5" />
           </div>
+          <div className="p-2 rounded text-[#858585] hover:text-white" title="Search templates">
+            <Search className="w-5 h-5" />
+          </div>
+          <div className="p-2 rounded text-[#858585] hover:text-white" title="Matter context">
+            <FolderOpen className="w-5 h-5" />
+          </div>
+          <div className="mt-auto p-2 rounded text-[#858585] hover:text-white" title="Settings">
+            <Settings className="w-5 h-5" />
+          </div>
+        </div>
 
-          <div className="space-y-2.5 max-h-[820px] overflow-y-auto pr-1">
+        {/* Explorer: motion templates */}
+        <aside className="w-[min(100%,280px)] shrink-0 flex flex-col border-r border-[#2b2b2b] bg-[#252526]">
+          <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[#bbbbbb] border-b border-[#2b2b2b]">
+            Explorer · Motion Templates
+          </div>
+          <div className="p-2 border-b border-[#2b2b2b]">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#6a6a6a]" />
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search templates..."
+                className="w-full pl-8 pr-2 py-1.5 rounded bg-[#3c3c3c] border border-[#3c3c3c] focus:border-[#007acc] text-[12px] text-[#cccccc] placeholder:text-[#6a6a6a] outline-none"
+              />
+            </div>
+            <div className="flex flex-wrap gap-1 mt-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setActiveCategory(cat)}
+                  className={`text-[10px] px-2 py-0.5 rounded border ${
+                    activeCategory === cat
+                      ? "bg-[#094771] border-[#007acc] text-white"
+                      : "bg-transparent border-[#3c3c3c] text-[#9d9d9d] hover:border-[#6a6a6a]"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex-1 overflow-y-auto py-1">
             {filteredTemplates.map((template) => {
               const isSelected = template.id === selectedTemplateId;
               return (
-                <div
+                <button
                   key={template.id}
+                  type="button"
                   onClick={() => {
                     setSelectedTemplateId(template.id);
-                    setCustomDraftText(""); // Reset custom edits when switching template
+                    setCustomDraftText("");
                   }}
-                  className={`p-4 rounded-2xl border cursor-pointer transition-all ${
+                  className={`w-full text-left px-3 py-2 border-l-2 ${
                     isSelected
-                      ? "bg-gradient-to-br from-[#ffffff] to-[#fff7fb] border-[#e040a0] shadow-[0_6px_24px_rgba(224,64,160,0.18)] scale-[1.01]"
-                      : "bg-white border-[#f0d5e2] hover:border-[#ddbfca] hover:shadow-sm"
+                      ? "bg-[#2a2d2e] border-[#007acc]"
+                      : "border-transparent hover:bg-[#2a2d2e]/80"
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono uppercase bg-[#ffd8e8] text-[#8a005e]">
-                      {template.badge}
-                    </span>
-                    <span className="text-[11px] font-semibold text-[#7c52aa]">
-                      {template.category}
+                  <div className="flex items-center gap-2">
+                    <FileText className={`w-3.5 h-3.5 shrink-0 ${isSelected ? "text-[#9cdcfe]" : "text-[#6a6a6a]"}`} />
+                    <span className={`text-[12px] truncate ${isSelected ? "text-white font-medium" : "text-[#cccccc]"}`}>
+                      {template.name}
                     </span>
                   </div>
-
-                  <h3 className="font-bold text-xs sm:text-sm text-[#281330] mt-2 leading-snug">
-                    {template.name}
-                  </h3>
-
-                  <p className="text-[11px] text-[#604868] mt-1.5 line-clamp-2 leading-relaxed">
-                    {template.summary}
-                  </p>
-
-                  <div className="mt-3 pt-2 border-t border-[#f8e6ef] flex items-center justify-between text-[10px] text-[#8a707b]">
-                    <span className="truncate max-w-[190px]">{template.governingRule}</span>
-                    <span className="flex items-center gap-1 font-bold text-[#af0a78]">
-                      View Draft <ArrowRight className="w-3 h-3" />
-                    </span>
-                  </div>
-                </div>
+                  <div className="pl-5 mt-0.5 text-[10px] text-[#6a6a6a] truncate">{template.badge} · {template.category}</div>
+                </button>
               );
             })}
-
             {filteredTemplates.length === 0 && (
-              <div className="p-8 text-center bg-white border border-[#f0d5e2] rounded-2xl">
-                <p className="text-xs text-[#604868]">No templates match your search filter.</p>
-              </div>
+              <p className="px-3 py-6 text-center text-[11px] text-[#6a6a6a]">No templates match.</p>
             )}
           </div>
-        </div>
+        </aside>
 
-        {/* Right Column: Pleading Studio Editor & Actions (8 cols) */}
-        <div className="lg:col-span-8 space-y-4">
-          {/* Action Ribbon */}
-          <div className="bg-white border border-[#f0d5e2] rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2">
-                <h2 className="font-bold text-sm sm:text-base text-[#281330]">
-                  {selectedTemplate.name}
-                </h2>
-                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-[#efdbff] text-[#5b3188] font-bold">
-                  Pro Se Pleading
-                </span>
-              </div>
-              <p className="text-xs text-[#604868]">
-                {selectedTemplate.governingRule} · {selectedTemplate.whenToFile}
-              </p>
+        {/* Editor column */}
+        <div className="flex-1 flex flex-col min-w-0 bg-[#1e1e1e]">
+          {/* Tabs */}
+          <div className="flex items-center gap-0 border-b border-[#2b2b2b] bg-[#252526] overflow-x-auto">
+            <div className="flex items-center gap-2 px-3 py-2 bg-[#1e1e1e] border-r border-[#2b2b2b] text-[12px] text-[#e0e0e0]">
+              <FileText className="w-3.5 h-3.5 text-blue-400" />
+              <span className="truncate max-w-[220px]">{selectedTemplate.name}.docx</span>
+              <span className="text-[#6a6a6a] text-[10px]">●</span>
             </div>
-
-            {/* Utility Buttons */}
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="px-3.5 py-1.5 rounded-full bg-[#fff7fb] hover:bg-[#ffd8e8] text-[#8a005e] border border-[#f0d5e2] text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
-                title="Copy entire pleading to clipboard"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-[#10b981]" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? "Copied!" : "Copy Text"}</span>
+            <div className="ml-auto flex items-center gap-1.5 px-2 py-1">
+              <button type="button" onClick={handleCopy} className="px-2 py-1 rounded text-[11px] text-[#cccccc] hover:bg-[#2a2d2e] flex items-center gap-1">
+                {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                {copied ? "Copied" : "Copy"}
               </button>
-
-              <button
-                type="button"
-                onClick={handleDownload}
-                className="px-3.5 py-1.5 rounded-full bg-[#fff7fb] hover:bg-[#efdbff] text-[#5b3188] border border-[#f0d5e2] text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
-                title="Download formatted document as text file"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Export .TXT</span>
+              <button type="button" onClick={handleDownload} className="px-2 py-1 rounded text-[11px] text-[#cccccc] hover:bg-[#2a2d2e] flex items-center gap-1">
+                <Download className="w-3 h-3" /> Export
               </button>
-
-              <button
-                type="button"
-                onClick={handlePrint}
-                className="px-3.5 py-1.5 rounded-full bg-[#fff7fb] hover:bg-[#e0f2fe] text-[#006388] border border-[#f0d5e2] text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
-                title="Print pleading or save to PDF"
-              >
-                <Printer className="w-3.5 h-3.5" />
-                <span>Print / PDF</span>
+              <button type="button" onClick={handlePrint} className="px-2 py-1 rounded text-[11px] text-[#cccccc] hover:bg-[#2a2d2e] flex items-center gap-1">
+                <Printer className="w-3 h-3" /> Print/PDF
               </button>
-
               <button
                 type="button"
                 onClick={() => setShowFilingChecklist(true)}
-                className="px-4 py-1.5 rounded-full bg-gradient-to-r from-[#e040a0] to-[#af0a78] text-white text-xs font-bold flex items-center gap-1.5 shadow-[0_4px_16px_rgba(224,64,160,0.25)] hover:scale-[1.02] transition-transform"
+                className="px-2.5 py-1 rounded text-[11px] font-semibold bg-[#0e639c] hover:bg-[#1177bb] text-white flex items-center gap-1"
               >
-                <FileCheck className="w-3.5 h-3.5" />
-                <span>Filing Packet Checklist</span>
+                <FileCheck className="w-3 h-3" /> Filing Packet
               </button>
             </div>
           </div>
 
-          {/* Quick Snippet Inserters */}
-          <div className="bg-[#fff7fb] border border-[#f0d5e2] rounded-2xl px-4 py-2.5 flex flex-wrap items-center gap-2 text-xs">
-            <span className="font-bold text-[#8a005e] flex items-center gap-1 mr-1">
-              <Sparkles className="w-3 h-3 text-[#af0a78]" />
-              Quick Insert:
-            </span>
+          {/* LibreOffice / Word–style ribbon */}
+          <div className="flex flex-wrap items-center gap-1 px-3 py-1.5 border-b border-[#2b2b2b] bg-[#2d2d2d] text-[#c8c8c8]">
+            <span className="text-[10px] uppercase tracking-wide text-[#6a6a6a] mr-1">Home</span>
+            <button type="button" className="p-1.5 rounded hover:bg-[#3c3c3c]" title="Bold (visual only)"><Bold className="w-3.5 h-3.5" /></button>
+            <button type="button" className="p-1.5 rounded hover:bg-[#3c3c3c]" title="Italic (visual only)"><Italic className="w-3.5 h-3.5" /></button>
+            <button type="button" className="p-1.5 rounded hover:bg-[#3c3c3c]" title="Underline (visual only)"><Underline className="w-3.5 h-3.5" /></button>
+            <span className="w-px h-4 bg-[#3c3c3c] mx-1" />
+            <button type="button" className="p-1.5 rounded hover:bg-[#3c3c3c]" title="Align left"><AlignLeft className="w-3.5 h-3.5" /></button>
+            <button type="button" className="p-1.5 rounded hover:bg-[#3c3c3c]" title="Center"><AlignCenter className="w-3.5 h-3.5" /></button>
+            <button type="button" className="p-1.5 rounded hover:bg-[#3c3c3c]" title="List"><List className="w-3.5 h-3.5" /></button>
+            <span className="w-px h-4 bg-[#3c3c3c] mx-1" />
+            <button type="button" onClick={handleResetToDefault} className="p-1.5 rounded hover:bg-[#3c3c3c] text-[11px] flex items-center gap-1" title="Reset to template">
+              <RefreshCw className="w-3.5 h-3.5" /> Reset
+            </button>
+            <button
+              type="button"
+              onClick={() => setLineNumbersEnabled(!lineNumbersEnabled)}
+              className={`ml-auto px-2 py-1 rounded text-[10px] border ${
+                lineNumbersEnabled ? "border-[#007acc] text-[#9cdcfe]" : "border-[#3c3c3c] text-[#808080]"
+              }`}
+            >
+              Line nos {lineNumbersEnabled ? "On" : "Off"}
+            </button>
+          </div>
 
+          {/* Quick insert chips */}
+          <div className="flex flex-wrap items-center gap-1.5 px-3 py-1.5 border-b border-[#2b2b2b] bg-[#252526] text-[11px]">
+            <Sparkles className="w-3 h-3 text-[#c586c0]" />
+            <span className="text-[#6a6a6a]">Insert:</span>
             {matter.charges.length > 0 && (
               <button
                 type="button"
@@ -723,12 +688,11 @@ export function DraftDeskView({ matter, onOpenActionModal, onSendToChambers }: D
                     `\n[ADDITIONAL COUNT REF]: Regarding Count 1 (${matter.charges[0].title}), Litigant specifically notes that elements regarding '${matter.charges[0].elements?.[0]?.name || "statutory proof"}' remain unproven.`
                   )
                 }
-                className="px-2.5 py-1 rounded-full bg-white hover:bg-[#ffd8e8] text-[#8a005e] border border-[#f0d5e2] text-[11px] font-semibold transition-colors"
+                className="px-2 py-0.5 rounded bg-[#3c3c3c] hover:bg-[#094771] text-[#cccccc]"
               >
-                + Count 1 ({matter.charges[0].title})
+                + Count 1
               </button>
             )}
-
             {matter.evidence.length > 0 && (
               <button
                 type="button"
@@ -737,12 +701,11 @@ export function DraftDeskView({ matter, onOpenActionModal, onSendToChambers }: D
                     `\n[EXHIBIT EVIDENCE CITED]: Exhibit [${matter.evidence[0].exhibitNumber}] - ${matter.evidence[0].title} (${matter.evidence[0].type}) is incorporated herein by reference as supporting documentation.`
                   )
                 }
-                className="px-2.5 py-1 rounded-full bg-white hover:bg-[#efdbff] text-[#5b3188] border border-[#f0d5e2] text-[11px] font-semibold transition-colors"
+                className="px-2 py-0.5 rounded bg-[#3c3c3c] hover:bg-[#094771] text-[#cccccc]"
               >
                 + Exhibit {matter.evidence[0].exhibitNumber}
               </button>
             )}
-
             {matter.nextCourtDate && (
               <button
                 type="button"
@@ -751,70 +714,43 @@ export function DraftDeskView({ matter, onOpenActionModal, onSendToChambers }: D
                     `\n[SCHEDULED HEARING DATE]: Hearing is currently scheduled on the Court calendar for ${matter.nextCourtDate}.`
                   )
                 }
-                className="px-2.5 py-1 rounded-full bg-white hover:bg-[#e0f2fe] text-[#006388] border border-[#f0d5e2] text-[11px] font-semibold transition-colors"
+                className="px-2 py-0.5 rounded bg-[#3c3c3c] hover:bg-[#094771] text-[#cccccc]"
               >
-                + Hearing Date ({matter.nextCourtDate})
+                + Hearing Date
               </button>
             )}
-
-            {customDraftText && (
-              <button
-                type="button"
-                onClick={handleResetToDefault}
-                className="ml-auto px-2.5 py-1 rounded-full bg-white hover:bg-red-50 text-red-600 border border-red-200 text-[11px] font-semibold flex items-center gap-1"
-                title="Revert custom edits back to template auto-filled defaults"
-              >
-                <RefreshCw className="w-3 h-3" />
-                Reset Defaults
-              </button>
-            )}
+            <span className="ml-auto text-[10px] text-[#6a6a6a] truncate max-w-[40%]">{selectedTemplate.governingRule}</span>
           </div>
 
-          {/* Legal Document Pleading Container */}
-          <div className="bg-white border border-[#f0d5e2] rounded-3xl shadow-[0_8px_30px_rgba(124,82,170,0.06)] overflow-hidden">
-            {/* Document Header Bar */}
-            <div className="bg-[#fff7fb] border-b border-[#f0d5e2] px-6 py-3 flex items-center justify-between text-xs text-[#604868]">
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-[#af0a78] font-bold uppercase tracking-wider">
-                  Pleading Paper Preview (Editable)
-                </span>
-                <span className="text-[#8a707b]">·</span>
-                <span className="text-[11px]">Click anywhere to type or amend your averments</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setLineNumbersEnabled(!lineNumbersEnabled)}
-                  className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border transition-colors ${
-                    lineNumbersEnabled
-                      ? "bg-[#ffd8e8] text-[#8a005e] border-[#ffafd5]"
-                      : "bg-white text-[#604868] border-[#f0d5e2]"
-                  }`}
-                >
-                  {lineNumbersEnabled ? "Line Numbers: On" : "Line Numbers: Off"}
-                </button>
-              </div>
-            </div>
-
-            {/* Editable Legal Pleading Sheet */}
-            <div className="p-6 sm:p-10 font-mono text-xs sm:text-[13px] text-[#281330] leading-relaxed bg-white">
+          {/* Word / LibreOffice page canvas */}
+          <div className="flex-1 overflow-auto bg-[#525659] p-4 sm:p-8">
+            <div className="mx-auto max-w-[816px] min-h-[1056px] bg-white text-black shadow-[0_8px_40px_rgba(0,0,0,0.45)] rounded-[2px] relative">
+              {/* faint margin guides */}
+              <div className="pointer-events-none absolute inset-y-0 left-[72px] w-px bg-blue-400/20" />
+              <div className="pointer-events-none absolute inset-y-0 right-[72px] w-px bg-blue-400/20" />
               <textarea
                 value={activeText}
                 onChange={(e) => setCustomDraftText(e.target.value)}
-                rows={32}
-                className="w-full bg-transparent border-0 focus:outline-none resize-y font-mono text-xs sm:text-[13px] text-[#281330] leading-relaxed selection:bg-[#ffd8e8]"
-                spellCheck="false"
+                spellCheck
+                className="w-full min-h-[1056px] bg-transparent border-0 resize-none focus:outline-none px-[72px] py-[72px] text-[13px] leading-[1.85] text-[#111] selection:bg-[#cce2ff]"
+                style={{
+                  fontFamily: '"Times New Roman", Times, "Liberation Serif", serif',
+                }}
+                aria-label="Pleading document editor"
               />
             </div>
+          </div>
 
-            {/* Pro Se Mandatory Warning Footer */}
-            <div className="bg-[#fff7fb] border-t border-[#f0d5e2] px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#604868]">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-[#af0a78] shrink-0" />
-                <span className="text-[11px]">
-                  <strong>Pro Se Verification:</strong> You must print, review, sign, and date this motion before filing with the Clerk.
-                </span>
-              </div>
+          {/* Status bar */}
+          <div className="h-6 shrink-0 flex items-center justify-between px-3 border-t border-[#007acc] bg-[#007acc] text-[11px] text-white">
+            <div className="flex items-center gap-3">
+              <span>Draft Desk</span>
+              <span className="opacity-80">{hasMatter ? matter.caseNumber || matter.caption || "Matter linked" : "No matter linked"}</span>
+            </div>
+            <div className="flex items-center gap-3 opacity-90">
+              <span>Ln {activeText.split("\n").length}</span>
+              <span>Spaces: 2</span>
+              <span>100%</span>
               <button
                 type="button"
                 onClick={() => {
@@ -828,9 +764,9 @@ export function DraftDeskView({ matter, onOpenActionModal, onSendToChambers }: D
                     setShowFilingChecklist(true);
                   }
                 }}
-                className="px-4 py-1.5 rounded-full bg-[#ffd8e8] text-[#8a005e] hover:bg-[#ffafd5] text-xs font-bold transition-colors shrink-0"
+                className="underline underline-offset-2"
               >
-                Filing Instructions & Packet
+                Filing instructions
               </button>
             </div>
           </div>
