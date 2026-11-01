@@ -9,13 +9,17 @@ This monorepo contains the core platform: frontend workspace, API server, RAG en
 
 | Doc | Purpose |
 |-----|---------|
+| [docs/CHAIN_OF_COMMAND_FULL_APP_BLUEPRINT_REVISED.md](docs/CHAIN_OF_COMMAND_FULL_APP_BLUEPRINT_REVISED.md) | **Living product blueprint v2.1** — IA, priorities (P0–P3), invariants |
+| [docs/MASTER_TASK_LIST.md](docs/MASTER_TASK_LIST.md) | Prioritized implementation backlog |
 | [docs/OPERATIONS.md](docs/OPERATIONS.md) | Dev, deploy, safety rules |
 | [docs/INFISICAL_SETUP.md](docs/INFISICAL_SETUP.md) | Machine identity + agent secrets |
 | [docs/ONBOARDING.md](docs/ONBOARDING.md) | First-run wizard and reset |
-| [docs/AI_GATEWAY.md](docs/AI_GATEWAY.md) | Chambers → Gemini/Ollama/templates |
+| [docs/AI_GATEWAY.md](docs/AI_GATEWAY.md) | Model gateway / Chambers → Gemini/Ollama/templates |
 | [docs/DATA_MODEL.md](docs/DATA_MODEL.md) | Matters, demo vs real, empty state |
 | [docs/SESSION_2026-10-09.md](docs/SESSION_2026-10-09.md) | What shipped this session |
 | [docs/CHAIN_OF_COMMAND_ARCHITECTURE.md](docs/CHAIN_OF_COMMAND_ARCHITECTURE.md) | Verification architecture |
+| [docs/LAW_LIBRARY.md](docs/LAW_LIBRARY.md) | Stacks / Record Room / Chronology / Evidence Locker |
+| [docs/DESIGN_DIRECTION.md](docs/DESIGN_DIRECTION.md) | Places model + Candy design system |
 | [AGENTS.md](AGENTS.md) | Product build principles + agent team |
 | [agent/multi-agent/README.md](agent/multi-agent/README.md) | Local multi-agent runtime |
 | [SECURITY.md](SECURITY.md) | Security policy |
@@ -87,5 +91,6 @@ npm run dev
 - **No Autonomous Filing**: The AI cannot file documents or take legal action automatically.
 - **Citation Grounding**: Legal claims must cite verifiable statutes or case law.
 - **Privacy & Auditability**: User data is isolated; AI actions are logged via the audit module.
+- **Capability-not-verified**: External connectors and court integrations default to honest “not verified” until proven.
 
-For agent/architecture rules see `AGENTS.md` and `docs/`.
+For agent/architecture rules see `AGENTS.md`, the revised blueprint, and `docs/`.

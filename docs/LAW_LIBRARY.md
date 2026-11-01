@@ -1,8 +1,20 @@
-# Law Library — Hybrid Legal Search (Supabase)
+# Law Library — Hybrid Legal Search & Workspace (Supabase)
 
 Educational tool only. Not a substitute for a licensed attorney or commercial databases for court filing authority.
 
-## Pipeline (shipped)
+Aligned with **Full App Blueprint v2.1** (see `docs/CHAIN_OF_COMMAND_FULL_APP_BLUEPRINT_REVISED.md`).
+
+## Internal Tabs (Themed)
+
+| Tab | Themed Name | Focus | Priority |
+|-----|-------------|-------|----------|
+| Research | **Stacks** | Hybrid search, Volume Cards, Research Brief, grounding | P1 core |
+| Documents | **Record Room** | Upload, immutable originals, versions, Draft Desk | P0–P1 |
+| Timeline | **Chronology** | Proposed-vs-confirmed events | P0 |
+| Evidence | **Evidence Locker** | User-uploaded only (cards, tags, chain notes) | P1 (user) / P3 (court-sourced) |
+| Structured Analysis | **Audits & Memos** | Rights Audit, Plea Analysis (structure only) | P1 |
+
+## Pipeline (shipped / in progress)
 
 ```
 Ingest (scripts/ingest_legal_corpus.py --seed)
@@ -30,6 +42,7 @@ Agent answers → searchAndGroundAnswer / groundAnswer
 | Library UI | `apps/web/src/app/library/` |
 | Grounding | `packages/legal-library/src/ground-answer.ts` |
 | Design | `docs/design/DIRECTION.md`, Candy tokens |
+| Blueprint | `docs/CHAIN_OF_COMMAND_FULL_APP_BLUEPRINT_REVISED.md` |
 
 ## Run ingest locally
 
@@ -73,3 +86,5 @@ const grounded = await searchAndGroundAnswer(
 ## UI
 
 Open **`/library`** after `pnpm dev` in `apps/web`. Candy tokens only — no ad-hoc palette.
+
+**Evidence Locker policy (v2.1):** Near-term scope is user-uploaded evidence only. Court-sourced evidence systems and official chain-of-custody integrations are P3 / capability-not-verified until formal relationships exist.
