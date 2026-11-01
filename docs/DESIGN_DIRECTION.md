@@ -3,6 +3,8 @@
 > **MANDATORY ARCHITECTURAL DIRECTIVE FOR ALL DEVELOPERS & AGENTS**  
 > Chain of Command is not a generic chatbot or a flat SaaS dashboard.  
 > It is an immersive **Platform of Places**, built upon **One Invisible Spine**, unified under a single **Candy Design Theme ("Joyful Pop")**.
+>
+> **Living IA source of truth:** `docs/CHAIN_OF_COMMAND_FULL_APP_BLUEPRINT_REVISED.md` (v2.1)
 
 ---
 
@@ -14,17 +16,18 @@
        ┌───────────────────┴───────────────────┐
        ▼                                       ▼
   CASE WORKSPACE                       PLATFORM OF PLACES
-  (Command Center & Docket)            (Law School, Library, Draft Desk, etc.)
+  (Command Center & The Docket)        (Law Library, The Wire, Court Watch…)
        │                                       │
        └───────────────────┬───────────────────┘
                            ▼
                   ONE INVISIBLE SPINE
   ┌────────────────────────────────────────────────────────┐
-  │ • Supabase / Firebase JWT Auth + Multi-Tenant RLS      │
+  │ • Supabase JWT Auth + Multi-Tenant RLS + ABAC          │
   │ • PostgreSQL + pgvector Embeddings                     │
   │ • Agent Kernel & Multi-Provider Model Gateway          │
-  │ • Document Pipeline: Draft → Review → ACK → Indexed   │
+  │ • Document Pipeline: Draft → Review → Human ACK        │
   │ • Cryptographic Hash-Chained Audit Trail               │
+  │ • Typed Result Envelopes (labeling + grounding)        │
   └────────────────────────────────────────────────────────┘
 ```
 
@@ -47,55 +50,55 @@ The user experiences Chain of Command as a constellation of dedicated, immersive
 
 ---
 
-## 3. The Places & Their Metaphors
+## 3. The Places & Their Metaphors (Aligned to Blueprint v2.1)
 
-### 1. The Command Center & The Docket (`/` and `/docket`)
+### 1. Command Center (`/` or case overview)
 * **Metaphor:** The Master Case Operating Console.
-* **Role:** High-level case overview, speedy trial countdowns, upcoming deadlines, charge decomposition, and Chronological Case Summary (CCS).
-* **Key Experience:** Total situational awareness for the self-represented litigant. Clean, reassuring, organized.
+* **Role:** Cross-case + case overview, Brief Stats, Charge Sheet, Chronology Rail, Team Panel, Court Log, Urgent Notices.
+* **Key Experience:** Total situational awareness. Clean, reassuring, organized. Links out to full Chronology and The Wire.
 
-### 2. The Draft Desk (`/draft-desk`)
-* **Metaphor:** The Hybrid Legal IDE (**VS Code × Office × Adobe Acrobat × LexisNexis**).
-* **Architecture:**
-  * **The Shell (VS Code):** Tabs, split panes, command palette (`Cmd+K`), keyboard-first navigation, and active draft states.
-  * **The Content Model (Office):** Formatted legal pleading paper, numbered averments, prayers for relief, and certificate of service blocks.
-  * **The Document Pane (Adobe):** Live PDF rendering, pro se clerk copy previews, line numbers, and pro se verification checklists.
-  * **The Authority Layer (LexisNexis):** Cite-as-you-write auto-binding with the active matter's cause number, court name, judge, and verified legal authorities.
-* **Pro Se Safety Boundary:** Every pleading includes the mandatory human-review header:
-  `[PREPARED FOR SELF-REPRESENTED LITIGANT - NOT LEGAL ADVICE - REQUIRES INDEPENDENT HUMAN REVIEW & SIGNATURE PRIOR TO FILING]`.
+### 2. The Docket (`/docket`)
+* **Metaphor:** The Matter Registry.
+* **Role:** Case list (open/closed/archived), Open a Matter (jurisdiction + court first), Matter Status, membership roles.
+* **Key Experience:** Strict case scoping and audited membership from the first click.
 
-### 3. The Law Library (`/library`)
-* **Metaphor:** The Grand Legal Reading Room.
-* **Architecture:** Catalog desks, stacks organized by jurisdiction and topic, reading tables where retrieved statutes and appellate opinions accumulate as shelf-able, physical-feeling volumes.
-* **Key Experience:** Shepardizing, good-law indicators, pinpoint citations, and direct integration with CourtListener. Every AI claim in any other place must resolve to a verifiable volume on these shelves.
+### 3. The Wire (`/wire` or case AI surface)
+* **Metaphor:** The AI Legal Team Operations Channel.
+* **Role:** Counsel Roster, Wire Feed, Brief Board, Counsel Brief (agent config), Notice of AI Assistance, Session Transcript (later).
+* **Key Experience:** Permissioned agents, typed result envelopes, grounding labels, human-in-the-loop. Replaces the old “Chambers = AI chat” naming collision.
 
-### 4. The Law School (`/school`)
+### 4. Law Library (`/library`)
+* **Metaphor:** The Grand Legal Reading Room + Workrooms.
+* **Internal Tabs:**
+  * **Stacks** — Research engine, Volume Cards, Research Brief, grounding guard
+  * **Record Room** — Filing Table, upload, immutable originals, Draft Desk
+  * **Chronology** — Proposed-vs-confirmed timeline
+  * **Evidence Locker** — User-uploaded evidence only (near-term)
+  * **Audits & Memos** — Rights Audit, Plea Analysis (structure only)
+* **Key Experience:** Every AI legal claim must resolve to a verifiable volume or be labeled ungrounded.
+
+### 5. Court Watch & Tasks (`/court-watch` or equivalent)
+* **Metaphor:** The Docket Watch Desk + Motion Board.
+* **Role:** Deadline Engine (deterministic + explainable), Action Items, Motion Board, basic docket feed, connector status (“verified” or “capability not verified”).
+* **Key Experience:** Honest about what the system can and cannot read from courts.
+
+### 6. Chambers (Later — P3)
+* **Metaphor:** Court Communication Rooms (Judge / Prosecutor / Clerk).
+* **Role:** Human-readable case updates and correspondence. Distinct from The Wire (AI team).
+* **Status:** Explicitly later; gated by verified connectors and capability-not-verified register.
+
+### 7. Law Academy (Later — P3)
 * **Metaphor:** The Virtual Legal Campus.
-* **Architecture:**
-  * **Lecture Halls:** Procedural walk-throughs, plain-language legal education modules, and rights breakdown.
-  * **The Moot Court:** Interactive argument practice and objection simulation against AI judicial panels.
-  * **Examination Rooms:** Self-assessment quizzes with model answers and statutory citations.
-  * **Study Halls:** Socratic dialogue with specialized AI legal workers.
-  * **Registrar:** Litigant skills transcript, progress tracking, and readiness certifications.
+* **Role:** Course Catalog, Rules & Procedure, Lessons / Moot Practice, Transcript of Study (progress only — no real certificates).
+* **Status:** Later phase.
 
-### 5. The Agent Directory & AI Talent Marketplace (`/directory`)
-* **Metaphor:** The Legal Worker & Skills Exchange.
-* **Architecture:**
-  * **AI Legal Workers & Skills:** 14+ specialized AI agents with certified operational skills (Terry stop audits, Brady demand drafting, cross-examination question generation, IPTG parenting schedules).
-  * **Hire & Team Assembly:** Users can hire specialists with one click, persistently binding them to their active case and making them available in Chambers.
-  * **Neutral Bar Directory:** Verified state bar attorney registry maintaining strict neutrality (no paid ranking, scoring, or recommendations per Rule 18/19).
+### 8. Counsel Directory (Placement TBD)
+* **Metaphor:** Neutral Attorney Registry.
+* **Rules (non-negotiable):** Filters only, per-field provenance, sponsored strip separated and excluded from agent corpora, no ranking, no AI recommendation, per-jurisdiction UPL review before enablement.
 
-### 6. Chambers (`/chambers`)
-* **Metaphor:** The AI Legal Team Strategy Room.
-* **Architecture:** Private multi-agent consultation room where hired AI specialists collaborate on docket analysis, evidence evaluation, and hearing prep with explicit context boundaries.
-
-### 7. The Filing Center (`/filing`)
-* **Metaphor:** The Procedural State Machine.
-* **Architecture:** Clean, zero-distraction workflow: Draft → Human Review & Verification → 3-Copy Assembly → Filing Fee / In Forma Pauperis Waiver → Certificate of Service → Clerk Timestamp Tracking.
-
-### 8. Empyrean (`/empyrean` or dedicated face)
-* **Metaphor:** The AI Agent Telemetry & Operations Console.
-* **Architecture:** Inspects model routing, token usage, grounding accuracy, and agent runtime execution.
+### 9. Empyrean / Telemetry (supporting)
+* **Metaphor:** AI Agent Telemetry & Operations Console.
+* **Role:** Model routing, token usage, grounding accuracy, agent runtime inspection. Supports The Wire and admin surfaces.
 
 ---
 
@@ -142,5 +145,7 @@ And imported into the web application via:
 1. **Zero-Pill-Drop Rule:** Buttons and status badges must always be pill-shaped (`rounded-full`). Never create sharp rectangular buttons.
 2. **Never Invent Colors:** Do not hardcode arbitrary hex codes in components. Use standard Candy tokens (`#af0a78`, `#e040a0`, `#744aa2`, `#006388`, `#281330`, `#fff7fb`, `#ffffff`).
 3. **Tinted Shadows:** Always use tinted shadows matching the component's accent color (e.g. `rgba(224, 64, 160, 0.22)`), never harsh generic black drop-shadows.
-4. **Preserve and Enhance:** When expanding any place, retain all existing state persistence (`localStorage`, Supabase, Firestore) and verify TypeScript compilation with `compile_applet`.
-5. **Pro Se Boundaries:** Never allow AI agents to autonomously submit or file documents. All actions remain strictly human-controlled.
+4. **Preserve and Enhance:** When expanding any place, retain all existing state persistence (`localStorage`, Supabase) and verify TypeScript compilation.
+5. **Pro Se Boundaries:** Never allow AI agents to autonomously submit or file documents. All external actions remain strictly human-controlled with payload-bound approval + fresh MFA.
+6. **Capability-not-verified:** External court connectors and evidence systems default to honest “capability not verified” until formally verified. Do not fake integrations.
+7. **IA Source of Truth:** Navigation labels, tab structure, and priority (P0–P3) are defined in `docs/CHAIN_OF_COMMAND_FULL_APP_BLUEPRINT_REVISED.md`. Update that document before inventing new places.
