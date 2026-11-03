@@ -17,7 +17,7 @@ const DEFAULT_FEATURES: NavFeatureItem[] = [
   {
     href: "/playground",
     title: "The Wire",
-    subtitle: "AI Lawyer Swarm & Agent Playground",
+    subtitle: "The Wire — AI Lawyer Swarm & Agent Playground",
     badge: "AI",
   },
   {

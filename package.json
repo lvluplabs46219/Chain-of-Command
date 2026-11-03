@@ -9,14 +9,15 @@
   "scripts": {
     "prebuild": "true",
     "dev": "npm --prefix apps/web run dev",
-    "dev:empyrean": "npm --prefix apps/empyrean run dev",
+    "dev:wire": "npm --prefix apps/empyrean run dev",
+    "dev:empyrean": "npm run dev:wire",
     "build": "npm --prefix apps/web run build",
     "lint": "npm --prefix apps/web run lint",
     "start": "npm --prefix apps/web run start",
     "secrets:agent": "infisical agent --config config/infisical/agent-config.yaml",
     "secrets:agent:root": "infisical agent --config agent-config.yaml",
-    "dev:all": "echo \"Start Empyrean (:3100) + Web (:3000). Empyrean package is unchanged.\" && npm run dev:empyrean & npm run dev",
-    "dev:stack": "npm run dev:empyrean"
+    "dev:all": "echo \"Start The Wire (:3100) + Web (:3000).\" && npm run dev:wire & npm run dev",
+    "dev:stack": "npm run dev:wire"
   },
   "dependencies": {
     "@types/three": "^0.186.0",

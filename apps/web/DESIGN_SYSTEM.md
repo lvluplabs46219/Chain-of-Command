@@ -34,7 +34,7 @@ There is **no per-place color identity**. Places (Law School, Library, Draft Des
 1. **No new hex values** in components. Use `var(--candy-*)` or Tailwind utilities mapped from Candy tokens.
 2. **One token source:** `packages/shared/src/candy-tokens.css`. Palette changes happen only there (+ `docs/design/DESIGN.md`).
 3. **Legacy Sovereign classes** (`.sov-panel`, `.sov-btn-gold`, `--sov-gold`, etc.) remain for existing markup but are **remapped to Candy** in `src/index.css`. Do not restore black/gold as a parallel theme.
-4. Empyrean (separate app) must import the same `candy-tokens.css` so the agent console matches the platform brand.
+4. The Wire (agent playground app) must import the same `candy-tokens.css` so the agent console matches the platform brand.
 
 ---
 
@@ -47,7 +47,7 @@ There is **no per-place color identity**. Places (Law School, Library, Draft Des
 | Law School | `/school` | Campus: lectures, moot court, exams, registrar |
 | Filing Center | `/filing` | State machine: draft → validate → submit → ACK → index |
 | Command Center | `/docket` + workspace | Case workspace, timeline, tasks |
-| Empyrean | separate deployment | Agent ops console |
+| The Wire | separate deployment / :3100 | Agent playground console |
 
 Ship order: **Draft Desk → Library → School** (each prior place supplies infrastructure the next consumes).
 

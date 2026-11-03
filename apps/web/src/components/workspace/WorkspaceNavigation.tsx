@@ -66,7 +66,7 @@ export function pathToTab(pathname: string): WorkspaceTab | null {
   if (pathname === "/" || pathname === "") return "dashboard";
   if (pathname.startsWith("/ai-intelligence")) return "chambers";
   if (pathname.startsWith("/playground")) return "chambers";
-  if (pathname.startsWith("/empyrean")) return "chambers";
+  if (pathname.startsWith("/wire") || pathname.startsWith("/empyrean")) return "chambers";
   const entry = Object.entries(TAB_ROUTES).find(
     ([, route]) => route !== "/" && pathname.startsWith(route)
   );

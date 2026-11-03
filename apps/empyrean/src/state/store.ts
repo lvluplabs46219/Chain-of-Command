@@ -526,7 +526,7 @@ console.log("[Raphael] JWT verifier initialized with HMAC-SHA256.");`,
         status: "completed",
         summary: "Confirmed dedicated high-throughput socket connections on port 3000 and reserved 4x H100 GPU nodes for Seraphim consensus workloads.",
         transcript: [
-          { speaker: "Raphael (AI Agent)", text: "Hello! Calling on behalf of Empyrean GenTeam to confirm socket availability for our multi-agent daemon.", timestamp: "00:03" },
+          { speaker: "Raphael (AI Agent)", text: "Hello! Calling on behalf of The Wire to confirm socket availability for our multi-agent daemon.", timestamp: "00:03" },
           { speaker: "Apex Support Representative", text: "Yes, your dedicated UDS and port 3000 endpoints are provisioned with 10Gbps loopback.", timestamp: "00:35" },
           { speaker: "Raphael (AI Agent)", text: "Excellent. Can you confirm the Seraphim fallback pipeline has priority bandwidth?", timestamp: "01:12" },
           { speaker: "Apex Support Representative", text: "Confirmed. SLA guarantee is 99.95% with automatic failover.", timestamp: "01:45" },

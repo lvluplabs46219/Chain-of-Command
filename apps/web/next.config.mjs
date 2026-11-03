@@ -44,9 +44,14 @@ const nextConfig = {
   async rewrites() {
     const rules = [
       {
-        // Empyrean multi-agent daemon (apps/empyrean). Override with EMPYREAN_URL.
+        // The Wire agent playground daemon (apps/empyrean). Override with WIRE_URL or EMPYREAN_URL.
+        source: '/wire-api/:path*',
+        destination: `${(process.env.WIRE_URL || process.env.EMPYREAN_URL || 'http://localhost:3100').replace(/\/+$/, '')}/api/:path*`,
+      },
+      {
+        // Legacy alias — prefer /wire-api
         source: '/empyrean-api/:path*',
-        destination: `${(process.env.EMPYREAN_URL || 'http://localhost:3100').replace(/\/+$/, '')}/api/:path*`,
+        destination: `${(process.env.WIRE_URL || process.env.EMPYREAN_URL || 'http://localhost:3100').replace(/\/+$/, '')}/api/:path*`,
       },
     ];
     if (process.env.API_URL?.trim()) {

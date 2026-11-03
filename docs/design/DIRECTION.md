@@ -17,7 +17,7 @@ token system.
 | The Draft Desk | `/desk` | Hybrid editor: VS Code shell × Office content model × Adobe document pane × LexisNexis authority layer |
 | The Filing Center | `/filing` | Document state machine surface (draft → validation → submission → court ACK → indexed) |
 | Command Center | `/docket` and workspace routes | Case workspace, docket, timeline, tasks |
-| Empyrean (separate app) | own deployment | Agent operations console: Telegram-style chat, DAG views, Three.js Nexus 3D |
+| The Wire (agent playground app) | own deployment | Agent operations console: Telegram-style chat, DAG views, Three.js Nexus 3D |
 
 Each place gets its own layout, navigation chrome, display typography, and
 texture. Places are built as their own route subtree under `apps/web` with a
@@ -33,7 +33,7 @@ per-place color identity. The Candy palette is the platform's skin.
   (exported as `@chain-of-command/shared/candy-tokens.css`).
 - Every place and every app consumes that file. Nothing defines its own colors.
 - Light and dark modes are both first-class (`[data-theme]`), per DESIGN.md.
-- Empyrean imports the same tokens: the agent console is a distinct app but the
+- The Wire imports the same tokens: the agent console is a distinct app but the
   same brand.
 
 ## 3. Governance rules (enforced in review)
@@ -73,12 +73,12 @@ Tailwind v4 (`apps/web`):
 }
 ```
 
-Non-Tailwind surfaces (Empyrean dashboard): import the same CSS file and set
+Non-Tailwind surfaces (The Wire dashboard): import the same CSS file and set
 `data-theme` on `<html>`; all `--candy-*` variables resolve identically.
 
-## 5. Empyrean is a separate face, not a subpage
+## 5. The Wire is a separate face, not a subpage
 
-Empyrean (`lvluplabs46219/empyrean`) is the agent playground and AI legal team
+The Wire (package path apps/the-wire; product name **The Wire**) is the agent playground and AI legal team
 console. It deploys as its own application (own port/subdomain), keeps its own
 shell and UX, and shares with Chain of Command: the agent kernel, the database,
 the auth (same Supabase JWTs), and — now — the Candy token system. It is one

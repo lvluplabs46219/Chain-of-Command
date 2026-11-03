@@ -36,7 +36,7 @@ export async function complete(prompt: string, timeoutMs?: number): Promise<stri
         : JSON.stringify({
             model: modelId(),
             messages: [
-              { role: "system", content: "You are Seraphim, an advanced deep-reasoning oracle in the Empyrean multi-agent swarm." },
+              { role: "system", content: "You are Seraphim, an advanced deep-reasoning oracle in the The Wire multi-agent swarm." },
               { role: "user", content: prompt },
             ],
             temperature: 0.3,

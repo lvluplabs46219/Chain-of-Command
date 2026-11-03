@@ -1,5 +1,5 @@
 {
-  "name": "Empyrean Multi-Agent Orchestrator",
+  "name": "The Wire — Multi-Agent Playground",
   "description": "Multi-agent orchestration kernel featuring YHWH (planning), Michael (orchestrator), Gabriel (messenger), Raphael (worker), and Metatron/Seraphim (gateway & reasoning).",
   "capabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

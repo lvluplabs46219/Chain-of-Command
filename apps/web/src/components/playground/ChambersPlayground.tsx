@@ -1,6 +1,6 @@
 "use client";
 
-// Chambers Playground — legal AI team SWARM workspace styled after the Empyrean app UI.
+// The Wire — multi-agent swarm playground (formerly Empyrean UI shell).
 // Slack-style: channel sidebar (Team Channels + Digital Employees), pinned directive,
 // agent message feed, Open Canvas / Call For Me / Appoint Counsel actions, Candy settings modal.
 // Chain of command: Head Legal AI -> Research AI -> Rights Checker -> Head. Not legal advice.
@@ -10,11 +10,11 @@ import Link from "next/link";
 import { LayoutGrid, X } from "lucide-react";
 import { AgentRolodex3D } from "@/components/directory/AgentRolodex3D";
 import {
-  empyreanHealth,
-  empyreanSendMessage,
-  empyreanDirective,
-  empyreanListMessages,
-  empyreanListAgents,
+  wireHealth,
+  wireSendMessage,
+  wireDirective,
+  wireListMessages,
+  wireListAgents,
 } from "@/lib/empyreanClient";
 
 const candy = {
@@ -90,8 +90,8 @@ export function ChambersPlayground() {
   const [input, setInput] = useState("");
   const [routing, setRouting] = useState(false);
   const [logs, setLogs] = useState<Record<string, Msg[]>>(() => ({ ...SEED }));
-  const [empyreanOnline, setEmpyreanOnline] = useState<boolean | null>(null);
-  const [empyreanNote, setEmpyreanNote] = useState<string | null>(null);
+  const [wireOnline, setWireOnline] = useState<boolean | null>(null);
+  const [wireNote, setWireNote] = useState<string | null>(null);
   const [rolodexOpen, setRolodexOpen] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const c = candy[theme];
@@ -105,25 +105,25 @@ export function ChambersPlayground() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const h = await empyreanHealth();
+      const h = await wireHealth();
       if (cancelled) return;
-      setEmpyreanOnline(h.ok);
+      setWireOnline(h.ok);
       if (h.ok) {
-        setEmpyreanNote(`Empyrean online · ${h.agentsCount ?? "?"} agents`);
+        setWireNote(`The Wire online · ${h.agentsCount ?? "?"} agents`);
         try {
-          const agents = await empyreanListAgents();
+          const agents = await wireListAgents();
           if (!cancelled && agents.length) {
-            setEmpyreanNote(`Empyrean online · ${agents.length} agents (Michael orchestration)`);
+            setWireNote(`The Wire online · ${agents.length} agents (Michael orchestration)`);
           }
         } catch { /* optional */ }
       } else {
-        setEmpyreanNote("Empyrean offline — demo chain active. Run: npm run dev:empyrean");
+        setWireNote("The Wire offline — demo chain active. Run: npm run dev:wire");
       }
     })();
     return () => { cancelled = true; };
   }, []);
 
-  const mapEmpyreanMsgs = useCallback((rows: { senderId?: string; senderName?: string; text?: string; timestamp?: string; isOutgoing?: boolean }[]): Msg[] => {
+  const mapWireMsgs = useCallback((rows: { senderId?: string; senderName?: string; text?: string; timestamp?: string; isOutgoing?: boolean }[]): Msg[] => {
     return rows.map((m) => {
       let agent = (m.senderId || "head").toLowerCase();
       if (m.isOutgoing || agent === "user") agent = "user";
@@ -147,27 +147,27 @@ export function ChambersPlayground() {
     const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     setLogs((l) => ({ ...l, [channel]: [...(l[channel] ?? []), { agent: "user", text, time: now }] }));
     setRouting(true);
-    setEmpyreanNote(null);
+    setWireNote(null);
 
-    // Prefer live Empyrean swarm
+    // Prefer live The Wire swarm
     try {
-      const health = await empyreanHealth();
-      setEmpyreanOnline(health.ok);
+      const health = await wireHealth();
+      setWireOnline(health.ok);
       if (health.ok) {
-        await empyreanSendMessage(channel, text);
+        await wireSendMessage(channel, text);
         // Also fire orchestrator directive for legal routing
         try {
-          await empyreanDirective(text, { channel, surface: "chambers-playground" });
+          await wireDirective(text, { channel, surface: "the-wire" });
         } catch (dirErr) {
-          console.warn("[Empyrean] directive", dirErr);
+          console.warn("[The Wire] directive", dirErr);
         }
         // Poll messages briefly for agent replies
         for (let i = 0; i < 6; i++) {
           await new Promise((r) => setTimeout(r, 700));
           try {
-            const remote = await empyreanListMessages(channel);
+            const remote = await wireListMessages(channel);
             if (remote.length) {
-              const mapped = mapEmpyreanMsgs(remote);
+              const mapped = mapWireMsgs(remote);
               if (mapped.length) {
                 setLogs((l) => ({ ...l, [channel]: mapped }));
               }
@@ -175,13 +175,13 @@ export function ChambersPlayground() {
           } catch { /* keep polling */ }
         }
         setRouting(false);
-        setEmpyreanNote("Routed through Empyrean (Michael → swarm)");
+        setWireNote("Routed through The Wire (orchestrator → swarm)");
         return;
       }
     } catch (err) {
-      console.warn("[Empyrean] send fallback", err);
-      setEmpyreanOnline(false);
-      setEmpyreanNote(err instanceof Error ? err.message : "Empyrean unreachable — demo chain");
+      console.warn("[The Wire] send fallback", err);
+      setWireOnline(false);
+      setWireNote(err instanceof Error ? err.message : "The Wire unreachable — demo chain");
     }
 
     // Offline demo chain of command
@@ -204,11 +204,11 @@ export function ChambersPlayground() {
   return (
     <div className="relative flex h-screen w-full overflow-hidden pt-7" style={{ background: c.bg, color: c.onSurface, fontFamily: "DM Sans, system-ui, sans-serif" }}>
 
-      {/* Empyrean status strip */}
+      {/* The Wire status strip */}
       <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between gap-2 px-3 py-1.5 text-[10px] font-mono border-b" style={{ background: c.surfaceContainer, borderColor: c.cardBorder, color: c.onSurfaceVariant }}>
         <span>
-          <span className="inline-block w-1.5 h-1.5 rounded-full mr-1.5 align-middle" style={{ background: empyreanOnline ? c.online : "#f43f5e" }} />
-          {empyreanNote || (empyreanOnline === null ? "Checking Empyrean…" : empyreanOnline ? "Empyrean connected" : "Empyrean offline (demo)")}
+          <span className="inline-block w-1.5 h-1.5 rounded-full mr-1.5 align-middle" style={{ background: wireOnline ? c.online : "#f43f5e" }} />
+          {wireNote || (wireOnline === null ? "Checking The Wire…" : wireOnline ? "The Wire connected" : "The Wire offline (demo)")}
         </span>
         <span className="flex gap-3">
           <Link href="/" className="hover:underline" style={{ color: c.primary }}>Workspace</Link>

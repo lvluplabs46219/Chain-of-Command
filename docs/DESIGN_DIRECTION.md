@@ -96,7 +96,7 @@ The user experiences Chain of Command as a constellation of dedicated, immersive
 * **Metaphor:** Neutral Attorney Registry.
 * **Rules (non-negotiable):** Filters only, per-field provenance, sponsored strip separated and excluded from agent corpora, no ranking, no AI recommendation, per-jurisdiction UPL review before enablement.
 
-### 9. Empyrean / Telemetry (supporting)
+### 9. The Wire / Telemetry (supporting)
 * **Metaphor:** AI Agent Telemetry & Operations Console.
 * **Role:** Model routing, token usage, grounding accuracy, agent runtime inspection. Supports The Wire and admin surfaces.
 

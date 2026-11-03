@@ -1,4 +1,4 @@
-// Telegram Web UI for Empyrean GenTeam Autonomous Multi-Agent Workspace
+// Web UI for The Wire — Chain of Command agent playground
 // Design Scheme: Candy — Playful & Vibrant ("Joyful Pop") with Light & Dark Mode + Settings Modal
 export function renderDashboard(): string {
   return `<!DOCTYPE html>
@@ -6,9 +6,9 @@ export function renderDashboard(): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Empyrean Multi-Agent Orchestrator</title>
+  <title>The Wire — Agent Playground</title>
   <meta name="description" content="Multi-agent orchestration kernel featuring YHWH (planning), Michael (orchestrator), Gabriel (messenger), Raphael (worker), and Metatron/Seraphim (gateway & reasoning).">
-  <meta property="og:title" content="Empyrean Multi-Agent Orchestrator">
+  <meta property="og:title" content="The Wire — Agent Playground">
   <meta property="og:description" content="Multi-agent orchestration kernel featuring YHWH (planning), Michael (orchestrator), Gabriel (messenger), Raphael (worker), and Metatron/Seraphim (gateway & reasoning).">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2133,7 +2133,7 @@ export function renderDashboard(): string {
       <div class="threejs-spec-badge">
         <div class="threejs-badge-header">
           <div class="threejs-badge-dot"></div>
-          <span class="threejs-badge-title">EMPYREAN 3D NEURAL SWARM // THREE.JS PBR NEXUS</span>
+          <span class="threejs-badge-title">THE WIRE 3D NEURAL SWARM // THREE.JS PBR NEXUS</span>
         </div>
         <div class="threejs-badge-stats">
           <span class="threejs-stat-item">FPS: <strong id="threeFpsCounter">60</strong></span>
@@ -2218,7 +2218,7 @@ export function renderDashboard(): string {
         <div class="tg-carousel-title-box">
           <div class="tg-carousel-title">
             <span style="font-size: 20px;">🎠</span>
-            <span>EMPYREAN 3D SWARM &amp; MODEL CAROUSEL</span>
+            <span>THE WIRE 3D SWARM &amp; MODEL CAROUSEL</span>
           </div>
           <div class="tg-carousel-subtitle">Interactive 3D spatial orbit of autonomous digital employees &amp; Hermes AI routing tiers</div>
         </div>
@@ -2546,7 +2546,7 @@ export function renderDashboard(): string {
           <div class="slide-viewer" id="slideViewer">
             <div id="slideContent">
               <span style="font-size: 12px; color: var(--candy-primary-accent); font-weight: 700; text-transform: uppercase;">Slide 1 / 4 · Overview</span>
-              <h2 style="font-size: 22px; color: var(--candy-on-surface); margin: 12px 0 8px;">Empyrean GenTeam Operations</h2>
+              <h2 style="font-size: 22px; color: var(--candy-on-surface); margin: 12px 0 8px;">The Wire Operations</h2>
               <p style="font-size: 14px; color: var(--candy-on-surface-variant); line-height: 1.5;">
                 A Telegram-native enterprise operations layer bridging autonomous digital employees, persistent Second Brain context, and live execution sandboxes.
               </p>
@@ -3144,7 +3144,7 @@ export function renderDashboard(): string {
     // Slide decks content
     var slidesData = [
       {
-        title: "Empyrean GenTeam Operations",
+        title: "The Wire Operations",
         category: "Slide 1 / 4 · Overview",
         body: "A Telegram-native enterprise operations layer bridging autonomous digital employees, persistent Second Brain context, and live execution sandboxes.",
         cards: [
@@ -3184,7 +3184,7 @@ export function renderDashboard(): string {
     // Initialize
     window.addEventListener('DOMContentLoaded', function() {
       applyTheme(currentTheme);
-      var savedCollapsed = localStorage.getItem('empyrean_sidebar_collapsed');
+      var savedCollapsed = localStorage.getItem('wire_sidebar_collapsed');
       if (savedCollapsed === 'true') {
         toggleSidebar(true);
       }
@@ -3268,7 +3268,7 @@ export function renderDashboard(): string {
         sidebar.classList.toggle('collapsed');
         isCollapsed = sidebar.classList.contains('collapsed');
       }
-      localStorage.setItem('empyrean_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+      localStorage.setItem('wire_sidebar_collapsed', isCollapsed ? 'true' : 'false');
       if (expandBtn) {
         expandBtn.style.display = isCollapsed ? 'flex' : 'none';
       }
@@ -4133,7 +4133,7 @@ export function renderDashboard(): string {
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
-      a.download = 'empyrean_model_matrix.csv';
+      a.download = 'wire_model_matrix.csv';
       a.click();
     }
 
@@ -4162,7 +4162,7 @@ export function renderDashboard(): string {
 
     function loadIframePreview() {
       var iframe = document.getElementById('sandboxIframe');
-      var htmlContent = '<!DOCTYPE html><html><head><style>body { font-family: "DM Sans", -apple-system, sans-serif; padding: 24px; background: #fff7fb; color: #281330; } .btn { background: #af0a78; color: #fff; padding: 8px 18px; border-radius: 9999px; border: none; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(224,64,160,0.3); } .card { background: #ffffff; border: 1.5px solid #f8d8ff; padding: 20px; border-radius: 18px; margin-top: 14px; box-shadow: 0 4px 16px rgba(116,74,162,0.08); }</style></head><body><h2 style="color: #af0a78;">Empyrean Candy Auth Prototype</h2><p style="color: #57414a; font-size: 13px;">Live rendered from Raphael\\'s scaffold module in Candy theme.</p><div class="card"><h4>JWT Verification Shield</h4><p style="font-size: 13px; color: #57414a; margin: 8px 0;">Token validation: SHA256 verified. RBAC permissions active.</p><button class="btn" onclick="alert(\\'JWT Authenticated Successfully!\\')">Test Verification</button></div></body></html>';
+      var htmlContent = '<!DOCTYPE html><html><head><style>body { font-family: "DM Sans", -apple-system, sans-serif; padding: 24px; background: #fff7fb; color: #281330; } .btn { background: #af0a78; color: #fff; padding: 8px 18px; border-radius: 9999px; border: none; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(224,64,160,0.3); } .card { background: #ffffff; border: 1.5px solid #f8d8ff; padding: 20px; border-radius: 18px; margin-top: 14px; box-shadow: 0 4px 16px rgba(116,74,162,0.08); }</style></head><body><h2 style="color: #af0a78;">The Wire Candy Auth Prototype</h2><p style="color: #57414a; font-size: 13px;">Live rendered from Raphael\\'s scaffold module in Candy theme.</p><div class="card"><h4>JWT Verification Shield</h4><p style="font-size: 13px; color: #57414a; margin: 8px 0;">Token validation: SHA256 verified. RBAC permissions active.</p><button class="btn" onclick="alert(\\'JWT Authenticated Successfully!\\')">Test Verification</button></div></body></html>';
       iframe.srcdoc = htmlContent;
     }
 
