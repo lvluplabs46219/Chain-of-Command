@@ -745,7 +745,7 @@ export function DraftDeskView({ matter, onOpenActionModal, onSendToChambers }: D
           <div className="h-6 shrink-0 flex items-center justify-between px-3 border-t border-[#007acc] bg-[#007acc] text-[11px] text-white">
             <div className="flex items-center gap-3">
               <span>Draft Desk</span>
-              <span className="opacity-80">{hasMatter ? matter.caseNumber || matter.caption || "Matter linked" : "No matter linked"}</span>
+              <span className="opacity-80">{hasMatter ? matter.caseNumber || matter.title || "Matter linked" : "No matter linked"}</span>
             </div>
             <div className="flex items-center gap-3 opacity-90">
               <span>Ln {activeText.split("\n").length}</span>

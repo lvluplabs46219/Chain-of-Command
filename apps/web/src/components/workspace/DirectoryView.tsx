@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import {
   AIAgent,
+  AIAgentSkill,
   ALL_AVAILABLE_AI_AGENTS,
   SpecialistAgent,
   AttorneyListing,
@@ -649,7 +650,7 @@ export function DirectoryView({
               </h4>
 
               <div className="space-y-2.5">
-                {(inspectedAgent.detailedSkills || inspectedAgent.capabilities.map((c) => ({ name: c, summary: "Operational execution capability." }))).map(
+                {((inspectedAgent.detailedSkills || inspectedAgent.capabilities.map((c): AIAgentSkill => ({ name: c, summary: "Operational execution capability." }))) as AIAgentSkill[]).map(
                   (skill, idx) => (
                     <div
                       key={idx}

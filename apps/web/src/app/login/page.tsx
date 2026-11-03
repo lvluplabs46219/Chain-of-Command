@@ -53,7 +53,7 @@ export default function LoginPage() {
         password,
         captchaToken,
       });
-      if (!result.ok) {
+      if ("error" in result) {
         setError(result.error);
         captchaRef.current?.resetCaptcha();
         setCaptchaToken(null);

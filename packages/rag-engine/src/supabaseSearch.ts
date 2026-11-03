@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-export type LegalCorpusHit = {
+type SupabaseLegalCorpusHit = {
   id: string;
   jurisdiction: string;
   source_type: string;
@@ -35,7 +35,7 @@ export async function hybridLegalSearch(opts: {
   matchThreshold?: number;
   matchCount?: number;
   jurisdiction?: string | null;
-}): Promise<LegalCorpusHit[]> {
+}): Promise<SupabaseLegalCorpusHit[]> {
   const supabase = client();
   const { data, error } = await supabase.rpc('hybrid_legal_search', {
     query_text: opts.queryText,
@@ -49,7 +49,7 @@ export async function hybridLegalSearch(opts: {
     console.error('hybrid_legal_search failed:', error);
     throw error;
   }
-  return (data ?? []) as LegalCorpusHit[];
+  return (data ?? []) as SupabaseLegalCorpusHit[];
 }
 
 /**
@@ -60,7 +60,7 @@ export async function lexicalLegalSearch(opts: {
   queryText: string;
   matchCount?: number;
   jurisdiction?: string | null;
-}): Promise<LegalCorpusHit[]> {
+}): Promise<SupabaseLegalCorpusHit[]> {
   const supabase = client();
   const { data, error } = await supabase.rpc('lexical_legal_search', {
     query_text: opts.queryText,
@@ -72,7 +72,7 @@ export async function lexicalLegalSearch(opts: {
     console.error('lexical_legal_search failed:', error);
     throw error;
   }
-  return (data ?? []) as LegalCorpusHit[];
+  return (data ?? []) as SupabaseLegalCorpusHit[];
 }
 
 /** @deprecated Prefer hybridLegalSearch — kept for older call sites. */

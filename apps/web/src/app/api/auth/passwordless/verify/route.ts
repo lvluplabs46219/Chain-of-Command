@@ -65,8 +65,11 @@ export async function POST(request: Request) {
           auth: { autoRefreshToken: false, persistSession: false },
         });
         const { data: listed } = await admin.auth.admin.listUsers({ page: 1, perPage: 200 });
-        const match = listed?.users?.find(
-          (u) => u.email?.toLowerCase() === String(alias).toLowerCase(),
+        // Supabase's inferred user type can collapse to `never` in some generated
+        // client configurations; narrow only the field used for this lookup.
+        const users = (listed?.users ?? []) as Array<{ email?: string | null }>;
+        const match = users.find(
+          (user) => user.email?.toLowerCase() === String(alias).toLowerCase(),
         );
         if (match) supabaseLinked = true;
       } catch (e) {

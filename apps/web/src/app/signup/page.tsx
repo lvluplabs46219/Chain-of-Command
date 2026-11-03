@@ -82,7 +82,7 @@ export default function SignupPage() {
         fullName: name.trim(),
         captchaToken: captchaToken!,
       });
-      if (!result.ok) {
+      if ("error" in result) {
         setError(result.error);
         captchaRef.current?.resetCaptcha();
         setCaptchaToken(null);

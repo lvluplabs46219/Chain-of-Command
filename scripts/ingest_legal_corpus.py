@@ -5,9 +5,9 @@ Ingest statutes/opinions into public.legal_corpus with 1536-d embeddings.
 Chunks by section / holding (not whole PDFs).
 
 Usage:
-  export OPENAI_API_KEY=...
-  export SUPABASE_URL=...
-  export SUPABASE_SERVICE_ROLE_KEY=...
+  export SUPABASE_URL="https://YOUR_PROJECT.supabase.co"
+  export OPENAI_API_KEY  # required — os.getenv / shell env; never hardcode
+  export SUPABASE_SERVICE_ROLE_KEY  # from Infisical / Vercel / secret store — never commit
 
   # Seed CA PC + FRCP from bundled JSONL
   python scripts/ingest_legal_corpus.py --seed
