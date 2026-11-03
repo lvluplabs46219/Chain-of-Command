@@ -20,6 +20,8 @@ function getApiDestination() {
 }
 
 const nextConfig = {
+  // Writable cache when root-owned .next blocks local dev
+  distDir: process.env.NEXT_DIST_DIR || '.next-dev',
   output: process.env.VERCEL ? undefined : 'standalone',
   transpilePackages: [
     '@chain-of-command/agent-runtime',
