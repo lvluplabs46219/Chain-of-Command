@@ -98,7 +98,7 @@
     "motion": "^12.4.7",
     "next": "^15.1.4",
     "react-router-dom": "^7.18.3",
-    "workflow": "5.0.1",
+    "workflow": "5.2.3",
     "zod": "^4.6.5"
   }
 }
