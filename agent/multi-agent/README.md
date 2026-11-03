@@ -1,5 +1,9 @@
 # Multi-Agent Runtime (Chain of Command)
 
+**Plane: out-of-app (owner devops).** These workers build and operate the platform.
+They are **not** Chambers counsel. Product legal agents are **in-app** — see
+[`docs/AGENT_PLANES.md`](../../docs/AGENT_PLANES.md).
+
 Implementation of the multi-agent architecture blueprint. Six cooperating layers
 running locally on Ubuntu — no sudo, all secrets via environment variables.
 

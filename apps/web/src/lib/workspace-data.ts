@@ -73,11 +73,16 @@ export interface AIAgentSkill {
   category?: string;
 }
 
+/** in_app = product counsel for litigants; out_of_app = owner devops workers */
+export type AgentPlane = "in_app" | "out_of_app";
+
 export interface AIAgent {
   id: string;
   name: string;
   role: string;
   specialty: string;
+  /** Product surface plane. Defaults to in_app for legal roster entries. */
+  plane?: AgentPlane;
   /** Internal model id — never show raw to litigants */
   model: string;
   /** Optional explicit UI mode label */
@@ -879,12 +884,101 @@ export type SpecialistAgent = AIAgent & {
   mustCiteMaterialClaims?: boolean;
 };
 
-export const SPECIALIST_AGENTS_ROSTER: SpecialistAgent[] = AI_TEAM_ROSTER.map((agent) => ({
-  ...agent,
-  description: agent.specialty,
-  disclaimerRequired: true,
-  mustCiteMaterialClaims: true,
-}));
+/** In-app legal agents only — never include out-of-app devops workers. */
+export const SPECIALIST_AGENTS_ROSTER: SpecialistAgent[] = AI_TEAM_ROSTER
+  .filter((agent) => (agent.plane ?? "in_app") === "in_app")
+  .map((agent) => ({
+    ...agent,
+    plane: "in_app" as const,
+    description: agent.specialty,
+    disclaimerRequired: true,
+    mustCiteMaterialClaims: true,
+  }));
+
+/** Explicit in-app filter for UI (Chambers, Directory, Command Center). */
+export function getInAppAgents(agents: AIAgent[] = ALL_AVAILABLE_AI_AGENTS): AIAgent[] {
+  return agents.filter((a) => (a.plane ?? "in_app") === "in_app");
+}
+
+/** Owner devops / platform worker agents — not product counsel. See docs/AGENT_PLANES.md */
+export const OUT_OF_APP_WORKER_AGENTS: AIAgent[] = [
+  {
+    id: "worker-yhwh",
+    name: "YHWH",
+    role: "Local Reasoning Core",
+    specialty: "Local LLM reasoning, policy gates, final approve for code changes",
+    plane: "out_of_app",
+    model: "ollama/llama3.2",
+    systemDirective: "Owner devops plane only. Never appear as litigant counsel.",
+    capabilities: ["llm.reason", "code.approve", "policy_gate"],
+    status: "Active",
+    avatarBg: "bg-yellow-600/20 text-yellow-300 border-yellow-500/30",
+  },
+  {
+    id: "worker-michael",
+    name: "Michael",
+    role: "Orchestrator",
+    specialty: "Task DAG, state machine, worker dispatch over UDS",
+    plane: "out_of_app",
+    model: "runtime",
+    systemDirective: "Orchestrate out-of-app workers. Not a UI counsel agent.",
+    capabilities: ["orchestrate", "code.verify", "dispatch"],
+    status: "Active",
+    avatarBg: "bg-red-600/20 text-red-300 border-red-500/30",
+  },
+  {
+    id: "worker-gabriel",
+    name: "Gabriel",
+    role: "Messenger",
+    specialty: "Notifications, patch generation, payload delivery",
+    plane: "out_of_app",
+    model: "runtime",
+    systemDirective: "Messenger and code.patch worker. Not available in Chambers.",
+    capabilities: ["notify", "code.patch", "deliver_payload"],
+    status: "Active",
+    avatarBg: "bg-sky-600/20 text-sky-300 border-sky-500/30",
+  },
+  {
+    id: "worker-raphael",
+    name: "Raphael",
+    role: "Task Worker",
+    specialty: "Shell, files, migrations, legal task handlers, workspace maintain",
+    plane: "out_of_app",
+    model: "runtime",
+    systemDirective: "Execute build/devops tasks when dispatched by Michael.",
+    capabilities: ["shell.exec", "file.scaffold", "db.migrate", "workspace.maintain"],
+    status: "Active",
+    avatarBg: "bg-green-600/20 text-green-300 border-green-500/30",
+  },
+  {
+    id: "worker-metatron",
+    name: "Metatron",
+    role: "Model Gateway",
+    specialty: "Provider routing, fallbacks, model health",
+    plane: "out_of_app",
+    model: "gateway",
+    systemDirective: "Route model calls for the out-of-app mesh.",
+    capabilities: ["llm.route", "health", "fallback"],
+    status: "Active",
+    avatarBg: "bg-violet-600/20 text-violet-300 border-violet-500/30",
+  },
+  {
+    id: "worker-seraphim",
+    name: "Seraphim",
+    role: "External Model Pool",
+    specialty: "Vertex/cloud inference, diagnose scans",
+    plane: "out_of_app",
+    model: "vertex",
+    systemDirective: "External inference pool for devops — not a product persona.",
+    capabilities: ["code.diagnose", "external_llm"],
+    status: "Standby",
+    avatarBg: "bg-orange-600/20 text-orange-300 border-orange-500/30",
+  },
+];
+
+export function getOutOfAppWorkers(): AIAgent[] {
+  return OUT_OF_APP_WORKER_AGENTS.filter((a) => a.plane === "out_of_app");
+}
 
 // TimelineRecord type and initial records
 export interface TimelineRecord {

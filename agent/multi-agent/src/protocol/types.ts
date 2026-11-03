@@ -1,17 +1,22 @@
-// Shared wire contract for all agents (YHWH, Michael, Gabriel, Raphael, Metatron, Seraphim)
+// Shared wire contract for the multi-agent mesh.
+// See docs/AGENT_PLANES.md — two planes must not be mixed in product UI:
+//   out_of_app mesh workers: yhwh, michael, gabriel, raphael, metatron, seraphim
+//   in_app legal personas (backend routing only): head_counsel, paralegal, …
 // "external" is a valid envelope recipient for deliveries that leave the
 // agent mesh (e.g. Gabriel webhook fanout); it is never a valid sender.
 // "watcher" is the GitHub Actions poller (cli/watch-github) — log-only identity.
-export type AgentName =
+
+/** Out-of-app owner devops workers (not Chambers counsel). */
+export type OutOfAppWorkerName =
   | "yhwh"
   | "michael"
   | "gabriel"
   | "raphael"
   | "metatron"
-  | "seraphim"
-  | "external"
-  | "watcher"
-  // Specialized legal agent personas (routed through the hierarchy)
+  | "seraphim";
+
+/** In-app legal personas — routed through the hierarchy; UI labels live in workspace-data. */
+export type InAppLegalPersonaName =
   | "head_counsel"
   | "paralegal"
   | "rights_checker"
@@ -20,6 +25,32 @@ export type AgentName =
   | "research_counsel"
   | "court_prep"
   | "document_analyst";
+
+export type AgentName =
+  | OutOfAppWorkerName
+  | InAppLegalPersonaName
+  | "external"
+  | "watcher";
+
+export const OUT_OF_APP_WORKERS: readonly OutOfAppWorkerName[] = [
+  "yhwh",
+  "michael",
+  "gabriel",
+  "raphael",
+  "metatron",
+  "seraphim",
+] as const;
+
+export const IN_APP_LEGAL_PERSONAS: readonly InAppLegalPersonaName[] = [
+  "head_counsel",
+  "paralegal",
+  "rights_checker",
+  "timeline_spotter",
+  "charge_explainer",
+  "research_counsel",
+  "court_prep",
+  "document_analyst",
+] as const;
 
 export type SenderName = Exclude<AgentName, "external" | "watcher">;
 

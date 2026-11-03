@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Sparkles, Scale, ArrowLeft } from "lucide-react";
-import { ALL_AVAILABLE_AI_AGENTS, type AIAgent } from "@/lib/workspace-data";
+import { getInAppAgents, type AIAgent } from "@/lib/workspace-data";
 
 /**
  * 3D fluid rolodex carousel of legal AI agents / skills.
@@ -19,7 +19,8 @@ export function AgentRolodex3D({
   variant?: "page" | "overlay";
   onClose?: () => void;
 }) {
-  const roster = agents?.length ? agents : ALL_AVAILABLE_AI_AGENTS;
+  // Never surface out-of-app devops workers (YHWH/Michael/…) as litigant counsel.
+  const roster = agents?.length ? agents.filter((a) => (a.plane ?? "in_app") === "in_app") : getInAppAgents();
   const [index, setIndex] = useState(0);
   const n = roster.length;
   const active = roster[index];

@@ -7,6 +7,15 @@
 > Claim → Plan → Implement → Test → Update tracker status.  
 > Never invent work outside the tracker.
 
+## Agent planes (do not mix)
+
+| Plane | Who | Where | Purpose |
+|-------|-----|-------|---------|
+| **in_app** | Litigant-facing legal agents | Chambers, Directory, `/api/ai/lawyer` | Educational case help |
+| **out_of_app** | Owner devops workers (YHWH, Michael, Gabriel, Raphael, Metatron, Seraphim) | `agent/multi-agent/` UDS mesh, CLI, CI | Build/operate the platform |
+
+Full rules: [`docs/AGENT_PLANES.md`](docs/AGENT_PLANES.md). Never list out-of-app workers as the user's counsel.
+
 # CHAIN OF COMMAND — GOOGLE AI STUDIO MASTER BUILD INSTRUCTIONS
 
 ## 1. ROLE
