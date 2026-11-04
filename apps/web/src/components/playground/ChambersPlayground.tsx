@@ -81,7 +81,12 @@ const CANNED: Record<string, string> = {
 
 const initials = (name: string) => name.split(" ").map((w) => w[0]).slice(0, 2).join("");
 
-export function ChambersPlayground() {
+export type ChambersPlaygroundProps = {
+  /** When true, fills the parent shell instead of owning the full viewport (one app, one nav). */
+  embedded?: boolean;
+};
+
+export function ChambersPlayground({ embedded = false }: ChambersPlaygroundProps) {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [bounce, setBounce] = useState(true);
   const [view, setView] = useState<"All" | "Channels" | "Employees" | "Canvas">("All");
@@ -201,18 +206,27 @@ export function ChambersPlayground() {
   const visibleChannels = view === "Employees" ? [] : CHANNELS;
   const visibleEmployees = view === "Channels" ? [] : EMPLOYEES;
 
-  return (
-    <div className="relative flex h-screen w-full overflow-hidden pt-7" style={{ background: c.bg, color: c.onSurface, fontFamily: "DM Sans, system-ui, sans-serif" }}>
+  // Distinct section UI (swarm shell). Embedded = lives under MasterApp nav; standalone still works for deep links.
+  const rootClass = embedded
+    ? "relative flex w-full overflow-hidden pt-7 min-h-[calc(100vh-11rem)] h-[calc(100vh-11rem)]"
+    : "relative flex h-screen w-full overflow-hidden pt-7";
 
-      {/* The Wire status strip */}
+  return (
+    <div className={rootClass} style={{ background: c.bg, color: c.onSurface, fontFamily: "DM Sans, system-ui, sans-serif" }}>
+
+      {/* Section status strip — Wire is this section's face, not a second product chrome */}
       <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between gap-2 px-3 py-1.5 text-[10px] font-mono border-b" style={{ background: c.surfaceContainer, borderColor: c.cardBorder, color: c.onSurfaceVariant }}>
         <span>
           <span className="inline-block w-1.5 h-1.5 rounded-full mr-1.5 align-middle" style={{ background: wireOnline ? c.online : "#f43f5e" }} />
-          {wireNote || (wireOnline === null ? "Checking The Wire…" : wireOnline ? "The Wire connected" : "The Wire offline (demo)")}
+          {wireNote || (wireOnline === null ? "Checking swarm…" : wireOnline ? "Swarm connected" : "Swarm offline (demo)")}
         </span>
         <span className="flex gap-3">
-          <Link href="/" className="hover:underline" style={{ color: c.primary }}>Workspace</Link>
-          <Link href="/library" className="hover:underline" style={{ color: c.primary }}>Library</Link>
+          {!embedded && (
+            <>
+              <Link href="/" className="hover:underline" style={{ color: c.primary }}>Workspace</Link>
+              <Link href="/library" className="hover:underline" style={{ color: c.primary }}>Library</Link>
+            </>
+          )}
           <span style={{ color: c.outline }}>NOT LEGAL ADVICE</span>
         </span>
       </div>

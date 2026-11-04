@@ -1,12 +1,14 @@
-import { ChambersPlayground } from "@/components/playground/ChambersPlayground";
+import { ChainOfCommandMasterApp } from "@/components/ChainOfCommandMasterApp";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "AI Lawyer — The Wire | Chain of Command",
-  description: "The Wire multi-agent legal team playground — AI lawyer workspace",
+  title: "AI Lawyer | Chain of Command",
+  description:
+    "AI Legal Team section — multi-agent swarm workspace inside Chain of Command",
 };
 
-export default function Page() {
-  return <ChambersPlayground />;
+/** Alias route: same shell + AI Lawyer section as /chambers */
+export default function AiIntelligencePage() {
+  return <ChainOfCommandMasterApp initialTab="chambers" />;
 }

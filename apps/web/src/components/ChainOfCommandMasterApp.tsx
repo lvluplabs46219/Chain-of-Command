@@ -42,8 +42,9 @@ const DocketView = dynamic(
   () => import("./workspace/DocketView").then((m) => ({ default: m.DocketView })),
   { loading: viewFallback },
 );
-const ChambersView = dynamic(
-  () => import("./workspace/ChambersView").then((m) => ({ default: m.ChambersView })),
+// Multi-agent / Wire section UI — same app shell, distinct surface (AI Lawyer nav slot)
+const ChambersPlayground = dynamic(
+  () => import("./playground/ChambersPlayground").then((m) => ({ default: m.ChambersPlayground })),
   { loading: viewFallback },
 );
 const LibraryView = dynamic(
@@ -373,11 +374,7 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
         )}
 
         {activeTab === "chambers" && (
-          <ChambersView
-            agents={agents}
-            matter={activeMatter}
-            onUpdateAgent={handleUpdateAgent}
-          />
+          <ChambersPlayground embedded />
         )}
 
         {activeTab === "library" && (

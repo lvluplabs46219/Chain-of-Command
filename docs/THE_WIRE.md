@@ -1,14 +1,16 @@
 # The Wire
 
-**The Wire** is Chain of Command’s **agent playground** (out-of-app owner/devops surface and swarm shell).  
-It is **not** in-app Chambers counsel and **not** the production Michael worker daemon under `agent/multi-agent` alone — it is the interactive playground / face for the multi-agent mesh.
+**The Wire** is the multi-agent swarm **section** of Chain of Command (AI Lawyer / AI Legal Team nav slot).  
+It is not a second product and does not replace the app’s document/module navigation.
 
 | Surface | Route | Notes |
 |--------|--------|--------|
-| Swarm shell (CoC web) | `/playground`, `/chambers`, `/ai-intelligence` | Calls The Wire API; demo fallback if offline |
-| Native Wire UI host | `/wire` | Embeds daemon UI (default `:3100`) |
+| AI Lawyer section (in-app) | `/chambers`, `/playground`, `/ai-intelligence` | Same MasterApp shell + nav; mounts the swarm UI under the AI Lawyer tab |
+| Native Wire UI host | `/wire` | Embeds daemon UI (default `:3100`) — specialized section, still CoC |
 | Legacy alias | `/empyrean` | Redirects to `/wire` |
 | API rewrite | `/wire-api/*` (legacy `/empyrean-api/*`) | → `WIRE_URL` or `EMPYREAN_URL` or `http://localhost:3100` |
+
+Sections intentionally feel different (swarm vs docket vs timeline). That is one product with distinct surfaces, not separate apps.
 
 ## Run locally
 
@@ -19,10 +21,11 @@ npm run dev         # Next web on :3000
 npm run dev:all
 ```
 
-Package path remains `apps/empyrean` for now (internal folder name); **product name is The Wire only**.
+Package path remains `apps/empyrean` for now (internal folder name).
 
 ## Naming
 
-- **Use:** The Wire  
-- **Do not use in UI/docs:** Empyrean, “agent playground” as a product name without The Wire  
+- **Product / nav:** Chain of Command → AI Lawyer (or AI Legal Team)
+- **Section face / daemon:** The Wire (internal to that section)
+- **Do not** present The Wire as a competing top-level product or alternate primary nav
 - **Out-of-app workers:** Michael / Gabriel / Raphael / Metatron / Seraphim (see `docs/AGENT_PLANES.md`)
