@@ -22,6 +22,8 @@ Source of truth for UI roster:
 - `apps/web/src/lib/workspace-data.ts` → `SPECIALIST_AGENTS_ROSTER` / `getInAppAgents()`
 - `packages/agent-runtime/src/catalog.ts` → `SEED_AGENTS`
 
+**Detailed documentation:** [`docs/in-app-agents/`](./in-app-agents/)
+
 ## 2. Out-of-app agents (owner devops workers)
 
 **Audience:** you (platform owner / engineer) only.
@@ -50,6 +52,8 @@ Source of truth:
 - `agent/multi-agent/README.md`
 - `OUT_OF_APP_WORKER_AGENTS` in `workspace-data.ts` (inventory only; not UI counsel)
 
+**Detailed documentation:** [`docs/worker-agents/`](./worker-agents/)
+
 ## 3. Routing rule
 
 ```
@@ -67,3 +71,4 @@ Do **not** give in-app agents `shell.exec` or production deploy tools.
 - [x] Directory rolodex uses only in-app agents
 - [x] Protocol types separate `OutOfAppWorkerName` vs `InAppLegalPersonaName`
 - [x] AGENTS.md + multi-agent README point here
+- [x] Dedicated directories: `docs/worker-agents/` and `docs/in-app-agents/`
