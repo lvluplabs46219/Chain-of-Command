@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -19,19 +23,53 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@chain-of-command/agent-runtime": ["../../packages/agent-runtime/src/index.ts"],
-      "@chain-of-command/agent-sdk": ["../../packages/agent-sdk/src/index.ts"],
-      "@chain-of-command/legal-library": ["../../packages/legal-library/src/index.ts"],
-      "@chain-of-command/deadline-engine": ["../../packages/deadline-engine/src/index.ts"],
-      "@chain-of-command/shared": ["../../packages/shared/src/index.ts"],
-      "@chain-of-command/audit": ["../../packages/audit/src/index.ts"],
-      "@chain-of-command/model-gateway": ["../../packages/model-gateway/src/index.ts"],
-      "@chain-of-command/auth": ["../../packages/auth/src/index.ts"],
-      "@chain-of-command/rag-engine": ["../../packages/rag-engine/src/index.ts"],
-      "@chain-of-command/database": ["../../packages/database/index.ts"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@chain-of-command/agent-runtime": [
+        "../../packages/agent-runtime/src/index.ts"
+      ],
+      "@chain-of-command/agent-sdk": [
+        "../../packages/agent-sdk/src/index.ts"
+      ],
+      "@chain-of-command/legal-library": [
+        "../../packages/legal-library/src/index.ts"
+      ],
+      "@chain-of-command/deadline-engine": [
+        "../../packages/deadline-engine/src/index.ts"
+      ],
+      "@chain-of-command/shared": [
+        "../../packages/shared/src/index.ts"
+      ],
+      "@chain-of-command/audit": [
+        "../../packages/audit/src/index.ts"
+      ],
+      "@chain-of-command/model-gateway": [
+        "../../packages/model-gateway/src/index.ts"
+      ],
+      "@chain-of-command/auth": [
+        "../../packages/auth/src/index.ts"
+      ],
+      "@chain-of-command/rag-engine": [
+        "../../packages/rag-engine/src/index.ts"
+      ],
+      "@chain-of-command/database": [
+        "../../packages/database/index.ts"
+      ]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../packages/*/src/**/*.ts"],
-  "exclude": ["node_modules", "../../packages/*/src/**/__tests__/**", "**/*.test.ts", "**/*.test.tsx"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "../../packages/*/src/**/*.ts",
+    ".next/types/**/*.ts",
+    "next-env.d.ts",
+    ".next-dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "../../packages/*/src/**/__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
 }

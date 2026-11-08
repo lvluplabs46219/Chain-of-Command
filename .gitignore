@@ -179,3 +179,17 @@ Thumbs.db
 .env.runtime
 .vercel
 .env*
+
+# Local env files (never commit secrets)
+env.local
+dev.env
+*.env.local
+.env*.local
+
+# Next.js local/dev output (alternate distDir)
+.next-dev/
+apps/web/.next-dev/
+
+# Commandcode / local skill caches if not intentionally versioned
+# (keep .commandcode/skills if you want them in repo; otherwise uncomment)
+# .commandcode/

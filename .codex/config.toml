@@ -1,0 +1,131 @@
+[mcp_servers.cloudflare]
+url = "https://mcp.cloudflare.com/mcp"
+
+[mcp_servers.cloudflare-bindings]
+url = "https://bindings.mcp.cloudflare.com/mcp"
+
+[mcp_servers.cloudflare-builds]
+url = "https://builds.mcp.cloudflare.com/mcp"
+
+[mcp_servers.cloudflare-docs]
+url = "https://docs.mcp.cloudflare.com/mcp"
+
+[mcp_servers.cloudflare-observability]
+url = "https://observability.mcp.cloudflare.com/mcp"
+
+[mcp_servers.infisical-docs]
+url = "https://infisical.com/docs/mcp"
+
+[mcp_servers.MCP_DOCKER]
+command = "docker"
+args = [
+    "run",
+    "-i",
+    "--rm",
+    "mcp/gateway:latest",
+]
+
+[mcp_servers."com.supabase/mcp"]
+url = "https://mcp.supabase.com/mcp"
+
+[mcp_servers."com.vercel/vercel-mcp"]
+url = "https://mcp.vercel.com"
+
+[mcp_servers.datacloud_alloydb_remote]
+url = "https://alloydb.us-central1.rep.googleapis.com/mcp"
+
+[mcp_servers.datacloud_alloydb_remote.http_headers]
+User-Agent = "datacloud.vscode"
+
+[mcp_servers.datacloud_bigquery_remote]
+url = "https://bigquery.googleapis.com/mcp"
+
+[mcp_servers.datacloud_bigquery_remote.http_headers]
+User-Agent = "datacloud.vscode"
+
+[mcp_servers.datacloud_cloud-sql_remote]
+url = "https://sqladmin.googleapis.com/mcp"
+
+[mcp_servers.datacloud_cloud-sql_remote.http_headers]
+User-Agent = "datacloud.vscode"
+
+[mcp_servers.datacloud_dataproc_remote]
+url = "https://dataproc-us-central1.googleapis.com/mcp"
+
+[mcp_servers.datacloud_dataproc_remote.http_headers]
+User-Agent = "datacloud.vscode"
+
+[mcp_servers.datacloud_knowledge_catalog_remote]
+url = "https://dataplex.googleapis.com/mcp"
+
+[mcp_servers.datacloud_knowledge_catalog_remote.http_headers]
+User-Agent = "datacloud.vscode"
+
+[mcp_servers.datacloud_spanner_remote]
+url = "https://spanner.googleapis.com/mcp"
+
+[mcp_servers.datacloud_spanner_remote.http_headers]
+User-Agent = "datacloud.vscode"
+
+[mcp_servers.debugai]
+command = "npx"
+args = [
+    "-y",
+    "@debugai/mcp",
+]
+
+[mcp_servers.docker]
+command = "npx"
+args = ["mcp-server-docker"]
+
+[mcp_servers.everything]
+command = "npx"
+args = ["@modelcontextprotocol/server-everything"]
+
+[mcp_servers.filesystem]
+command = "npx"
+args = ["@modelcontextprotocol/server-filesystem"]
+
+[mcp_servers.hf-mcp-server]
+url = "https://huggingface.co/mcp?login"
+
+[mcp_servers."huggingface/hf-mcp-server"]
+url = "https://huggingface.co/mcp?login"
+
+[mcp_servers."io.github.ChromeDevTools/chrome-devtools-mcp"]
+command = "npx"
+args = [
+    "--registry",
+    "https://registry.npmjs.org",
+    "chrome-devtools-mcp@1.6.0",
+]
+
+[mcp_servers."io.github.github/github-mcp-server"]
+url = "https://api.githubcopilot.com/mcp/"
+
+[mcp_servers."io.github.vercel/next-devtools-mcp"]
+command = "npx"
+args = ["next-devtools-mcp@0.3.6"]
+
+[mcp_servers."io.github.wonderwhy-er/desktop-commander"]
+command = "npx"
+args = [
+    "--registry",
+    "https://registry.npmjs.org",
+    "@wonderwhy-er/desktop-commander@0.2.44",
+]
+
+[mcp_servers.memory]
+command = "npx"
+args = ["@modelcontextprotocol/server-memory"]
+
+[mcp_servers."metasploit/metasploit-mcp-server"]
+command = "node"
+args = ["/home/andrew/Downloads/metasploit-mcp-server-main/src/index.js"]
+
+[mcp_servers."microsoft/playwright-mcp"]
+command = "npx"
+args = ["@playwright/mcp@latest"]
+
+[mcp_servers.supabase]
+url = "https://mcp.supabase.com/mcp?project_ref=YOUR_PROJECT_REF&features=docs,account,database,debugging,development,functions,branching"
