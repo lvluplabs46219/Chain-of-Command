@@ -84,7 +84,7 @@
     "@google/genai": "^2.32.0",
     "@hcaptcha/react-hcaptcha": "^2.2.0",
     "@supabase/ssr": "^0.12.7",
-    "@supabase/supabase-js": "^2.116.0",
+    "@supabase/supabase-js": "^2.119.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "ai": "^7.0.159",
