@@ -21,7 +21,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
 
       - name: Reject dual lockfiles
@@ -43,11 +43,14 @@ jobs:
       - name: Security Scan (npm audit — critical)
         run: npm audit --audit-level=critical
 
+      # On push: base = previous tip (github.event.before) so the pushed
+      # range is scanned. On PR: base = default branch. Avoids BASE==HEAD
+      # which causes TruffleHog to exit 1 and skip typecheck/build.
       - name: Secret Scanning (TruffleHog)
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: ${{ github.event.repository.default_branch }}
+          base: ${{ github.event_name == 'pull_request' && github.event.repository.default_branch || github.event.before }}
           head: HEAD
           extra_args: --only-verified
 
