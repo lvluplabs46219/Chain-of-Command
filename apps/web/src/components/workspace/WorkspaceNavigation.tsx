@@ -49,7 +49,7 @@ interface WorkspaceNavigationProps {
 export const TAB_ROUTES: Record<WorkspaceTab, string> = {
   dashboard: "/",
   docket: "/docket",
-  chambers: "/chambers",
+  chambers: "/wire",
   library: "/library",
   investigations: "/investigations",
   timeline: "/timeline",

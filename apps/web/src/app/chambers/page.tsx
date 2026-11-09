@@ -1,13 +1,8 @@
-import { ChainOfCommandMasterApp } from "@/components/ChainOfCommandMasterApp";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "AI Lawyer | Chain of Command",
-  description:
-    "AI Legal Team section — multi-agent swarm workspace inside Chain of Command",
-};
-
+/** AI Lawyer tab → The Wire (Empyrean-style GenTeam playground). */
 export default function ChambersPage() {
-  return <ChainOfCommandMasterApp initialTab="chambers" />;
+  redirect("/wire");
 }
