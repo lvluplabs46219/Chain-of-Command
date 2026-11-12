@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chain-of-command.local/schemas/nft-loadout-metadata.json",
+  "title": "Counsel Lab Loadout Kit NFT Metadata",
+  "type": "object",
+  "required": ["name", "description", "image", "attributes", "properties"],
+  "properties": {
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "image": { "type": "string", "description": "ipfs:// or https:// URI" },
+    "external_url": { "type": "string" },
+    "attributes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["trait_type", "value"],
+        "properties": {
+          "trait_type": { "type": "string" },
+          "value": {}
+        }
+      }
+    },
+    "properties": {
+      "type": "object",
+      "required": ["kitId", "gearIds", "compatibleTitles", "soulbound", "chain", "version"],
+      "properties": {
+        "kitId": { "type": "string" },
+        "gearIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "compatibleTitles": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "soulbound": { "type": "boolean", "default": false },
+        "chain": { "type": "string", "const": "base" },
+        "version": { "type": "string" },
+        "skuId": { "type": "string" },
+        "official": { "type": "boolean", "default": false }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "examples": [
+    {
+      "name": "Library Set Kit #001",
+      "description": "Tradable loadout kit: law reporter, sticky tabs, expanding briefcase. Grants equip rights in Counsel Lab on Base.",
+      "image": "ipfs://bafyexample/library-set.png",
+      "attributes": [
+        { "trait_type": "Kit", "value": "library-set" },
+        { "trait_type": "Rarity", "value": "Standard" },
+        { "trait_type": "Soulbound", "value": "false" }
+      ],
+      "properties": {
+        "kitId": "library-set",
+        "gearIds": ["law-reporter", "sticky-tabs", "briefcase"],
+        "compatibleTitles": ["research-assistant", "paralegal"],
+        "soulbound": false,
+        "chain": "base",
+        "version": "1.0.0",
+        "skuId": "library-set",
+        "official": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,246 @@
+{
+  "version": "1.0.0",
+  "chain": {
+    "id": "base",
+    "paymentToken": "USDC",
+    "nftStandard": "ERC-721"
+  },
+  "slots": {
+    "primary": { "uiName": "In hand", "max": 1 },
+    "secondary": { "uiName": "On the blotter", "max": 3 },
+    "tools": { "uiName": "Desk drawer", "max": null },
+    "knowledge": { "uiName": "Briefcase", "max": null }
+  },
+  "gear": [
+    {
+      "id": "fountain-pen",
+      "name": "Fountain pen",
+      "icon": "pen-line",
+      "emoji": "🖋️",
+      "slot": ["primary", "tools"],
+      "skillIds": ["draft-docs", "scaffold"],
+      "description": "Drafts documents, memos, letters, and checklists for human review.",
+      "defaultInTitles": ["document-clerk", "paralegal"],
+      "sku": "drafting-set"
+    },
+    {
+      "id": "yellow-pad",
+      "name": "Yellow legal pad",
+      "icon": "notepad-text",
+      "emoji": "🗒️",
+      "slot": ["secondary", "tools"],
+      "skillIds": ["timeline", "fact-log"],
+      "description": "Chronology rail and numbered fact notes.",
+      "defaultInTitles": ["paralegal", "investigator", "calendar-clerk"]
+    },
+    {
+      "id": "case-file",
+      "name": "Case file folder",
+      "icon": "folder-open",
+      "emoji": "📁",
+      "slot": ["secondary", "tools"],
+      "skillIds": ["summarize-matter", "workspace-schema", "exhibit-index"],
+      "description": "Matter summary, exhibit index, workspace structure.",
+      "defaultInTitles": ["paralegal", "file-clerk", "intake-coordinator"]
+    },
+    {
+      "id": "briefcase",
+      "name": "Expanding briefcase",
+      "icon": "briefcase",
+      "emoji": "💼",
+      "slot": ["knowledge"],
+      "skillIds": ["rag", "knowledge-packs", "long-term-memory"],
+      "description": "Retrieves retained knowledge and matter memory.",
+      "sku": "library-set"
+    },
+    {
+      "id": "law-reporter",
+      "name": "Law reporter / hornbook",
+      "icon": "book-open",
+      "emoji": "📚",
+      "slot": ["primary", "knowledge"],
+      "skillIds": ["deep-research", "public-law-lookup"],
+      "description": "Grounded research and public authority lookup when available.",
+      "defaultInTitles": ["research-assistant"],
+      "sku": "library-set"
+    },
+    {
+      "id": "sticky-tabs",
+      "name": "Sticky tabs",
+      "icon": "bookmark",
+      "emoji": "🏷️",
+      "slot": ["secondary"],
+      "skillIds": ["compare-authorities", "issue-pin"],
+      "description": "Flags key passages and compares authorities.",
+      "defaultInTitles": ["research-assistant"],
+      "sku": "library-set"
+    },
+    {
+      "id": "desk-calendar",
+      "name": "Desk calendar",
+      "icon": "calendar",
+      "emoji": "📅",
+      "slot": ["tools"],
+      "skillIds": ["deadlines-info", "hearing-dates"],
+      "description": "Informational deadlines and hearing dates only.",
+      "defaultInTitles": ["paralegal", "calendar-clerk"]
+    },
+    {
+      "id": "task-stamp",
+      "name": "Task stamp",
+      "icon": "stamp",
+      "emoji": "✳️",
+      "slot": ["primary", "secondary"],
+      "skillIds": ["plan-dag", "checklists"],
+      "description": "Procedural checklists and ordered steps. Never auto-files.",
+      "defaultInTitles": ["paralegal", "intake-coordinator"]
+    },
+    {
+      "id": "rolodex",
+      "name": "Rolodex",
+      "icon": "contact-round",
+      "emoji": "🗃️",
+      "slot": ["secondary", "primary"],
+      "skillIds": ["route-agents", "roster"],
+      "description": "Routes work to specialists on the team.",
+      "defaultInTitles": ["intake-coordinator", "paralegal"]
+    },
+    {
+      "id": "speakerphone",
+      "name": "Speakerphone",
+      "icon": "phone",
+      "emoji": "📞",
+      "slot": ["primary", "tools"],
+      "skillIds": ["notify", "go-live-entry"],
+      "description": "Notifications and voice consult entry points.",
+      "defaultInTitles": ["runner"],
+      "sku": "comms-set"
+    },
+    {
+      "id": "envelope",
+      "name": "Interoffice envelope",
+      "icon": "mail",
+      "emoji": "✉️",
+      "slot": ["tools"],
+      "skillIds": ["webhook-deliver", "outbound-notify"],
+      "description": "Signed outbound delivery and fanout.",
+      "defaultInTitles": ["runner"],
+      "sku": "comms-set"
+    },
+    {
+      "id": "reading-glasses",
+      "name": "Reading glasses",
+      "icon": "scan-eye",
+      "emoji": "👓",
+      "slot": ["secondary", "tools"],
+      "skillIds": ["lint-fix", "review-pass"],
+      "description": "Consistency and review passes on drafts.",
+      "defaultInTitles": ["document-clerk", "research-assistant"]
+    },
+    {
+      "id": "lockbox",
+      "name": "Lockbox",
+      "icon": "lock",
+      "emoji": "🔒",
+      "slot": ["tools", "secondary"],
+      "skillIds": ["matter-isolation", "redaction-helpers"],
+      "description": "Confidentiality scope and basic redaction helpers.",
+      "defaultInTitles": ["investigator", "file-clerk"]
+    },
+    {
+      "id": "circuit-binder",
+      "name": "Circuit binder",
+      "icon": "book-marked",
+      "emoji": "📒",
+      "slot": ["primary"],
+      "skillIds": ["explain-tx", "read-chain"],
+      "description": "Explains on-chain activity; never signs or sends value.",
+      "defaultInTitles": ["web3-ops-aide"],
+      "sku": "crypto-pouch"
+    },
+    {
+      "id": "ledger-viewer",
+      "name": "Ledger viewer",
+      "icon": "scroll-text",
+      "emoji": "🧾",
+      "slot": ["tools"],
+      "skillIds": ["rpc-read", "address-book"],
+      "description": "Read-only chain log and labels.",
+      "defaultInTitles": ["web3-ops-aide"],
+      "sku": "crypto-pouch"
+    },
+    {
+      "id": "wallet-checklist",
+      "name": "Wallet checklist",
+      "icon": "badge",
+      "emoji": "🪪",
+      "slot": ["secondary", "knowledge"],
+      "skillIds": ["wallet-safety"],
+      "description": "Safety checklist only; no signing.",
+      "sku": "crypto-pouch"
+    }
+  ],
+  "prefabAgents": [
+    {
+      "id": "paralegal",
+      "title": "Paralegal",
+      "defaultLoadout": {
+        "primary": "task-stamp",
+        "secondary": ["yellow-pad", "case-file", "rolodex"],
+        "tools": ["desk-calendar"],
+        "knowledge": []
+      }
+    },
+    {
+      "id": "research-assistant",
+      "title": "Research assistant",
+      "defaultLoadout": {
+        "primary": "law-reporter",
+        "secondary": ["sticky-tabs", "reading-glasses"],
+        "tools": [],
+        "knowledge": ["briefcase"]
+      }
+    },
+    {
+      "id": "document-clerk",
+      "title": "Document clerk",
+      "defaultLoadout": {
+        "primary": "fountain-pen",
+        "secondary": ["reading-glasses", "case-file"],
+        "tools": [],
+        "knowledge": []
+      }
+    },
+    {
+      "id": "runner",
+      "title": "Runner / messenger",
+      "defaultLoadout": {
+        "primary": "speakerphone",
+        "secondary": ["envelope"],
+        "tools": [],
+        "knowledge": []
+      }
+    },
+    {
+      "id": "web3-ops-aide",
+      "title": "Web3 ops aide",
+      "defaultLoadout": {
+        "primary": "circuit-binder",
+        "secondary": ["reading-glasses", "lockbox"],
+        "tools": ["ledger-viewer"],
+        "knowledge": ["wallet-checklist"]
+      }
+    }
+  ],
+  "skus": [
+    { "id": "team-free", "name": "Team Free", "priceUsdc": 0, "interval": null },
+    { "id": "team-pro", "name": "Team Pro", "priceUsdc": 29, "interval": "month" },
+    { "id": "drafting-set", "name": "Drafting Set", "priceUsdc": 12, "interval": "month" },
+    { "id": "library-set", "name": "Library Set", "priceUsdc": 24, "interval": "month" },
+    { "id": "comms-set", "name": "Comms Set", "priceUsdc": 9, "interval": "month" },
+    { "id": "crypto-pouch", "name": "Crypto Pouch", "priceUsdc": 15, "interval": "month" },
+    { "id": "criminal-procedure-pack", "name": "Criminal Procedure Pack", "priceUsdc": 18, "interval": "month", "requiresVerificationStamp": true },
+    { "id": "creator", "name": "Creator", "priceUsdc": 19, "interval": "month" },
+    { "id": "team-seat", "name": "Team Seat", "priceUsdc": 18, "interval": "month" }
+  ]
+}
