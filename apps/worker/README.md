@@ -1,9 +1,10 @@
-# Chain of Command — Cloudflare Worker + Hyperdrive
+# Chain of Command — Cloudflare Worker + Hyperdrive (PlanetScale)
 
-Edge worker that queries Postgres through **Cloudflare Hyperdrive**.
+Primary app storage and RAG path: **PlanetScale Postgres** via **Cloudflare Hyperdrive**.
+Supabase is being phased down to edge functions only where still needed.
 
 Hyperdrive config ID: `307dadda67a042b886fc4241492aac4f`  
-Intended origin: PlanetScale Postgres (`chain-of-command` / `aws-us-east-1-2.pg.psdb.cloud`)
+Origin host: `aws-us-east-1-2.pg.psdb.cloud` (PlanetScale Postgres)
 
 ## Setup
 
@@ -12,41 +13,72 @@ cd apps/worker
 npm install
 ```
 
-### 1. Point Hyperdrive at PlanetScale
+### 1. Hyperdrive origin
 
-In Cloudflare dashboard → Hyperdrive → this config, set the origin to your PlanetScale role connection string:
-
-```text
-postgresql://postgres.<BRANCH_ID>:<PASSWORD>@aws-us-east-1-2.pg.psdb.cloud:5432/postgres?sslmode=require
-```
-
-Or via CLI (after creating a PlanetScale role):
+Credentials live in the Cloudflare Hyperdrive config (dashboard or CLI), **not** in git.
 
 ```bash
 npx wrangler hyperdrive update 307dadda67a042b886fc4241492aac4f \
-  --connection-string "postgresql://USER:PASSWORD@HOST:5432/postgres?sslmode=require"
+  --connection-string "postgresql://USER:PASSWORD@aws-us-east-1-2.pg.psdb.cloud:5432/postgres?sslmode=require"
 ```
 
-### 2. Local dev
+### 2. Apply schema (once)
+
+Run against PlanetScale (psql, PlanetScale console, or any client):
+
+```bash
+psql "$PLANETSCALE_URL" -f sql/001_entitlements_gear_knowledge_packs.sql
+```
+
+### 3. Local / deploy
 
 ```bash
 npm run dev
-```
-
-### 3. Deploy
-
-```bash
 npm run deploy
 ```
 
 ## Endpoints
 
-| Path | Description |
-|------|-------------|
-| `/health` | Liveness (no DB) |
-| `/` or `/tables` | List public tables |
-| `/size` | Table sizes (top 20) |
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/health` | Liveness (no DB) |
+| GET | `/` or `/tables` | List public tables |
+| GET | `/size` | Table sizes |
+| POST | `/equip` | Equip gear (server-side entitlement check) |
+| POST | `/checkout` | Base USDC payment record → entitlement grant |
+| GET | `/entitlements?subjectType=&subjectId=` | List active grants |
+| GET | `/loadout?agentInstanceId=` | Current agent loadout |
 
-## Note on migration
+### Example: equip
 
-This worker only **connects**. Data still lives on Supabase until you run `pg_dump` → `pg_restore` into PlanetScale.
+```bash
+curl -X POST "$WORKER_URL/equip" -H 'content-type: application/json' -d '{
+  "agentInstanceId": "inst-1",
+  "agentTitleId": "paralegal",
+  "slot": "primary",
+  "gearId": "task-stamp",
+  "subjectType": "wallet",
+  "subjectId": "0xabc..."
+}'
+```
+
+### Example: checkout
+
+```bash
+curl -X POST "$WORKER_URL/checkout" -H 'content-type: application/json' -d '{
+  "subjectType": "wallet",
+  "subjectId": "0xabc...",
+  "skuId": "library-set",
+  "amountUsdc": 24,
+  "txHash": "0x...",
+  "durationDays": 30
+}'
+```
+
+## Architecture notes
+
+- **AuthZ**: enforced in the Worker (subject_id on requests). No Supabase RLS.
+- **Equip**: never trust client-only wallet state; always check `entitlements` (or free baseline gear list).
+- **Checkout**: production must verify Base USDC tx to treasury before `confirmed`.
+- **gearCatalog**: still `packages/shared/src/gearCatalog.json` for UI chips and SKUs.
+- **Knowledge packs**: require `version`, `source`, `last_reviewed`, `verification_stamp` before selling jurisdiction packs.
