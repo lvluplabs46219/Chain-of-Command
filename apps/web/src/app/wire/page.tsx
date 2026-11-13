@@ -4,12 +4,12 @@ import { WirePlaygroundHost } from "@/components/wire/WirePlaygroundHost";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "The Wire — Agent Playground | Chain of Command",
+  title: "The Wire — Counsel Lab | Chain of Command",
   description:
-    "Full multi-agent playground UI (Candy GenTeam shell). Same surface that shipped as the Empyrean-style dashboard — channels, swarm, light/dark.",
+    "Native multi-agent playground on the same origin as Chain of Command: directory, retain counsel, channels, loadouts, and chat. No iframe to :3100.",
 };
 
-/** Product place: The Wire. Visual shell = native daemon UI on :3100 (Empyrean-style GenTeam). */
+/** The Wire lives on :3000 inside the main app — not a separate daemon UI. */
 export default function WirePage() {
   return <WirePlaygroundHost />;
 }

@@ -206,7 +206,7 @@ export function ChainOfCommandMasterApp({ initialTab = "dashboard" }: ChainOfCom
 
   if (authLoading || !dataReady) {
     return (
-      <div className="min-h-screen bg-[#0C0D10] flex items-center justify-center text-neutral-400 text-sm">
+      <div className="min-h-screen bg-[#fff7fb] flex items-center justify-center text-[#57414a] text-sm font-sans">
         Preparing your workspace…
       </div>
     );

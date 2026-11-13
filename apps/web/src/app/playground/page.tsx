@@ -1,14 +1,8 @@
-import { ChainOfCommandMasterApp } from "@/components/ChainOfCommandMasterApp";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "AI Lawyer | Chain of Command",
-  description:
-    "AI Legal Team section — multi-agent swarm workspace inside Chain of Command",
-};
-
-/** Alias route: same shell + AI Lawyer section as /chambers */
+/** Legacy AI Lawyer alias → The Wire (single playground surface). */
 export default function PlaygroundPage() {
-  return <ChainOfCommandMasterApp initialTab="chambers" />;
+  redirect("/wire");
 }

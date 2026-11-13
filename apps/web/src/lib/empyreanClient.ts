@@ -1,20 +1,22 @@
 /**
- * The Wire multi-agent playground client.
- * Browser calls same-origin /wire-api/* (legacy: /empyrean-api/*) which Next rewrites
- * to WIRE_URL / EMPYREAN_URL (default :3100).
+ * The Wire client — same-origin Next routes under /api/wire/*
+ * (No dependency on :3100 daemon for the playground UI.)
  */
 
-const BASE = "/wire-api";
+const BASE = "/api/wire";
 
 export type WireAgent = {
   id: string;
+  displayName?: string;
   name?: string;
+  roleTitle?: string;
   role?: string;
   status?: string;
+  retained?: boolean;
   [key: string]: unknown;
 };
 
-/** @deprecated Use WireAgent — Empyrean was renamed to The Wire */
+/** @deprecated Use WireAgent */
 export type EmpyreanAgent = WireAgent;
 
 export type WireMessage = {
@@ -59,7 +61,7 @@ export async function wireListAgents(): Promise<WireAgent[]> {
 export const empyreanListAgents = wireListAgents;
 
 export async function wireListMessages(chatId: string): Promise<WireMessage[]> {
-  const res = await fetch(`${BASE}/chats/${encodeURIComponent(chatId)}/messages`, { cache: "no-store" });
+  const res = await fetch(`${BASE}/messages?chatId=${encodeURIComponent(chatId)}`, { cache: "no-store" });
   const data = await parseJson<WireMessage[] | { messages?: WireMessage[] }>(res);
   return Array.isArray(data) ? data : data.messages ?? [];
 }
@@ -67,12 +69,11 @@ export async function wireListMessages(chatId: string): Promise<WireMessage[]> {
 /** @deprecated Use wireListMessages */
 export const empyreanListMessages = wireListMessages;
 
-/** Post a user message into a Wire channel / swarm chat. */
 export async function wireSendMessage(chatId: string, text: string): Promise<{ ok: boolean; raw?: unknown }> {
-  const res = await fetch(`${BASE}/chats/${encodeURIComponent(chatId)}/messages`, {
+  const res = await fetch(`${BASE}/messages`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({ chatId, text }),
   });
   if (!res.ok) throw new Error(`The Wire send failed (${res.status})`);
   try {
@@ -89,17 +90,8 @@ export async function wireDirective(
   text: string,
   meta?: Record<string, unknown>,
 ): Promise<{ ok: boolean; raw?: unknown }> {
-  const res = await fetch(`${BASE}/directive`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text, ...(meta ?? {}) }),
-  });
-  if (!res.ok) throw new Error(`The Wire directive failed (${res.status})`);
-  try {
-    return { ok: true, raw: await res.json() };
-  } catch {
-    return { ok: true };
-  }
+  // Directive maps to swarm message in same-origin mode
+  return wireSendMessage("general-swarm", text);
 }
 
 /** @deprecated Use wireDirective */
