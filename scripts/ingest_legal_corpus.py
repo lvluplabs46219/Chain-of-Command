@@ -4,22 +4,21 @@ Ingest statutes/opinions into public.legal_corpus with 1536-d embeddings.
 
 Chunks by section / holding (not whole PDFs).
 
+Primary backend: PlanetScale Postgres via DATABASE_URL.
+Legacy fallback: Supabase REST (SUPABASE_URL + service role).
+
 Usage:
-  export SUPABASE_URL="https://YOUR_PROJECT.supabase.co"
-  export OPENAI_API_KEY  # required — os.getenv / shell env; never hardcode
-  export SUPABASE_SERVICE_ROLE_KEY  # from Infisical / Vercel / secret store — never commit
+  export DATABASE_URL  # PlanetScale — from Infisical only; never commit
+  export OPENAI_API_KEY
 
-  # Seed CA PC + FRCP from bundled JSONL
   python scripts/ingest_legal_corpus.py --seed
-
-  # Custom JSONL (one object per line)
   python scripts/ingest_legal_corpus.py data/legal_corpus/seed_ca_pc_frcp.jsonl
-
-  # Optional CourtListener opinions (requires COURTLISTENER_TOKEN)
   python scripts/ingest_legal_corpus.py --courtlistener --query "Fourth Amendment" --pages 2
 
 Env:
-  OPENAI_API_KEY, SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL), SUPABASE_SERVICE_ROLE_KEY
+  OPENAI_API_KEY (required)
+  DATABASE_URL or PLANETSCALE_DATABASE_URL (preferred)
+  SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (fallback only)
   COURTLISTENER_TOKEN (optional)
   OPENAI_EMBED_MODEL (default text-embedding-3-small)
 """
@@ -105,7 +104,50 @@ def embed(text: str, api_key: str, model: str) -> list[float]:
     return data["data"][0]["embedding"]
 
 
-def upsert_row(supabase_url: str, service_key: str, row: dict[str, Any]) -> None:
+def upsert_row_postgres(database_url: str, row: dict[str, Any]) -> None:
+    """Upsert into public.legal_corpus on PlanetScale / any Postgres (DATABASE_URL)."""
+    try:
+        import psycopg
+    except ImportError as e:
+        raise SystemExit(
+            "psycopg is required for DATABASE_URL ingest. pip install 'psycopg[binary]'"
+        ) from e
+
+    emb = row["embedding"]
+    if isinstance(emb, list):
+        emb_literal = "[" + ",".join(str(float(x)) for x in emb) + "]"
+    else:
+        emb_literal = str(emb)
+
+    sql = """
+    INSERT INTO public.legal_corpus
+      (jurisdiction, source_type, citation, title, content, embedding)
+    VALUES (%s, %s, %s, %s, %s, %s::vector)
+    ON CONFLICT (jurisdiction, citation)
+    DO UPDATE SET
+      source_type = EXCLUDED.source_type,
+      title = EXCLUDED.title,
+      content = EXCLUDED.content,
+      embedding = EXCLUDED.embedding
+    """
+    with psycopg.connect(database_url) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                sql,
+                (
+                    row["jurisdiction"],
+                    row["source_type"],
+                    row["citation"],
+                    row["title"],
+                    row["content"],
+                    emb_literal,
+                ),
+            )
+        conn.commit()
+
+
+def upsert_row_supabase(supabase_url: str, service_key: str, row: dict[str, Any]) -> None:
+    """Legacy REST upsert (only if DATABASE_URL is unset)."""
     url = f"{supabase_url.rstrip('/')}/rest/v1/legal_corpus?on_conflict=jurisdiction,citation"
     body = json.dumps([row]).encode("utf-8")
     req = urllib.request.Request(
@@ -195,31 +237,38 @@ def fetch_courtlistener(query: str, pages: int, token: str) -> list[dict[str, An
 
 def ingest(rows: list[dict[str, Any]]) -> int:
     openai_key = env("OPENAI_API_KEY")
+    database_url = env("DATABASE_URL", "PLANETSCALE_DATABASE_URL")
     supabase_url = env("SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL")
     service_key = env("SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_SERVICE_KEY")
     model = env("OPENAI_EMBED_MODEL") or "text-embedding-3-small"
-    if not openai_key or not supabase_url or not service_key:
+    if not openai_key:
+        raise SystemExit("Need OPENAI_API_KEY")
+    if not database_url and not (supabase_url and service_key):
         raise SystemExit(
-            "Need OPENAI_API_KEY, SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL), SUPABASE_SERVICE_ROLE_KEY"
+            "Need DATABASE_URL (PlanetScale Postgres preferred) "
+            "or SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY fallback"
         )
+
+    backend = "planetscale_postgres" if database_url else "supabase_rest"
+    print(f"ingest backend={backend}")
 
     expanded = expand_chunks(rows)
     print(f"rows={len(rows)} chunks={len(expanded)}")
     ok = 0
     for row in expanded:
         emb = embed(f"{row['citation']}\n{row['title']}\n{row['content']}", openai_key, model)
-        upsert_row(
-            supabase_url,
-            service_key,
-            {
-                "jurisdiction": row["jurisdiction"],
-                "source_type": row["source_type"],
-                "citation": row["citation"],
-                "title": row["title"],
-                "content": row["content"],
-                "embedding": emb,
-            },
-        )
+        payload = {
+            "jurisdiction": row["jurisdiction"],
+            "source_type": row["source_type"],
+            "citation": row["citation"],
+            "title": row["title"],
+            "content": row["content"],
+            "embedding": emb,
+        }
+        if database_url:
+            upsert_row_postgres(database_url, payload)
+        else:
+            upsert_row_supabase(supabase_url, service_key, payload)
         ok += 1
         print("upserted", row["jurisdiction"], row["citation"])
         time.sleep(0.15)

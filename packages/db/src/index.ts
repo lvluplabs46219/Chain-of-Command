@@ -262,12 +262,16 @@ function createChainableQuery(defaultResult: any = []): any {
 
 try {
   if (dbUrl) {
-    pool = new Pool({ 
+    const needsSsl =
+      /psdb\.cloud|planetscale|supabase\.co|sslmode=require|sslmode=verify/i.test(dbUrl) ||
+      process.env.NODE_ENV === "production";
+    pool = new Pool({
       connectionString: dbUrl,
-      ssl: dbUrl.includes("supabase.co") || process.env.NODE_ENV === "production" ? { rejectUnauthorized: process.env.NODE_ENV === "production" } : undefined,
+      // PlanetScale / managed Postgres: TLS on; CA via system store when sslmode=verify-full in URL
+      ssl: needsSsl ? { rejectUnauthorized: true } : undefined,
       max: 20,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 5000
+      connectionTimeoutMillis: 10000,
     });
     
     pool.on('error', (err: Error) => {
