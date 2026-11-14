@@ -28,7 +28,15 @@ export type AuditAction =
   | 'data.export'
   | 'data.delete'
   | 'security.denied'
-  | 'security.injection_flagged';
+  | 'security.injection_flagged'
+  // Source verification protocol (docs/SOURCE_VERIFICATION_PROTOCOL.md)
+  | 'verification.ingest_accepted'
+  | 'verification.ingest_quarantined'
+  | 'verification.source_checked'
+  | 'verification.approved'
+  | 'verification.rejected'
+  | 'verification.claim_unverified'
+  | 'verification.challenge';
 
 export interface AuditEvent {
   id: string;

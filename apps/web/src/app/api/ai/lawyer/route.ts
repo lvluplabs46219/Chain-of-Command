@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
+import { claimsFromCitationStrings } from "@chain-of-command/legal-library";
 
 export const dynamic = "force-dynamic";
 
@@ -535,10 +536,22 @@ This information is provided for educational and procedural purposes only and do
       }
     }
 
+    const claimBundle = claimsFromCitationStrings(generatedText, citations, {
+      jurisdiction,
+      generationMethod: usedTemplateFallback ? "template" : usedLiveModel ? "model" : "template",
+    });
+
     return NextResponse.json({
       success: true,
       text: generatedText,
       citations,
+      /** Claim-level source verification (docs/SOURCE_VERIFICATION_PROTOCOL.md) */
+      claims: claimBundle.claims,
+      claimBundle: {
+        verificationStatus: claimBundle.verificationStatus,
+        generationMethod: claimBundle.generationMethod,
+        lastVerifiedAt: claimBundle.lastVerifiedAt ?? null,
+      },
       agentRole,
       runId: `run-${Date.now()}`,
       verified: usedLiveModel && !usedTemplateFallback,
@@ -549,7 +562,7 @@ This information is provided for educational and procedural purposes only and do
         citationsCount: citations.length,
         note: usedTemplateFallback
           ? "No live model available; educational template only — verify all citations."
-          : undefined,
+          : "Citations mapped to ClaimObject sources; not yet re-fetched against primary corpus.",
       },
       disclaimer: "This information is provided for educational and procedural purposes only and does not constitute legal advice.",
       humanReviewRequired: true,
